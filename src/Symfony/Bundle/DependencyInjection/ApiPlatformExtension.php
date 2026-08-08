@@ -24,6 +24,8 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
 use ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface as OrmLinksHandlerInterface;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
+use ApiPlatform\Meilisearch\Extension\RequestParametersCollectionExtensionInterface as MeilisearchRequestParametersCollectionExtensionInterface;
+use ApiPlatform\Meilisearch\Filter\FilterInterface as MeilisearchFilterInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Executor;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
@@ -198,6 +200,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMercureConfiguration($container, $config, $loader);
         $this->registerMessengerConfiguration($container, $config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
+        $this->registerMeilisearchConfiguration($container, $config, $loader);
         $this->registerSecurityConfiguration($container, $config, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
@@ -1048,6 +1051,31 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.elasticsearch.ssl_ca_bundle', $config['elasticsearch']['ssl_ca_bundle']);
         $container->setParameter('api_platform.elasticsearch.ssl_verification', $config['elasticsearch']['ssl_verification']);
         $loader->load('elasticsearch.php');
+    }
+
+    private function registerMeilisearchConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
+    {
+        $enabled = $this->isConfigEnabled($container, $config['meilisearch']);
+
+        $container->setParameter('api_platform.meilisearch.enabled', $enabled);
+
+        if (!$enabled) {
+            return;
+        }
+
+        if (!InstalledVersions::isInstalled('api-platform/meilisearch')) {
+            throw new \LogicException('Meilisearch support cannot be enabled as the Meilisearch component is not installed. Try running "composer require api-platform/meilisearch".');
+        }
+
+        $clientDefinition = new Definition(\Meilisearch\Client::class);
+        $clientDefinition->setArguments([$config['meilisearch']['url'], $config['meilisearch']['api_key']]);
+        $container->setDefinition('api_platform.meilisearch.client', $clientDefinition);
+        $container->registerForAutoconfiguration(MeilisearchRequestParametersCollectionExtensionInterface::class)
+            ->addTag('api_platform.meilisearch.request_parameters_extension.collection');
+        $container->registerForAutoconfiguration(MeilisearchFilterInterface::class)
+            ->addTag('api_platform.meilisearch.filter');
+        $container->setParameter('api_platform.meilisearch.url', $config['meilisearch']['url']);
+        $loader->load('meilisearch.php');
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
