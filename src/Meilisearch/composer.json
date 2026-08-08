@@ -22,7 +22,7 @@
         "api-platform/metadata": "^4.2 || ^5.0@alpha",
         "api-platform/serializer": "^4.2 || ^5.0@alpha",
         "api-platform/state": "^4.2 || ^5.0@alpha",
-        "meilisearch/meilisearch-php": "^2.0",
+        "meilisearch/meilisearch-php": "dev-main",
         "psr/container": "^1.1 || ^2.0",
         "symfony/serializer": "^6.4 || ^7.4 || ^8.0"
     },
