@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Meilisearch\Filter;
 
+use ApiPlatform\Metadata\FilterInterface as BaseFilterInterface;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -21,8 +22,14 @@ use ApiPlatform\Metadata\Operation;
  * `filter` expression fragments (see FilterExtension) -- simpler than
  * Elasticsearch's bool/must JSON-tree merging, since Meilisearch's filter
  * syntax is a single flat expression string.
+ *
+ * Extends the core FilterInterface (still required by
+ * ParameterValidationResourceMetadataCollectionFactory for `filters:`-
+ * referenced services as of 5.0-alpha, despite getDescription() itself
+ * being marked @deprecated there since 4.2) so filters declared this way
+ * satisfy both contracts.
  */
-interface FilterInterface
+interface FilterInterface extends BaseFilterInterface
 {
     /**
      * @param array<string, mixed> $parameters

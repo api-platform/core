@@ -39,6 +39,32 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDescription(string $resourceClass): array
+    {
+        $description = [];
+
+        foreach ($this->getProperties($resourceClass) as $property) {
+            $description[$property] = [
+                'property' => $property,
+                'type' => 'string',
+                'required' => false,
+                'is_collection' => false,
+            ];
+
+            $description[$property.'[]'] = [
+                'property' => $property,
+                'type' => 'string',
+                'required' => false,
+                'is_collection' => true,
+            ];
+        }
+
+        return $description;
+    }
+
+    /**
      * Quotes a value for use inside a Meilisearch filter expression.
      */
     protected function quote(mixed $value): string
