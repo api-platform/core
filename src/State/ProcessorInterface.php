@@ -37,6 +37,8 @@ interface ProcessorInterface
      *
      * @psalm-param array{request?: Request, previous_data?: mixed, resource_class?: string|null, original_data?: mixed, ...<string, mixed>} $context
      *
+     * @throws \Throwable
+     *
      * @return T2
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []);
