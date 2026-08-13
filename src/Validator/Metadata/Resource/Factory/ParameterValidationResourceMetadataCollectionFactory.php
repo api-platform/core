@@ -152,8 +152,14 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
     {
         $parameters = [];
 
-        foreach ($this->defaultParameters as $parameterClass => $config) {
-            if (!is_subclass_of($parameterClass, Parameter::class)) {
+        foreach ($this->defaultParameters as $entryName => $config) {
+            if (!\is_array($config)) {
+                continue;
+            }
+
+            $parameterClass = $config['class'] ?? $entryName;
+
+            if (!\is_string($parameterClass) || !is_subclass_of($parameterClass, Parameter::class)) {
                 continue;
             }
 

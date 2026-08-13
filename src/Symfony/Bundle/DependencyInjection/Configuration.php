@@ -705,7 +705,13 @@ final class Configuration implements ConfigurationInterface
                     ->info('Global parameters applied to all resources and operations.')
                     ->useAttributeAsKey('parameter_class')
                     ->prototype('array')
-                        ->ignoreExtraKeys(false);
+                        ->ignoreExtraKeys(false)
+                        ->children()
+                            ->scalarNode('class')
+                                ->cannotBeEmpty()
+                                ->info('The parameter class for a named global parameter entry.')
+                            ->end()
+                        ->end();
 
         $this->defineDefault($parametersNode, new \ReflectionClass(Parameter::class), $nameConverter);
 
