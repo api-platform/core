@@ -19,9 +19,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
             -   name: Setup PHP with pre-release PECL extension
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
                 with:
                     php-version: 8.2
                     tools: pecl, composer:2.9.8
@@ -39,7 +39,7 @@ jobs:
                     composer global config --no-plugins allow-plugins.symfony/runtime true
                     composer global require php-documentation-generator/php-documentation-generator:dev-main
             -   name: Cache dependencies
-                uses: actions/cache@v5
+                uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
                 with:
                     path: ${{ steps.composercache.outputs.dir }}
                     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}

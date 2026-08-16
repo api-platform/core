@@ -23,13 +23,13 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.API_PLATFORM_APP_ID }}
           private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           token: ${{ steps.generate_token.outputs.token }}
           fetch-depth: 0
@@ -56,7 +56,7 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.API_PLATFORM_APP_ID }}
           private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.API_PLATFORM_APP_ID }}
           private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
