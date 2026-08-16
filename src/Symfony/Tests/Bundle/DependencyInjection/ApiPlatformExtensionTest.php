@@ -119,12 +119,20 @@ class ApiPlatformExtensionTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->container = $this->createContainer([
+            'DoctrineBundle' => DoctrineBundle::class,
+            'SecurityBundle' => SecurityBundle::class,
+            'TwigBundle' => TwigBundle::class,
+        ]);
+    }
+
+    /**
+     * @param array<string, class-string> $bundles
+     */
+    private function createContainer(array $bundles): ContainerBuilder
+    {
         $containerParameterBag = new ParameterBag([
-            'kernel.bundles' => [
-                'DoctrineBundle' => DoctrineBundle::class,
-                'SecurityBundle' => SecurityBundle::class,
-                'TwigBundle' => TwigBundle::class,
-            ],
+            'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => [
                 'TestBundle' => [
                     'parent' => null,
@@ -137,7 +145,7 @@ class ApiPlatformExtensionTest extends TestCase
             'kernel.environment' => 'test',
         ]);
 
-        $this->container = new ContainerBuilder($containerParameterBag);
+        return new ContainerBuilder($containerParameterBag);
     }
 
     private function assertContainerHas(array $services, array $aliases = []): void
@@ -368,6 +376,55 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHas($services, $aliases);
         $this->container->hasParameter('api_platform.swagger.http_auth');
+    }
+
+    public function testMcpProviderChainIsSecuredAndValidatedWithSecurityBundle(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['use_symfony_listeners'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.mcp.handler');
+
+        foreach ([
+            'api_platform.mcp.state_provider.access_checker',
+            'api_platform.mcp.state_provider.access_checker.pre_read',
+            'api_platform.mcp.state_provider.access_checker.post_deserialize',
+            'api_platform.mcp.state_provider.access_checker.post_validate',
+            'api_platform.mcp.state_provider.security_parameter',
+            'api_platform.mcp.state_provider.validate',
+            'api_platform.mcp.state_provider.parameter_validator',
+        ] as $service) {
+            $this->assertContainerHasService($service);
+        }
+    }
+
+    public function testMcpProviderChainIsNotSecuredWithoutSecurityBundle(): void
+    {
+        $this->container = $this->createContainer([
+            'DoctrineBundle' => DoctrineBundle::class,
+            'TwigBundle' => TwigBundle::class,
+        ]);
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['use_symfony_listeners'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.mcp.handler');
+        $this->assertNotContainerHasService('api_platform.state_provider.access_checker');
+
+        foreach ([
+            'api_platform.mcp.state_provider.access_checker',
+            'api_platform.mcp.state_provider.access_checker.pre_read',
+            'api_platform.mcp.state_provider.access_checker.post_deserialize',
+            'api_platform.mcp.state_provider.access_checker.post_validate',
+            'api_platform.mcp.state_provider.security_parameter',
+        ] as $service) {
+            $this->assertNotContainerHasService($service);
+        }
+
+        $this->assertContainerHasService('api_platform.mcp.state_provider.validate');
+        $this->assertContainerHasService('api_platform.mcp.state_provider.parameter_validator');
     }
 
     public function testItRegistersMetadataConfiguration(): void
