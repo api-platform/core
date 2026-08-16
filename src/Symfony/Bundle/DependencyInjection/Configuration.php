@@ -476,10 +476,8 @@ final class Configuration implements ConfigurationInterface
                                 ->ifTrue()
                                 ->then(static function (bool $v): bool {
                                     if (
-                                        // ES v7
-                                        !class_exists(\Elasticsearch\Client::class)
                                         // ES v8 and up
-                                        && !class_exists(\Elastic\Elasticsearch\Client::class)
+                                        !class_exists(\Elastic\Elasticsearch\Client::class)
                                         // OpenSearch
                                         && !class_exists(\OpenSearch\Client::class)
                                     ) {
@@ -518,6 +516,15 @@ final class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                         ->end()
+                        ->enumNode('query_language')
+                            ->values(['dsl', 'esql'])
+                            ->defaultValue('dsl')
+                            ->info('The default query language used by collection operations: "dsl" (the classic _search Query DSL) or "esql" (ES|QL, requires Elasticsearch >= 8.14; partial pagination only, no "nested" field support). Can be overridden per operation with the "queryLanguage" state option.')
+                        ->end()
+                    ->end()
+                    ->validate()
+                        ->ifTrue(static fn (array $v): bool => ($v['enabled'] ?? false) && 'opensearch' === $v['client'] && 'esql' === $v['query_language'])
+                        ->thenInvalid('ES|QL (api_platform.elasticsearch.query_language: "esql") is not supported by OpenSearch.')
                     ->end()
                 ->end()
             ->end();

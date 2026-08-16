@@ -24,8 +24,6 @@ use ApiPlatform\State\ProviderInterface;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
-use Elasticsearch\Client as V7Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception as V7Missing404Exception;
 use OpenSearch\Client as OpenSearchClient;
 use OpenSearch\Common\Exceptions\Missing404Exception as OpenSearchMissing404Exception;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -42,7 +40,7 @@ final class CollectionProvider implements ProviderInterface
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
     public function __construct(
-        private readonly V7Client|Client|OpenSearchClient $client, // @phpstan-ignore-line
+        private readonly Client|OpenSearchClient $client, // @phpstan-ignore-line
         private readonly ?DenormalizerInterface $denormalizer = null,
         private readonly ?Pagination $pagination = null,
         private readonly iterable $collectionExtensions = [],
@@ -78,7 +76,7 @@ final class CollectionProvider implements ProviderInterface
 
         try {
             $documents = $this->client->search($params); // @phpstan-ignore-line
-        } catch (V7Missing404Exception|OpenSearchMissing404Exception $e) { // @phpstan-ignore-line
+        } catch (OpenSearchMissing404Exception $e) { // @phpstan-ignore-line
             throw new Error(status: $e->getCode(), detail: $e->getMessage(), title: $e->getMessage(), originalTrace: $e->getTrace()); // @phpstan-ignore-line
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();

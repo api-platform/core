@@ -27,7 +27,7 @@
         "api-platform/metadata": "^5.0@alpha",
         "api-platform/serializer": "^5.0@alpha",
         "api-platform/state": "^5.0@alpha",
-        "elasticsearch/elasticsearch": "^7.17 || ^8.4 || ^9.0",
+        "elasticsearch/elasticsearch": "^8.11 || ^9.0",
         "symfony/cache": "^7.4 || ^8.0",
         "symfony/console": "^7.4 || ^8.0",
         "symfony/property-access": "^7.4 || ^8.0",
@@ -81,5 +81,8 @@
         "test": "./vendor/bin/phpunit"
     },
     "minimum-stability": "beta",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "conflict": {
+        "psr/http-factory": "<1.0.2"
+    }
 }

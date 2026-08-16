@@ -41,21 +41,12 @@ final class ElasticsearchClientPass implements CompilerPassInterface
 
         if ('opensearch' === $container->getParameter('api_platform.elasticsearch.client')) {
             $builderName = \OpenSearch\ClientBuilder::class; // @phpstan-ignore class.notFound
-        } elseif (class_exists(\Elasticsearch\ClientBuilder::class)) {
-            // ES v7
-            $builderName = \Elasticsearch\ClientBuilder::class;
         } else {
-            // ES v8 and up
             $builderName = \Elastic\Elasticsearch\ClientBuilder::class;
         }
 
         if ($container->has('logger')) {
             $clientConfiguration['logger'] = new Reference('logger');
-
-            // @phpstan-ignore-next-line
-            if (\Elasticsearch\ClientBuilder::class === $builderName) {
-                $clientConfiguration['tracer'] = new Reference('logger');
-            }
         }
 
         if ($sslCaBundle = $container->getParameter('api_platform.elasticsearch.ssl_ca_bundle')) {

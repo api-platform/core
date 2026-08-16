@@ -720,13 +720,9 @@ jobs:
             elasticsearch-version: '9.0.0'
             elasticsearch-package: ''
             extensions: 'intl, bcmath, curl, openssl, mbstring, mongodb'
-          - php: '8.5'
-            elasticsearch-version: '8.4.0'
-            elasticsearch-package: 'elasticsearch/elasticsearch:^8.4'
-            extensions: 'intl, bcmath, curl, openssl, mbstring'
           - php: '8.3'
-            elasticsearch-version: '7.17.0'
-            elasticsearch-package: 'elasticsearch/elasticsearch:prefer-lowest'
+            elasticsearch-version: '8.4.0'
+            elasticsearch-package: 'elasticsearch/elasticsearch:^8.11'
             extensions: 'intl, bcmath, curl, openssl, mbstring'
       fail-fast: false
     env:
@@ -767,10 +763,9 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
-          if [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:^8.4" ]; then
-            composer require elasticsearch/elasticsearch "^8.4" -W
-          elif [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:prefer-lowest" ]; then
-            composer update elasticsearch/elasticsearch --prefer-lowest
+          if [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:^8.11" ]; then
+            # pin the v8 client: the default resolution installs v9, which cannot talk to the v8 server of this job
+            composer require elasticsearch/elasticsearch "^8.11" -W
           fi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi

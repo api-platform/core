@@ -136,5 +136,9 @@ return function (ContainerConfigurator $container) {
 
     $services->set('api_platform.elasticsearch.metadata.resource.metadata_collection_factory', ElasticsearchProviderResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
-        ->args([service('api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner')]);
+        ->args([
+            service('api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner'),
+            '%api_platform.elasticsearch.query_language%',
+            '%api_platform.elasticsearch.esql%',
+        ]);
 };

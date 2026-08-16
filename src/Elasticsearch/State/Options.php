@@ -17,8 +17,13 @@ use ApiPlatform\State\OptionsInterface;
 
 class Options implements OptionsInterface
 {
+    /**
+     * @param mixed $handleLinks a callable that alters the ES|QL query according to the operation links (only used with QueryLanguage::Esql), see {@see \ApiPlatform\Elasticsearch\Esql\State\LinksHandlerInterface}
+     */
     public function __construct(
         protected ?string $index = null,
+        protected ?QueryLanguage $queryLanguage = null,
+        protected mixed $handleLinks = null,
     ) {
     }
 
@@ -31,6 +36,32 @@ class Options implements OptionsInterface
     {
         $self = clone $this;
         $self->index = $index;
+
+        return $self;
+    }
+
+    public function getQueryLanguage(): ?QueryLanguage
+    {
+        return $this->queryLanguage;
+    }
+
+    public function withQueryLanguage(?QueryLanguage $queryLanguage): self
+    {
+        $self = clone $this;
+        $self->queryLanguage = $queryLanguage;
+
+        return $self;
+    }
+
+    public function getHandleLinks(): mixed
+    {
+        return $this->handleLinks;
+    }
+
+    public function withHandleLinks(mixed $handleLinks): self
+    {
+        $self = clone $this;
+        $self->handleLinks = $handleLinks;
 
         return $self;
     }
