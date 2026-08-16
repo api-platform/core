@@ -280,7 +280,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             // which lacks subclass-only properties (and thus their types). The concrete is the
             // discriminator-resolved $type on a fresh denormalization, or the class of the object
             // being populated (e.g. PATCH), where $type is left as the abstract base.
-            $concreteClass = null !== $objectToPopulate ? $objectToPopulate::class : $type;
+            $concreteClass = null !== $objectToPopulate ? $this->getObjectClass($objectToPopulate) : $type;
             if ($concreteClass !== $context['resource_class']) {
                 $resourceClass = $concreteClass;
                 $context['resource_class'] = $concreteClass;
