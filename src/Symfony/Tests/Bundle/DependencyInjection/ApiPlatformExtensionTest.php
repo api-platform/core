@@ -30,6 +30,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
+use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -380,6 +381,10 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testMcpProviderChainIsSecuredAndValidatedWithSecurityBundle(): void
     {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('symfony/mcp-bundle is not installed.');
+        }
+
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['use_symfony_listeners'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
@@ -401,6 +406,10 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testMcpProviderChainIsNotSecuredWithoutSecurityBundle(): void
     {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('symfony/mcp-bundle is not installed.');
+        }
+
         $this->container = $this->createContainer([
             'DoctrineBundle' => DoctrineBundle::class,
             'TwigBundle' => TwigBundle::class,
