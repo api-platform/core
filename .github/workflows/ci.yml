@@ -231,7 +231,7 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Setup Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
       - name: Install Redocly CLI
@@ -1107,7 +1107,7 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Setup node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22'
       - name: Get composer cache directory
