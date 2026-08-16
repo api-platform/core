@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Mcp\Schema\Content\TextContent;
+use Mcp\Schema\Content\TextResourceContents;
 use Mcp\Schema\JsonRpc\Response;
 use Mcp\Schema\Result\CallToolResult;
 use Mcp\Schema\Result\ReadResourceResult;
@@ -69,6 +70,15 @@ final class StructuredContentProcessor implements ProcessorInterface
             if ($includeStructuredContent) {
                 $structuredContent = $normalized;
             }
+        }
+
+        if ($operation instanceof McpResource) {
+            return new Response(
+                $context['mcp_request']->getId(),
+                new ReadResourceResult([
+                    new TextResourceContents($operation->getUri(), $operation->getMimeType() ?? 'application/json', $result),
+                ]),
+            );
         }
 
         return new Response(
