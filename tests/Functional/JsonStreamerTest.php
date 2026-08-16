@@ -113,7 +113,9 @@ class JsonStreamerTest extends ApiTestCase
         $r = self::createClient()->request('GET', '/json_stream_resources/1', ['headers' => ['accept' => 'application/ld+json']]);
         $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertIsInt($res['views']);
-        $this->assertIsFloat($res['rating']);
+        // json-streamer only encodes with JSON_PRESERVE_ZERO_FRACTION since 8.1.4, so an integral
+        // float decodes as int on lower versions
+        $this->assertTrue(\is_int($res['rating']) || \is_float($res['rating']));
         $this->assertIsBool($res['isFeatured']);
         $this->assertIsString($res['price']);
         $this->assertEquals('/json_stream_resources/1', $res['@id']);
@@ -170,7 +172,9 @@ class JsonStreamerTest extends ApiTestCase
         $r = self::createClient()->request('GET', '/json_stream_resources/1', ['headers' => ['accept' => 'application/json']]);
         $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertIsInt($res['views']);
-        $this->assertIsFloat($res['rating']);
+        // json-streamer only encodes with JSON_PRESERVE_ZERO_FRACTION since 8.1.4, so an integral
+        // float decodes as int on lower versions
+        $this->assertTrue(\is_int($res['rating']) || \is_float($res['rating']));
         $this->assertIsBool($res['isFeatured']);
         $this->assertIsString($res['price']);
         $this->assertArrayNotHasKey('@id', $res);
@@ -227,7 +231,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame('asd', $res['title']);
         $this->assertSame(0, $res['views']);
-        $this->assertSame(0.0, $res['rating']);
+        $this->assertEquals(0, $res['rating']);
         $this->assertFalse($res['isFeatured']);
         $this->assertContains($res['price'], ['0', '0.00']); // Depends on DB
         $this->assertStringStartsWith('/json_stream_resources/', $res['@id']);
@@ -276,7 +280,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame('asd', $res['title']);
         $this->assertSame(0, $res['views']);
-        $this->assertSame(0.0, $res['rating']);
+        $this->assertEquals(0, $res['rating']);
         $this->assertFalse($res['isFeatured']);
         $this->assertContains($res['price'], ['0', '0.00']); // Depends on DB
         $this->assertArrayNotHasKey('@id', $res);
