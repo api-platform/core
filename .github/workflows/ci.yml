@@ -22,6 +22,10 @@ concurrency:
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COMPOSER_ROOT_VERSION: "4.3.x-dev"
+  # Pinned build tooling: these are installed and executed on the runner, so an
+  # unconstrained version would run whatever the registry serves that day.
+  PMU_VERSION: "0.3.0"
+  PHP_COVERALLS_VERSION: "2.9.1"
 
 jobs:
   architecture:
@@ -56,7 +60,7 @@ jobs:
       - run: composer validate
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev doctrine/mongodb-odm-bundle
@@ -116,7 +120,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Run container lint
@@ -158,7 +162,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev doctrine/mongodb-odm-bundle
@@ -220,7 +224,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Setup Node.js
@@ -228,7 +232,7 @@ jobs:
         with:
           node-version: '20'
       - name: Install Redocly CLI
-        run: npm install -g @redocly/cli@latest
+        run: npm install -g @redocly/cli@2.43.3
       - name: Clear test app cache
         run: |
           rm -Rf tests/Fixtures/app/var/cache/*
@@ -273,7 +277,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -302,7 +306,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
@@ -350,7 +354,7 @@ jobs:
           ini-values: memory_limit=-1
       - name: PMU
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
       - name: Linking
         if: ${{ !matrix.php.lowest && !matrix.php.minimal-changes }}
@@ -393,7 +397,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
         continue-on-error: true
@@ -436,7 +440,7 @@ jobs:
           ini-values: memory_limit=-1
       - name: Linking
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
       - name: Run ${{ matrix.component }} install
@@ -489,7 +493,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -539,7 +543,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -590,7 +594,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer require --dev doctrine/mongodb-odm-bundle
@@ -618,7 +622,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
@@ -671,7 +675,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -698,7 +702,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
@@ -758,7 +762,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           if [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:^8.4" ]; then
@@ -820,7 +824,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev opensearch-project/opensearch-php "^2.5" -W
@@ -860,7 +864,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -903,7 +907,7 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -949,7 +953,7 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -990,7 +994,7 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer update --prefer-lowest
@@ -1040,7 +1044,7 @@ jobs:
         run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -1075,7 +1079,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
@@ -1114,7 +1118,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -1125,7 +1129,7 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-          npm i -g @quobix/vacuum
+          npm i -g @quobix/vacuum@0.30.0
           vacuum lint -r tests/Fixtures/app/ruleset.yaml build/out/openapi/openapi_v3.yaml -d --ignore-array-circle-ref --ignore-polymorph-circle-ref -b --no-clip
 
   laravel:
@@ -1151,7 +1155,7 @@ jobs:
           ini-values: memory_limit=-1
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer api-platform/laravel update
@@ -1177,12 +1181,12 @@ jobs:
           ini-values: memory_limit=-1
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
       - name: Setup laravel project
         run: |
-          composer global require laravel/installer
+          composer global require laravel/installer:5.31.0
           laravel new test-api-platform-install --pest --no-interaction
       - name: Install api-platform/laravel
         run: |
