@@ -28,7 +28,6 @@ env:
   # Pinned build tooling: these are installed and executed on the runner, so an
   # unconstrained version would run whatever the registry serves that day.
   PMU_VERSION: "0.3.0"
-  PHP_COVERALLS_VERSION: "2.9.1"
 
 jobs:
   architecture:
@@ -304,15 +303,6 @@ jobs:
           flags: phpunit
           fail_ci_if_error: true
         continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
-        continue-on-error: true
 
   phpunit-components:
     name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}${{ matrix.php.lowest && 'lowest' || '' }}${{ matrix.php.minimal-changes && 'minimal-changes' || '' }}${{ matrix.opensearch && 'opensearch' || '' }})
@@ -394,15 +384,6 @@ jobs:
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
         continue-on-error: true
 
   phpunit-components-fail-deprecation:
@@ -621,14 +602,6 @@ jobs:
           flags: phpunit
           fail_ci_if_error: true
         continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
-        continue-on-error: true
 
   mercure:
     name: PHPUnit (PHP ${{ matrix.php }}) (Mercure)
@@ -700,14 +673,6 @@ jobs:
           name: phpunit-php${{ matrix.php }}-mercure
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   elasticsearch:
@@ -1076,15 +1041,6 @@ jobs:
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi "php-coveralls/php-coveralls:$PHP_COVERALLS_VERSION"
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   openapi:
