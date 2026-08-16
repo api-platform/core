@@ -35,6 +35,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 #[Map(target: MappedResourceWithRelationEntity::class)]
 class MappedResourceWithRelation
 {
+    #[Map(transform: 'intval')]
     public ?string $id = null;
     #[Map(if: false)]
     public ?string $relationName = null;
