@@ -60,7 +60,7 @@
         "phpunit/phpunit": "^11.5 || ^12.2",
         "symfony/expression-language": "^7.4 || ^8.0",
         "symfony/intl": "^7.4 || ^8.0",
-        "symfony/mercure-bundle": "*",
+        "symfony/mercure-bundle": "^0.4.3|^0.5",
         "symfony/object-mapper": "^7.4 || ^8.0",
         "symfony/routing": "^7.4 || ^8.0",
         "symfony/type-info": "^7.4 || ^8.0",

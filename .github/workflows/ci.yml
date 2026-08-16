@@ -19,9 +19,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COMPOSER_ROOT_VERSION: "4.4.x-dev"
+  # Pinned build tooling: these are installed and executed on the runner, so an
+  # unconstrained version would run whatever the registry serves that day.
+  PMU_VERSION: "0.3.0"
 
 jobs:
   architecture:
@@ -35,9 +41,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
@@ -48,7 +54,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -56,7 +62,7 @@ jobs:
       - run: composer validate
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev doctrine/mongodb-odm-bundle
@@ -73,9 +79,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
@@ -96,9 +102,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring
@@ -109,14 +115,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Run container lint
@@ -179,12 +185,12 @@ jobs:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       # https://github.com/staabm/phpstan-todo-by#prerequisite
       -   name: Get tags
           run: git fetch --tags origin
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -195,19 +201,19 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev doctrine/mongodb-odm-bundle
       - name: Cache PHPStan results
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: /tmp/phpstan
           key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -244,9 +250,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring
@@ -257,22 +263,22 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
       - name: Install Redocly CLI
-        run: npm install -g @redocly/cli@latest
+        run: npm install -g @redocly/cli@2.43.3
       - name: Clear test app cache
         run: |
           rm -Rf tests/Fixtures/app/var/cache/*
@@ -297,9 +303,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -310,14 +316,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -326,29 +332,20 @@ jobs:
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   phpunit-components:
@@ -391,9 +388,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php.version }}
           tools: pecl, composer:2.9.8
@@ -401,7 +398,7 @@ jobs:
           ini-values: memory_limit=-1
       - name: PMU
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
       - name: Linking
         if: ${{ !matrix.php.lowest && !matrix.php.minimal-changes }}
@@ -429,14 +426,14 @@ jobs:
           ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: /tmp/build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: /tmp/build/logs/phpunit
@@ -444,15 +441,56 @@ jobs:
           flags: phpunit
           fail_ci_if_error: true
         continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  phpunit-components-fail-deprecation:
+    name: PHPUnit no deprecations ${{ matrix.component }} (PHP ${{ matrix.php.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - version: '8.5'
+        component:
+          - api-platform/doctrine-common
+          - api-platform/doctrine-orm
+          - api-platform/doctrine-odm
+          - api-platform/metadata
+          - api-platform/hydra
+          - api-platform/json-api
+          - api-platform/json-schema
+          - api-platform/elasticsearch
+          - api-platform/openapi
+          - api-platform/graphql
+          - api-platform/http-cache
+          - api-platform/ramsey-uuid
+          - api-platform/serializer
+          - api-platform/state
+          - api-platform/symfony
+          - api-platform/validator
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php.version }}
+          tools: pecl, composer:2.9.8
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
+          ini-values: memory_limit=-1
+      - name: Linking
         run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
-        continue-on-error: true
+          composer global require "soyuka/pmu:$PMU_VERSION"
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+      - name: Run ${{ matrix.component }} install
+        run: |
+          composer ${{matrix.component}} update
+      - name: Run ${{ matrix.component }} tests
+        run: |
+          mkdir -p /tmp/build/logs/phpunit
+          cd $(composer ${{matrix.component}} --cwd)
+          ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations --log-junit "/tmp/build/logs/phpunit/junit.xml" 
 
   postgresql:
     name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -469,7 +507,7 @@ jobs:
       PGPASSWORD: apiplatformrocks
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup postgres
         run: |
           sudo systemctl start postgresql
@@ -477,7 +515,7 @@ jobs:
           createdb -h localhost -p 5432 -U api_platform api_platform_test
           pg_isready -d api_platform_test -h localhost -p 5432 -U api_platform
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -488,14 +526,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -525,9 +563,9 @@ jobs:
       DATABASE_URL: mysql://root:root@127.0.0.1/api_platform_test
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -538,14 +576,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -567,7 +605,7 @@ jobs:
       MONGODB_URL: mongodb://localhost:27017
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup MongoDB
         run: |
           sudo apt update
@@ -578,7 +616,7 @@ jobs:
           sudo apt install -y mongodb-org
           sudo systemctl start mongod
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -589,14 +627,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer require --dev doctrine/mongodb-odm-bundle
@@ -606,27 +644,19 @@ jobs:
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --exclude-group=orm
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: phpunit-logs-php${{ matrix.php }}-mongodb
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}-mongodb
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   mercure:
@@ -657,9 +687,9 @@ jobs:
           - 1337:1337
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -670,14 +700,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -686,27 +716,19 @@ jobs:
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mercure
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: phpunit-logs-php${{ matrix.php }}-mercure
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}-mercure
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   elasticsearch:
@@ -733,7 +755,7 @@ jobs:
       APP_ENV: elasticsearch
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Configure sysctl limits
         run: |
           sudo swapoff -a
@@ -741,12 +763,12 @@ jobs:
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
       - name: Runs Elasticsearch
-        uses: elastic/elastic-github-actions/elasticsearch@master
+        uses: elastic/elastic-github-actions/elasticsearch@98431b45a60cbb6ace481778827bc8e11f12fd65 # master
         with:
           stack-version: ${{ matrix.elasticsearch-version }}
           security-enabled: false
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -757,14 +779,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           if [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:^8.4" ]; then
@@ -806,9 +828,9 @@ jobs:
           --health-retries 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -819,14 +841,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev opensearch-project/opensearch-php "^2.5" -W
@@ -846,9 +868,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -859,14 +881,14 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -885,9 +907,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -900,7 +922,7 @@ jobs:
       - name: Allow unstable project dependencies
         run: composer config minimum-stability dev
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -909,7 +931,7 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -929,9 +951,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -943,10 +965,13 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Allow unstable project dependencies
         run: composer config minimum-stability dev
-      - name: Force Symfony 8.1 dev for framework-bundle and json-streamer
-        run: composer require --dev --no-update --no-interaction "symfony/framework-bundle:8.1.x-dev" "symfony/json-streamer:8.1.x-dev"
+      # minimum-stability dev lets unpinned components float to the next minor's dev branch, and
+      # mixing Symfony minor dev branches is not supported: framework-bundle 8.1.x-dev with
+      # property-info/serializer/type-info 8.2.x-dev loses property metadata entirely
+      - name: Force Symfony 8.1 dev
+        run: composer require --dev --no-update --no-interaction "symfony/framework-bundle:8.1.x-dev" "symfony/json-streamer:8.1.x-dev" "symfony/serializer:8.1.x-dev" "symfony/property-info:8.1.x-dev" "symfony/type-info:8.1.x-dev"
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-symfony-edge-${{ hashFiles('**/composer.json') }}
@@ -955,7 +980,7 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -974,9 +999,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -987,7 +1012,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -996,7 +1021,7 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer update --prefer-lowest
@@ -1023,9 +1048,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -1036,7 +1061,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -1046,7 +1071,7 @@ jobs:
         run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -1061,29 +1086,20 @@ jobs:
           fi
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   openapi:
@@ -1097,30 +1113,30 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22'
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
@@ -1131,7 +1147,7 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-          npm i -g @quobix/vacuum
+          npm i -g @quobix/vacuum@0.30.0
           vacuum lint -r tests/Fixtures/app/ruleset.yaml build/out/openapi/openapi_v3.yaml -d --ignore-array-circle-ref --ignore-polymorph-circle-ref -b --no-clip
 
   laravel:
@@ -1147,9 +1163,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer:2.9.8
@@ -1157,7 +1173,7 @@ jobs:
           ini-values: memory_limit=-1
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer api-platform/laravel update
@@ -1173,9 +1189,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: 8.5
           tools: pecl, composer:2.9.8
@@ -1183,12 +1199,12 @@ jobs:
           ini-values: memory_limit=-1
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
       - name: Setup laravel project
         run: |
-          composer global require laravel/installer
+          composer global require laravel/installer:5.31.0
           laravel new test-api-platform-install --pest --no-interaction
       - name: Install api-platform/laravel
         run: |

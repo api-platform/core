@@ -193,6 +193,7 @@ use Negotiation\Negotiator;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Log\LoggerInterface;
 use Symfony\AI\McpBundle\Controller\McpController;
+use Symfony\AI\McpBundle\Http\MiddlewareFactory;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -1346,7 +1347,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $psrHttpFactory,
                 $httpFoundationFactory,
                 $psr17Factory,
-                $psr17Factory
+                $psr17Factory,
+                new MiddlewareFactory()
             );
         });
     }

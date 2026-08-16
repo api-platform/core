@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptions;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptionsAndNoApiFilter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameter as SearchFilterParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExactAndComparisonParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsAndNoApiFilterEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProductWithQueryParameter;
@@ -39,7 +41,126 @@ final class DoctrineTest extends ApiTestCase
             FilterWithStateOptions::class,
             FilterWithStateOptionsAndNoApiFilter::class,
             ProductWithQueryParameter::class,
+            ExactAndComparisonParameter::class,
         ];
+    }
+
+    public function testExactFilterIgnoresOperatorMap(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        $resource = ExactAndComparisonParameter::class;
+        $this->recreateSchema([$resource]);
+
+        $container = static::$kernel->getContainer();
+        $manager = $container->get('doctrine')->getManager();
+        foreach ([5, 8, 10, 15] as $q) {
+            $e = new ExactAndComparisonParameter();
+            $e->setQuantity($q);
+            $manager->persist($e);
+        }
+        $manager->flush();
+
+        $route = 'exact_and_comparison_parameter';
+
+        // Exact match: ?quantity=10 must return only the row with quantity = 10.
+        $response = self::createClient()->request('GET', $route.'?quantity=10');
+        $this->assertResponseIsSuccessful();
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertSame(10, $members[0]['quantity']);
+
+        // Operator map: ?quantity[lt]=10 must apply only the comparison (< 10),
+        // the exact filter must NOT also inject `quantity IN ('lt' => ...)`.
+        $response = self::createClient()->request('GET', $route.'?quantity[lt]=10');
+        $this->assertResponseIsSuccessful();
+        $quantities = array_map(static fn ($m) => $m['quantity'], $response->toArray()['hydra:member']);
+        sort($quantities);
+        $this->assertSame([5, 8], $quantities);
+    }
+
+    public function testDoctrineEntitySearchFilter(): void
+    {
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
+        $response = self::createClient()->request('GET', $route.'?foo=bar');
+        $a = $response->toArray();
+        $this->assertCount(2, $a['hydra:member']);
+        $this->assertEquals('bar', $a['hydra:member'][0]['foo']);
+        $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
+
+        $this->assertArraySubset(['hydra:search' => [
+            'hydra:template' => \sprintf('/%s{?foo,fooAlias,q,order[id],order[foo],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],search[foo],search[createdAt],id,createdAt}', $route),
+        ]], $a);
+
+        $this->assertArraySubset(['@type' => 'IriTemplateMapping', 'variable' => 'fooAlias', 'property' => 'foo'], $a['hydra:search']['hydra:mapping'][1]);
+
+        $response = self::createClient()->request('GET', $route.'?fooAlias=baz');
+        $a = $response->toArray();
+        $this->assertCount(1, $a['hydra:member']);
+        $this->assertEquals('baz', $a['hydra:member'][0]['foo']);
+
+        $response = self::createClient()->request('GET', $route.'?order[foo]=asc');
+        $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'bar');
+        $response = self::createClient()->request('GET', $route.'?order[foo]=desc');
+        $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'foo');
+
+        $response = self::createClient()->request('GET', $route.'?searchPartial[foo]=az');
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertArraySubset(['foo' => 'baz'], $members[0]);
+
+        $response = self::createClient()->request('GET', $route.'?searchOnTextAndDate[foo]=bar&searchOnTextAndDate[createdAt][before]=2024-01-21');
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
+    }
+
+    public function testGraphQl(): void
+    {
+        if ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false) {
+            $this->markTestSkipped('Parameters are not supported in BC mode.');
+        }
+
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $object = 'searchFilterParameters';
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => \sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object),
+        ]]);
+        $this->assertEquals('bar', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => \sprintf('{ %s(searchPartial: {foo: "az"}) { edges { node { id foo createdAt } } } }', $object),
+        ]]);
+        $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => \sprintf('{ %s(searchExact: {foo: "baz"}) { edges { node { id foo createdAt } } } }', $object),
+        ]]);
+        $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+
+        $response = self::createClient()->request('POST', '/graphql', ['json' => [
+            'query' => \sprintf('{ %s(searchOnTextAndDate: {foo: "bar", createdAt: {before: "2024-01-21"}}) { edges { node { id foo createdAt } } } }', $object),
+        ]]);
+        $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $response->toArray()['data'][$object]['edges'][0]['node']);
+    }
+
+    public function testPropertyPlaceholderFilter(): void
+    {
+        static::bootKernel();
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
+        $response = self::createClient()->request('GET', $route.'?foo=baz');
+        $a = $response->toArray();
+        $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
     }
 
     public function testStateOptions(): void

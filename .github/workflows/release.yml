@@ -14,29 +14,34 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   split:
     name: Subtree Split
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.API_PLATFORM_APP_ID }}
           private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           token: ${{ steps.generate_token.outputs.token }}
           fetch-depth: 0
 
       - name: Install splitsh
+        env:
+          SPLITSH_VERSION: v1.0.1
+          SPLITSH_SHA256: 2539301ce5e21d0ca44b689d0dd2c1b20d9f9e996c1fe6c462afb8af4e7141cc
         run: |
-          curl -L https://github.com/splitsh/lite/releases/download/v1.0.1/lite_linux_amd64.tar.gz > lite_linux_amd64.tar.gz
+          curl -fsSL "https://github.com/splitsh/lite/releases/download/$SPLITSH_VERSION/lite_linux_amd64.tar.gz" > lite_linux_amd64.tar.gz
+          echo "$SPLITSH_SHA256  lite_linux_amd64.tar.gz" | sha256sum --check --strict
           tar -zxpf lite_linux_amd64.tar.gz
           chmod +x splitsh-lite
           echo "$(pwd)" >> $GITHUB_PATH
@@ -52,7 +57,7 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.API_PLATFORM_APP_ID }}
           private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
@@ -70,7 +75,7 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.API_PLATFORM_APP_ID }}
           private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
