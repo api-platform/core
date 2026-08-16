@@ -179,6 +179,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
         }
 
+        // McpToolProvider requires Symfony's object_mapper service; mirror FrameworkBundle's gate so we don't try to wire it when object-mapper is dev-only.
+        $mcpEnabled = ($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle']);
+        // kernel listeners never run for a JSON-RPC tool call, so MCP needs its own provider chain
+        $mcpProviderChain = $mcpEnabled && $config['use_symfony_listeners'];
+
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
@@ -193,12 +198,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
         $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
         $this->registerHttpCacheConfiguration($container, $config, $loader);
-        $this->registerValidatorConfiguration($container, $config, $loader);
+        $this->registerValidatorConfiguration($container, $config, $loader, $mcpProviderChain);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
         $this->registerMercureConfiguration($container, $config, $loader);
         $this->registerMessengerConfiguration($container, $config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
-        $this->registerSecurityConfiguration($container, $config, $loader);
+        $this->registerSecurityConfiguration($container, $config, $loader, $mcpProviderChain);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
@@ -214,34 +219,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.mcp.format', $config['mcp']['format'] ?? null);
 
-        // McpToolProvider requires Symfony's object_mapper service; mirror FrameworkBundle's gate so we don't try to wire it when object-mapper is dev-only.
-        if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
+        if ($mcpEnabled) {
             $loader->load('mcp/mcp.php');
-
-            if ($config['use_symfony_listeners']) {
-                // In this mode the state pipeline is driven by kernel listeners, which never run for
-                // a JSON-RPC tool call, so MCP needs its own provider chain to keep enforcing
-                // security, parameters and validation.
-                $loader->load('mcp/events.php');
-
-                /** @var string[] $bundles */
-                $bundles = $container->getParameter('kernel.bundles');
-                $hasValidator = interface_exists(ValidatorInterface::class);
-
-                if ($hasValidator) {
-                    $loader->load('mcp/validator.php');
-                }
-
-                if (isset($bundles['SecurityBundle'])) {
-                    $loader->load('mcp/security.php');
-
-                    if ($hasValidator) {
-                        $loader->load('mcp/security_validator.php');
-                    }
-                }
-            } else {
-                $loader->load('mcp/state.php');
-            }
+            $loader->load($mcpProviderChain ? 'mcp/events.php' : 'mcp/state.php');
         }
 
         $container->registerForAutoconfiguration(FilterInterface::class)
@@ -956,9 +936,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return $formats;
     }
 
-    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader, bool $mcpProviderChain): void
     {
-        if (interface_exists(ValidatorInterface::class)) {
+        if ($this->isValidatorAvailable()) {
             $loader->load('metadata/validator.php');
             $loader->load('validator/validator.php');
 
@@ -967,6 +947,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
 
             $loader->load($config['use_symfony_listeners'] ? 'validator/events.php' : 'validator/state.php');
+
+            if ($mcpProviderChain) {
+                $loader->load('mcp/validator.php');
+            }
 
             $container->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
                 ->addTag('api_platform.validation_groups_generator');
@@ -1067,7 +1051,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('elasticsearch.php');
     }
 
-    private function registerSecurityConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
+    private function registerSecurityConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader, bool $mcpProviderChain): void
     {
         /** @var string[] $bundles */
         $bundles = $container->getParameter('kernel.bundles');
@@ -1080,13 +1064,26 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('state/security.php');
 
-        if (interface_exists(ValidatorInterface::class)) {
+        if ($mcpProviderChain) {
+            $loader->load('mcp/security.php');
+        }
+
+        if ($this->isValidatorAvailable()) {
             $loader->load('state/security_validator.php');
+
+            if ($mcpProviderChain) {
+                $loader->load('mcp/security_validator.php');
+            }
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql/security.php');
         }
+    }
+
+    private function isValidatorAvailable(): bool
+    {
+        return interface_exists(ValidatorInterface::class);
     }
 
     private function registerOpenApiConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
