@@ -97,6 +97,7 @@
         "api-platform/jsonld": "self.version",
         "api-platform/laravel": "self.version",
         "api-platform/mcp": "self.version",
+        "api-platform/meilisearch": "self.version",
         "api-platform/metadata": "self.version",
         "api-platform/openapi": "self.version",
         "api-platform/parameter-validator": "self.version",

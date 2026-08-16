@@ -1,0 +1,61 @@
+{
+    "name": "api-platform/meilisearch",
+    "description": "API Platform Meilisearch bridge",
+    "type": "library",
+    "keywords": [
+        "REST",
+        "API",
+        "filter",
+        "meilisearch",
+        "search"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "api-platform/metadata": "^4.2 || ^5.0@alpha",
+        "api-platform/serializer": "^4.2 || ^5.0@alpha",
+        "api-platform/state": "^4.2 || ^5.0@alpha",
+        "meilisearch/meilisearch-php": "dev-main",
+        "psr/container": "^1.1 || ^2.0",
+        "symfony/serializer": "^6.4 || ^7.4 || ^8.0"
+    },
+    "require-dev": {
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpunit/phpunit": "^11.5 || ^12.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Meilisearch\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "5.0.x-dev"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}

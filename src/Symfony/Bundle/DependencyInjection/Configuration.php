@@ -176,6 +176,7 @@ final class Configuration implements ConfigurationInterface
         $this->addMercureSection($rootNode);
         $this->addMessengerSection($rootNode);
         $this->addElasticsearchSection($rootNode);
+        $this->addMeilisearchSection($rootNode);
         $this->addOpenApiSection($rootNode);
         $this->addMakerSection($rootNode);
         $this->addMcpSection($rootNode);
@@ -517,6 +518,40 @@ final class Configuration implements ConfigurationInterface
                                     return $v;
                                 })
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addMeilisearchSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('meilisearch')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')
+                            ->defaultFalse()
+                            ->validate()
+                                ->ifTrue()
+                                ->then(static function (bool $v): bool {
+                                    if (!class_exists(\Meilisearch\Client::class)) {
+                                        throw new InvalidConfigurationException('The meilisearch/meilisearch-php package is required for Meilisearch support.');
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('url')
+                            ->defaultValue('http://localhost:7700')
+                            ->info('The Meilisearch instance URL.')
+                        ->end()
+                        ->scalarNode('api_key')
+                            ->defaultNull()
+                            ->info('The Meilisearch API key.')
                         ->end()
                     ->end()
                 ->end()
