@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Mercure;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Jwt\TokenFactoryInterface;
 use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
+use Symfony\Component\Mercure\ProtocolVersion;
 use Symfony\Component\Mercure\Update;
 
 final class TestHub implements HubInterface
@@ -71,5 +72,17 @@ final class TestHub implements HubInterface
         $this->updates[] = $update;
 
         return $this->hub->publish($update);
+    }
+
+    // Added to HubInterface in symfony/mercure 0.8. ProtocolVersion does not exist on 0.6/0.7, but PHP
+    // only resolves a return type when the method is called, and nothing calls these before 0.8.
+    public function getProtocolVersion(): ProtocolVersion
+    {
+        return $this->hub->getProtocolVersion();
+    }
+
+    public function getCookieName(): string
+    {
+        return $this->hub->getCookieName();
     }
 }

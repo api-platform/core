@@ -15,6 +15,11 @@
 ### Bug fixes
 
 * [88f458a11](https://github.com/api-platform/core/commit/88f458a1108ba2fcd052a58d7647f23dad1b186b) fix(jsonschema): drop removed getBuiltinTypes path in SchemaPropertyMetadataFactory
+## v4.4.0-alpha.3
+
+### Bug fixes
+
+* [f8c217283](https://github.com/api-platform/core/commit/f8c217283659dc80985e85c5570e113e1eba6482) fix(state): correct composer "conflicts" key to "conflict" (#8400)
 
 ### Dependencies
 

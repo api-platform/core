@@ -57,14 +57,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
             [$normalizationAttributes, $denormalizationAttributes] = $this->getEffectiveSerializerAttributes($options);
 
-            if ($normalizationAttributes && !\is_array($normalizationAttributes)) {
-                $normalizationAttributes = [$normalizationAttributes];
-            }
-
-            if ($denormalizationAttributes && !\is_array($denormalizationAttributes)) {
-                $denormalizationAttributes = [$denormalizationAttributes];
-            }
-
             $ignoredAttributes = $options['ignored_attributes'] ?? [];
         } catch (ResourceClassNotFoundException) {
             // TODO: for input/output classes, the serializer groups must be read from the actual resource class

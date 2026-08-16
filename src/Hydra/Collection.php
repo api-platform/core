@@ -31,7 +31,7 @@ class Collection
     #[StreamedName('@type')]
     public string $type = 'Collection';
 
-    public float $totalItems;
+    public int $totalItems;
 
     public ?IriTemplate $search = null;
     public ?PartialCollectionView $view = null;

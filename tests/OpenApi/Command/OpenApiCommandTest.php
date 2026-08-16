@@ -76,27 +76,21 @@ class OpenApiCommandTest extends KernelTestCase
 
         $this->assertYaml($result);
 
-        $operationId = 'api_dummy_cars_get_collection';
+        // the serializer does not guarantee property order, so assert the structure rather than a
+        // rendered block, and keep separate assertions for the formatting this test cares about
+        $parsed = Yaml::parse($result);
+
+        $this->assertSame('api_dummy_cars_get_collection', $parsed['paths']['/dummy_cars']['get']['operationId'], 'nested object should be present.');
+        $this->assertSame(['DummyCar'], $parsed['paths']['/dummy_cars']['get']['tags']);
+        $this->assertSame('api_dummy_cars_id_get', $parsed['paths']['/dummy_cars/{id}']['get']['operationId']);
+        $this->assertSame([], $parsed['paths']['/dummy_cars/{id}']['get']['tags']);
 
         $expected = <<<YAML
-  /dummy_cars:
-    get:
-      operationId: $operationId
       tags:
         - DummyCar
 YAML;
-
-        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
-
-        $operationId = 'api_dummy_cars_id_get';
-        $expected = <<<YAML
-  '/dummy_cars/{id}':
-    get:
-      operationId: $operationId
-      tags: []
-YAML;
-
-        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString($expected, $result, 'sequences should be correctly formatted.');
+        $this->assertStringContainsString('      tags: []', $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML

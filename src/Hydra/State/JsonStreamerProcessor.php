@@ -102,7 +102,7 @@ final class JsonStreamerProcessor implements ProcessorInterface
             }
 
             if ($data instanceof PaginatorInterface) {
-                $collection->totalItems = $data->getTotalItems();
+                $collection->totalItems = (int) $data->getTotalItems();
             }
 
             if (\is_array($data) || ($data instanceof \Countable && !$data instanceof PartialPaginatorInterface)) {
