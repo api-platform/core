@@ -36,6 +36,8 @@ interface ProviderInterface
      *
      * @psalm-param array{request?: Request, resource_class?: string, ...<string, mixed>} $context
      *
+     * @throws \Throwable
+     *
      * @return T|PartialPaginatorInterface<T>|iterable<T>|null
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null;
