@@ -1103,6 +1103,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
         $container->setParameter('api_platform.openapi.license.identifier', $config['openapi']['license']['identifier']);
         $container->setParameter('api_platform.openapi.overrideResponses', $config['openapi']['overrideResponses']);
+        $container->setParameter('api_platform.openapi.include_null_in_nullable_enum', $config['openapi']['include_null_in_nullable_enum']);
 
         $tags = [];
         foreach ($config['openapi']['tags'] as $tag) {

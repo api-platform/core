@@ -166,6 +166,7 @@ return [
 
     // 'openapi' => [
     //     'tags' => [],
+    //     'include_null_in_nullable_enum' => true, // Whether null is included in the enum array for nullable enum properties in the JSON Schema.
     // ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,

@@ -47,6 +47,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.resource_class_resolver'),
             service('api_platform.json_schema.metadata.property.metadata_factory.schema.inner'),
+            param('api_platform.openapi.include_null_in_nullable_enum'),
         ]);
 
     $services->set('api_platform.json_schema.backward_compatible_schema_factory', BackwardCompatibleSchemaFactory::class)

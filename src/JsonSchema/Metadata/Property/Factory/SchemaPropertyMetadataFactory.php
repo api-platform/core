@@ -43,6 +43,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     public function __construct(
         ResourceClassResolverInterface $resourceClassResolver,
         private readonly ?PropertyMetadataFactoryInterface $decorated = null,
+        private readonly bool $includeNullInNullableEnum = true,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -184,7 +185,9 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $schema['type'] = \is_array($currentType) ? array_merge($currentType, ['null']) : [$currentType, 'null'];
 
             if (isset($schema['enum'])) {
-                $schema['enum'][] = null;
+                if ($this->includeNullInNullableEnum) {
+                    $schema['enum'][] = null;
+                }
 
                 return $schema;
             }

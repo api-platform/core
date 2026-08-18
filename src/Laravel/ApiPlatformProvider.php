@@ -370,7 +370,8 @@ class ApiPlatformProvider extends ServiceProvider
                             $app->make(ResourceClassResolverInterface::class)
                         ),
                         $app->make(ResourceClassResolverInterface::class)
-                    )
+                    ),
+                    (bool) $config->get('api-platform.openapi.include_null_in_nullable_enum', true),
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );

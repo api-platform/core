@@ -41,6 +41,37 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals(['type' => ['integer', 'null'], 'enum' => [1, 2, null]], $apiProperty->getSchema());
     }
 
+    public function testEnumNullableIncludesNullByDefault(): void
+    {
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $apiProperty = new ApiProperty(nativeType: Type::nullable(Type::enum(IntEnumAsIdentifier::class)));
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'intEnumAsIdentifier')->willReturn($apiProperty);
+
+        // explicitly passing true (same as default) must still add null to enum
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated, includeNullInNullableEnum: true);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'intEnumAsIdentifier');
+
+        $this->assertEquals(['type' => ['integer', 'null'], 'enum' => [1, 2, null]], $apiProperty->getSchema());
+    }
+
+    public function testEnumNullableExcludesNullWhenDisabled(): void
+    {
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $apiProperty = new ApiProperty(nativeType: Type::nullable(Type::enum(IntEnumAsIdentifier::class)));
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'intEnumAsIdentifier')->willReturn($apiProperty);
+
+        // with includeNullInNullableEnum=false, null must NOT appear in the enum array
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated, includeNullInNullableEnum: false);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'intEnumAsIdentifier');
+
+        $schema = $apiProperty->getSchema();
+        $this->assertEquals(['integer', 'null'], $schema['type']);
+        $this->assertEquals([1, 2], $schema['enum']);
+        $this->assertNotContains(null, $schema['enum']);
+    }
+
     public function testWithCustomOpenApiContext(): void
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);

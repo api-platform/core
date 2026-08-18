@@ -573,6 +573,7 @@ final class Configuration implements ConfigurationInterface
                             ->info('To pass extra configuration to Scalar API Reference, like theme or darkMode.')
                         ->end()
                         ->booleanNode('overrideResponses')->defaultTrue()->info('Whether API Platform adds automatic responses to the OpenAPI documentation.')->end()
+                        ->booleanNode('include_null_in_nullable_enum')->defaultTrue()->info('Whether null is included in the enum array for nullable enum properties in the JSON Schema.')->end()
                         ->scalarNode('error_resource_class')->defaultNull()->info('The class used to represent errors in the OpenAPI documentation.')->end()
                         ->scalarNode('validation_error_resource_class')->defaultNull()->info('The class used to represent validation errors in the OpenAPI documentation.')->end()
                     ->end()
