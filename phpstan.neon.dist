@@ -46,6 +46,11 @@ parameters:
 		-
 			message: '#Symfony\\Component\\PropertyInfo\\Type#'
 			identifier: class.notFound
+		# TODO: remove once "symfony/web-link" >= 8.2 is required, we fall back to our own implementation before that
+		-
+			message: '#Symfony\\Component\\WebLink\\LinkTemplateHeaderSerializer#'
+			identifier: class.notFound
+			path: src/State/Util/LinkTemplateHeaderSerializer.php
 		# False positives
 		-   message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\).#'
 		-
