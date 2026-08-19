@@ -40,6 +40,6 @@ class LinkHeaderTest extends TestCase
     {
         $response = $this->get('/api/', ['accept' => ['application/ld+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('link', '<http://localhost/api/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"');
+        $response->assertHeader('link', '<http://localhost/.well-known/api-catalog>; rel="api-catalog",<http://localhost/api/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"');
     }
 }

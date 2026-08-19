@@ -153,6 +153,7 @@ final class ApiLoader extends Loader
 
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.php'));
+            $routeCollection->addCollection($this->fileLoader->load('api_catalog.php'));
         }
 
         if ($this->graphqlEnabled) {
