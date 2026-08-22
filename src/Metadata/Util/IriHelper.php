@@ -26,6 +26,11 @@ use ApiPlatform\State\Util\RequestParser;
  */
 final class IriHelper
 {
+    private const EMPTY_BRACKET_REPLACEMENT = '%5B%5D';
+    private const INDEXED_LEAF_BRACKET_PATTERN = '/%5B\d+%5D(?!%5B)/';
+    private const QUERY_ASSIGNMENT_SEPARATOR = '=';
+    private const QUERY_SEPARATOR = '&';
+
     private function __construct()
     {
     }
@@ -64,11 +69,8 @@ final class IriHelper
             $parameters[$pageParameterName] = $page;
         }
 
-        $query = http_build_query($parameters, '', '&', \PHP_QUERY_RFC3986);
-        // Only collapse a numeric index when it is the leaf segment of a bracket chain
-        // (a simple list element). Collapsing a non-leaf index would merge distinct keys of a
-        // nested array into separate elements (e.g. filters[0][a] must stay filters[0][a]).
-        $parts['query'] = preg_replace('/%5B\d+%5D(?!%5B)/', '%5B%5D', $query);
+        $query = http_build_query($parameters, '', self::QUERY_SEPARATOR, \PHP_QUERY_RFC3986);
+        $parts['query'] = self::collapseNumericLeafIndexesInQueryKeys($query);
 
         $url = '';
         if ((UrlGeneratorInterface::ABS_URL === $urlGenerationStrategy || UrlGeneratorInterface::NET_PATH === $urlGenerationStrategy) && isset($parts['host'])) {
@@ -109,5 +111,22 @@ final class IriHelper
         }
 
         return $url;
+    }
+
+    private static function collapseNumericLeafIndexesInQueryKeys(string $query): string
+    {
+        $parameters = explode(self::QUERY_SEPARATOR, $query);
+
+        foreach ($parameters as $index => $parameter) {
+            [$key, $value] = explode(self::QUERY_ASSIGNMENT_SEPARATOR, $parameter, 2) + [1 => null];
+
+            // Only collapse a numeric index when it is the leaf segment of a bracket chain
+            // (a simple list element). Collapsing a non-leaf index would merge distinct keys of a
+            // nested array into separate elements (e.g. filters[0][a] must stay filters[0][a]).
+            $key = preg_replace(self::INDEXED_LEAF_BRACKET_PATTERN, self::EMPTY_BRACKET_REPLACEMENT, $key);
+            $parameters[$index] = null === $value ? $key : $key.self::QUERY_ASSIGNMENT_SEPARATOR.$value;
+        }
+
+        return implode(self::QUERY_SEPARATOR, $parameters);
     }
 }

@@ -23,6 +23,10 @@ use PHPUnit\Framework\TestCase;
  */
 class IriHelperTest extends TestCase
 {
+    private const OBJECTS_PATH = '/objects';
+    private const PAGE_PARAMETER_NAME = 'page';
+    private const BRACKETED_INDEX_VALUE = 'x[0]';
+
     public function testHelpers(): void
     {
         $parsed = [
@@ -93,16 +97,31 @@ class IriHelperTest extends TestCase
     public function testHelpersCollapseSimpleListQueryParameters(): void
     {
         $parts = [
-            'path' => '/objects',
+            'path' => self::OBJECTS_PATH,
             'query' => '',
         ];
         $parameters = [
             'foo' => ['a', 'b'],
         ];
 
-        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
+        $iri = IriHelper::createIri($parts, $parameters, self::PAGE_PARAMETER_NAME, 2.);
 
         $this->assertSame('/objects?foo%5B%5D=a&foo%5B%5D=b&page=2', $iri);
+    }
+
+    public function testCreateIriPreservesBracketedNumericIndexesInQueryValues(): void
+    {
+        $parts = [
+            'path' => self::OBJECTS_PATH,
+            'query' => '',
+        ];
+        $parameters = [
+            'v' => self::BRACKETED_INDEX_VALUE,
+        ];
+
+        $iri = IriHelper::createIri($parts, $parameters, self::PAGE_PARAMETER_NAME, 2.);
+
+        $this->assertSame('/objects?v=x%5B0%5D&page=2', $iri);
     }
 
     public function testParseIriWithInvalidUrl(): void
