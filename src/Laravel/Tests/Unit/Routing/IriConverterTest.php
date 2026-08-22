@@ -87,4 +87,113 @@ class IriConverterTest extends TestCase
             ['uri_variables' => ['id' => 1]],
         ));
     }
+
+    public function testGetIriFromResourceWithoutOperationUsesTheLocalOperationCache(): void
+    {
+        $itemOpName = 'item_op';
+        $itemOp = (new Get())->withName($itemOpName)->withClass(Book::class);
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturn('/api/books/1');
+
+        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->expects($this->once())
+            ->method('create')
+            ->with(Book::class)
+            ->willReturn(new ResourceMetadataCollection(Book::class, [
+                (new ApiResource())->withOperations(new Operations([$itemOpName => $itemOp])),
+            ]));
+
+        $iriConverter = $this->createIriConverter($router, $resourceMetadataFactory);
+
+        // No operation argument: the path every relation and every collection item's @id takes.
+        $context = ['uri_variables' => ['id' => 1]];
+        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
+        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
+    }
+
+    public function testGetIriFromResourceWithoutOperationReusesTheCachedOperation(): void
+    {
+        $cachedOp = (new Get())->withName('cached_op')->withClass(Book::class);
+        $staleOp = (new Get())->withName('stale_op')->withClass(Book::class);
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->method('generate')
+            ->willReturnCallback(fn (string $routeName): string => 'cached_op' === $routeName ? '/api/books/1' : '/api/stale/1');
+
+        // Hand back a different operation on a hypothetical second call: if the cache is not
+        // read, the second IRI visibly changes.
+        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->method('create')->willReturnOnConsecutiveCalls(
+            new ResourceMetadataCollection(Book::class, [(new ApiResource())->withOperations(new Operations(['cached_op' => $cachedOp]))]),
+            new ResourceMetadataCollection(Book::class, [(new ApiResource())->withOperations(new Operations(['stale_op' => $staleOp]))]),
+        );
+
+        $iriConverter = $this->createIriConverter($router, $resourceMetadataFactory);
+
+        $context = ['uri_variables' => ['id' => 1]];
+        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
+        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
+    }
+
+    public function testLocalOperationCacheDistinguishesItemAndCollectionAcrossCacheReads(): void
+    {
+        $collectionOpName = 'collection_op';
+        $itemOpName = 'item_op';
+
+        $collectionOp = (new GetCollection())->withName($collectionOpName)->withClass(Book::class);
+        $itemOp = (new Get())->withName($itemOpName)->withClass(Book::class);
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->exactly(4))
+            ->method('generate')
+            ->willReturnCallback(function (string $routeName) use ($collectionOpName, $itemOpName): string {
+                if ($collectionOpName === $routeName) {
+                    return '/api/books';
+                }
+                if ($itemOpName === $routeName) {
+                    return '/api/books/1';
+                }
+                $this->fail(\sprintf('Unexpected route name "%s".', $routeName));
+            });
+
+        // getOperation(null, $forceCollection, true) picks between the two according to $forceCollection.
+        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->expects($this->exactly(2))
+            ->method('create')
+            ->with(Book::class)
+            ->willReturn(new ResourceMetadataCollection(Book::class, [
+                (new ApiResource())->withOperations(new Operations([
+                    $collectionOpName => $collectionOp,
+                    $itemOpName => $itemOp,
+                ])),
+            ]));
+
+        $iriConverter = $this->createIriConverter($router, $resourceMetadataFactory);
+
+        // Both forms use a string resource, so only the item/collection part of the key differs.
+        // Interleaved on purpose: the third and fourth calls must read what the first two wrote.
+        $context = ['uri_variables' => ['id' => 1]];
+        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
+        $this->assertSame('/api/books', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, new GetCollection()));
+        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
+        $this->assertSame('/api/books', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, new GetCollection()));
+    }
+
+    private function createIriConverter(RouterInterface $router, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory): IriConverter
+    {
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        return new IriConverter(
+            $this->createStub(ProviderInterface::class),
+            $this->createStub(OperationMetadataFactoryInterface::class),
+            $router,
+            $this->createStub(IdentifiersExtractorInterface::class),
+            $resourceClassResolver,
+            $resourceMetadataFactory,
+        );
+    }
 }

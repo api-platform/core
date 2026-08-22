@@ -110,6 +110,92 @@ class IriConverterTest extends TestCase
         $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_URL, $operation));
     }
 
+    public function testGetIriFromItemWithoutOperationUsesTheLocalOperationCache(): void
+    {
+        $item = new Dummy();
+        $item->setId(1);
+
+        $operationName = 'operation_name';
+        $operation = (new Get())->withName($operationName);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate($operationName, ['id' => 1], UrlGeneratorInterface::ABS_PATH)->shouldBeCalledTimes(2)->willReturn('/dummies/1');
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($item, $operation, Argument::any())->shouldBeCalledTimes(2)->willReturn(['id' => 1]);
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalledOnce()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([$operationName => $operation])),
+        ]));
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, $identifiersExtractorProphecy, $resourceMetadataCollectionFactoryProphecy);
+
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item));
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item));
+    }
+
+    public function testGetIriFromItemWithoutOperationReusesTheCachedOperation(): void
+    {
+        $item = new Dummy();
+        $item->setId(1);
+
+        $cachedOperation = (new Get())->withName('cached_operation');
+        $staleOperation = (new Get())->withName('stale_operation');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('cached_operation', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies/1');
+        $routerProphecy->generate('stale_operation', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willReturn('/stale/1');
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($item, Argument::cetera())->willReturn(['id' => 1]);
+
+        // Prophecy returns these in order across consecutive calls, repeating the last.
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(
+            new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['cached_operation' => $cachedOperation]))]),
+            new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['stale_operation' => $staleOperation]))]),
+        );
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, $identifiersExtractorProphecy, $resourceMetadataCollectionFactoryProphecy);
+
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item));
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item));
+    }
+
+    public function testLocalOperationCacheDistinguishesItemAndCollectionIris(): void
+    {
+        $item = new Dummy();
+        $item->setId(1);
+
+        $itemOperation = (new Get())->withName('item_operation')->withClass(Dummy::class);
+        $collectionOperation = (new GetCollection())->withName('collection_operation')->withClass(Dummy::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('item_operation', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->shouldBeCalledTimes(2)->willReturn('/dummies/1');
+        $routerProphecy->generate('collection_operation', [], UrlGeneratorInterface::ABS_PATH)->shouldBeCalledTimes(2)->willReturn('/dummies');
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($item, Argument::cetera())->willReturn(['id' => 1]);
+
+        // getOperation(null, $forceCollection, true) picks between the two according to $forceCollection.
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalledTimes(2)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([
+                'item_operation' => $itemOperation,
+                'collection_operation' => $collectionOperation,
+            ])),
+        ]));
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, $identifiersExtractorProphecy, $resourceMetadataCollectionFactoryProphecy);
+
+        // Interleaved on purpose: the third and fourth calls must read the cache entry the first two wrote.
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item));
+        $this->assertSame('/dummies', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection()));
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item));
+        $this->assertSame('/dummies', $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection()));
+    }
+
     public function testGetIriFromItemWithNoOperations(): void
     {
         $this->expectExceptionMessage(\sprintf('Unable to generate an IRI for the item of type "%s"', Dummy::class));
