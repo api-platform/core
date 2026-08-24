@@ -23,6 +23,7 @@ use ApiPlatform\Symfony\Controller\MainController;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use GraphQL\GraphQL;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
@@ -592,6 +593,7 @@ final class Configuration implements ConfigurationInterface
                         SerializerExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                         OptimisticLockException::class => Response::HTTP_CONFLICT,
+                        UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)
