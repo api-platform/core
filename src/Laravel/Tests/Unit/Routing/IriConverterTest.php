@@ -121,7 +121,7 @@ class IriConverterTest extends TestCase
 
         $router = $this->createMock(RouterInterface::class);
         $router->method('generate')
-            ->willReturnCallback(fn (string $routeName): string => 'cached_op' === $routeName ? '/api/books/1' : '/api/stale/1');
+            ->willReturnCallback(static fn (string $routeName): string => 'cached_op' === $routeName ? '/api/books/1' : '/api/stale/1');
 
         // Hand back a different operation on a hypothetical second call: if the cache is not
         // read, the second IRI visibly changes.
