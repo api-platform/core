@@ -104,7 +104,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $jsonStream = null,
         array $extraProperties = [],
         ?bool $throwOnNotFound = null,
-        private ?string $itemUriTemplate = null,
+        ?string $itemUriTemplate = null,
         ?bool $map = null,
     ) {
         parent::__construct(
@@ -190,20 +190,8 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
-            map: $map
+            map: $map,
+            itemUriTemplate: $itemUriTemplate
         );
-    }
-
-    public function getItemUriTemplate(): ?string
-    {
-        return $this->itemUriTemplate;
-    }
-
-    public function withItemUriTemplate(string $itemUriTemplate): self
-    {
-        $self = clone $this;
-        $self->itemUriTemplate = $itemUriTemplate;
-
-        return $self;
     }
 }

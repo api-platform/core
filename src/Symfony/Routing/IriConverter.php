@@ -156,6 +156,13 @@ final class IriConverter implements IriConverterInterface
         }
 
         $identifiersExtractorOperation = $operation;
+
+        // The IRI of an item operation with a custom URI template points to the canonical operation declared with "itemUriTemplate"
+        if (!isset($context['item_uri_template']) && $this->operationMetadataFactory && $operation instanceof HttpOperation && !$operation instanceof CollectionOperationInterface && null !== ($itemUriTemplate = $operation->getItemUriTemplate())) {
+            $operation = $this->operationMetadataFactory->create($itemUriTemplate);
+            $identifiersExtractorOperation = $operation;
+        }
+
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()

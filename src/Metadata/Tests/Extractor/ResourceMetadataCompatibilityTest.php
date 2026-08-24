@@ -62,6 +62,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         null,
         [
             'uriTemplate' => '/users/{userId}/comments',
+            'itemUriTemplate' => '/users/{userId}/comments/{commentId}{._format}',
             'shortName' => self::SHORT_NAME,
             'description' => 'A list of Comments from User',
             'routePrefix' => '/api',

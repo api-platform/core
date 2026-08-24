@@ -225,6 +225,7 @@ class HttpOperation extends Operation
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        protected ?string $itemUriTemplate = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -312,6 +313,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
+
+        return $self;
+    }
+
+    public function getItemUriTemplate(): ?string
+    {
+        return $this->itemUriTemplate;
+    }
+
+    public function withItemUriTemplate(?string $itemUriTemplate = null): static
+    {
+        $self = clone $this;
+        $self->itemUriTemplate = $itemUriTemplate;
 
         return $self;
     }

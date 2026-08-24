@@ -24,6 +24,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
 {
     private const ATTRIBUTES = [
         'uriTemplate',
+        'itemUriTemplate',
         'shortName',
         'description',
         'routePrefix',

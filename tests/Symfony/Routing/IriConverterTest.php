@@ -323,6 +323,28 @@ class IriConverterTest extends TestCase
         return $resourceClassResolver->reveal();
     }
 
+    public function testGetIriFromItemOperationWithItemUriTemplate(): void
+    {
+        $item = new Dummy();
+        $item->setId(1);
+
+        // e.g. a PATCH operation with a custom URI template, whose IRI must point to the canonical operation
+        $operation = (new \ApiPlatform\Metadata\Patch())->withName('patch_custom')->withItemUriTemplate('/dummies/{id}{._format}');
+        $canonicalOperation = (new Get())->withName('canonical_get')->withUriTemplate('/dummies/{id}{._format}');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('canonical_get', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->shouldBeCalled()->willReturn('/dummies/1');
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($item, $canonicalOperation, Argument::any())->shouldBeCalled()->willReturn(['id' => 1]);
+
+        $operationMetadataFactoryProphecy = $this->prophesize(OperationMetadataFactoryInterface::class);
+        $operationMetadataFactoryProphecy->create('/dummies/{id}{._format}')->shouldBeCalled()->willReturn($canonicalOperation);
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, $identifiersExtractorProphecy, null, null, null, $operationMetadataFactoryProphecy);
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_PATH, $operation));
+    }
+
     private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null, $decorated = null, ?ObjectProphecy $operationMetadataFactory = null): IriConverter
     {
         if (!$stateProviderProphecy) {

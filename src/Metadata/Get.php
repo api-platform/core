@@ -105,6 +105,7 @@ final class Get extends HttpOperation
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -189,7 +190,8 @@ final class Get extends HttpOperation
             jsonStream: $jsonStream,
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            itemUriTemplate: $itemUriTemplate
         );
     }
 }

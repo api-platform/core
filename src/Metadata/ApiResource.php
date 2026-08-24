@@ -982,6 +982,7 @@ class ApiResource extends Metadata
         protected array $extraProperties = [],
         ?bool $map = null,
         protected ?array $mcp = null,
+        protected ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1089,6 +1090,19 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
+
+        return $self;
+    }
+
+    public function getItemUriTemplate(): ?string
+    {
+        return $this->itemUriTemplate;
+    }
+
+    public function withItemUriTemplate(?string $itemUriTemplate = null): static
+    {
+        $self = clone $this;
+        $self->itemUriTemplate = $itemUriTemplate;
 
         return $self;
     }
