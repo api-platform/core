@@ -48,6 +48,7 @@ final class IsGrantedTest extends ApiTestCase
 
         $client->request('GET', '/is_granted_tests/1');
         $this->assertResponseStatusCodeSame(403);
+        $this->assertJsonContains(['detail' => "Access Denied. The user doesn't have ROLE_ADMIN."]);
     }
 
     public function testGetIsGrantedAsAnonymous(): void

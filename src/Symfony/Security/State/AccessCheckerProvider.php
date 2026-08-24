@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Symfony\Security\AccessDeniedMessageProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use ApiPlatform\Symfony\Security\ObjectVariableCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -32,7 +33,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 final class AccessCheckerProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $decorated, private readonly ResourceAccessCheckerInterface $resourceAccessChecker, private readonly ?string $event = null)
+    public function __construct(private readonly ProviderInterface $decorated, private readonly ResourceAccessCheckerInterface $resourceAccessChecker, private readonly ?string $event = null, private readonly bool $debug = false)
     {
     }
 
@@ -98,7 +99,19 @@ final class AccessCheckerProvider implements ProviderInterface
         }
 
         if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
-            $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.', null, 403, false);
+            if ($operation instanceof GraphQlOperation) {
+                throw new AccessDeniedHttpException($message ?? 'Access Denied.');
+            }
+
+            $voterMessage = null;
+            if (null === $message && $this->resourceAccessChecker instanceof AccessDeniedMessageProviderInterface) {
+                $voterMessage = $this->resourceAccessChecker->getAccessDeniedMessage();
+            }
+
+            $publicDetail = $message ?? ($this->debug ? $voterMessage : null) ?? 'Access Denied.';
+            $message ??= $voterMessage ?? 'Access Denied.';
+
+            throw new AccessDeniedException($message, triggerDeprecation: false, detail: $publicDetail);
         }
 
         return 'pre_read' === $this->event ? $this->decorated->provide($operation, $uriVariables, $context) : $body;

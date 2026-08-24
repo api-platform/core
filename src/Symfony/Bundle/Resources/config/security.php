@@ -29,7 +29,8 @@ return static function (ContainerConfigurator $container) {
             service('security.role_hierarchy')->nullOnInvalid(),
             service('security.token_storage')->nullOnInvalid(),
             service('security.authorization_checker')->nullOnInvalid(),
-        ]);
+        ])
+        ->tag('kernel.reset', ['method' => 'reset']);
 
     $services->alias(ResourceAccessCheckerInterface::class, 'api_platform.security.resource_access_checker');
 

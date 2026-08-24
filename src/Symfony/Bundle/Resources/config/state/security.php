@@ -24,7 +24,8 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.state_provider.access_checker.inner'),
             service('api_platform.security.resource_access_checker'),
-        ]);
+        ])
+        ->arg('$debug', '%kernel.debug%');
 
     $services->set('api_platform.state_provider.access_checker.post_deserialize', AccessCheckerProvider::class)
         ->decorate('api_platform.state_provider.deserialize', null, 0)
@@ -32,7 +33,8 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_provider.access_checker.post_deserialize.inner'),
             service('api_platform.security.resource_access_checker'),
             'post_denormalize',
-        ]);
+        ])
+        ->arg('$debug', '%kernel.debug%');
 
     $services->set('api_platform.state_provider.security_parameter', SecurityParameterProvider::class)
         ->decorate('api_platform.state_provider.access_checker', null, 0)
@@ -47,5 +49,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_provider.access_checker.pre_read.inner'),
             service('api_platform.security.resource_access_checker'),
             'pre_read',
-        ]);
+        ])
+        ->arg('$debug', '%kernel.debug%');
 };

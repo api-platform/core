@@ -253,6 +253,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.security.resource_access_checker', ['kernel.reset']);
 
         // api.xml
         $this->assertServiceHasTags('api_platform.route_loader', ['routing.loader']);
@@ -275,6 +276,20 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertTrue($this->container->hasParameter('api_platform.enable_head_request_optimization'));
         $this->assertTrue($this->container->getParameter('api_platform.enable_head_request_optimization'));
+    }
+
+    public function testHttpAccessCheckerProvidersUseKernelDebugToExposeVoterReasons(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        foreach ([
+            'api_platform.state_provider.access_checker',
+            'api_platform.state_provider.access_checker.post_deserialize',
+            'api_platform.state_provider.access_checker.post_validate',
+            'api_platform.state_provider.access_checker.pre_read',
+        ] as $serviceId) {
+            $this->assertSame('%kernel.debug%', $this->container->getDefinition($serviceId)->getArgument('$debug'));
+        }
     }
 
     public function testSwaggerUiDisabledConfiguration(): void
