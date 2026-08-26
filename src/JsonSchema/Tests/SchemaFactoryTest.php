@@ -42,6 +42,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
@@ -805,5 +806,131 @@ class SchemaFactoryTest extends TestCase
 
         self::assertSame('RequiredResource.jsonMergePatch', $patchSchema->getRootDefinitionKey());
         self::assertArrayNotHasKey('required', $patchSchema->getDefinitions()[$patchSchema->getRootDefinitionKey()]);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideASingleReference(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::object(GenericChild::class))
+            ->withDescription('The child.')
+            ->withSchema(['description' => 'The child.', 'type' => Schema::UNKNOWN_TYPE]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            '$ref' => '#/definitions/GenericChild',
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideANullableReference(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::object(GenericChild::class)))
+            ->withDescription('The child.')
+            ->withDefault('default_child')
+            ->withExample('example_child')
+            ->withSchema(['description' => 'The child.', 'default' => 'default_child', 'example' => 'example_child', 'type' => Schema::UNKNOWN_TYPE]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            'default' => 'default_child',
+            'example' => 'example_child',
+            'anyOf' => [
+                ['$ref' => '#/definitions/GenericChild'],
+                ['type' => 'null'],
+            ],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideACollectionOfReferences(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::list(Type::object(GenericChild::class)))
+            ->withDescription('The children.')
+            ->withWritable(false)
+            ->withSchema(['description' => 'The children.', 'readOnly' => true, 'maxItems' => 1, 'type' => 'array', 'items' => ['type' => Schema::UNKNOWN_TYPE]]));
+
+        $this->assertSame([
+            'description' => 'The children.',
+            'readOnly' => true,
+            'maxItems' => 1,
+            'type' => 'array',
+            'items' => ['$ref' => '#/definitions/GenericChild'],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * An intersection carries its unresolved type in an allOf, which must not survive next to the references.
+     *
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideAnIntersectionOfReferences(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::intersection(Type::object(GenericChild::class), Type::object(Serializable::class)))
+            ->withDescription('The child.')
+            ->withSchema(['description' => 'The child.', 'allOf' => [['type' => Schema::UNKNOWN_TYPE], ['type' => Schema::UNKNOWN_TYPE]]]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            'anyOf' => [
+                ['$ref' => '#/definitions/GenericChild'],
+                ['$ref' => '#/definitions/Serializable'],
+            ],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * Builds the schema of a non-resource class holding a single property typed after another class.
+     *
+     * @return array<string, \ArrayObject<string, mixed>>
+     */
+    private function buildPropertiesWithReference(string $propertyName, ApiProperty $propertyMetadata): array
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(
+            static fn (string $class): PropertyNameCollection => new PropertyNameCollection(
+                NotAResource::class === $class ? [$propertyName] : ['property'],
+            ),
+        );
+
+        $childPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::string())
+            ->withReadable(true)
+            ->withSchema(['type' => 'string']);
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(
+            static fn (string $class): ApiProperty => NotAResource::class === $class
+                ? $propertyMetadata->withReadable(true)
+                : $childPropertyMetadata,
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            resourceClassResolver: $resourceClassResolver,
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $schema = $schemaFactory->buildSchema(NotAResource::class);
+
+        return $schema->getDefinitions()[$schema->getRootDefinitionKey()]['properties'];
     }
 }
