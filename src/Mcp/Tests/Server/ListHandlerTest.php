@@ -20,10 +20,12 @@ use ApiPlatform\Mcp\Server\ListHandler;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use Mcp\Capability\Registry;
 use Mcp\Capability\Registry\Loader\LoaderInterface;
 use Mcp\Capability\RegistryInterface;
@@ -34,6 +36,7 @@ use Mcp\Schema\Result\ListToolsResult;
 use Mcp\Schema\Tool;
 use Mcp\Server\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 class ListHandlerTest extends TestCase
 {
@@ -127,6 +130,73 @@ class ListHandlerTest extends TestCase
         $this->assertTrue($handler->supports(new ListResourcesRequest()));
     }
 
+    public function testListToolsOmitsToolsTheCallerCannotInvoke(): void
+    {
+        $secured = new McpTool(name: 'secured', description: 'Secured', structuredContent: false, class: \stdClass::class, security: "is_granted('ROLE_ADMIN')");
+        $public = new McpTool(name: 'public', description: 'Public', structuredContent: false, class: \stdClass::class);
+
+        $accessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $accessChecker->method('isGranted')->willReturn(false);
+
+        $result = $this->handleListTools([$secured, $public], $accessChecker);
+
+        $this->assertInstanceOf(ListToolsResult::class, $result);
+        $this->assertSame(['public'], array_map(static fn (Tool $t): string => $t->name, $result->tools));
+    }
+
+    public function testListToolsKeepsToolsTheCallerCanInvoke(): void
+    {
+        $secured = new McpTool(name: 'secured', description: 'Secured', structuredContent: false, class: \stdClass::class, security: "is_granted('ROLE_ADMIN')");
+
+        $accessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $accessChecker->expects($this->once())->method('isGranted')->with(\stdClass::class, "is_granted('ROLE_ADMIN')")->willReturn(true);
+
+        $result = $this->handleListTools([$secured], $accessChecker);
+
+        $this->assertInstanceOf(ListToolsResult::class, $result);
+        $this->assertSame(['secured'], array_map(static fn (Tool $t): string => $t->name, $result->tools));
+    }
+
+    /**
+     * An expression reading the object (or a uri variable) cannot be evaluated before the tool is
+     * called: the tool stays listed and tools/call still enforces the expression.
+     */
+    public function testListToolsKeepsToolsWhoseExpressionNeedsCallTimeVariables(): void
+    {
+        $secured = new McpTool(name: 'secured', description: 'Secured', structuredContent: false, class: \stdClass::class, security: 'object.owner == user');
+
+        $accessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $accessChecker->method('isGranted')->willThrowException(new SyntaxError('Variable "object" is not valid'));
+
+        $result = $this->handleListTools([$secured], $accessChecker);
+
+        $this->assertInstanceOf(ListToolsResult::class, $result);
+        $this->assertSame(['secured'], array_map(static fn (Tool $t): string => $t->name, $result->tools));
+    }
+
+    public function testListResourcesOmitsResourcesTheCallerCannotRead(): void
+    {
+        $secured = new McpResource(uri: 'dummy://secured', name: 'secured', description: 'Secured', mimeType: 'text/plain', class: \stdClass::class, security: "is_granted('ROLE_ADMIN')");
+        $public = new McpResource(uri: 'dummy://public', name: 'public', description: 'Public', mimeType: 'text/plain', class: \stdClass::class);
+
+        $accessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $accessChecker->method('isGranted')->willReturn(false);
+
+        $apiResource = (new ApiResource(class: \stdClass::class))->withMcp(['secured' => $secured, 'public' => $public]);
+        $handler = new ListHandler(
+            new Registry(),
+            $this->createLoader($apiResource, $this->createMock(SchemaFactoryInterface::class)),
+            20,
+            $this->createOperationMetadataFactory([$secured, $public]),
+            $accessChecker,
+        );
+
+        $result = $handler->handle((new ListResourcesRequest())->withId(1), $this->createMock(SessionInterface::class))->result;
+
+        $this->assertInstanceOf(ListResourcesResult::class, $result);
+        $this->assertSame(['dummy://public'], array_map(static fn ($r): string => $r->uri, $result->resources));
+    }
+
     private function createLoader(ApiResource $resource, SchemaFactoryInterface $schemaFactory): Loader
     {
         $nameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
@@ -136,5 +206,55 @@ class ListHandlerTest extends TestCase
         $metadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class, [$resource]));
 
         return new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+    }
+
+    /**
+     * @param list<McpTool> $tools
+     */
+    private function handleListTools(array $tools, ResourceAccessCheckerInterface $accessChecker): mixed
+    {
+        $inputSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($inputSchema['$schema']);
+        $inputSchema['type'] = 'object';
+        $inputSchema['properties'] = [];
+
+        $schemaFactory = $this->createMock(SchemaFactoryInterface::class);
+        $schemaFactory->method('buildSchema')->willReturn($inputSchema);
+
+        $mcp = [];
+        foreach ($tools as $tool) {
+            $mcp[$tool->getName()] = $tool;
+        }
+
+        $resource = (new ApiResource(class: \stdClass::class))->withMcp($mcp);
+
+        $handler = new ListHandler(
+            new Registry(),
+            $this->createLoader($resource, $schemaFactory),
+            20,
+            $this->createOperationMetadataFactory($tools),
+            $accessChecker,
+        );
+
+        return $handler->handle((new ListToolsRequest())->withId(1), $this->createMock(SessionInterface::class))->result;
+    }
+
+    /**
+     * @param list<McpTool|McpResource> $operations
+     */
+    private function createOperationMetadataFactory(array $operations): OperationMetadataFactoryInterface
+    {
+        $factory = $this->createMock(OperationMetadataFactoryInterface::class);
+        $factory->method('create')->willReturnCallback(static function (string $name) use ($operations) {
+            foreach ($operations as $operation) {
+                if ($operation->getName() === $name || ($operation instanceof McpResource && $operation->getUri() === $name)) {
+                    return $operation;
+                }
+            }
+
+            return null;
+        });
+
+        return $factory;
     }
 }

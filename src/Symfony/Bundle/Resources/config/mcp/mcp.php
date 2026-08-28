@@ -46,6 +46,9 @@ return static function (ContainerConfigurator $container) {
             service('mcp.registry'),
             service('api_platform.mcp.loader'),
         ])
+        ->arg('$operationMetadataFactory', service('api_platform.mcp.metadata.operation.mcp_factory'))
+        ->arg('$resourceAccessChecker', service('api_platform.security.resource_access_checker')->ignoreOnInvalid())
+        ->arg('$requestStack', service('request_stack'))
         ->tag('mcp.request_handler');
 
     $services->set('api_platform.mcp.iri_converter', IriConverter::class)
