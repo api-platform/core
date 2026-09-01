@@ -17,11 +17,16 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use Illuminate\Support\Facades\Cache;
 
-final readonly class CachePropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
+final class CachePropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
 {
+    /**
+     * @var array<string, PropertyNameCollection>
+     */
+    private array $localCache = [];
+
     public function __construct(
-        private PropertyNameCollectionFactoryInterface $decorated,
-        private string $cacheStore,
+        private readonly PropertyNameCollectionFactoryInterface $decorated,
+        private readonly string $cacheStore,
     ) {
     }
 
@@ -29,7 +34,7 @@ final readonly class CachePropertyNameCollectionMetadataFactory implements Prope
     {
         $key = hash('xxh3', serialize(['resource_class' => $resourceClass] + $options));
 
-        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $options) {
+        return $this->localCache[$key] ??= Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $options) {
             return $this->decorated->create($resourceClass, $options);
         });
     }
