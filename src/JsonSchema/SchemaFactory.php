@@ -47,6 +47,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
+    public const PARTIAL_UPDATE = 'partial_update';
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
@@ -95,12 +96,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $isJsonMergePatch = 'json' === $format && 'PATCH' === $method && Schema::TYPE_INPUT === $type;
+        $isNonStandardPut = Schema::TYPE_INPUT === $type && 'PUT' === $method && !($operation?->getExtraProperties()['standard_put'] ?? true);
+        $isPartialUpdate = $isJsonMergePatch || $isNonStandardPut;
         $definitionFormat = match (true) {
             default => $format,
             $isJsonMergePatch => 'merge-patch+json',
         };
 
-        $definitionName = $this->definitionNameFactory->create($className, $definitionFormat, $inputOrOutputClass, $operation, $serializerContext + ['schema_type' => $type]);
+        $definitionName = $this->definitionNameFactory->create($className, $definitionFormat, $inputOrOutputClass, $operation, $serializerContext + [
+            'schema_type' => $type,
+            self::PARTIAL_UPDATE => $isPartialUpdate && !$isJsonMergePatch,
+        ]);
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = $this->getSchemaUriPrefix($version).$definitionName;
@@ -154,7 +160,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
-            if ($propertyMetadata->isRequired() && !$isJsonMergePatch) {
+            if ($propertyMetadata->isRequired() && !$isPartialUpdate) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 

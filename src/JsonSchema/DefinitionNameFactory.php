@@ -79,6 +79,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             $name = $parts ? \sprintf('%s-%s', $prefix, implode('_', $parts)) : $prefix;
         }
 
+        if ($serializerContext[SchemaFactory::PARTIAL_UPDATE] ?? false) {
+            $name .= '.partial';
+        }
+
         if (false === ($serializerContext['gen_id'] ?? true)) {
             $name .= '_noid';
         }

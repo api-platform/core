@@ -29,6 +29,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -730,5 +732,78 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
         $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
+    }
+
+    public function testPartialUpdateRequiredPropertiesUseDistinctDefinitions(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::string())
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withRequired(true)
+                ->withSchema(['type' => 'string'])
+        );
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(true);
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
+            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
+        );
+
+        $postSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'jsonld',
+            Schema::TYPE_INPUT,
+            new Post(class: NotAResource::class, shortName: 'RequiredResource'),
+        );
+        $postDefinitionKey = $postSchema->getRootDefinitionKey();
+
+        $partialPutSchema = new Schema(Schema::VERSION_OPENAPI);
+        $partialPutSchema->setDefinitions($postSchema->getDefinitions());
+        $partialPutSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'jsonld',
+            Schema::TYPE_INPUT,
+            new Put(class: NotAResource::class, shortName: 'RequiredResource', extraProperties: ['standard_put' => false]),
+            $partialPutSchema,
+        );
+        $partialPutDefinitionKey = $partialPutSchema->getRootDefinitionKey();
+
+        $standardPutSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'jsonld',
+            Schema::TYPE_INPUT,
+            new Put(class: NotAResource::class, shortName: 'RequiredResource'),
+        );
+        $standardPutDefinitionKey = $standardPutSchema->getRootDefinitionKey();
+
+        self::assertSame('RequiredResource.jsonld', $postDefinitionKey);
+        self::assertSame('RequiredResource.jsonld.partial', $partialPutDefinitionKey);
+        self::assertSame('RequiredResource.jsonld', $standardPutDefinitionKey);
+        self::assertNotSame($postDefinitionKey, $partialPutDefinitionKey);
+        self::assertSame(['foo'], $postSchema->getDefinitions()[$postDefinitionKey]['required']);
+        self::assertArrayNotHasKey('required', $partialPutSchema->getDefinitions()[$partialPutDefinitionKey]);
+        self::assertSame(['foo'], $standardPutSchema->getDefinitions()[$standardPutDefinitionKey]['required']);
+
+        $patchSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'json',
+            Schema::TYPE_INPUT,
+            new Patch(class: NotAResource::class, shortName: 'RequiredResource'),
+        );
+
+        self::assertSame('RequiredResource.jsonMergePatch', $patchSchema->getRootDefinitionKey());
+        self::assertArrayNotHasKey('required', $patchSchema->getDefinitions()[$patchSchema->getRootDefinitionKey()]);
     }
 }
