@@ -1,8 +1,10 @@
 parameters:
     container.autowiring.strict_mode: true
     .container.dumper.inline_class_loader: true
-    env(MERCURE_URL): https://demo.mercure.rocks
+    env(MERCURE_URL): http://localhost:1337/.well-known/mercure
     env(MERCURE_JWT_SECRET): eyJhbGciOiJIUzI1NiJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdLCJzdWJzY3JpYmUiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbS9teS1wcml2YXRlLXRvcGljIiwie3NjaGVtZX06Ly97K2hvc3R9L2RlbW8vYm9va3Mve2lkfS5qc29ubGQiLCIvLndlbGwta25vd24vbWVyY3VyZS9zdWJzY3JpcHRpb25zey90b3BpY317L3N1YnNjcmliZXJ9Il0sInBheWxvYWQiOnsidXNlciI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXNlcnMvZHVuZ2xhcyIsInJlbW90ZUFkZHIiOiIxMjcuMC4wLjEifX19.KKPIikwUzRuB3DTpVw6ajzwSChwFw5omBMmMcWKiDcM
+    # Only config_mercure.yml (APP_ENV=mercure) runs a hub and flips this on.
+    app.mercure.publish_to_hub: false
 
 doctrine:
     dbal:
@@ -25,9 +27,6 @@ web_profiler:
 mercure:
     hubs:
         default:
-            url: '%env(MERCURE_URL)%'
-            jwt: '%env(MERCURE_JWT_SECRET)%'
-        debug:
             url: '%env(MERCURE_URL)%'
             jwt: '%env(MERCURE_JWT_SECRET)%'
 
@@ -290,10 +289,19 @@ services:
         tags:
             - name: 'api_platform.validation_groups_generator'
 
+    # Plain service, not a second `mercure.hubs` entry: the bundle registers one messenger
+    # handler per hub, so a second hub published every async update a second time, unguarded.
+    app.mercure.inner_hub:
+        class: Symfony\Component\Mercure\Hub
+        arguments:
+            $url: '%env(MERCURE_URL)%'
+            $jwtProvider: '@mercure.hub.default.jwt.provider'
+
     mercure.hub.default.test_hub:
         class: ApiPlatform\Tests\Fixtures\TestBundle\Mercure\TestHub
         arguments:
-           $hub: '@mercure.hub.debug'
+           $hub: '@app.mercure.inner_hub'
+           $publishToHub: '%app.mercure.publish_to_hub%'
         public: true
     mercure.hub.default: '@mercure.hub.default.test_hub'
 

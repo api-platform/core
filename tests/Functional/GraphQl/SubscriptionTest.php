@@ -103,7 +103,7 @@ final class SubscriptionTest extends ApiTestCase
         $this->assertSame('Dummy Mercure #1', $data['dummyMercure']['name']);
         $this->assertSame('myId', $data['clientSubscriptionId']);
         $this->assertMatchesRegularExpression(
-            '@^https://demo\.mercure\.rocks\?topic=http://[^/]+/subscriptions/[a-f0-9]+$@',
+            '@^http://localhost:1337/\.well-known/mercure\?topic=http://[^/]+/subscriptions/[a-f0-9]+$@',
             $data['mercureUrl'],
         );
 
@@ -120,7 +120,7 @@ final class SubscriptionTest extends ApiTestCase
         $data = $response->toArray()['data']['updateDummyMercureSubscribe'];
         $this->assertSame('/dummy_mercures/2', $data['dummyMercure']['id']);
         $this->assertMatchesRegularExpression(
-            '@^https://demo\.mercure\.rocks\?topic=http://[^/]+/subscriptions/[a-f0-9]+$@',
+            '@^http://localhost:1337/\.well-known/mercure\?topic=http://[^/]+/subscriptions/[a-f0-9]+$@',
             $data['mercureUrl'],
         );
     }
