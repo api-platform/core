@@ -49,7 +49,7 @@ final class MercureTest extends ApiTestCase
         ]);
 
         $this->assertContains(
-            '<https://demo.mercure.rocks>; rel="mercure"',
+            '<http://localhost:1337/.well-known/mercure>; rel="mercure"',
             $response->getHeaders()['link'],
         );
     }
@@ -59,7 +59,7 @@ final class MercureTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/');
 
         $this->assertNotContains(
-            '<https://demo.mercure.rocks/hub>; rel="mercure"',
+            '<http://localhost:1337/.well-known/mercure>; rel="mercure"',
             $response->getHeaders()['link'] ?? [],
         );
     }

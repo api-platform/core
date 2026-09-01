@@ -18,6 +18,7 @@ use Symfony\Component\Mercure\Jwt\TokenFactoryInterface;
 use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
 use Symfony\Component\Mercure\ProtocolVersion;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Uid\Uuid;
 
 final class TestHub implements HubInterface
 {
@@ -26,7 +27,11 @@ final class TestHub implements HubInterface
      */
     private array $updates = [];
 
-    public function __construct(private readonly HubInterface $hub)
+    /**
+     * Only the dedicated Mercure test env runs a hub; publishing anywhere else would call an
+     * unrelated third party over the network and make the whole suite flaky.
+     */
+    public function __construct(private readonly HubInterface $hub, private readonly bool $publishToHub = false)
     {
     }
 
@@ -70,6 +75,10 @@ final class TestHub implements HubInterface
     public function publish(Update $update): string
     {
         $this->updates[] = $update;
+
+        if (!$this->publishToHub) {
+            return 'urn:uuid:'.Uuid::v4()->toRfc4122();
+        }
 
         return $this->hub->publish($update);
     }
