@@ -129,7 +129,9 @@ final class IriConverter implements IriConverterInterface
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
-        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_s' : '_o').($operation instanceof CollectionOperationInterface ? '_c' : '_i');
+        // item_uri_template steers both the skolem check and the resource class promotion below,
+        // so it has to be part of the key even when it did not resolve to an operation.
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_s' : '_o').($operation instanceof CollectionOperationInterface ? '_c' : '_i').($context['item_uri_template'] ?? '');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }

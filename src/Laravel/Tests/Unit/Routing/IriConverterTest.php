@@ -96,6 +96,7 @@ class IriConverterTest extends TestCase
         $router = $this->createMock(RouterInterface::class);
         $router->expects($this->exactly(2))
             ->method('generate')
+            ->with($itemOpName, ['id' => 1], UrlGeneratorInterface::ABS_PATH)
             ->willReturn('/api/books/1');
 
         $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
@@ -105,31 +106,6 @@ class IriConverterTest extends TestCase
             ->willReturn(new ResourceMetadataCollection(Book::class, [
                 (new ApiResource())->withOperations(new Operations([$itemOpName => $itemOp])),
             ]));
-
-        $iriConverter = $this->createIriConverter($router, $resourceMetadataFactory);
-
-        // No operation argument: the path every relation and every collection item's @id takes.
-        $context = ['uri_variables' => ['id' => 1]];
-        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
-        $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
-    }
-
-    public function testGetIriFromResourceWithoutOperationReusesTheCachedOperation(): void
-    {
-        $cachedOp = (new Get())->withName('cached_op')->withClass(Book::class);
-        $staleOp = (new Get())->withName('stale_op')->withClass(Book::class);
-
-        $router = $this->createMock(RouterInterface::class);
-        $router->method('generate')
-            ->willReturnCallback(static fn (string $routeName): string => 'cached_op' === $routeName ? '/api/books/1' : '/api/stale/1');
-
-        // Hand back a different operation on a hypothetical second call: if the cache is not
-        // read, the second IRI visibly changes.
-        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactory->method('create')->willReturnOnConsecutiveCalls(
-            new ResourceMetadataCollection(Book::class, [(new ApiResource())->withOperations(new Operations(['cached_op' => $cachedOp]))]),
-            new ResourceMetadataCollection(Book::class, [(new ApiResource())->withOperations(new Operations(['stale_op' => $staleOp]))]),
-        );
 
         $iriConverter = $this->createIriConverter($router, $resourceMetadataFactory);
 
@@ -159,7 +135,6 @@ class IriConverterTest extends TestCase
                 $this->fail(\sprintf('Unexpected route name "%s".', $routeName));
             });
 
-        // getOperation(null, $forceCollection, true) picks between the two according to $forceCollection.
         $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->expects($this->exactly(2))
             ->method('create')
@@ -174,7 +149,6 @@ class IriConverterTest extends TestCase
         $iriConverter = $this->createIriConverter($router, $resourceMetadataFactory);
 
         // Both forms use a string resource, so only the item/collection part of the key differs.
-        // Interleaved on purpose: the third and fourth calls must read what the first two wrote.
         $context = ['uri_variables' => ['id' => 1]];
         $this->assertSame('/api/books/1', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, null, $context));
         $this->assertSame('/api/books', $iriConverter->getIriFromResource(Book::class, UrlGeneratorInterface::ABS_PATH, new GetCollection()));
