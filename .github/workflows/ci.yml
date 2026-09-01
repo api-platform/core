@@ -25,6 +25,9 @@ permissions:
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COMPOSER_ROOT_VERSION: "5.0.x-dev"
+  # Pinned build tooling: these are installed and executed on the runner, so an
+  # unconstrained version would run whatever the registry serves that day.
+  PMU_VERSION: "0.3.0"
 
 jobs:
   architecture:
@@ -156,7 +159,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer global require soyuka/pmu
+          composer global require "soyuka/pmu:$PMU_VERSION"
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Codemod unit tests
