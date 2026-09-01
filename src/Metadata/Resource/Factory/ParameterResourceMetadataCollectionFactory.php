@@ -423,11 +423,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             try {
                 return $this->getLegacyFilterMetadata($parameter, $operation, $filter);
             } catch (RuntimeException $exception) {
-                // An inline filter instance (e.g. `new NumericFilter()`) passed to a QueryParameter is
-                // never wired with a ManagerRegistry, unlike a filter resolved through the filter locator
-                // as a service. Its getDescription() then fails on the Doctrine metadata lookup. This is
-                // expected and recoverable during cache warmup, so log it at debug level instead of the
-                // alarming ALERT reserved for genuinely unexpected registry failures.
+                // An inline filter instance never gets a ManagerRegistry, unlike one resolved as a service
+                // through the filter locator: failing to describe it is expected, not an alert-worthy event.
                 if ($filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
                     $this->logger?->debug($exception->getMessage(), ['exception' => $exception]);
                 } else {
