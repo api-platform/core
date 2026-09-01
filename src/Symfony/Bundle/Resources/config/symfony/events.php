@@ -57,9 +57,12 @@ return static function (ContainerConfigurator $container) {
         ->arg(1, service('api_platform.serializer.context_builder'))
         ->arg('$logger', service('logger')->nullOnInvalid());
 
+    // Outermost decorator of the read chain (access checkers sit at 0) so parameters are
+    // resolved, and their values propagated to the uriVariables, before anything reads them.
     $services->set('api_platform.state_provider.parameter', ParameterProvider::class)
+        ->decorate('api_platform.state_provider.read', null, -10)
         ->args([
-            null,
+            service('api_platform.state_provider.parameter.inner'),
             tagged_locator('api_platform.parameter_provider', 'key'),
         ]);
 
@@ -68,7 +71,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_provider.read'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.uri_variables.converter'),
-            service('api_platform.state_provider.parameter')->nullOnInvalid(),
         ])
         ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 4]);
 

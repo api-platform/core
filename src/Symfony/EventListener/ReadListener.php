@@ -43,7 +43,6 @@ final class ReadListener
         private readonly ProviderInterface $provider,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         ?UriVariablesConverterInterface $uriVariablesConverter = null,
-        private readonly ?ProviderInterface $parameterProvider = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
@@ -88,7 +87,6 @@ final class ReadListener
             'uri_variables' => $uriVariables,
             'resource_class' => $operation->getClass(),
         ];
-        $this->parameterProvider?->provide($operation, $uriVariables, $context);
         $this->provider->provide($operation, $uriVariables, $context);
     }
 }

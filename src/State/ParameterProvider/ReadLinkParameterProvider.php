@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Checks if the linked resources have security attributes and prepares them for access checking.
  */
-final class ReadLinkParameterProvider implements ParameterProviderInterface
+final class ReadLinkParameterProvider implements ParameterProviderInterface, PreservesUriVariableInterface
 {
     /**
      * @param ProviderInterface<object> $locator

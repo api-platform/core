@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterNotFound;
+use ApiPlatform\State\ParameterProvider\PreservesUriVariableInterface;
 use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\StopwatchAwareInterface;
@@ -108,7 +109,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
-    private function handlePathParameters(HttpOperation $operation, array $uriVariables, array $context): HttpOperation
+    private function handlePathParameters(HttpOperation $operation, array &$uriVariables, array $context): HttpOperation
     {
         foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
             $uriVariable = $uriVariable->withKey($key);
@@ -136,9 +137,30 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             if (($op = $this->callParameterProvider($operation, $uriVariable, $values, $context)) instanceof HttpOperation) {
                 $context['operation'] = $operation = $op;
             }
+
+            // A provider that resolves the parameter to a resource leaves an object in the value,
+            // which is not the identifier the resource is queried with.
+            if (!$uriVariable->getValue() instanceof ParameterNotFound
+                && !$this->resolveProvider($operation, $uriVariable->getProvider()) instanceof PreservesUriVariableInterface
+            ) {
+                $uriVariables[$key] = $uriVariable->getValue();
+            }
         }
 
         return $operation;
+    }
+
+    private function resolveProvider(Operation $operation, mixed $provider): mixed
+    {
+        if (!\is_string($provider)) {
+            return $provider;
+        }
+
+        if (!$this->locator->has($provider)) {
+            throw new ProviderNotFoundException(\sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
+        }
+
+        return $this->locator->get($provider);
     }
 
     /**
@@ -162,13 +184,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             return $operation;
         }
 
-        if (\is_string($provider)) {
-            if (!$this->locator->has($provider)) {
-                throw new ProviderNotFoundException(\sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
-            }
-
-            $provider = $this->locator->get($provider);
-        }
+        $provider = $this->resolveProvider($operation, $provider);
 
         if (($op = $provider->provide($parameter, $values, $context)) instanceof Operation) {
             $operation = $op;
