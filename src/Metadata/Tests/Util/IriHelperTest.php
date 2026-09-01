@@ -23,10 +23,6 @@ use PHPUnit\Framework\TestCase;
  */
 class IriHelperTest extends TestCase
 {
-    private const OBJECTS_PATH = '/objects';
-    private const PAGE_PARAMETER_NAME = 'page';
-    private const BRACKETED_INDEX_VALUE = 'x[0]';
-
     public function testHelpers(): void
     {
         $parsed = [
@@ -97,14 +93,14 @@ class IriHelperTest extends TestCase
     public function testHelpersCollapseSimpleListQueryParameters(): void
     {
         $parts = [
-            'path' => self::OBJECTS_PATH,
+            'path' => '/objects',
             'query' => '',
         ];
         $parameters = [
             'foo' => ['a', 'b'],
         ];
 
-        $iri = IriHelper::createIri($parts, $parameters, self::PAGE_PARAMETER_NAME, 2.);
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
 
         $this->assertSame('/objects?foo%5B%5D=a&foo%5B%5D=b&page=2', $iri);
     }
@@ -112,16 +108,31 @@ class IriHelperTest extends TestCase
     public function testCreateIriPreservesBracketedNumericIndexesInQueryValues(): void
     {
         $parts = [
-            'path' => self::OBJECTS_PATH,
+            'path' => '/objects',
             'query' => '',
         ];
         $parameters = [
-            'v' => self::BRACKETED_INDEX_VALUE,
+            'v' => 'x[0]',
         ];
 
-        $iri = IriHelper::createIri($parts, $parameters, self::PAGE_PARAMETER_NAME, 2.);
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
 
         $this->assertSame('/objects?v=x%5B0%5D&page=2', $iri);
+    }
+
+    public function testHelpersCollapseListKeysWhilePreservingBracketedValues(): void
+    {
+        $parts = [
+            'path' => '/objects',
+            'query' => '',
+        ];
+        $parameters = [
+            'foo' => ['x[0]', 'b'],
+        ];
+
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
+
+        $this->assertSame('/objects?foo%5B%5D=x%5B0%5D&foo%5B%5D=b&page=2', $iri);
     }
 
     public function testParseIriWithInvalidUrl(): void
