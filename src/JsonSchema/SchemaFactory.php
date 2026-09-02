@@ -354,7 +354,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (Schema::UNKNOWN_TYPE === $propertySchemaType) {
-            $propertySchema = [];
+            // the type is resolved to a reference below: drop the unresolved one, keep the rest of the property schema
+            $propertySchema = $this->withoutTypeExpression($propertySchema);
         }
 
         // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
@@ -498,9 +499,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             if (($c = \count($refs)) > 1) {
-                $propertySchema = ['anyOf' => $refs];
+                $propertySchema['anyOf'] = $refs;
             } elseif (1 === $c) {
-                $propertySchema = ['$ref' => $refs[0]['$ref']];
+                $propertySchema['$ref'] = $refs[0]['$ref'];
             }
         }
 
@@ -567,6 +568,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
     {
         $this->schemaFactory = $schemaFactory;
+    }
+
+    /**
+     * Drops every key getSchemaValue() reads the type from, keeping the keys that document or
+     * constrain the property.
+     */
+    private function withoutTypeExpression(array $schema): array
+    {
+        unset($schema['type'], $schema['items'], $schema['allOf'], $schema['anyOf'], $schema['oneOf']);
+
+        return $schema;
     }
 
     private function getSchemaValue(array $schema, string $key): array|string|null
