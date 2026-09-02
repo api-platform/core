@@ -1,0 +1,9 @@
+namespace App\Api\Resource;
+
+use ApiPlatform\Metadata\ApiResource;
+
+#[ApiResource(
+)]
+class Minimal
+{
+}

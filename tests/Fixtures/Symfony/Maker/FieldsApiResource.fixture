@@ -1,0 +1,20 @@
+namespace App\ApiResource;
+
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use App\State\BookStateProvider;
+
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ],
+    provider: BookStateProvider::class,
+)]
+class Book
+{
+    public string $title;
+
+    public ?int $price = null;
+}
