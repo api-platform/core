@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Mcp\Server;
 
 use ApiPlatform\Mcp\State\ToolProvider;
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -131,7 +132,15 @@ final class Handler implements RequestHandlerInterface
             $operation = $operation->withDeserialize(false);
         }
 
-        $body = $this->provider->provide($operation, $uriVariables, $context);
+        // The MCP transport has no HTTP response to carry a status code, so a caller-facing
+        // HttpExceptionInterface (e.g. access denied, validation) is converted into a JSON-RPC
+        // error carrying its message; anything else stays uncaught and reaches the SDK's own
+        // generic handler, which does not leak arbitrary exception messages to the client.
+        try {
+            $body = $this->provider->provide($operation, $uriVariables, $context);
+        } catch (HttpExceptionInterface $e) {
+            return Error::forInternalError($e->getMessage(), $request->getId());
+        }
 
         if (!$isResource && null !== ($httpRequest = $context['request'] ?? null)) {
             $context['previous_data'] = $httpRequest->attributes->get('previous_data');
@@ -148,6 +157,10 @@ final class Handler implements RequestHandlerInterface
             $operation = $operation->withSerialize(false);
         }
 
-        return $this->processor->process($body, $operation, $uriVariables, $context);
+        try {
+            return $this->processor->process($body, $operation, $uriVariables, $context);
+        } catch (HttpExceptionInterface $e) {
+            return Error::forInternalError($e->getMessage(), $request->getId());
+        }
     }
 }
