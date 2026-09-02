@@ -68,7 +68,7 @@ final class JsonApiProvider implements ProviderInterface
         if (
             \is_array($pageParameter)
         ) {
-            $filters = array_merge($pageParameter, $filters);
+            $filters = array_merge($this->transformPagination($pageParameter), $filters);
         }
 
         foreach (['page', 'itemsPerPage', 'pagination', 'partial'] as $paginationParameter) {
@@ -132,5 +132,14 @@ final class JsonApiProvider implements ProviderInterface
         }
 
         return [$included, $properties];
+    }
+
+    private function transformPagination(array $pageParameter): array
+    {
+        return array_filter([
+            'page' => $pageParameter['number'] ?? null,
+            'itemsPerPage' => $pageParameter['size'] ?? null,
+            'pagination' => $pageParameter['pagination'] ?? null,
+        ], fn($v) => $v !== null);
     }
 }
