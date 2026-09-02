@@ -108,7 +108,8 @@ class IriConverter implements IriConverterInterface
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
-        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_s' : '_o').($operation instanceof CollectionOperationInterface ? '_c' : '_i');
+        // A Relation skips the resource class promotion below, it can not share a cache entry with its related model.
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_s' : '_o').($operation instanceof CollectionOperationInterface ? '_c' : '_i').($resource instanceof Relation ? '_r' : '');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }
