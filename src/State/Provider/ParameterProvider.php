@@ -138,16 +138,23 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
                 $context['operation'] = $operation = $op;
             }
 
-            // A provider that resolves the parameter to a resource leaves an object in the value,
-            // which is not the identifier the resource is queried with.
-            if (!$uriVariable->getValue() instanceof ParameterNotFound
-                && !$this->resolveProvider($operation, $uriVariable->getProvider()) instanceof PreservesUriVariableInterface
-            ) {
+            if (!$uriVariable->getValue() instanceof ParameterNotFound && !$this->preservesUriVariable($operation, $uriVariable)) {
                 $uriVariables[$key] = $uriVariable->getValue();
             }
         }
 
         return $operation;
+    }
+
+    /**
+     * A provider may resolve the parameter to a resource, leaving an object in the value where the
+     * resource is queried with an identifier.
+     */
+    private function preservesUriVariable(Operation $operation, Parameter $parameter): bool
+    {
+        $provider = $this->resolveProvider($operation, $parameter->getProvider());
+
+        return $provider instanceof PreservesUriVariableInterface && $provider->preservesUriVariable($parameter);
     }
 
     private function resolveProvider(Operation $operation, mixed $provider): mixed

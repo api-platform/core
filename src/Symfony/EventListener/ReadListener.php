@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
@@ -37,13 +38,19 @@ final class ReadListener
     use UriVariablesResolverTrait;
 
     /**
-     * @param ProviderInterface<object> $provider
+     * @param ProviderInterface<object>      $provider
+     * @param ProviderInterface<object>|null $parameterProvider no longer used, the parameter provider decorates the read chain
      */
     public function __construct(
         private readonly ProviderInterface $provider,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         ?UriVariablesConverterInterface $uriVariablesConverter = null,
+        ?ProviderInterface $parameterProvider = null,
     ) {
+        if (null !== $parameterProvider) {
+            trigger_deprecation('api-platform/core', '5.0', 'Passing a "%s" as 4th argument to "%s" is deprecated and will be removed in 6.0, parameters are now provided by "%s" decorating the read provider chain.', ProviderInterface::class, self::class, ParameterProvider::class);
+        }
+
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
     }

@@ -13,13 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\ParameterProvider;
 
+use ApiPlatform\Metadata\Parameter;
+
 /**
- * Marks a ParameterProviderInterface whose value must not replace the uri variable it was computed from.
+ * Implemented by a ParameterProviderInterface whose value is not always the uri variable it was computed
+ * from, typically because it resolves a resource for a security expression instead of an identifier.
  *
- * A provider is otherwise assumed to transform its parameter value, and the result becomes the uri
- * variable the resource is queried with. Implement this interface when the value is something else,
- * typically a resource resolved for a security expression rather than an identifier.
+ * A provider that does not implement this interface is assumed to transform its parameter value, and the
+ * result becomes the uri variable the resource is queried with.
  */
 interface PreservesUriVariableInterface
 {
+    /**
+     * Whether the uri variable this parameter was computed from must be left untouched.
+     */
+    public function preservesUriVariable(Parameter $parameter): bool;
 }
