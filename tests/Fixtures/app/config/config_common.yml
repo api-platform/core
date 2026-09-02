@@ -95,15 +95,15 @@ api_platform:
         include_type: true
 
 mcp:
-    client_transports:
-        http: true
-        stdio: false
-    http:
-        path: '/mcp'
-        session:
-            store: 'file'
-            directory: '%kernel.cache_dir%/mcp'
-            ttl: 3600
+    servers:
+        default:
+            http:
+                path: '/mcp'
+            session:
+                store: 'file'
+                directory: '%kernel.cache_dir%/mcp'
+                ttl: 3600
+            registry: '*'
 
 services:
     test.client:

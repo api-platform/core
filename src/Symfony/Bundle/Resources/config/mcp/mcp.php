@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Mcp\Capability\Registry\Loader;
-use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter;
@@ -42,18 +41,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.mcp.metadata.operation.mcp_factory'),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
             service('request_stack'),
-        ]);
-
-    // Decorates the SDK registry so the SDK's own list handlers stay in charge (they receive the
-    // configured mcp.pagination_limit, which the previous custom handler silently overrode).
-    // Loading API Platform elements on first read heals a persistent runtime (e.g. FrankenPHP
-    // worker mode) where the SDK builds the registry once and may capture an empty state.
-    $services->set('api_platform.mcp.secure_registry', SecureRegistry::class)
-        ->decorate('mcp.registry')
-        ->args([
-            service('api_platform.mcp.secure_registry.inner'),
-            service('api_platform.mcp.loader'),
-            service('api_platform.mcp.security.expression_access_checker'),
         ]);
 
     $services->set('api_platform.mcp.iri_converter', IriConverter::class)
