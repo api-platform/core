@@ -67,7 +67,7 @@ class ApiResource extends Metadata
         /**
          * A description for this resource that will show on documentations.
          */
-        protected ?string $description = null,
+        protected string|\Stringable|null $description = null,
 
         /**
          * The RDF types of this resource.
