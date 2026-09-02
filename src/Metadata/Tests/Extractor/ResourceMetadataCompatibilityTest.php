@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
+use ApiPlatform\Elasticsearch\State\Options as ElasticsearchOptions;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
@@ -729,7 +730,15 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         $configuration = reset($values);
         switch (key($values)) {
             case 'elasticsearchOptions':
-                return null;
+                // Mirrors the extractors, which only build the options when the component is installed:
+                // the expectation must not assume that api-platform/elasticsearch is absent.
+                if (!class_exists(ElasticsearchOptions::class)) {
+                    return null;
+                }
+
+                return new ElasticsearchOptions(
+                    isset($configuration['index']) ? (string) $configuration['index'] : null,
+                );
         }
 
         throw new \LogicException(\sprintf('Unsupported "%s" state options.', key($values)));
