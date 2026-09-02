@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -313,6 +314,81 @@ class IriConverterTest extends TestCase
         $iriConverter->getResourceFromIri('/dummies/1');
     }
 
+    public function testGetIriFromItemOperationWithItemUriTemplate(): void
+    {
+        $item = new Dummy();
+        $item->setId(1);
+
+        // e.g. a PATCH operation with a custom URI template, whose IRI must point to the canonical operation
+        $operation = (new Patch())->withName('patch_custom')->withItemUriTemplate('/dummies/{id}{._format}');
+        $canonicalOperation = (new Get())->withName('canonical_get')->withUriTemplate('/dummies/{id}{._format}');
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->once())->method('generate')
+            ->with('canonical_get', ['id' => 1], UrlGeneratorInterface::ABS_PATH)
+            ->willReturn('/dummies/1');
+
+        $identifiersExtractor = $this->createMock(IdentifiersExtractorInterface::class);
+        $identifiersExtractor->expects($this->once())->method('getIdentifiersFromItem')
+            ->with($item, $canonicalOperation, $this->anything())
+            ->willReturn(['id' => 1]);
+
+        $operationMetadataFactory = $this->createMock(OperationMetadataFactoryInterface::class);
+        $operationMetadataFactory->expects($this->once())->method('create')
+            ->with('/dummies/{id}{._format}')
+            ->willReturn($canonicalOperation);
+
+        $iriConverter = $this->createIriConverter($router, $identifiersExtractor, $operationMetadataFactory);
+
+        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_PATH, $operation));
+    }
+
+    public function testGetIriFromItemOperationWithAnUnresolvableItemUriTemplate(): void
+    {
+        $item = new Dummy();
+        $item->setId(1);
+
+        $operation = (new Patch())->withName('patch_custom')->withItemUriTemplate('/does-not-exist/{id}');
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->once())->method('generate')
+            ->with('patch_custom', ['id' => 1], UrlGeneratorInterface::ABS_PATH)
+            ->willReturn('/dummies/1/custom');
+
+        $identifiersExtractor = $this->createMock(IdentifiersExtractorInterface::class);
+        $identifiersExtractor->expects($this->once())->method('getIdentifiersFromItem')
+            ->with($item, $operation, $this->anything())
+            ->willReturn(['id' => 1]);
+
+        $operationMetadataFactory = $this->createMock(OperationMetadataFactoryInterface::class);
+        $operationMetadataFactory->expects($this->once())->method('create')
+            ->with('/does-not-exist/{id}')
+            ->willReturn(null);
+
+        $iriConverter = $this->createIriConverter($router, $identifiersExtractor, $operationMetadataFactory);
+
+        // the template resolves to nothing, so the operation is left alone instead of breaking the IRI
+        $this->assertSame('/dummies/1/custom', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_PATH, $operation));
+    }
+
+    private function createIriConverter(RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, OperationMetadataFactoryInterface $operationMetadataFactory): IriConverter
+    {
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+        $resourceClassResolver->method('getResourceClass')->willReturnCallback(static fn (?object $item): string => $item::class);
+
+        return new IriConverter(
+            $this->createStub(ProviderInterface::class),
+            $router,
+            $identifiersExtractor,
+            $resourceClassResolver,
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            null,
+            null,
+            $operationMetadataFactory,
+        );
+    }
+
     private function getResourceClassResolver()
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
@@ -321,28 +397,6 @@ class IriConverterTest extends TestCase
         $resourceClassResolver->getResourceClass(Argument::cetera())->will(static fn ($args) => $args[0]::class);
 
         return $resourceClassResolver->reveal();
-    }
-
-    public function testGetIriFromItemOperationWithItemUriTemplate(): void
-    {
-        $item = new Dummy();
-        $item->setId(1);
-
-        // e.g. a PATCH operation with a custom URI template, whose IRI must point to the canonical operation
-        $operation = (new \ApiPlatform\Metadata\Patch())->withName('patch_custom')->withItemUriTemplate('/dummies/{id}{._format}');
-        $canonicalOperation = (new Get())->withName('canonical_get')->withUriTemplate('/dummies/{id}{._format}');
-
-        $routerProphecy = $this->prophesize(RouterInterface::class);
-        $routerProphecy->generate('canonical_get', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->shouldBeCalled()->willReturn('/dummies/1');
-
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromItem($item, $canonicalOperation, Argument::any())->shouldBeCalled()->willReturn(['id' => 1]);
-
-        $operationMetadataFactoryProphecy = $this->prophesize(OperationMetadataFactoryInterface::class);
-        $operationMetadataFactoryProphecy->create('/dummies/{id}{._format}')->shouldBeCalled()->willReturn($canonicalOperation);
-
-        $iriConverter = $this->getIriConverter(null, $routerProphecy, $identifiersExtractorProphecy, null, null, null, $operationMetadataFactoryProphecy);
-        $this->assertSame('/dummies/1', $iriConverter->getIriFromResource($item, UrlGeneratorInterface::ABS_PATH, $operation));
     }
 
     private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null, $decorated = null, ?ObjectProphecy $operationMetadataFactory = null): IriConverter
