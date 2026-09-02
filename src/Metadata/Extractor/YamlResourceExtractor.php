@@ -17,9 +17,12 @@ use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
 use ApiPlatform\Doctrine\Orm\State\Options as OrmOptions;
 use ApiPlatform\Elasticsearch\State\Options as ElasticsearchOptions;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
@@ -89,6 +92,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 try {
                     $base = $this->buildExtendedBase($resourceYamlDatum);
                     $this->resources[$resourceName][$resourcesCount + $key] = array_merge($base, [
+                        'itemUriTemplate' => $this->phpize($resourceYamlDatum, 'itemUriTemplate', 'string'),
                         'operations' => $this->buildOperations($resourceYamlDatum, $base),
                         'graphQlOperations' => $this->buildGraphQlOperations($resourceYamlDatum, $base),
                     ]);
@@ -349,7 +353,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 }
             }
 
-            if (\in_array((string) $class, [GetCollection::class, Post::class], true)) {
+            if (\in_array((string) $class, [GetCollection::class, Post::class, Get::class, Patch::class, Put::class], true)) {
                 $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
             } elseif (isset($operation['itemUriTemplate'])) {
                 throw new InvalidArgumentException(\sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $class));

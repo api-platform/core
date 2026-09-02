@@ -982,6 +982,61 @@ class ApiResource extends Metadata
         protected array $extraProperties = [],
         ?bool $map = null,
         protected ?array $mcp = null,
+        /**
+         * The `itemUriTemplate` option is the URI template of the operation that item IRIs of this
+         * resource point to. It is the default for every operation of the resource, and an operation
+         * declaring its own `itemUriTemplate` wins over it.
+         *
+         * Use it when items are reachable through several URIs and one of them is the canonical one:
+         * the `@id` of an item read or written through a custom URI then points to the canonical
+         * operation rather than to the URI the request came from. On `GetCollection` and `Post`,
+         * where the option already existed, it keeps its meaning: the items of that collection, and
+         * the item just created, are given that URI.
+         *
+         * <div data-code-selector>
+         *
+         * ```php
+         * <?php
+         * // api/src/Entity/Book.php
+         * use ApiPlatform\Metadata\ApiResource;
+         * use ApiPlatform\Metadata\Get;
+         * use ApiPlatform\Metadata\Patch;
+         *
+         * #[ApiResource(
+         *     itemUriTemplate: '/books/{id}',
+         *     operations: [
+         *         new Get('/books/{id}'),
+         *         new Patch('/books/{id}/cover'),
+         *     ],
+         * )]
+         * class Book
+         * {
+         *     // ...
+         * }
+         * ```
+         *
+         * ```yaml
+         * # api/config/api_platform/resources.yaml
+         * resources:
+         *     App\Entity\Book:
+         *         - itemUriTemplate: /books/{id}
+         * ```
+         *
+         * ```xml
+         * <?xml version="1.0" encoding="UTF-8" ?>
+         * <!-- api/config/api_platform/resources.xml -->
+         * <resources
+         *         xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+         *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         *         xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+         *         https://api-platform.com/schema/metadata/resources-3.0.xsd">
+         *     <resource class="App\Entity\Book" itemUriTemplate="/books/{id}" />
+         * </resources>
+         * ```
+         *
+         * </div>
+         */
+        protected ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1089,6 +1144,19 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
+
+        return $self;
+    }
+
+    public function getItemUriTemplate(): ?string
+    {
+        return $this->itemUriTemplate;
+    }
+
+    public function withItemUriTemplate(?string $itemUriTemplate = null): static
+    {
+        $self = clone $this;
+        $self->itemUriTemplate = $itemUriTemplate;
 
         return $self;
     }

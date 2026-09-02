@@ -102,7 +102,7 @@ final class Post extends HttpOperation
         ?bool $jsonStream = null,
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
-        private ?string $itemUriTemplate = null,
+        ?string $itemUriTemplate = null,
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
         ?bool $map = null,
@@ -191,20 +191,8 @@ final class Post extends HttpOperation
             jsonStream: $jsonStream,
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            itemUriTemplate: $itemUriTemplate
         );
-    }
-
-    public function getItemUriTemplate(): ?string
-    {
-        return $this->itemUriTemplate;
-    }
-
-    public function withItemUriTemplate(string $itemUriTemplate): self
-    {
-        $self = clone $this;
-        $self->itemUriTemplate = $itemUriTemplate;
-
-        return $self;
     }
 }

@@ -111,6 +111,7 @@ class XmlExtractorTest extends TestCase
                     'jsonldContext' => null,
 
                     'throwOnNotFound' => null,
+                    'itemUriTemplate' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -291,6 +292,7 @@ class XmlExtractorTest extends TestCase
                             'jsonldContext' => null,
 
                             'throwOnNotFound' => null,
+                            'itemUriTemplate' => null,
                         ],
                         [
                             'name' => null,
@@ -408,6 +410,7 @@ class XmlExtractorTest extends TestCase
                             'jsonldContext' => null,
 
                             'throwOnNotFound' => null,
+                            'itemUriTemplate' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -424,6 +427,7 @@ class XmlExtractorTest extends TestCase
                     'jsonldContext' => null,
 
                     'throwOnNotFound' => null,
+                    'itemUriTemplate' => null,
                 ],
             ],
         ], $extractor->getResources());

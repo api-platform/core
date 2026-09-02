@@ -106,6 +106,7 @@ final class Put extends HttpOperation
         ?bool $hideHydraOperation = null,
         private ?bool $allowCreate = null,
         ?bool $map = null,
+        ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
             method: 'PUT',
@@ -191,7 +192,8 @@ final class Put extends HttpOperation
             jsonStream: $jsonStream,
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            itemUriTemplate: $itemUriTemplate
         );
     }
 

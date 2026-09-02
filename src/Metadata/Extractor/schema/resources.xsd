@@ -22,6 +22,7 @@
         </xsd:sequence>
         <xsd:attributeGroup ref="extendedBase"/>
         <xsd:attribute type="xsd:string" name="uriTemplate"/>
+        <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
         <xsd:attribute type="xsd:string" name="class" use="required"/>
     </xsd:complexType>
 
