@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Mcp\Capability\Registry;
 
-use ApiPlatform\Metadata\Exception\RuntimeException;
-use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
-use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\Mcp\Security\ElementAccessCheckerInterface;
 use Mcp\Capability\Registry\Loader\LoaderInterface;
 use Mcp\Capability\Registry\PromptReference;
 use Mcp\Capability\Registry\ResourceReference;
@@ -27,8 +25,6 @@ use Mcp\Schema\Prompt;
 use Mcp\Schema\ResourceDefinition;
 use Mcp\Schema\ResourceTemplate;
 use Mcp\Schema\Tool;
-use Symfony\Component\ExpressionLanguage\SyntaxError;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Decorates the SDK registry, loading API Platform elements into it on first read.
@@ -40,7 +36,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * that: it runs once per process (registrations are idempotent by name) and reads back through
  * the shared registry, so runtime registrations and other registry decorators are preserved.
  *
- * Elements whose operation-level "security" expression denies the current caller are omitted from
+ * Elements the configured ElementAccessCheckerInterface denies to the current caller are omitted from
  * getTools()/getResources(), so a caller cannot discover the name, description and input schema of
  * a tool it is not allowed to invoke. Nothing else is filtered: has*() is read by
  * Builder::detectCapabilities() at build time, where there is no request to check against, and
@@ -57,9 +53,7 @@ final class SecureRegistry implements RegistryInterface
     public function __construct(
         private readonly RegistryInterface $inner,
         private readonly LoaderInterface $loader,
-        private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
-        private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
-        private readonly ?RequestStack $requestStack = null,
+        private readonly ?ElementAccessCheckerInterface $accessChecker = null,
     ) {
     }
 
@@ -248,45 +242,18 @@ final class SecureRegistry implements RegistryInterface
      */
     private function filterGranted(array $references, callable $identify): array
     {
-        if (null === $this->operationMetadataFactory || null === $this->resourceAccessChecker) {
+        if (null === $this->accessChecker) {
             return array_values($references);
         }
 
         $granted = [];
 
         foreach ($references as $reference) {
-            if ($this->isGranted($identify($reference))) {
+            if ($this->accessChecker->isGranted($identify($reference))) {
                 $granted[] = $reference;
             }
         }
 
         return $granted;
-    }
-
-    /**
-     * Only the operation-level "security" expression can be evaluated here: securityPostDenormalize
-     * and securityPostValidation need arguments and an object that do not exist yet.
-     */
-    private function isGranted(string $operationName): bool
-    {
-        if (null === $this->operationMetadataFactory || null === $this->resourceAccessChecker) {
-            throw new RuntimeException(\sprintf('Cannot evaluate the security of the "%s" operation without an operation metadata factory and a resource access checker.', $operationName));
-        }
-
-        $operation = $this->operationMetadataFactory->create($operationName);
-
-        if (null === $operation || null === ($security = $operation->getSecurity())) {
-            return true;
-        }
-
-        try {
-            return $this->resourceAccessChecker->isGranted($operation->getClass() ?? '', $security, ['request' => $this->requestStack?->getCurrentRequest()]);
-        } catch (SyntaxError) {
-            // The expression reads variables that only exist once the element is called (object,
-            // previous_object, uri variables). Listing cannot decide, so the element stays visible
-            // and the expression is enforced on tools/call and resources/read, as
-            // AccessCheckerProvider already defers the pre_read stage in that case.
-            return true;
-        }
     }
 }

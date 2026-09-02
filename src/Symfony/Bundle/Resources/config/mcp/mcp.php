@@ -18,6 +18,7 @@ use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter;
+use ApiPlatform\Mcp\Security\ExpressionAccessChecker;
 use ApiPlatform\Mcp\State\ToolProvider;
 
 return static function (ContainerConfigurator $container) {
@@ -36,6 +37,13 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('mcp.loader');
 
+    $services->set('api_platform.mcp.security.expression_access_checker', ExpressionAccessChecker::class)
+        ->args([
+            service('api_platform.mcp.metadata.operation.mcp_factory'),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
+            service('request_stack'),
+        ]);
+
     // Decorates the SDK registry so the SDK's own list handlers stay in charge (they receive the
     // configured mcp.pagination_limit, which the previous custom handler silently overrode).
     // Loading API Platform elements on first read heals a persistent runtime (e.g. FrankenPHP
@@ -45,10 +53,8 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.mcp.secure_registry.inner'),
             service('api_platform.mcp.loader'),
-        ])
-        ->arg('$operationMetadataFactory', service('api_platform.mcp.metadata.operation.mcp_factory'))
-        ->arg('$resourceAccessChecker', service('api_platform.security.resource_access_checker')->ignoreOnInvalid())
-        ->arg('$requestStack', service('request_stack'));
+            service('api_platform.mcp.security.expression_access_checker'),
+        ]);
 
     $services->set('api_platform.mcp.iri_converter', IriConverter::class)
         ->decorate('api_platform.iri_converter', null, 300)
