@@ -140,11 +140,16 @@ class IriConverter implements IriConverterInterface
             !$operation->getName()
             || ($operation instanceof HttpOperation && 'POST' === $operation->getMethod())
         ) {
-            $forceCollection = $operation instanceof CollectionOperationInterface;
-            try {
-                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
-                $identifiersExtractorOperation = $operation;
-            } catch (OperationNotFoundException) {
+            if (isset($this->localOperationCache[$localOperationCacheKey])) {
+                $operation = $this->localOperationCache[$localOperationCacheKey];
+                $identifiersExtractorOperation = $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? $operation;
+            } else {
+                $forceCollection = $operation instanceof CollectionOperationInterface;
+                try {
+                    $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
+                    $identifiersExtractorOperation = $operation;
+                } catch (OperationNotFoundException) {
+                }
             }
         }
 
