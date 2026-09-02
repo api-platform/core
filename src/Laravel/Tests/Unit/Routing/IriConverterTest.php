@@ -30,13 +30,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Workbench\App\Models\Book;
-
-/**
- * A model that is not a resource itself but extends one.
- */
-class BookVariant extends Book
-{
-}
+use Workbench\App\Models\BookVariant;
 
 class IriConverterTest extends TestCase
 {
