@@ -19,6 +19,7 @@ use ApiPlatform\HttpCache\VarnishPurger;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
 use ApiPlatform\Laravel\Eloquent\Listener\PurgeHttpCacheListener;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Events\RequestHandled;
@@ -90,7 +91,8 @@ class ApiPlatformEventProvider extends ServiceProvider
             return new PurgeHttpCacheListener(
                 $app->make(PurgerInterface::class),
                 $app->make(IriConverterInterface::class),
-                $app->make(ResourceClassResolverInterface::class)
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
     }
