@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Mcp\Server;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use Mcp\Capability\Registry\Loader\LoaderInterface;
@@ -112,7 +113,15 @@ final class ListHandler implements RequestHandlerInterface
             return $references;
         }
 
-        return array_values(array_filter($references, fn (Tool|ResourceDefinition $reference): bool => $this->isGranted($identify($reference))));
+        $granted = [];
+
+        foreach ($references as $reference) {
+            if ($this->isGranted($identify($reference))) {
+                $granted[] = $reference;
+            }
+        }
+
+        return $granted;
     }
 
     /**
@@ -121,7 +130,9 @@ final class ListHandler implements RequestHandlerInterface
      */
     private function isGranted(string $operationName): bool
     {
-        \assert(null !== $this->operationMetadataFactory && null !== $this->resourceAccessChecker);
+        if (null === $this->operationMetadataFactory || null === $this->resourceAccessChecker) {
+            throw new RuntimeException(\sprintf('Cannot evaluate the security of the "%s" operation without an operation metadata factory and a resource access checker.', $operationName));
+        }
 
         $operation = $this->operationMetadataFactory->create($operationName);
 
