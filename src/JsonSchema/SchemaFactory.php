@@ -442,16 +442,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     }
 
     /**
-     * @return array<string, mixed>|null
-     */
-    private function buildSubclassPropertySchema(Schema $schema, ApiProperty $propertyMetadata): ?array
-    {
-        $propertySchema = $this->getBasePropertySchema($propertyMetadata, $schema->getVersion());
-
-        return $propertySchema ?: null;
-    }
-
-    /**
      * Builds polymorphic schema (oneOf + discriminator) when the class has a Symfony DiscriminatorMap attribute.
      */
     private function buildDiscriminatorSchema(Schema $schema, \ArrayObject $definitions, string $definitionName, \ArrayObject $definition, string $inputOrOutputClass, string $format, string $type, string $version, array $options, array $serializerContext, bool $isJsonMergePatch): void
@@ -497,6 +487,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             /** @var \ArrayObject<string, array<string, mixed>> $subclassProperties */
             $subclassProperties = new \ArrayObject();
 
+            $definitions[$subDefinitionName] = new \ArrayObject(['type' => 'object', 'properties' => $subclassProperties]);
+
             foreach ($this->propertyNameCollectionFactory->create($subClassName, $options) as $propertyName) {
                 if (isset($parentPropertyNames[$propertyName])) {
                     continue;
@@ -513,9 +505,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $definition['required'][] = $normalizedPropertyName;
                 }
 
-                if ($propertySchema = $this->buildSubclassPropertySchema($schema, $propertyMetadata)) {
-                    $subclassProperties[$normalizedPropertyName] = $propertySchema;
-                }
+                $this->buildPropertySchema($schema, $subDefinitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
             }
 
             $allOf = [
