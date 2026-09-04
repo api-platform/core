@@ -109,7 +109,12 @@ final class SecurityParameterProvider implements ProviderInterface
                     default => AccessDeniedHttpException::class,
                 };
 
-                throw new ($exception)($parameter->getSecurityMessage() ?? 'Access Denied.');
+                $securityMessage = $parameter->getSecurityMessage();
+                if (MetadataAccessDeniedException::class === $exception) {
+                    throw new $exception($securityMessage ?? 'Access Denied.', detail: $securityMessage);
+                }
+
+                throw new $exception($securityMessage ?? 'Access Denied.');
             }
         }
 

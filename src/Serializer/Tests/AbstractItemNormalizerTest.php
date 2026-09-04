@@ -573,14 +573,20 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, $resourceAccessChecker->reveal()) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessage('Custom access denied message');
-
         $operation = new Patch(securityMessage: 'Custom access denied message', extraProperties: ['throw_on_access_denied' => true]);
 
-        $normalizer->denormalize($data, SecuredDummy::class, 'json', [
-            'operation' => $operation,
-        ]);
+        $exception = null;
+        try {
+            $normalizer->denormalize($data, SecuredDummy::class, 'json', [
+                'operation' => $operation,
+            ]);
+        } catch (\Throwable $caughtException) {
+            $exception = $caughtException;
+        }
+
+        $this->assertInstanceOf(AccessDeniedException::class, $exception);
+        $this->assertSame('Custom access denied message', $exception->getMessage());
+        $this->assertSame('Custom access denied message', $exception->getDetail());
     }
 
     public function testDenormalizeWithSecuredPropertyAndThrowOnAccessDeniedExtraPropertyInOperationThrowsAccessDeniedException(): void

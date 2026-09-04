@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Tests\Provider;
 
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Parameters;
@@ -63,9 +64,6 @@ final class SecurityParameterProviderTest extends TestCase
 
     public function testSecurityMessageLink(): void
     {
-        $this->expectException(AccessDeniedHttpException::class);
-        $this->expectExceptionMessage('You are not admin.');
-
         $obj = new \stdClass();
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
@@ -77,6 +75,13 @@ final class SecurityParameterProviderTest extends TestCase
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
         $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
         $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
-        $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
+
+        try {
+            $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
+            self::fail('An AccessDeniedException should have been thrown.');
+        } catch (AccessDeniedException $exception) {
+            $this->assertSame('You are not admin.', $exception->getMessage());
+            $this->assertSame('You are not admin.', $exception->getDetail());
+        }
     }
 }

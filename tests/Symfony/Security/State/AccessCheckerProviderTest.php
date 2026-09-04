@@ -13,17 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Security\State;
 
+use ApiPlatform\Metadata\Exception\AccessDeniedException as MetadataAccessDeniedException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Security\AccessDeniedMessageProviderInterface;
+use ApiPlatform\Symfony\Security\AccessDecisionAwareResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use ApiPlatform\Symfony\Security\ObjectVariableCheckerInterface;
 use ApiPlatform\Symfony\Security\State\AccessCheckerProvider;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessCheckerProviderTest extends TestCase
 {
@@ -140,7 +144,9 @@ class AccessCheckerProviderTest extends TestCase
             $this->fail('An access denied exception should have been thrown.');
         } catch (AccessDeniedException $exception) {
             $this->assertSame('hello', $exception->getMessage());
-            $this->assertSame('hello', $exception->getDetail());
+            $problem = $exception->getPrevious();
+            $this->assertInstanceOf(MetadataAccessDeniedException::class, $problem);
+            $this->assertSame('hello', $problem->getDetail());
         }
     }
 
@@ -159,35 +165,15 @@ class AccessCheckerProviderTest extends TestCase
         $accessChecker->provide($operation, [], []);
     }
 
-    public function testPropagatesCapturedAccessDeniedMessage(): void
+    public function testPropagatesTheAccessDecisionMessageInternally(): void
     {
         $obj = new \stdClass();
         $operation = new Get(class: DummyEntity::class, security: 'hi');
         $decorated = $this->createStub(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
-        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDeniedMessageInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->willReturn(false);
-        $resourceAccessChecker->expects($this->once())->method('getAccessDeniedMessage')->willReturn('Access Denied. Voter reason.');
-        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, debug: true);
-
-        try {
-            $accessChecker->provide($operation, [], []);
-            $this->fail('An access denied exception should have been thrown.');
-        } catch (AccessDeniedException $exception) {
-            $this->assertSame('Access Denied. Voter reason.', $exception->getMessage());
-            $this->assertSame('Access Denied. Voter reason.', $exception->getDetail());
-        }
-    }
-
-    public function testKeepsCapturedAccessDeniedMessageInternalWhenDebugIsDisabled(): void
-    {
-        $obj = new \stdClass();
-        $operation = new Get(class: DummyEntity::class, security: 'hi');
-        $decorated = $this->createStub(ProviderInterface::class);
-        $decorated->method('provide')->willReturn($obj);
-        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDeniedMessageInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->willReturn(false);
-        $resourceAccessChecker->expects($this->once())->method('getAccessDeniedMessage')->willReturn('Access Denied. Voter reason.');
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDecisionInterface::class);
+        $resourceAccessChecker->expects($this->never())->method('isGranted');
+        $resourceAccessChecker->expects($this->once())->method('decide')->willReturn(self::createDecision(false, 'Voter reason.'));
         $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
 
         try {
@@ -195,8 +181,24 @@ class AccessCheckerProviderTest extends TestCase
             $this->fail('An access denied exception should have been thrown.');
         } catch (AccessDeniedException $exception) {
             $this->assertSame('Access Denied. Voter reason.', $exception->getMessage());
-            $this->assertSame('Access Denied.', $exception->getDetail());
+            $problem = $exception->getPrevious();
+            $this->assertInstanceOf(MetadataAccessDeniedException::class, $problem);
+            $this->assertNull($problem->getDetail());
         }
+    }
+
+    public function testUsesTheDecisionResultInsteadOfCallingIsGranted(): void
+    {
+        $obj = new \stdClass();
+        $operation = new Get(class: DummyEntity::class, security: 'hi');
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($obj);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDecisionInterface::class);
+        $resourceAccessChecker->expects($this->never())->method('isGranted');
+        $resourceAccessChecker->expects($this->once())->method('decide')->willReturn(self::createDecision(true));
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
+
+        $this->assertSame($obj, $accessChecker->provide($operation, [], []));
     }
 
     public function testConfiguredEmptyMessageTakesPrecedence(): void
@@ -205,34 +207,38 @@ class AccessCheckerProviderTest extends TestCase
         $operation = new Get(class: DummyEntity::class, security: 'hi', securityMessage: '');
         $decorated = $this->createStub(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
-        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDeniedMessageInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->willReturn(false);
-        $resourceAccessChecker->expects($this->never())->method('getAccessDeniedMessage');
-        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, debug: true);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDecisionInterface::class);
+        $resourceAccessChecker->expects($this->once())->method('decide')->willReturn(self::createDecision(false, 'Voter reason.'));
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
 
         try {
             $accessChecker->provide($operation, [], []);
             $this->fail('An access denied exception should have been thrown.');
         } catch (AccessDeniedException $exception) {
             $this->assertSame('', $exception->getMessage());
+            $problem = $exception->getPrevious();
+            $this->assertInstanceOf(MetadataAccessDeniedException::class, $problem);
+            $this->assertSame('', $problem->getDetail());
         }
     }
 
-    public function testFallsBackToGenericMessageWhenCapturedMessageIsNull(): void
+    public function testFallsBackToGenericMessageWhenTheDecisionHasNoReason(): void
     {
         $operation = new Get(class: DummyEntity::class, security: 'hi');
         $decorated = $this->createStub(ProviderInterface::class);
         $decorated->method('provide')->willReturn(new \stdClass());
-        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDeniedMessageInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->willReturn(false);
-        $resourceAccessChecker->expects($this->once())->method('getAccessDeniedMessage')->willReturn(null);
-        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, debug: true);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDecisionInterface::class);
+        $resourceAccessChecker->expects($this->once())->method('decide')->willReturn(self::createDecision(false));
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
 
         try {
             $accessChecker->provide($operation, [], []);
             $this->fail('An access denied exception should have been thrown.');
         } catch (AccessDeniedException $exception) {
             $this->assertSame('Access Denied.', $exception->getMessage());
+            $problem = $exception->getPrevious();
+            $this->assertInstanceOf(MetadataAccessDeniedException::class, $problem);
+            $this->assertNull($problem->getDetail());
         }
     }
 
@@ -243,14 +249,50 @@ class AccessCheckerProviderTest extends TestCase
         $decorated->method('provide')->willReturn(new \stdClass());
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
         $resourceAccessChecker->expects($this->once())->method('isGranted')->willReturn(false);
-        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, debug: true);
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
 
         try {
             $accessChecker->provide($operation, [], []);
             $this->fail('An access denied exception should have been thrown.');
         } catch (AccessDeniedException $exception) {
             $this->assertSame('Access Denied.', $exception->getMessage());
+            $problem = $exception->getPrevious();
+            $this->assertInstanceOf(MetadataAccessDeniedException::class, $problem);
+            $this->assertNull($problem->getDetail());
         }
+    }
+
+    public function testGraphQlDoesNotExposeTheAccessDecisionMessage(): void
+    {
+        $operation = new Query(class: DummyEntity::class, security: 'hi');
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn(new \stdClass());
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithDecisionInterface::class);
+        $resourceAccessChecker->expects($this->once())->method('decide')->willReturn(self::createDecision(false, 'Voter reason.'));
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
+
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->expectExceptionMessage('Access Denied.');
+
+        $accessChecker->provide($operation, [], []);
+    }
+
+    private static function createDecision(bool $granted, ?string $reason = null): AccessDecision
+    {
+        $decision = new AccessDecision();
+        $decision->isGranted = $granted;
+
+        if (null === $reason) {
+            return $decision;
+        }
+
+        $vote = new Vote();
+        $vote->voter = self::class;
+        $vote->result = $granted ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED;
+        $vote->addReason($reason);
+        $decision->votes[] = $vote;
+
+        return $decision;
     }
 }
 
@@ -258,6 +300,6 @@ interface ResourceAccessCheckerWithObjectVariableInterface extends ResourceAcces
 {
 }
 
-interface ResourceAccessCheckerWithDeniedMessageInterface extends ResourceAccessCheckerInterface, AccessDeniedMessageProviderInterface
+interface ResourceAccessCheckerWithDecisionInterface extends ResourceAccessCheckerInterface, AccessDecisionAwareResourceAccessCheckerInterface
 {
 }

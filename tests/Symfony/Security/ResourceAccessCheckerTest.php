@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Security;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Symfony\Security\AccessDecisionAwareResourceAccessCheckerInterface;
+use ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -31,7 +33,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -136,8 +137,11 @@ class ResourceAccessCheckerTest extends TestCase
             'A' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason A.']]],
         ]);
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A', object)", ['object' => new \stdClass()]));
-        $this->assertSame('Access Denied. Reason A.', $checker->getAccessDeniedMessage());
+        $this->assertInstanceOf(AccessDecisionAwareResourceAccessCheckerInterface::class, $checker);
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object)", ['object' => new \stdClass()]);
+
+        $this->assertFalse($decision->isGranted);
+        $this->assertSame('Access Denied. Reason A.', $decision->getMessage());
     }
 
     public function testAndShortCircuitsAfterTheFirstDenial(): void
@@ -148,12 +152,14 @@ class ResourceAccessCheckerTest extends TestCase
             'B' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason B.']]],
         ], $calls);
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A', object) && is_granted('B', object)", ['object' => new \stdClass()]));
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object) && is_granted('B', object)", ['object' => new \stdClass()]);
+
+        $this->assertFalse($decision->isGranted);
         $this->assertSame(['A'], $calls);
-        $this->assertSame('Access Denied. Reason A.', $checker->getAccessDeniedMessage());
+        $this->assertSame('Access Denied. Reason A.', $decision->getMessage());
     }
 
-    public function testAndSelectsTheSecondDecisionWhenTheFirstGrants(): void
+    public function testAndAggregatesDeniedVotesAcrossAuthorizationChecks(): void
     {
         $calls = [];
         $checker = self::createResourceAccessChecker([
@@ -164,12 +170,14 @@ class ResourceAccessCheckerTest extends TestCase
             'B' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason B.']]],
         ], $calls);
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A', object) && is_granted('B', object)", ['object' => new \stdClass()]));
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object) && is_granted('B', object)", ['object' => new \stdClass()]);
+
+        $this->assertFalse($decision->isGranted);
         $this->assertSame(['A', 'B'], $calls);
-        $this->assertSame('Access Denied. Reason B.', $checker->getAccessDeniedMessage());
+        $this->assertSame('Access Denied. A minority denial. Reason B.', $decision->getMessage());
     }
 
-    public function testOrSelectsTheLastDecisionWhenBothDeny(): void
+    public function testOrAggregatesBothDecisionsWhenBothDeny(): void
     {
         $calls = [];
         $checker = self::createResourceAccessChecker([
@@ -177,9 +185,11 @@ class ResourceAccessCheckerTest extends TestCase
             'B' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason B.']]],
         ], $calls);
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A', object) || is_granted('B', object)", ['object' => new \stdClass()]));
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object) || is_granted('B', object)", ['object' => new \stdClass()]);
+
+        $this->assertFalse($decision->isGranted);
         $this->assertSame(['A', 'B'], $calls);
-        $this->assertSame('Access Denied. Reason B.', $checker->getAccessDeniedMessage());
+        $this->assertSame('Access Denied. Reason A. Reason B.', $decision->getMessage());
     }
 
     public function testNegatedGrantExposesNoDeniedMessage(): void
@@ -188,8 +198,10 @@ class ResourceAccessCheckerTest extends TestCase
             'A' => [true, [[VoterInterface::ACCESS_GRANTED, 'Reason A.']]],
         ]);
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "!is_granted('A', object)", ['object' => new \stdClass()]));
-        $this->assertNull($checker->getAccessDeniedMessage());
+        $decision = $checker->decide(Dummy::class, "!is_granted('A', object)", ['object' => new \stdClass()]);
+
+        $this->assertFalse($decision->isGranted);
+        $this->assertSame('Access Denied.', $decision->getMessage());
     }
 
     public function testNonAuthorizationConditionAfterAGrantExposesNoDeniedMessage(): void
@@ -201,8 +213,10 @@ class ResourceAccessCheckerTest extends TestCase
             public bool $enabled = false;
         };
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A', object) && object.enabled", ['object' => $object]));
-        $this->assertNull($checker->getAccessDeniedMessage());
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object) && object.enabled", ['object' => $object]);
+
+        $this->assertFalse($decision->isGranted);
+        $this->assertSame('Access Denied.', $decision->getMessage());
     }
 
     public function testAuthorizationDenialBeforeAnObjectConditionExposesItsMessage(): void
@@ -215,12 +229,14 @@ class ResourceAccessCheckerTest extends TestCase
             public bool $enabled = false;
         };
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A', object) && object.enabled", ['object' => $object]));
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object) && object.enabled", ['object' => $object]);
+
+        $this->assertFalse($decision->isGranted);
         $this->assertSame(['A'], $calls);
-        $this->assertSame('Access Denied. Reason A.', $checker->getAccessDeniedMessage());
+        $this->assertSame('Access Denied. Reason A.', $decision->getMessage());
     }
 
-    public function testPureNonAuthorizationDenialExposesNoDeniedMessage(): void
+    public function testPureNonAuthorizationDenialReturnsAnInitializedDecision(): void
     {
         $calls = [];
         $checker = self::createResourceAccessChecker([], $calls);
@@ -228,9 +244,28 @@ class ResourceAccessCheckerTest extends TestCase
             public bool $enabled = false;
         };
 
-        $this->assertFalse($checker->isGranted(Dummy::class, 'object.enabled', ['object' => $object]));
+        $decision = $checker->decide(Dummy::class, 'object.enabled', ['object' => $object]);
+
+        $this->assertFalse($decision->isGranted);
         $this->assertSame([], $calls);
-        $this->assertNull($checker->getAccessDeniedMessage());
+        $this->assertSame('Access Denied.', $decision->getMessage());
+    }
+
+    public function testNonAuthorizationConditionCanGrantAfterAnAuthorizationDenial(): void
+    {
+        $calls = [];
+        $checker = self::createResourceAccessChecker([
+            'A' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason A.']]],
+        ], $calls);
+        $object = new class {
+            public bool $owner = true;
+        };
+
+        $decision = $checker->decide(Dummy::class, "is_granted('A', object) || object.owner", ['object' => $object]);
+
+        $this->assertTrue($decision->isGranted);
+        $this->assertSame(['A'], $calls);
+        $this->assertSame('Access Granted.', $decision->getMessage());
     }
 
     public function testDeniedDecisionWithoutReasonExposesTheGenericMessage(): void
@@ -239,42 +274,27 @@ class ResourceAccessCheckerTest extends TestCase
             'A' => [false, []],
         ]);
 
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A')"));
-        $this->assertSame('Access Denied.', $checker->getAccessDeniedMessage());
+        $decision = $checker->decide(Dummy::class, "is_granted('A')");
+
+        $this->assertFalse($decision->isGranted);
+        $this->assertSame('Access Denied.', $decision->getMessage());
     }
 
-    public function testCapturedMessageIsResetBetweenEvaluations(): void
+    public function testKeepsIndependentDeniedDecisionsSeparate(): void
     {
         $checker = self::createResourceAccessChecker([
             'A' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason A.']]],
-        ]);
-        $object = new class {
-            public bool $enabled = false;
-        };
-
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A')"));
-        $this->assertSame('Access Denied. Reason A.', $checker->getAccessDeniedMessage());
-
-        $this->assertFalse($checker->isGranted(Dummy::class, 'object.enabled', ['object' => $object]));
-        $this->assertNull($checker->getAccessDeniedMessage());
-
-        $this->assertTrue($checker->isGranted(Dummy::class, 'true'));
-        $this->assertNull($checker->getAccessDeniedMessage());
-    }
-
-    public function testResetClearsTheCapturedMessage(): void
-    {
-        $checker = self::createResourceAccessChecker([
-            'A' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason A.']]],
+            'B' => [false, [[VoterInterface::ACCESS_DENIED, 'Reason B.']]],
         ]);
 
-        $this->assertInstanceOf(ResetInterface::class, $checker);
-        $this->assertFalse($checker->isGranted(Dummy::class, "is_granted('A')"));
-        $this->assertSame('Access Denied. Reason A.', $checker->getAccessDeniedMessage());
+        $first = $checker->decide(Dummy::class, "is_granted('A')");
+        $second = $checker->decide(Dummy::class, "is_granted('B')");
 
-        $checker->reset();
-
-        $this->assertNull($checker->getAccessDeniedMessage());
+        $this->assertNotSame($first, $second);
+        $this->assertFalse($first->isGranted);
+        $this->assertFalse($second->isGranted);
+        $this->assertSame('Access Denied. Reason A.', $first->getMessage());
+        $this->assertSame('Access Denied. Reason B.', $second->getMessage());
     }
 
     /**
@@ -299,7 +319,7 @@ class ResourceAccessCheckerTest extends TestCase
 
     private static function createResourceAccessCheckerWithAuthorizationChecker(?AuthorizationCheckerInterface $authorizationChecker): ResourceAccessChecker
     {
-        return new ResourceAccessChecker(new ExpressionLanguage(), new AuthenticationTrustResolver(), null, new TokenStorage(), $authorizationChecker);
+        return new ResourceAccessChecker(new ExpressionLanguage(null, [new ExpressionLanguageProvider()]), new AuthenticationTrustResolver(), null, new TokenStorage(), $authorizationChecker);
     }
 
     private static function createAuthorizationChecker(\Closure $callback): AuthorizationCheckerInterface
@@ -316,6 +336,9 @@ class ResourceAccessCheckerTest extends TestCase
         };
     }
 
+    /**
+     * @param VoterInterface::ACCESS_* $result
+     */
     private static function createVote(int $result, string $reason): Vote
     {
         $vote = new Vote();

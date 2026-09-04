@@ -22,27 +22,28 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Checks if the logged user has sufficient permissions to access the given resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ResourceAccessChecker implements ResourceAccessCheckerInterface, ObjectVariableCheckerInterface, AccessDeniedMessageProviderInterface, ResetInterface
+final class ResourceAccessChecker implements ResourceAccessCheckerInterface, ObjectVariableCheckerInterface, AccessDecisionAwareResourceAccessCheckerInterface
 {
-    private ?string $accessDeniedMessage = null;
-
     public function __construct(private readonly ?ExpressionLanguage $expressionLanguage = null, private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null, private readonly ?RoleHierarchyInterface $roleHierarchy = null, private readonly ?TokenStorageInterface $tokenStorage = null, private readonly ?AuthorizationCheckerInterface $authorizationChecker = null)
     {
     }
 
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
     {
-        $this->reset();
+        return $this->decide($resourceClass, $expression, $extraVariables)->isGranted;
+    }
 
+    public function decide(string $resourceClass, string $expression, array $extraVariables = []): AccessDecision
+    {
         if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
             throw new \LogicException('The "symfony/security" library must be installed to use the "security" attribute.');
         }
@@ -51,24 +52,10 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
             throw new \LogicException('The "symfony/expression-language" library must be installed to use the "security" attribute.');
         }
 
-        $authorizationChecker = null === $this->authorizationChecker ? null : new AccessDecisionCapturingAuthorizationChecker($this->authorizationChecker);
-        $granted = (bool) $this->expressionLanguage->evaluate($expression, $this->getVariables($extraVariables, $authorizationChecker));
+        $decision = new AccessDecision();
+        $decision->isGranted = (bool) $this->expressionLanguage->evaluate($expression, $this->getVariables($extraVariables, $decision));
 
-        if (!$granted && null !== $authorizationChecker) {
-            $this->accessDeniedMessage = $authorizationChecker->getAccessDeniedMessage();
-        }
-
-        return $granted;
-    }
-
-    public function getAccessDeniedMessage(): ?string
-    {
-        return $this->accessDeniedMessage;
-    }
-
-    public function reset(): void
-    {
-        $this->accessDeniedMessage = null;
+        return $decision;
     }
 
     public function usesObjectVariable(string $expression, array $variables = []): bool
@@ -81,7 +68,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
             throw new RuntimeException('The "symfony/expression-language" library must be installed to use the "security" attribute.');
         }
 
-        return $this->hasObjectVariable($this->expressionLanguage->parse($expression, array_keys($this->getVariables($variables, $this->authorizationChecker)))->getNodes()->toArray());
+        return $this->hasObjectVariable($this->expressionLanguage->parse($expression, array_keys($this->getVariables($variables)))->getNodes()->toArray());
     }
 
     /**
@@ -89,7 +76,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
      *
      * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php
      */
-    private function getVariables(array $variables, ?AuthorizationCheckerInterface $authorizationChecker): array
+    private function getVariables(array $variables, ?AccessDecision $accessDecision = null): array
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             $token = new NullToken();
@@ -100,7 +87,8 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
             'user' => $token->getUser(),
             'roles' => $this->getEffectiveRoles($token),
             'trust_resolver' => $this->authenticationTrustResolver,
-            'auth_checker' => $authorizationChecker, // needed for the is_granted expression function
+            'auth_checker' => $this->authorizationChecker, // needed for the is_granted expression function
+            'access_decision' => $accessDecision,
         ]);
     }
 

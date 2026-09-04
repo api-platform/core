@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State;
 
 use ApiPlatform\Metadata\ErrorResourceInterface;
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -74,6 +75,20 @@ final class ErrorProvider implements ProviderInterface
         $status = $operation->getStatus() ?? 500;
         $cl = is_a($operation->getClass(), ErrorResourceInterface::class, true) ? $operation->getClass() : Error::class;
         $error = $cl::createFromException($exception, $status);
+        if (null !== ($accessDeniedException = $this->findAccessDeniedException($exception))) {
+            if ($status !== $accessDeniedException->getStatus()) {
+                if (method_exists($error, 'setStatus')) {
+                    $error->setStatus($status);
+                }
+                if (method_exists($error, 'setType')) {
+                    $error->setType("/errors/$status");
+                }
+            }
+
+            if (method_exists($error, 'setDetail')) {
+                $error->setDetail($accessDeniedException->getDetail() ?? ($this->debug ? $accessDeniedException->getMessage() : 'Access Denied.'));
+            }
+        }
         if (!$this->debug && $status >= 500 && method_exists($error, 'setDetail')) {
             $error->setDetail('Internal Server Error');
         }
@@ -93,5 +108,19 @@ final class ErrorProvider implements ProviderInterface
     <body><h1>Error $status</h1>$text</body>
 </html>
 HTML);
+    }
+
+    private function findAccessDeniedException(\Throwable $exception): ?AccessDeniedException
+    {
+        $current = $exception;
+        while (null !== $current) {
+            if ($current instanceof AccessDeniedException) {
+                return $current;
+            }
+
+            $current = $current->getPrevious();
+        }
+
+        return null;
     }
 }

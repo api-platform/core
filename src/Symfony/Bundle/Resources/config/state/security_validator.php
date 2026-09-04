@@ -24,6 +24,5 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_provider.access_checker.post_validate.inner'),
             service('api_platform.security.resource_access_checker'),
             'post_validate',
-        ])
-        ->arg('$debug', '%kernel.debug%');
+        ]);
 };

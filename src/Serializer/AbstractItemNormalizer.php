@@ -329,7 +329,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
                 if ($throwOnPropertyAccessDenied) {
-                    throw new AccessDeniedException($securityMessage ?? 'Access denied');
+                    throw new AccessDeniedException($securityMessage ?? 'Access denied', detail: $securityMessage);
                 }
                 if (null !== $previousObject) {
                     $this->setValue($object, $attribute, $this->propertyAccessor->getValue($previousObject, $attribute));
