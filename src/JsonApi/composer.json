@@ -24,7 +24,7 @@
         "php": ">=8.2",
         "api-platform/documentation": "^4.4@alpha",
         "api-platform/json-schema": "^4.4@alpha",
-        "api-platform/metadata": "^4.4@alpha",
+        "api-platform/metadata": "^4.4.0-alpha.4",
         "api-platform/serializer": "^4.4.0-alpha.3",
         "api-platform/state": "^4.4@alpha",
         "symfony/error-handler": "^7.4 || ^8.0",
