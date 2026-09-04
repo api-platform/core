@@ -157,7 +157,9 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
                 continue;
             }
 
-            $parameterClass = $config['class'] ?? $entryName;
+            $parameterClass = is_subclass_of($entryName, Parameter::class)
+                ? $entryName
+                : ($config['class'] ?? QueryParameter::class);
 
             if (!\is_string($parameterClass) || !is_subclass_of($parameterClass, Parameter::class)) {
                 continue;

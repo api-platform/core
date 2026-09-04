@@ -172,6 +172,22 @@ final class ParameterValidationResourceMetadataCollectionFactoryDefaultParameter
         $this->assertTrue($parameters->has('Request-ID', HeaderParameter::class));
     }
 
+    public function testNamedDefaultParameterWithoutClassDefaultsToQueryParameter(): void
+    {
+        $attributesFactory = new AttributesResourceMetadataCollectionFactory();
+        $parameterValidationFactory = new ParameterValidationResourceMetadataCollectionFactory(
+            $attributesFactory,
+            null,
+            ['sort' => ['key' => 'sort', 'required' => false]]
+        );
+
+        $collection = $parameterValidationFactory->create(TestProductResource::class);
+        $parameters = $collection[0]->getOperations()?->getIterator()->current()?->getParameters();
+
+        $this->assertCount(1, $parameters);
+        $this->assertTrue($parameters->has('sort', QueryParameter::class));
+    }
+
     public function testOperationParameterOverridesOnlyMatchingNamedDefaultParameter(): void
     {
         $attributesFactory = new AttributesResourceMetadataCollectionFactory();
