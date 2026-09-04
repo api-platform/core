@@ -22,6 +22,7 @@ if (false !== $xdebugMaxNestingLevel && $xdebugMaxNestingLevel <= 512) {
 $loader = require __DIR__.'/../../../vendor/autoload.php';
 require __DIR__.'/AppKernel.php';
 require __DIR__.'/DefaultParametersAppKernel.php';
+require __DIR__.'/RepeatedDefaultParametersAppKernel.php';
 
 if (!is_file($resourcesFile = __DIR__.'/var/resources.php')) {
     if (!is_dir(dirname($resourcesFile))) {

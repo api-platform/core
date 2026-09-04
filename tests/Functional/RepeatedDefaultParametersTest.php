@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Metadata\HeaderParameter;
+namespace ApiPlatform\Tests\Functional;
+
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class RepeatedDefaultParametersTest extends ApiTestCase
 {
@@ -22,7 +21,7 @@ final class RepeatedDefaultParametersTest extends ApiTestCase
 
     protected static function getKernelClass(): string
     {
-        return RepeatedDefaultParametersAppKernel::class;
+        return \RepeatedDefaultParametersAppKernel::class;
     }
 
     public function testRepeatedDefaultParametersAppearTogetherInOpenApi(): void
@@ -65,38 +64,5 @@ final class RepeatedDefaultParametersTest extends ApiTestCase
         }
 
         $this->fail('No OpenAPI operation contained both repeated default header parameters.');
-    }
-}
-
-final class RepeatedDefaultParametersAppKernel extends AppKernel
-{
-    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
-    {
-        parent::configureContainer($container, $loader);
-
-        $loader->load(static function (ContainerBuilder $container): void {
-            if ($container->hasDefinition('phpunit_resource_name_collection')) {
-                $container->removeDefinition('phpunit_resource_name_collection');
-            }
-
-            $container->loadFromExtension('api_platform', [
-                'defaults' => [
-                    'parameters' => [
-                        'api_token' => [
-                            'class' => HeaderParameter::class,
-                            'key' => 'API-Token',
-                            'required' => true,
-                            'description' => 'API token',
-                        ],
-                        'request_id' => [
-                            'class' => HeaderParameter::class,
-                            'key' => 'Request-ID',
-                            'required' => false,
-                            'description' => 'Request correlation identifier',
-                        ],
-                    ],
-                ],
-            ]);
-        });
     }
 }
