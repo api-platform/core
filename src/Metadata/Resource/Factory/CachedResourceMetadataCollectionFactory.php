@@ -25,6 +25,8 @@ use Psr\Cache\CacheItemPoolInterface;
 final class CachedResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     public const CACHE_KEY_PREFIX = 'resource_metadata_collection_';
+
+    /** @var array<string, ResourceMetadataCollection> */
     private array $localCache = [];
 
     public function __construct(private readonly CacheItemPoolInterface $cacheItemPool, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
@@ -37,30 +39,24 @@ final class CachedResourceMetadataCollectionFactory implements ResourceMetadataC
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $cacheKey = self::CACHE_KEY_PREFIX.hash('xxh3', $resourceClass);
-        if (\array_key_exists($cacheKey, $this->localCache)) {
-            return new ResourceMetadataCollection($resourceClass, $this->localCache[$cacheKey]);
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
         }
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
         } catch (CacheException) {
-            $resourceMetadataCollection = $this->decorated->create($resourceClass);
-            $this->localCache[$cacheKey] = (array) $resourceMetadataCollection;
-
-            return $resourceMetadataCollection;
+            return $this->localCache[$cacheKey] = $this->decorated->create($resourceClass);
         }
 
         if ($cacheItem->isHit()) {
-            $this->localCache[$cacheKey] = $cacheItem->get();
-
-            return new ResourceMetadataCollection($resourceClass, $this->localCache[$cacheKey]);
+            return $this->localCache[$cacheKey] = new ResourceMetadataCollection($resourceClass, $cacheItem->get());
         }
 
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
-        $this->localCache[$cacheKey] = (array) $resourceMetadataCollection;
-        $cacheItem->set($this->localCache[$cacheKey]);
+        $cacheItem->set((array) $resourceMetadataCollection);
         $this->cacheItemPool->save($cacheItem);
 
-        return $resourceMetadataCollection;
+        return $this->localCache[$cacheKey] = $resourceMetadataCollection;
     }
 }

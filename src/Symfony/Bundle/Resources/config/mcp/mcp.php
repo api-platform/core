@@ -17,7 +17,7 @@ use ApiPlatform\Mcp\Capability\Registry\Loader;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter;
-use ApiPlatform\Mcp\Server\ListHandler;
+use ApiPlatform\Mcp\Security\ExpressionAccessChecker;
 use ApiPlatform\Mcp\State\ToolProvider;
 
 return static function (ContainerConfigurator $container) {
@@ -36,17 +36,12 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('mcp.loader');
 
-    // Serves tools/list and resources/list, loading API Platform elements into the registry on
-    // first use. This heals a persistent runtime (e.g. FrankenPHP worker mode) where the SDK
-    // builds the registry once and may capture an empty state. Reads back through the shared
-    // registry so runtime registrations and decorators are preserved. Takes precedence over the
-    // SDK's registry-backed list handlers.
-    $services->set('api_platform.mcp.list_handler', ListHandler::class)
+    $services->set('api_platform.mcp.security.expression_access_checker', ExpressionAccessChecker::class)
         ->args([
-            service('mcp.registry'),
-            service('api_platform.mcp.loader'),
-        ])
-        ->tag('mcp.request_handler');
+            service('api_platform.mcp.metadata.operation.mcp_factory'),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
+            service('request_stack'),
+        ]);
 
     $services->set('api_platform.mcp.iri_converter', IriConverter::class)
         ->decorate('api_platform.iri_converter', null, 300)

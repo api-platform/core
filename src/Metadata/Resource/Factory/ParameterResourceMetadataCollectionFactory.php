@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -342,7 +343,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withSchema($schema);
         }
 
-        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface && ($openApiParameter = $filter->getOpenApiParameters($parameter))) {
+        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface
+            && class_exists(OpenApiParameter::class) && ($openApiParameter = $filter->getOpenApiParameters($parameter))) {
             $parameter = $parameter->withOpenApi($openApiParameter);
         }
 
@@ -416,7 +418,13 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             try {
                 return $this->getLegacyFilterMetadata($parameter, $operation, $filter);
             } catch (RuntimeException $exception) {
-                $this->logger?->alert($exception->getMessage(), ['exception' => $exception]);
+                // An inline filter instance never gets a ManagerRegistry, unlike one resolved as a service
+                // through the filter locator: failing to describe it is expected, not an alert-worthy event.
+                if ($filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
+                    $this->logger?->debug($exception->getMessage(), ['exception' => $exception]);
+                } else {
+                    $this->logger?->alert($exception->getMessage(), ['exception' => $exception]);
+                }
 
                 return $parameter;
             }

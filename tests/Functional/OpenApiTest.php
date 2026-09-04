@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6151\OverrideOpenApiR
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUserAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8143\ReferenceResponse;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\OpenApiPartialUpdateResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
@@ -112,6 +113,7 @@ class OpenApiTest extends ApiTestCase
             DeprecatedPutUser::class,
             DeprecatedPutUserAction::class,
             ReferenceResponse::class,
+            OpenApiPartialUpdateResource::class,
         ];
     }
 
@@ -150,6 +152,28 @@ class OpenApiTest extends ApiTestCase
         $userName = substr($userRef, \strlen('#/components/schemas/'));
         $this->assertArrayHasKey($userName, $schemas, 'Nested DeprecatedPutUser schema is missing from components');
         $this->assertArrayNotHasKey('deprecated', $schemas[$userName], 'Nested DeprecatedPutUser schema must not be marked deprecated because of the deprecated PUT operation');
+    }
+
+    public function testPartialUpdateSchemasDoNotRequireProperties(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $json = $response->toArray();
+        $schemas = $json['components']['schemas'];
+        $postSchema = $json['paths']['/openapi_partial_update_resources']['post']['requestBody']['content']['application/json']['schema'];
+        $putSchema = $json['paths']['/openapi_partial_update_resources/{id}']['put']['requestBody']['content']['application/json']['schema'];
+        $patchSchema = $json['paths']['/openapi_partial_update_resources/{id}']['patch']['requestBody']['content']['application/json']['schema'];
+        $postName = substr($postSchema['$ref'], \strlen('#/components/schemas/'));
+        $putName = substr($putSchema['$ref'], \strlen('#/components/schemas/'));
+        $patchName = substr($patchSchema['$ref'], \strlen('#/components/schemas/'));
+
+        self::assertNotSame($postName, $putName);
+        self::assertNotSame($postName, $patchName);
+        self::assertSame(['name'], $schemas[$postName]['required']);
+        self::assertArrayNotHasKey('required', $schemas[$putName]);
+        self::assertArrayNotHasKey('required', $schemas[$patchName]);
     }
 
     public function testErrorsAreDocumented(): void

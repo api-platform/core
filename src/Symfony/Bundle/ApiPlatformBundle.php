@@ -22,6 +22,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\JsonStreamerTransformerPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\McpRegistryPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\PropertyInfoTagPass;
@@ -60,6 +61,7 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new SerializerMappingLoaderPass());
         $container->addCompilerPass(new ErrorResourceAttributeLoaderPass());
         $container->addCompilerPass(new MutatorPass());
+        $container->addCompilerPass(new McpRegistryPass());
         $container->addCompilerPass(new PropertyInfoTagPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         // Must run after Symfony's TransformerPass so we can rely on the value_object_transformer tag being processed.
         $container->addCompilerPass(new JsonStreamerTransformerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
