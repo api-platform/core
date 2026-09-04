@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
@@ -30,13 +31,18 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ResourceAccessChecker implements ResourceAccessCheckerInterface, ObjectVariableCheckerInterface
+final class ResourceAccessChecker implements ResourceAccessCheckerInterface, ObjectVariableCheckerInterface, AccessDecisionAwareResourceAccessCheckerInterface
 {
     public function __construct(private readonly ?ExpressionLanguage $expressionLanguage = null, private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null, private readonly ?RoleHierarchyInterface $roleHierarchy = null, private readonly ?TokenStorageInterface $tokenStorage = null, private readonly ?AuthorizationCheckerInterface $authorizationChecker = null)
     {
     }
 
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
+    {
+        return $this->decide($resourceClass, $expression, $extraVariables)->isGranted;
+    }
+
+    public function decide(string $resourceClass, string $expression, array $extraVariables = []): AccessDecision
     {
         if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
             throw new \LogicException('The "symfony/security" library must be installed to use the "security" attribute.');
@@ -46,7 +52,10 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
             throw new \LogicException('The "symfony/expression-language" library must be installed to use the "security" attribute.');
         }
 
-        return (bool) $this->expressionLanguage->evaluate($expression, $this->getVariables($extraVariables));
+        $decision = new AccessDecision();
+        $decision->isGranted = (bool) $this->expressionLanguage->evaluate($expression, $this->getVariables($extraVariables, $decision));
+
+        return $decision;
     }
 
     public function usesObjectVariable(string $expression, array $variables = []): bool
@@ -67,7 +76,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
      *
      * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php
      */
-    private function getVariables(array $variables): array
+    private function getVariables(array $variables, ?AccessDecision $accessDecision = null): array
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             $token = new NullToken();
@@ -79,6 +88,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
             'roles' => $this->getEffectiveRoles($token),
             'trust_resolver' => $this->authenticationTrustResolver,
             'auth_checker' => $this->authorizationChecker, // needed for the is_granted expression function
+            'access_decision' => $accessDecision,
         ]);
     }
 

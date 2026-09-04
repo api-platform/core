@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Mcp\Server;
 
 use ApiPlatform\Mcp\State\ToolProvider;
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
@@ -139,7 +140,7 @@ final class Handler implements RequestHandlerInterface
         try {
             $body = $this->provider->provide($operation, $uriVariables, $context);
         } catch (HttpExceptionInterface $e) {
-            return Error::forInternalError($e->getMessage(), $request->getId());
+            return Error::forInternalError($this->getPublicErrorMessage($e), $request->getId());
         }
 
         if (!$isResource && null !== ($httpRequest = $context['request'] ?? null)) {
@@ -160,7 +161,21 @@ final class Handler implements RequestHandlerInterface
         try {
             return $this->processor->process($body, $operation, $uriVariables, $context);
         } catch (HttpExceptionInterface $e) {
-            return Error::forInternalError($e->getMessage(), $request->getId());
+            return Error::forInternalError($this->getPublicErrorMessage($e), $request->getId());
         }
+    }
+
+    private function getPublicErrorMessage(\Throwable $exception): string
+    {
+        $current = $exception;
+        while (null !== $current) {
+            if ($current instanceof AccessDeniedException) {
+                return $current->getDetail() ?? 'Access Denied.';
+            }
+
+            $current = $current->getPrevious();
+        }
+
+        return $exception->getMessage();
     }
 }

@@ -100,7 +100,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
      */
     public function __construct(
         private readonly string $title,
-        private readonly string $detail,
+        private readonly ?string $detail,
         #[ApiProperty(identifier: true)] private int $status,
         array $originalTrace = [],
         private readonly ?string $instance = null,
@@ -127,7 +127,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[SerializedName('description')]
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->detail;
     }
