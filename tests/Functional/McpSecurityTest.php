@@ -85,6 +85,34 @@ final class McpSecurityTest extends ApiTestCase
         self::assertStringContainsString('Secured: hello', $result['result']['content'][0]['text'] ?? '');
     }
 
+    public function testAnonymousCannotDiscoverToolsItCannotCall(): void
+    {
+        $this->skipUnlessMcpIsAvailable();
+
+        $client = self::createClient();
+        $names = $this->listToolNames($client, $this->initializeMcpSession($client));
+
+        self::assertNotContains('secured_tool', $names, 'An anonymous caller discovered a tool it cannot invoke.');
+
+        // Only the operation level "security" can be evaluated before the tool runs: the other
+        // expressions need arguments, an object or uri variables, so those tools stay listed and
+        // are enforced on tools/call.
+        self::assertContains('secured_post_denormalize_tool', $names);
+        self::assertContains('secured_post_validation_tool', $names);
+        self::assertContains('secured_uri_variable_tool', $names);
+    }
+
+    public function testAdminDiscoversSecuredTool(): void
+    {
+        $this->skipUnlessMcpIsAvailable();
+
+        $client = self::createClient();
+        $sessionId = $this->initializeMcpSession($client);
+        $names = $this->listToolNames($client, $sessionId, ['Authorization' => self::ADMIN_AUTH]);
+
+        self::assertContains('secured_tool', $names);
+    }
+
     private function skipUnlessMcpIsAvailable(): void
     {
         if (!class_exists(McpBundle::class)) {
@@ -151,5 +179,31 @@ final class McpSecurityTest extends ApiTestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @param array<string, string> $headers
+     *
+     * @return list<string>
+     */
+    private function listToolNames($client, string $sessionId, array $headers = []): array
+    {
+        $result = $client->request('POST', '/mcp', [
+            'headers' => $headers + [
+                'Accept' => 'application/json, text/event-stream',
+                'Content-Type' => 'application/json',
+                'mcp-session-id' => $sessionId,
+            ],
+            'json' => [
+                'jsonrpc' => '2.0',
+                'id' => 2,
+                'method' => 'tools/list',
+                'params' => [],
+            ],
+        ])->toArray(false);
+
+        self::assertArrayNotHasKey('error', $result, 'MCP error: '.json_encode($result['error'] ?? null));
+
+        return array_column($result['result']['tools'] ?? [], 'name');
     }
 }

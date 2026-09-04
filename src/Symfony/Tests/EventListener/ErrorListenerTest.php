@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\Symfony\EventListener\ErrorListener;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -158,5 +159,43 @@ class ErrorListenerTest extends TestCase
         $controllerProp = $refl->getProperty('controller');
 
         $this->assertEquals($initialController, $controllerProp->getValue($errorListener), 'The controller property must never be modified.');
+    }
+
+    /**
+     * The listener announces that it is converting an exception into an Error
+     * resource. That is normal operation, and the call is already gated behind
+     * $debug, so it must not be reported at "error" level: with Symfony's
+     * fallback stderr logger (no Monolog) the phpunit recipe's
+     * SHELL_VERBOSITY=-1 puts the threshold at exactly "error", which makes the
+     * line surface in otherwise green test suites as though something failed.
+     */
+    public function testDiagnosticIsLoggedAtDebugLevel(): void
+    {
+        $exception = new \Exception();
+        $operation = new Get(name: '_api_errors_problem', priority: 0, status: 400);
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')
+                                          ->with(Error::class)
+                                          ->willReturn(
+                                              new ResourceMetadataCollection(Error::class, [new ApiResource(operations: [$operation])])
+                                          );
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->with($exception::class)->willReturn(false);
+
+        $kernel = $this->createStub(KernelInterface::class);
+        $kernel->method('handle')->willReturn(new Response());
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method('error');
+        $logger->expects($this->once())
+               ->method('debug')
+               ->with('An exception occured, transforming to an Error resource.', $this->anything());
+
+        $request = Request::create('/');
+        $request->attributes->set('_api_operation', new Get());
+        $exceptionEvent = new ExceptionEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST, $exception);
+        $errorListener = new ErrorListener('action', $logger, true, [], $resourceMetadataCollectionFactory, ['jsonproblem' => ['application/problem+json']], [], null, $resourceClassResolver);
+        $errorListener->onKernelException($exceptionEvent);
     }
 }

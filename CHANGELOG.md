@@ -48,6 +48,35 @@
 * [c9e5071d9](https://github.com/api-platform/core/commit/c9e5071d973caedeb9b554f885dedbc89743b93d) feat(symfony): deprecate Symfony Security AccessDeniedException (#8318)
 * [cc0ae1254](https://github.com/api-platform/core/commit/cc0ae1254acaf9742c7f899dd24a14d46c89ca6e) feat: support dynamic HTTP response status code via request attribute (#7904)
 
+## v4.3.18
+
+### Bug fixes
+
+* [01560f985](https://github.com/api-platform/core/commit/01560f9854977f6e58d2f572235544f6ca5c2c86) fix(mcp): filter Laravel tools/list by policy
+* [0257eda05](https://github.com/api-platform/core/commit/0257eda05111a2fb94b8c7ac9e2c877e920aa2d7) fix(metadata): preserve bracketed indexes in query values (#8409)
+* [05c51c273](https://github.com/api-platform/core/commit/05c51c2736c45fd4f94fb30b0b315649ae559a44) fix(doctrine): ignore operator-map values in ExactFilter and PartialSearchFilter (#8415)
+* [0864f2f40](https://github.com/api-platform/core/commit/0864f2f40af03e7b8265c978ff47cc30bf53c9dd) fix(symfony): remove redundant messenger dispatch docblocks (#8410)
+* [113aeb47c](https://github.com/api-platform/core/commit/113aeb47c1e47a61103bff28210b87668c8716da) fix(jsonschema): handle partial update required properties (#8485)
+* [1a53ca212](https://github.com/api-platform/core/commit/1a53ca212abd8d4fa64978831a75cedaaad18926) fix(hydra): stream totalItems as an integer (#8459)
+* [2c440c713](https://github.com/api-platform/core/commit/2c440c713228acdd39ef8b38d8d19910c39d47a9) fix(symfony): log the ErrorListener diagnostic at debug level (#8433)
+* [3fe1838a6](https://github.com/api-platform/core/commit/3fe1838a6228a1a0c0e89d0fea81cef04c1f0829) perf: improve iri converter cache (#8472)
+* [496b78db7](https://github.com/api-platform/core/commit/496b78db7327da983fad9c3e8d03026ba9e677c6) fix(mcp): support mcp/sdk 0.7 and pin symfony/mcp-bundle (#8425)
+* [4f70189ef](https://github.com/api-platform/core/commit/4f70189ef25e6486b565a16c4f99ef33a87e9ae3) fix(mcp): fix no security / validation in mcp tools when using symfony listeners (#8435)
+* [5375d4c41](https://github.com/api-platform/core/commit/5375d4c41d9ee6f43e44fecae21d5e8ba523ef30) fix(serializer): discriminated input patch fix (#8427)
+* [6b9c7028d](https://github.com/api-platform/core/commit/6b9c7028daf7e7aa51962f54d635c46f59695e7a) fix(mcp): evaluate security when listing tools and resources
+* [76bad1028](https://github.com/api-platform/core/commit/76bad10281182f75c48bd567d4d0a528b6117e96) test(symfony): support symfony/mercure 0.8 in test fixtures (#8458)
+* [7d81bb5e9](https://github.com/api-platform/core/commit/7d81bb5e9085b7241e0aee49b0d4322a47175c52) fix(laravel): key the iri operation cache on Relation (#8492)
+* [9087c5876](https://github.com/api-platform/core/commit/9087c5876fa66ddfa0eaccadef43d95f785330df) fix(mcp): return caller-facing errors as JSON-RPC
+* [911a9c5f1](https://github.com/api-platform/core/commit/911a9c5f11fd10f0c8e4daf292f68cb533d6492f) fix(metadata): guard openapi filter parameters
+* [9a6a684b3](https://github.com/api-platform/core/commit/9a6a684b3d4a6028ffef6bcc05dde6d63b11b7b1) fix(jsonschema): keep property metadata on reference schemas (#8480)
+* [e22463fdb](https://github.com/api-platform/core/commit/e22463fdb3c54061eeb870bbe3f6f56facf161f5) fix(metadata): drop unreachable array guards on serializer attributes (#8460)
+
+### Notes
+
+* MCP: listing tools and resources now evaluates `security` (Symfony) and policies (Laravel), so unauthorized items are filtered out of `tools/list` and `resources/list` instead of only failing at call time (#8435).
+* MCP now requires `mcp/sdk` `^0.8` and `symfony/mcp-bundle` `^0.13`.
+* Performance: the cached resource metadata collection is reused instead of rebuilt (#8493), and the Laravel metadata cache factories gained a local in-memory cache (#8417).
+
 ## v4.3.17
 
 ### Bug fixes

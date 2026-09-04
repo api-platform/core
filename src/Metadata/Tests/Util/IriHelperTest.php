@@ -105,6 +105,36 @@ class IriHelperTest extends TestCase
         $this->assertSame('/objects?foo%5B%5D=a&foo%5B%5D=b&page=2', $iri);
     }
 
+    public function testCreateIriPreservesBracketedNumericIndexesInQueryValues(): void
+    {
+        $parts = [
+            'path' => '/objects',
+            'query' => '',
+        ];
+        $parameters = [
+            'v' => 'x[0]',
+        ];
+
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
+
+        $this->assertSame('/objects?v=x%5B0%5D&page=2', $iri);
+    }
+
+    public function testHelpersCollapseListKeysWhilePreservingBracketedValues(): void
+    {
+        $parts = [
+            'path' => '/objects',
+            'query' => '',
+        ];
+        $parameters = [
+            'foo' => ['x[0]', 'b'],
+        ];
+
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
+
+        $this->assertSame('/objects?foo%5B%5D=x%5B0%5D&foo%5B%5D=b&page=2', $iri);
+    }
+
     public function testParseIriWithInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);

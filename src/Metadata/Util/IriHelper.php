@@ -65,10 +65,12 @@ final class IriHelper
         }
 
         $query = http_build_query($parameters, '', '&', \PHP_QUERY_RFC3986);
-        // Only collapse a numeric index when it is the leaf segment of a bracket chain
-        // (a simple list element). Collapsing a non-leaf index would merge distinct keys of a
-        // nested array into separate elements (e.g. filters[0][a] must stay filters[0][a]).
-        $parts['query'] = preg_replace('/%5B\d+%5D(?!%5B)/', '%5B%5D', $query);
+        // Only collapse a numeric index when it is the leaf segment of a bracket chain (a simple
+        // list element): collapsing a non-leaf index would merge distinct keys of a nested array
+        // into separate elements (e.g. filters[0][a] must stay filters[0][a]). The (?=[^=&]*=)
+        // lookahead confines matches to the key half of a pair, as an RFC3986-encoded value can
+        // never contain a literal '='.
+        $parts['query'] = preg_replace('/%5B\d+%5D(?!%5B)(?=[^=&]*=)/', '%5B%5D', $query);
 
         $url = '';
         if ((UrlGeneratorInterface::ABS_URL === $urlGenerationStrategy || UrlGeneratorInterface::NET_PATH === $urlGenerationStrategy) && isset($parts['host'])) {

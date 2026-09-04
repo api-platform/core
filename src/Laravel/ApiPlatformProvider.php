@@ -113,9 +113,11 @@ use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Mcp\Capability\Registry\Loader as McpLoader;
+use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory as McpSchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
+use ApiPlatform\Mcp\Security\PolicyAccessChecker;
 use ApiPlatform\Mcp\Server\Handler;
 use ApiPlatform\Mcp\State\StructuredContentProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
@@ -186,6 +188,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Mcp\Capability\Registry;
+use Mcp\Capability\RegistryInterface;
 use Mcp\Server;
 use Mcp\Server\Builder;
 use Mcp\Server\Session\InMemorySessionStore;
@@ -1254,6 +1257,21 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
 
+        $this->app->singleton(PolicyAccessChecker::class, static function (Application $app) {
+            return new PolicyAccessChecker(
+                $app->make(McpOperationMetadataFactory::class),
+                $app->make(ResourceAccessCheckerInterface::class)
+            );
+        });
+
+        $this->app->singleton(RegistryInterface::class, static function (Application $app) {
+            return new SecureRegistry(
+                $app->make(Registry::class),
+                $app->make(McpLoader::class),
+                $app->make(PolicyAccessChecker::class)
+            );
+        });
+
         // TODO: add more stores?
         $this->app->singleton('mcp.session.store', static function () {
             return new InMemorySessionStore(3600);
@@ -1271,7 +1289,7 @@ class ApiPlatformProvider extends ServiceProvider
                     null // website_url todo
                 )
                 ->setPaginationLimit(100)
-                ->setRegistry($app->make(Registry::class))
+                ->setRegistry($app->make(RegistryInterface::class))
                 ->setSession($app->make('mcp.session.store'));
 
             foreach ($app->tagged('mcp.loader') as $loader) {

@@ -34,6 +34,8 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Dummy.jsonapi', Dummy::class, 'jsonapi'];
         yield ['Dummy.jsonhal', Dummy::class, 'jsonhal'];
         yield ['Dummy.jsonld', Dummy::class, 'jsonld'];
+        yield ['Dummy.partial', Dummy::class, 'json', null, null, [SchemaFactory::PARTIAL_UPDATE => true]];
+        yield ['Dummy.jsonld.partial', Dummy::class, 'jsonld', null, null, [SchemaFactory::PARTIAL_UPDATE => true]];
 
         yield ['Dummy.DtoOutput', Dummy::class, 'json', DtoOutput::class];
         yield ['Dummy.DtoOutput.jsonapi', Dummy::class, 'jsonapi', DtoOutput::class];
