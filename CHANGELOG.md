@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.4.0-alpha.4
+
+### Bug fixes
+
+* [854c9218e](https://github.com/api-platform/core/commit/854c9218efd907b87c096a2a6e3e44c7f8c36f1a) fix(metadata): stop alerting on inline unwired filters at warmup (#8490)
+
+### Dependencies
+
+* The Doctrine (ORM, ODM, Common) and JSON:API components now require `api-platform/metadata` `^4.4.0-alpha.4`. Their filters instantiate `ApiPlatform\OpenApi\Model\Parameter`, which the metadata component only guards behind a `class_exists()` check from that version on, so an older metadata makes them fatal on an install without `api-platform/openapi`.
+
+Also contains [v4.3.18 changes](#v4318).
+
 ## v4.4.0-alpha.3
 
 ### Bug fixes
