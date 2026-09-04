@@ -1,5 +1,26 @@
 # Changelog
 
+## v5.0.0-alpha.3
+
+### Features
+
+* [672d48e25](https://github.com/api-platform/core/commit/672d48e2510ca08aed92958677c8f861cb36f959) feat(symfony): map UniqueConstraintViolationException to 422 by default (#8478)
+
+### Bug fixes
+
+* [78151b7d1](https://github.com/api-platform/core/commit/78151b7d19da1dfba9a37362bb23a9cb4ff4acd1) fix(mcp): return resource read results for resources (#8436)
+
+### Dependencies
+
+* The Doctrine (ORM, ODM, Common) and JSON:API components now require `api-platform/metadata` `^5.0.0-alpha.3`. Their filters instantiate `ApiPlatform\OpenApi\Model\Parameter`, which the metadata component only guards behind a `class_exists()` check from that version on, so an older metadata makes them fatal on an install without `api-platform/openapi`.
+
+### Notes
+
+* JSON-LD: `/contexts/Error` and `/contexts/ConstraintViolationList` are no longer special-cased to the base context; they are built like any other resource context, since exceptions have been resources since 3.2 (#8402).
+* `SerializerContextBuilder` no longer injects `uri_variables` into the serialization context — URI variables are parsed by the serializer processor instead (#8402).
+
+Also contains [v4.4.0-alpha.4 changes](#v440-alpha4).
+
 ## v5.0.0-alpha.2
 
 ### Breaking changes
