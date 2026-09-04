@@ -41,7 +41,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
      */
     public function createLinkFromProperty(Metadata $operation, string $property): Link
     {
-        $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
+        $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getDataClass(), $property);
         $relationClass = $this->getPropertyClassType($metadata->getNativeType());
         if (!$relationClass) {
             throw new RuntimeException(\sprintf('We could not find a class matching the uriVariable "%s" on "%s".', $property, $resourceClass));
@@ -57,7 +57,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
      */
     public function createLinksFromIdentifiers(Metadata $operation): array
     {
-        $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getClass());
+        $identifiers = $this->getIdentifiersFromResourceClass($resourceClass = $operation->getApiClass());
 
         if (!$identifiers) {
             return [];
@@ -83,7 +83,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     public function createLinksFromRelations(Metadata $operation): array
     {
         $links = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getApiClass()) as $property) {
             $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
             if (!($relationClass = $this->getPropertyClassType($metadata->getNativeType())) || !$this->resourceClassResolver->isResourceClass($relationClass)) {
@@ -105,7 +105,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     {
         $links = [];
         try {
-            $reflectionClass = new \ReflectionClass($resourceClass = $operation->getClass());
+            $reflectionClass = new \ReflectionClass($resourceClass = $operation->getApiClass());
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
                 $reflectionProperty = $reflectionClass->getProperty($property);
 

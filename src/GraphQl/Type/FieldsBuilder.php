@@ -511,7 +511,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 if ($filter = $this->resolveFilter($parameter->getFilter())) {
                     $property = $parameter->getProperty() ?? $name;
                     $property = str_replace('.', $this->nestingSeparator, $property);
-                    $description = $filter->getDescription($operation->getClass());
+                    $description = $filter->getDescription($operation->getDataClass());
 
                     foreach ($description as $descKey => $descValue) {
                         $descKey = str_replace('.', $this->nestingSeparator, $descKey);
@@ -608,7 +608,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 continue;
             }
 
-            $entityClass = $this->getStateOptionsClass($resourceOperation, $resourceOperation->getClass());
+            $entityClass = $this->getStateOptionsClass($resourceOperation, $resourceOperation->getApiClass());
             foreach ($filter->getDescription($entityClass) as $key => $description) {
                 $filterType = \in_array($description['type'], TypeIdentifier::values(), true) ? Type::builtin($description['type']) : Type::object($description['type']);
                 if (!($description['required'] ?? false)) {

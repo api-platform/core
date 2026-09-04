@@ -54,7 +54,7 @@ final class JsonStreamerSerializeListener
         $response = $this->jsonStreamerProcessor->process($event->getControllerResult(), $operation, $uriVariables, [
             'request' => $request,
             'uri_variables' => $uriVariables,
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
             'original_data' => $request->attributes->get('original_data'),
         ]);
 

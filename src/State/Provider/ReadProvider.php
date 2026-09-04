@@ -69,7 +69,7 @@ final class ReadProvider implements ProviderInterface, StopwatchAwareInterface
             $context['filters'] = $filters;
         }
 
-        $resourceClass = $operation->getClass();
+        $resourceClass = $operation->getApiClass();
 
         if ($this->serializerContextBuilder && $request) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses

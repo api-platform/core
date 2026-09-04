@@ -57,16 +57,23 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
                     $entityClass = $options->getModelClass();
                 }
 
-                $class = $operation->getInput()['class'] ?? $operation->getClass();
-                $outputClass = $operation->getOutput()['class'] ?? null;
+                $class = $operation->getInputClass();
+                $outputClass = $operation->getOutputClass();
                 $entityMap = null;
 
+                // Only guard output: skip when outputClass equals the resource class (fallback from
+                // getOutputClass() with no explicit output), to avoid triggering mapping for resources
+                // that declare #[Map] for entity→resource but have no separate output DTO.
+                $effectiveOutputClass = ($outputClass !== null && $outputClass !== $operation->getApiClass()) ? $outputClass : null;
+
+                // TODO review that
+
                 // Look for Mapping metadata
-                if ($this->canBeMapped($class) || ($outputClass && $this->canBeMapped($outputClass)) || ($entityClass && ($entityMap = $this->canBeMapped($entityClass)))) {
+                if ($this->canBeMapped($class) || ($effectiveOutputClass && $this->canBeMapped($effectiveOutputClass)) || ($entityClass && ($entityMap = $this->canBeMapped($entityClass)))) {
                     $found = true;
                     if ($entityMap) {
                         foreach ($entityMap as $mapping) {
-                            if ($found = ($mapping->source === $operation->getClass() || $mapping->target === $operation->getClass())) {
+                            if ($found = ($mapping->source === $operation->getApiClass() || $mapping->target === $operation->getApiClass())) {
                                 break;
                             }
                         }
@@ -89,8 +96,12 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
     /**
      * @return bool|list<Mapping>
      */
-    private function canBeMapped(string $class): bool|array
+    private function canBeMapped(?string $class): bool|array
     {
+        if (!$class) {
+            return false;
+        }
+
         try {
             $r = new \ReflectionClass($class);
             if (!$r->isInstantiable() || !($mapping = $this->objectMapperMetadata->create($r->newInstanceWithoutConstructor(), null, ['_api_check_can_be_mapped' => true]))) {

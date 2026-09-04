@@ -23,7 +23,7 @@ final class BackedEnumProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array
     {
-        $resourceClass = $operation->getClass();
+        $resourceClass = $operation->getApiClass();
         if (!$resourceClass || !is_a($resourceClass, \BackedEnum::class, true)) {
             throw new RuntimeException('This resource is not an enum');
         }

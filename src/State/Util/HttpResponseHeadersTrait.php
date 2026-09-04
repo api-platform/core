@@ -53,10 +53,11 @@ trait HttpResponseHeadersTrait
     {
         $status = $this->getStatus($request, $operation, $context);
         $method = $request->getMethod();
-        $output = $operation->getOutput();
-        $outputMetadata = $output ?? ['class' => $operation->getClass()];
-        $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
-        $outputExplicitlyDisabled = \is_array($output) && \array_key_exists('class', $output) && null === $output['class'];
+        $outputClass = $operation->getOutputClass();
+        $hasOutput = null !== $outputClass;
+        // Disabled only when output: false was explicitly set. When there's no resource class at all
+        // (e.g. context endpoints), getOutputClass() also returns null but the output is not disabled.
+        $outputExplicitlyDisabled = null === $outputClass && null !== $operation->getClass();
         // RFC 7230 §3.3.2 / §3.3.3: 204, 205 and 304 responses MUST NOT include a payload body,
         // and a sender MUST NOT generate a Content-Type field for a message without a body.
         $isBodylessStatus = \in_array($status, [Response::HTTP_NO_CONTENT, Response::HTTP_RESET_CONTENT, Response::HTTP_NOT_MODIFIED], true);
@@ -118,8 +119,8 @@ trait HttpResponseHeadersTrait
                 $iri = null;
                 if ($hasData) {
                     $iri = $this->iriConverter->getIriFromResource($originalData);
-                } elseif ($operation->getClass()) {
-                    $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
+                } elseif ($operation->getApiClass()) {
+                    $iri = $this->iriConverter->getIriFromResource($operation->getApiClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                 }
 
                 if ($iri && 'GET' !== $method) {
@@ -140,7 +141,7 @@ trait HttpResponseHeadersTrait
         if (
             !$operation instanceof Error
             && $operation->getUriTemplate()
-            && $this->resourceClassResolver?->isResourceClass($operation->getClass())
+            && $this->resourceClassResolver?->isResourceClass($operation->getApiClass())
         ) {
             $this->addLinkedDataPlatformHeaders($headers, $operation);
         }
@@ -156,7 +157,7 @@ trait HttpResponseHeadersTrait
 
         $acceptPost = null;
         $allowedMethods = ['OPTIONS', 'HEAD'];
-        $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
+        $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getApiClass());
         foreach ($resourceCollection as $resource) {
             foreach ($resource->getOperations() as $op) {
                 if ($op->getUriTemplate() === $operation->getUriTemplate()) {

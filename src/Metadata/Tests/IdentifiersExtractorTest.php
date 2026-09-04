@@ -54,7 +54,7 @@ class IdentifiersExtractorTest extends TestCase
         $operation = $this->prophesize(HttpOperation::class);
         $item = new Dummy();
         $resourceClass = Dummy::class;
-        $operation->getClass()->willReturn(null);
+        $operation->getApiClass()->willReturn(null);
 
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
@@ -82,7 +82,7 @@ class IdentifiersExtractorTest extends TestCase
         $operation = $this->prophesize(HttpOperation::class);
         $item = new Dummy();
         $resourceClass = Dummy::class;
-        $operation->getClass()->willReturn($resourceClass);
+        $operation->getApiClass()->willReturn($resourceClass);
         $operation->getUriVariables()->willReturn([]);
 
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);

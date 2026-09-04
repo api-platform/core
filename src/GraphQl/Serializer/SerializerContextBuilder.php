@@ -40,16 +40,18 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['operation'] = $operation;
-        if ($operation->getInput()) {
-            $context['input'] = $operation->getInput();
+        $apiClass = $operation->getApiClass();
+        $dataClass = $operation->getDataClass();
+        if (null !== ($inputClass = $operation->getInputClass()) && $inputClass !== $apiClass) {
+            $context['input'] = ['class' => $inputClass];
         }
-        if ($operation->getOutput()) {
-            $context['output'] = $operation->getOutput();
+        if (null !== ($outputClass = $operation->getOutputClass()) && $outputClass !== $apiClass) {
+            $context['output'] = ['class' => $outputClass];
         }
         $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 
         if ($normalization) {
-            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation, $resolverContext, $context);
+            $context['attributes'] = $this->fieldsToAttributes($dataClass, $operation, $resolverContext, $context);
         }
 
         // to keep the cache computation smaller, we have "operation_name" and "iri" anyways

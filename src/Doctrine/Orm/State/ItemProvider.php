@@ -50,7 +50,7 @@ final class ItemProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $entityClass = $operation->getDataClass();
 
         /** @var EntityManagerInterface|null $manager */
         $manager = $this->managerRegistry->getManagerForClass($entityClass);

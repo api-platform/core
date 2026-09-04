@@ -223,6 +223,7 @@ class HttpOperation extends Operation
         ?bool $jsonStream = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $dataClass = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -283,7 +284,8 @@ class HttpOperation extends Operation
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            dataClass: $dataClass
         );
     }
 

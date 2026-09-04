@@ -40,8 +40,7 @@ trait HttpResponseStatusTrait
         $status = $operation->getStatus();
         $method = $request->getMethod();
 
-        $outputMetadata = $operation->getOutput() ?? ['class' => $operation->getClass()];
-        $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
+        $hasOutput = null !== $operation->getOutputClass();
         $originalData = $context['original_data'] ?? null;
         $hasData = !$hasOutput ? false : ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData)));
 

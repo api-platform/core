@@ -29,11 +29,10 @@ trait ResourceMetadataTrait
 
     private function findOutputClass(string $className, string $type, Operation $operation, ?array $serializerContext): ?string
     {
-        $inputOrOutput = ['class' => $className];
-        $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
+        $resourceClass = (Schema::TYPE_OUTPUT === $type ? $operation->getOutputClass() : $operation->getInputClass()) ?? $className;
         $forceSubschema = $serializerContext[SchemaFactory::FORCE_SUBSCHEMA] ?? false;
 
-        return $forceSubschema ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
+        return $forceSubschema ? ($resourceClass ?? $operation->getApiClass()) : $resourceClass;
     }
 
     private function findOperation(string $className, string $type, ?Operation $operation, ?array $serializerContext, ?string $format = null): Operation
@@ -58,7 +57,7 @@ trait ResourceMetadataTrait
         }
 
         // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise
-        if ($this->resourceMetadataFactory && !$operation->getClass()) {
+        if ($this->resourceMetadataFactory && !$operation->getApiClass()) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
 
             if ($operation->getName()) {

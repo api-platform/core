@@ -103,6 +103,7 @@ final class Get extends HttpOperation
         ?bool $jsonStream = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $dataClass = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -185,7 +186,8 @@ final class Get extends HttpOperation
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            dataClass: $dataClass
         );
     }
 }

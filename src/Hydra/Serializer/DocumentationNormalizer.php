@@ -216,13 +216,11 @@ final class DocumentationNormalizer implements NormalizerInterface
                 continue;
             }
 
-            $inputMetadata = $operation->getInput();
-            if (null !== $inputClass = $inputMetadata['class'] ?? null) {
+            if (null !== ($inputClass = $operation->getInputClass())) {
                 $classes[$inputClass] = true;
             }
 
-            $outputMetadata = $operation->getOutput();
-            if (null !== $outputClass = $outputMetadata['class'] ?? null) {
+            if (null !== ($outputClass = $operation->getOutputClass())) {
                 $classes[$outputClass] = true;
             }
         }
@@ -288,11 +286,8 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         $shortName = $operation->getShortName();
-        $inputMetadata = $operation->getInput() ?? [];
-        $outputMetadata = $operation->getOutput() ?? [];
-
-        $inputClass = \array_key_exists('class', $inputMetadata) ? $inputMetadata['class'] : false;
-        $outputClass = \array_key_exists('class', $outputMetadata) ? $outputMetadata['class'] : false;
+        $inputClass = $operation->getInputClass();
+        $outputClass = $operation->getOutputClass();
 
         if ('GET' === $method && $operation instanceof CollectionOperationInterface) {
             $hydraOperation += [

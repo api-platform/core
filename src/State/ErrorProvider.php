@@ -45,7 +45,7 @@ final class ErrorProvider implements ProviderInterface
 
             // We change the operation to get our normalization context according to the format
             if ($this->resourceMetadataCollectionFactory) {
-                $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
+                $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getApiClass());
                 foreach ($resourceCollection as $resource) {
                     foreach ($resource->getOperations() as $name => $operation) {
                         if (isset($operation->getOutputFormats()[$request->getRequestFormat()])) {
@@ -59,7 +59,7 @@ final class ErrorProvider implements ProviderInterface
 
             $text = Response::$statusTexts[$status] ?? throw new NotFoundHttpException();
 
-            $cl = $operation->getClass();
+            $cl = $operation->getApiClass();
 
             return match ($request->getRequestFormat()) {
                 'html' => $this->renderError((int) $status, $text),
@@ -72,7 +72,7 @@ final class ErrorProvider implements ProviderInterface
         }
 
         $status = $operation->getStatus() ?? 500;
-        $cl = is_a($operation->getClass(), ErrorResourceInterface::class, true) ? $operation->getClass() : Error::class;
+        $cl = is_a($operation->getApiClass(), ErrorResourceInterface::class, true) ? $operation->getApiClass() : Error::class;
         $error = $cl::createFromException($exception, $status);
         if (!$this->debug && $status >= 500 && method_exists($error, 'setDetail')) {
             $error->setDetail('Internal Server Error');
