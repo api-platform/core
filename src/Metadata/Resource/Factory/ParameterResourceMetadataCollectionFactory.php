@@ -348,7 +348,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withSchema($schema);
         }
 
-        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface && ($openApiParameter = $filter->getOpenApiParameters($parameter))) {
+        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface
+            && class_exists(OpenApiParameter::class) && ($openApiParameter = $filter->getOpenApiParameters($parameter))) {
             $parameter = $parameter->withOpenApi($openApiParameter);
         }
 
