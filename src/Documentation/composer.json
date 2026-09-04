@@ -21,7 +21,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.4@alpha"
+        "api-platform/metadata": "^4.4@alpha",
+        "symfony/web-link": "^7.4 || ^8.0"
     },
     "extra": {
         "branch-alias": {

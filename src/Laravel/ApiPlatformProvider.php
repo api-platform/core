@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel;
 
+use ApiPlatform\Documentation\ApiCatalogFactory;
 use ApiPlatform\GraphQl\Error\ErrorHandler as GraphQlErrorHandler;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Executor;
@@ -80,6 +81,7 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
+use ApiPlatform\Laravel\Controller\ApiCatalogController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Controller\NotExposedController;
@@ -873,11 +875,29 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ApiCatalogFactory::class, static function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new ApiCatalogFactory(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(UrlGeneratorInterface::class),
+                $config->get('api-platform.docs_formats'),
+                $config->get('api-platform.enable_docs', true),
+            );
+        });
+
+        $this->app->singleton(ApiCatalogController::class, static function (Application $app) {
+            return new ApiCatalogController($app->make(ApiCatalogFactory::class));
+        });
+
         $this->app->singleton(EntrypointController::class, static function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new EntrypointController($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
+            return new EntrypointController($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'), $app->make(ApiCatalogFactory::class));
         });
 
         $this->app->singleton(Pagination::class, static function (Application $app) {

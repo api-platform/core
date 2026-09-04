@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\StopwatchAwareInterface;
 use ApiPlatform\State\StopwatchAwareTrait;
+use ApiPlatform\State\Util\LinkTemplateHeaderSerializer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
@@ -33,7 +34,7 @@ final class AddLinkHeaderProcessor implements ProcessorInterface, StopwatchAware
     /**
      * @param ProcessorInterface<T1, T2> $decorated
      */
-    public function __construct(private readonly ProcessorInterface $decorated, private readonly ?HttpHeaderSerializer $serializer = new HttpHeaderSerializer())
+    public function __construct(private readonly ProcessorInterface $decorated, private readonly ?HttpHeaderSerializer $serializer = new HttpHeaderSerializer(), private readonly ?LinkTemplateHeaderSerializer $templateSerializer = new LinkTemplateHeaderSerializer())
     {
     }
 
@@ -51,8 +52,15 @@ final class AddLinkHeaderProcessor implements ProcessorInterface, StopwatchAware
         $this->stopwatch?->start('api_platform.processor.add_link_header');
         // We add our header here as Symfony does it only for the main Request and we want it to be done on errors (sub-request) as well
         $linksProvider = $request->attributes->get('_api_platform_links');
-        if ($this->serializer && ($links = $linksProvider?->getLinks())) {
-            $response->headers->set('Link', $this->serializer->serialize($links));
+        if ($links = $linksProvider?->getLinks()) {
+            // Symfony's HttpHeaderSerializer skips templated links, they belong to the Link-Template header (RFC 9652)
+            if ($this->serializer && null !== ($header = $this->serializer->serialize($links))) {
+                $response->headers->set('Link', $header);
+            }
+
+            if ($this->templateSerializer && null !== ($header = $this->templateSerializer->serialize($links))) {
+                $response->headers->set('Link-Template', $header);
+            }
         }
         $this->stopwatch?->stop('api_platform.processor.add_link_header');
 
