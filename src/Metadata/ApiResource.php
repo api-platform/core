@@ -438,8 +438,16 @@ class ApiResource extends Metadata
          * @var string|bool|null
          */
         protected $messenger = null,
+        /**
+         * @deprecated use inputClass instead
+         */
         protected $input = null,
+        protected ?string $inputClass = null,
+        /**
+         * @deprecated use outputClass instead
+         */
         protected $output = null,
+        protected ?string $outputClass = null,
         /**
          * Override the default order of items in your collection. Note that this is handled by our doctrine filters such as
          * the [OrderFilter](/docs/reference/Doctrine/Orm/Filter/OrderFilter).
@@ -997,7 +1005,9 @@ class ApiResource extends Metadata
             mercure: $mercure,
             messenger: $messenger,
             input: $input,
+            inputClass: $inputClass,
             output: $output,
+            outputClass: $outputClass,
             order: $order,
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,

@@ -21,6 +21,10 @@ trait InputOutputMetadataTrait
 
     protected function getInputClass(array $context = []): ?string
     {
+        if (\is_string($context['input'] ?? null)) {
+            return $context['input'];
+        }
+
         if (!$this->resourceMetadataCollectionFactory) {
             return $context['input']['class'] ?? null;
         }
@@ -34,6 +38,10 @@ trait InputOutputMetadataTrait
 
     protected function getOutputClass(array $context = []): ?string
     {
+        if (\is_string($context['output'] ?? null)) {
+            return $context['output'];
+        }
+
         if (!$this->resourceMetadataCollectionFactory) {
             return $context['output']['class'] ?? null;
         }

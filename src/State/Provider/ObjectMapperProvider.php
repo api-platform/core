@@ -41,9 +41,12 @@ final class ObjectMapperProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
-        $class = $operation->getOutput()['class'] ?? $operation->getClass();
+        // Falls back to the resource class itself when there's no distinct output DTO (including when
+        // output is disabled for response-body purposes, e.g. NotExposed): the mapped entity still needs
+        // to be represented as a proper instance of the resource class internally (IRI resolution, etc.).
+        $class = $operation->getOutputClass() ?? $operation->getClass();
 
-        if (!$this->objectMapper || !$operation->canMap()) {
+        if (!$this->objectMapper || !$operation->canMap() || null === $class) {
             return $data;
         }
 

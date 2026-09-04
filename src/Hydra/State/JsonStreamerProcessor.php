@@ -76,6 +76,7 @@ final class JsonStreamerProcessor implements ProcessorInterface
             || !($request = $context['request'] ?? null)
             || !$operation->getJsonStream()
             || 'jsonld' !== $request->getRequestFormat()
+            || null === ($outputClass = $operation->getOutputClass())
         ) {
             return $this->processor?->process($data, $operation, $uriVariables, $context);
         }
@@ -111,13 +112,13 @@ final class JsonStreamerProcessor implements ProcessorInterface
 
             $data = $this->jsonStreamer->write(
                 $collection,
-                Type::generic(Type::object($collection::class), Type::object($operation->getClass())),
+                Type::generic(Type::object($collection::class), Type::object($outputClass)),
                 ['data' => $data, 'operation' => $operation],
             );
         } else {
             $data = $this->jsonStreamer->write(
                 $data,
-                Type::object($operation->getClass()),
+                Type::object($outputClass),
                 ['data' => $data, 'operation' => $operation],
             );
         }

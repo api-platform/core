@@ -35,11 +35,11 @@ final class JsonStreamerProvider implements ProviderInterface
 
         $data = $this->decorated ? $this->decorated->provide($operation, $uriVariables, $context) : $request->attributes->get('data');
 
-        if (!$operation->canDeserialize() || 'json' !== $request->attributes->get('input_format')) {
+        if (!$operation->canDeserialize() || 'json' !== $request->attributes->get('input_format') || null === ($inputClass = $operation->getInputClass())) {
             return $data;
         }
 
-        $data = $this->jsonStreamReader->read($request->getContent(true), Type::object($operation->getClass()));
+        $data = $this->jsonStreamReader->read($request->getContent(true), Type::object($inputClass));
         $context['request']->attributes->set('deserialized', true);
 
         if (\PHP_VERSION_ID > 80400) {
