@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Util;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -118,6 +119,9 @@ trait HttpResponseHeadersTrait
                 $iri = null;
                 if ($hasData) {
                     $iri = $this->iriConverter->getIriFromResource($originalData);
+                } elseif (\is_object($originalData) && ($itemUriTemplate = $this->getMappedOutputItemUriTemplate($operation))) {
+                    // A mapped (non-resource) output DTO: derive the item IRI from the operation's item URI template
+                    $iri = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, null, ['item_uri_template' => $itemUriTemplate]);
                 } elseif ($operation->getClass()) {
                     $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                 }
@@ -146,6 +150,19 @@ trait HttpResponseHeadersTrait
         }
 
         return $headers;
+    }
+
+    private function getMappedOutputItemUriTemplate(HttpOperation $operation): ?string
+    {
+        if (!$operation->canMap() || null === ($operation->getOutput()['class'] ?? null)) {
+            return null;
+        }
+
+        if (method_exists($operation, 'getItemUriTemplate')) {
+            return $operation->getItemUriTemplate();
+        }
+
+        return $operation instanceof CollectionOperationInterface ? null : $operation->getUriTemplate();
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void

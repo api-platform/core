@@ -16,6 +16,7 @@ namespace ApiPlatform\Serializer;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\AttributesExtractor;
 use ApiPlatform\State\SerializerContextBuilderInterface;
@@ -70,6 +71,19 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         // Special case as this is usually handled by our OperationContextTrait, here we want to force the IRI in the response
         if (!$operation instanceof CollectionOperationInterface && method_exists($operation, 'getItemUriTemplate') && $operation->getItemUriTemplate()) {
             $context['item_uri_template'] = $operation->getItemUriTemplate();
+        } elseif (
+            $normalization
+            && $operation instanceof HttpOperation
+            && !$operation instanceof CollectionOperationInterface
+            && !method_exists($operation, 'getItemUriTemplate')
+            && $operation->canMap()
+            && null !== ($context['output']['class'] ?? null)
+            && !\in_array($operation->getMethod(), ['GET', 'HEAD', 'OPTIONS'], true)
+            && $operation->getUriTemplate()
+        ) {
+            // A mapped output DTO on an item write operation (PUT/PATCH): the operation's own
+            // URI template is the item template, use it to generate the IRI of the DTO.
+            $context['item_uri_template'] = $operation->getUriTemplate();
         }
 
         if ($types = $operation->getTypes()) {
