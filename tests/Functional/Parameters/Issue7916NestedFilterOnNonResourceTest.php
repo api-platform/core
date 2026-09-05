@@ -52,6 +52,14 @@ final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
         return [UserActionResource::class, UserResource::class];
     }
 
+    /**
+     * The ORM and ODM resources cannot share one URI template: operation names double as route names.
+     */
+    private function path(): string
+    {
+        return $this->isMongoDB() ? '/user-actions-odm' : '/user-actions';
+    }
+
     protected function setUp(): void
     {
         $entities = $this->isMongoDB()
@@ -69,7 +77,7 @@ final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
      */
     public function testFilteringOnNonResourceRelationName(): void
     {
-        $response = self::createClient()->request('GET', '/user-actions?name=john');
+        $response = self::createClient()->request('GET', $this->path().'?name=john');
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
@@ -82,7 +90,7 @@ final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
      */
     public function testFilteringOnNonResourceRelationEmail(): void
     {
-        $response = self::createClient()->request('GET', '/user-actions?email=john@example.com');
+        $response = self::createClient()->request('GET', $this->path().'?email=john@example.com');
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
@@ -95,7 +103,7 @@ final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
      */
     public function testPartialFilteringOnNonResourceRelation(): void
     {
-        $response = self::createClient()->request('GET', '/user-actions?name=ane');
+        $response = self::createClient()->request('GET', $this->path().'?name=ane');
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
@@ -108,7 +116,7 @@ final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
      */
     public function testNoMatchFilteringOnNonResourceRelation(): void
     {
-        $response = self::createClient()->request('GET', '/user-actions?name=nonexistent');
+        $response = self::createClient()->request('GET', $this->path().'?name=nonexistent');
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
