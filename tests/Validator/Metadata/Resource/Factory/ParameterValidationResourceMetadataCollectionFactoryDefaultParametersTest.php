@@ -143,8 +143,8 @@ final class ParameterValidationResourceMetadataCollectionFactoryDefaultParameter
         $this->assertTrue($parameters->has('Request-ID', HeaderParameter::class));
         $this->assertSame('API token', $parameters->get('API-Token', HeaderParameter::class)?->getDescription());
         $this->assertSame('Request correlation identifier', $parameters->get('Request-ID', HeaderParameter::class)?->getDescription());
-        $this->assertTrue($parameters->get('API-Token', HeaderParameter::class)?->getRequired());
-        $this->assertFalse($parameters->get('Request-ID', HeaderParameter::class)?->getRequired());
+        $this->assertTrue($parameters->get('API-Token', HeaderParameter::class)->getRequired());
+        $this->assertFalse($parameters->get('Request-ID', HeaderParameter::class)->getRequired());
     }
 
     public function testHistoricalAndNamedDefaultParametersAreAppliedTogether(): void
