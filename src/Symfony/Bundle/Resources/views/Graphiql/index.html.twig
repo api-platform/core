@@ -9,8 +9,10 @@
         <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
     {% endblock %}
 
+    {%- set csp_nonce_attr = cspNonce is defined and cspNonce is not null ? ' nonce="' ~ (cspNonce|e('html_attr')) ~ '"' : '' -%}
+
     {% block importmap %}
-        <script type="importmap">
+        <script type="importmap"{{ csp_nonce_attr|raw }}>
         {
             "imports": {
                 "react": "https://esm.sh/react@19.2.5",
@@ -35,7 +37,7 @@
 
     {% block head_javascript %}
         {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
-        <script id="graphiql-data" type="application/json">{{ graphiql_data|json_encode(65)|raw }}</script>
+        <script id="graphiql-data" type="application/json"{{ csp_nonce_attr|raw }}>{{ graphiql_data|json_encode(65)|raw }}</script>
     {% endblock %}
 </head>
 
@@ -43,7 +45,7 @@
 <div id="graphiql">Loading...</div>
 
 {% block body_javascript %}
-    <script type="module" src="{{ asset('bundles/apiplatform/init-graphiql.js', assetPackage) }}"></script>
+    <script type="module" src="{{ asset('bundles/apiplatform/init-graphiql.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
 {% endblock %}
 
 </body>

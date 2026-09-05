@@ -13,6 +13,8 @@
     {% set active_ui = app.request.query.get('ui', 'swagger_ui') %}
     {% set is_scalar = (scalarEnabled and not swaggerUiEnabled and not reDocEnabled) or (scalarEnabled and 'scalar' == active_ui) %}
 
+    {%- set csp_nonce_attr = cspNonce is defined and cspNonce is not null ? ' nonce="' ~ (cspNonce|e('html_attr')) ~ '"' : '' -%}
+
     {% block stylesheet %}
         {% if not is_scalar %}
             <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/400.css', assetPackage) }}">
@@ -26,7 +28,7 @@
 
     {% block head_javascript %}
         {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
-        <script id="swagger-data" type="application/json">{{ swagger_data|merge(oauth_data)|json_encode(65)|raw }}</script>
+        <script id="swagger-data" type="application/json"{{ csp_nonce_attr|raw }}>{{ swagger_data|merge(oauth_data)|json_encode(65)|raw }}</script>
     {% endblock %}
 </head>
 
@@ -101,18 +103,18 @@
 
 {% block javascript %}
     {% if is_scalar %}
-        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
-        <script src="{{ asset('bundles/apiplatform/init-scalar-ui.js', assetPackage) }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"{{ csp_nonce_attr|raw }}></script>
+        <script src="{{ asset('bundles/apiplatform/init-scalar-ui.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
     {% elseif (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
-        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js', assetPackage) }}"></script>
-        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
+        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
     {% else %}
-        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js', assetPackage) }}"></script>
-        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js', assetPackage) }}"></script>
-        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
+        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
     {% endif %}
     {% if not is_scalar %}
-        <script src="{{ asset('bundles/apiplatform/init-common-ui.js', assetPackage) }}" defer></script>
+        <script src="{{ asset('bundles/apiplatform/init-common-ui.js', assetPackage) }}" defer{{ csp_nonce_attr|raw }}></script>
     {% endif %}
 {% endblock %}
 
