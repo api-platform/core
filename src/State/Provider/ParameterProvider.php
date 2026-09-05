@@ -26,6 +26,9 @@ use ApiPlatform\State\StopwatchAwareTrait;
 use ApiPlatform\State\Util\ParameterParserTrait;
 use ApiPlatform\State\Util\RequestParser;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 /**
  * Loops over parameters to:
@@ -46,8 +49,14 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         $this->stopwatch?->start('api_platform.provider.parameter');
         $request = $context['request'] ?? null;
         if ($request && null === $request->attributes->get('_api_query_parameters')) {
-            $queryString = RequestParser::getQueryString($request);
-            $request->attributes->set('_api_query_parameters', $queryString ? RequestParser::parseRequestParams($queryString) : []);
+            // RFC 10008: the HTTP QUERY method carries its parameters in the request body
+            // rather than in the URI query string.
+            if ($operation instanceof HttpOperation && HttpOperation::METHOD_QUERY === $operation->getMethod()) {
+                $request->attributes->set('_api_query_parameters', $this->parseQueryParametersFromBody($request));
+            } else {
+                $queryString = RequestParser::getQueryString($request);
+                $request->attributes->set('_api_query_parameters', $queryString ? RequestParser::parseRequestParams($queryString) : []);
+            }
         }
 
         if ($request && null === $request->attributes->get('_api_header_parameters')) {
@@ -100,6 +109,43 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         $this->stopwatch?->stop('api_platform.provider.parameter');
 
         return $this->decorated?->provide($operation, $uriVariables, $context);
+    }
+
+    /**
+     * Reads the parameters of an HTTP QUERY request (RFC 10008) from its body, negotiated
+     * by content type: "application/x-www-form-urlencoded" shares the query-string grammar,
+     * any JSON-based media type decodes to an associative array.
+     *
+     * @return array<string, mixed>
+     */
+    private function parseQueryParametersFromBody(Request $request): array
+    {
+        $content = (string) $request->getContent();
+        if ('' === $content) {
+            return [];
+        }
+
+        $mimeType = trim(strtolower(explode(';', (string) $request->headers->get('Content-Type', ''))[0]));
+
+        if ('application/x-www-form-urlencoded' === $mimeType) {
+            return RequestParser::parseRequestParams($content);
+        }
+
+        if (str_contains($mimeType, 'json')) {
+            try {
+                $params = json_decode($content, true, flags: \JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new BadRequestHttpException('The QUERY request body is not valid JSON.', $e);
+            }
+
+            if (!\is_array($params)) {
+                throw new BadRequestHttpException('The QUERY request body must decode to a JSON object.');
+            }
+
+            return $params;
+        }
+
+        throw new UnsupportedMediaTypeHttpException(\sprintf('The content type "%s" is not supported for the HTTP QUERY method. Use "application/x-www-form-urlencoded" or a JSON-based media type.', $mimeType ?: 'none'), headers: ['Accept-Query' => 'application/x-www-form-urlencoded, application/json']);
     }
 
     /**
