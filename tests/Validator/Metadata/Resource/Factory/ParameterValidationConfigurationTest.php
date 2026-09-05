@@ -81,6 +81,83 @@ final class ParameterValidationConfigurationTest extends TestCase
         $this->assertArrayHasKey('ApiPlatform\Metadata\QueryParameter', $config['defaults']['parameters']);
     }
 
+    public function testNamedDefaultParametersWithSameClassConfiguration(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [
+                        'api_token' => [
+                            'class' => 'ApiPlatform\Metadata\HeaderParameter',
+                            'key' => 'API-Token',
+                            'required' => true,
+                        ],
+                        'request_id' => [
+                            'class' => 'ApiPlatform\Metadata\HeaderParameter',
+                            'key' => 'Request-ID',
+                            'required' => false,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $parameters = $config['defaults']['parameters'];
+
+        $this->assertCount(2, $parameters);
+        $this->assertSame('ApiPlatform\Metadata\HeaderParameter', $parameters['api_token']['class']);
+        $this->assertSame('API-Token', $parameters['api_token']['key']);
+        $this->assertTrue($parameters['api_token']['required']);
+        $this->assertSame('ApiPlatform\Metadata\HeaderParameter', $parameters['request_id']['class']);
+        $this->assertSame('Request-ID', $parameters['request_id']['key']);
+        $this->assertFalse($parameters['request_id']['required']);
+    }
+
+    public function testHistoricalAndNamedDefaultParametersConfiguration(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [
+                        'ApiPlatform\Metadata\QueryParameter' => [
+                            'key' => 'page_size',
+                        ],
+                        'api_token' => [
+                            'class' => 'ApiPlatform\Metadata\HeaderParameter',
+                            'key' => 'API-Token',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $parameters = $config['defaults']['parameters'];
+
+        $this->assertCount(2, $parameters);
+        $this->assertArrayHasKey('ApiPlatform\Metadata\QueryParameter', $parameters);
+        $this->assertArrayNotHasKey('class', $parameters['ApiPlatform\Metadata\QueryParameter']);
+        $this->assertSame('page_size', $parameters['ApiPlatform\Metadata\QueryParameter']['key']);
+        $this->assertSame('ApiPlatform\Metadata\HeaderParameter', $parameters['api_token']['class']);
+        $this->assertSame('API-Token', $parameters['api_token']['key']);
+    }
+
+    public function testNamedDefaultParameterClassCannotBeEmpty(): void
+    {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [
+                        'api_token' => [
+                            'class' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testDefaultParametersWithAllOptions(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
