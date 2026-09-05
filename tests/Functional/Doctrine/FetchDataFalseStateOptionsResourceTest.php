@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Functional\Doctrine;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FetchDataFalseStateOptions;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FetchDataFalseStateOptionsEntity;
 use ApiPlatform\Tests\RecreateSchemaTrait;

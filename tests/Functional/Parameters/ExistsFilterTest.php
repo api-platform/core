@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredExistsParameter as FilteredExistsParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredExistsParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;

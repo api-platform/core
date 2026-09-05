@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonLd;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InterfaceTaxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InterfaceTaxonProduct;
 use ApiPlatform\Tests\SetupClassResourcesTrait;

@@ -58,7 +58,7 @@ jobs:
                 working-directory: docs
                 env:
                     APP_DEBUG: 0
-                    PDG_AUTOLOAD: ${{ github.workspace }}/docs/vendor/autoload.php
+                    PDG_AUTOLOAD: ${{ github.workspace }}/docs/pdg-autoload.php
                     KERNEL_CLASS: \ApiPlatform\Playground\Kernel
                 run: |
                     for d in guides/*.php; do

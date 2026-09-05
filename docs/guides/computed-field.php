@@ -285,7 +285,7 @@ namespace DoctrineMigrations {
 
 namespace App\Tests {
     use ApiPlatform\Playground\Test\TestGuideTrait;
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+    use ApiPlatform\Test\ApiTestCase;
 
     final class ComputedFieldTest extends ApiTestCase
     {

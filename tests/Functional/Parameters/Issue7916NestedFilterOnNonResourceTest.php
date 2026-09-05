@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7916\UserActionResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7916\UserActionResourceOdm;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7916\UserResource;

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Uuid;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid\SymfonyUuidDevice;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid\SymfonyUuidDeviceEndpoint;
 use ApiPlatform\Tests\RecreateSchemaTrait;

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Bundle\Test;
+namespace ApiPlatform\Tests\Test;
 
-use ApiPlatform\Symfony\Bundle\Test\Response;
+use ApiPlatform\Test\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Response as BrowserKitResponse;

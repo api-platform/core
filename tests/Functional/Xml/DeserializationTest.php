@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Xml;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceWithBoolean;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceWithFloat;
