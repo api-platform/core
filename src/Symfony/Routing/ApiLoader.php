@@ -66,6 +66,7 @@ final class ApiLoader extends Loader
             $this->loadExternalFiles($routeCollection);
         }
 
+        $exposedOperations = [];
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
@@ -125,6 +126,22 @@ final class ApiLoader extends Loader
                         [$operation->getMethod()],
                         $operation->getCondition() ?? ''
                     );
+
+                    // A NotExposed placeholder may share its name with an exposed operation of another class, the exposed one always wins.
+                    $existing = $routeCollection->get($operationName);
+                    if (null !== $existing && ($existingResourceClass = $existing->getDefault('_api_resource_class')) !== $resourceClass) {
+                        if ($operation instanceof NotExposed) {
+                            continue;
+                        }
+
+                        if (isset($exposedOperations[$operationName])) {
+                            throw new RuntimeException(\sprintf('Operation "%s" is declared by both "%s" and "%s". Operation names must be unique because they are also used as Symfony route names, and the second declaration would silently replace the first. Use distinct operation names or URI templates, or make one resource reuse the route of the other with "routeName".', $operationName, $existingResourceClass, $resourceClass));
+                        }
+                    }
+
+                    if (!$operation instanceof NotExposed) {
+                        $exposedOperations[$operationName] = true;
+                    }
 
                     $routeCollection->add($operationName, $route);
                 }
