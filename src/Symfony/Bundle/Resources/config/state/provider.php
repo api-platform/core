@@ -17,6 +17,7 @@ use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\Provider\RangeHeaderProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\Symfony\EventListener\ErrorListener;
 use ApiPlatform\Validator\DenormalizationViolationFactory;
@@ -49,6 +50,13 @@ return static function (ContainerConfigurator $container) {
         ]);
 
     $services->alias(DenormalizationViolationFactoryInterface::class, 'api_platform.state.denormalization_violation_factory');
+
+    $services->set('api_platform.state_provider.range_header', RangeHeaderProvider::class)
+        ->decorate('api_platform.state_provider.read', null, 1)
+        ->args([
+            service('api_platform.state_provider.range_header.inner'),
+            service('api_platform.pagination'),
+        ]);
 
     $services->set('api_platform.state_provider.deserialize', DeserializeProvider::class)
         ->decorate('api_platform.state_provider.main', null, 300)
