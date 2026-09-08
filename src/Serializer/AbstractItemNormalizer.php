@@ -295,6 +295,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource must be "array" (nested document) or "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, ['array', 'string'], $context['deserialization_path'] ?? null);
         }
 
+        unset($context['relation_native_type']);
+
         $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $type, $format, $context);
 
