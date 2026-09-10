@@ -99,17 +99,30 @@ final class IriConverter implements IriConverterInterface
         }
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
+        $dispatchOperation = $routeOperation;
+        $expectedClass = $context['resource_class'] ?? null;
+        if (\is_string($expectedClass) && $expectedClass !== $parameters['_api_resource_class'] && class_exists($expectedClass)) {
+            foreach ($this->resourceMetadataCollectionFactory->create($expectedClass) as $resourceMetadata) {
+                foreach ($resourceMetadata->getOperations() ?? [] as $candidate) {
+                    if ($candidate instanceof HttpOperation && !$candidate instanceof CollectionOperationInterface && $candidate->getRouteName() === ($parameters['_route'] ?? null)) {
+                        $dispatchOperation = $candidate;
+                        break 2;
+                    }
+                }
+            }
+        }
+
         try {
-            $uriVariables = $this->getOperationUriVariables($routeOperation, $parameters, $attributes['resource_class']);
+            $uriVariables = $this->getOperationUriVariables($dispatchOperation, $parameters, $dispatchOperation->getClass() ?? $attributes['resource_class']);
         } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
         // If a caller-provided GraphQl operation carries its own provider, dispatch through it
         // so the user-defined Query(provider: X) wins over the route-matched HTTP operation.
-        $dispatchOperation = ($operation instanceof GraphQlOperation && null !== $operation->getProvider())
-            ? $operation
-            : $routeOperation;
+        if ($operation instanceof GraphQlOperation && null !== $operation->getProvider()) {
+            $dispatchOperation = $operation;
+        }
 
         if ($item = $this->provider->provide($dispatchOperation, $uriVariables, $context)) {
             return $item;
