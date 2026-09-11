@@ -470,7 +470,7 @@ class McpTest extends ApiTestCase
                                 'id' => ['type' => 'integer'],
                                 'title' => ['type' => 'string'],
                                 'isbn' => ['type' => 'string'],
-                                'status' => ['type' => ['string', 'null']],
+                                'status' => ['anyOf' => [['type' => 'string'], ['type' => 'null']]],
                             ],
                         ],
                     ],
