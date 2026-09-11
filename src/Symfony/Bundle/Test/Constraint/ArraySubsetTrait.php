@@ -18,7 +18,7 @@ use ApiPlatform\Test\Constraint\ArraySubsetTrait as BaseArraySubsetTrait;
 trigger_deprecation('api-platform/core', '5.0', 'The "%s" trait is deprecated, use "%s" instead.', ArraySubsetTrait::class, BaseArraySubsetTrait::class);
 
 /**
- * @deprecated since API Platform 5.0, use {@see \ApiPlatform\Test\Constraint\ArraySubsetTrait} instead
+ * @deprecated since API Platform 5.0, use {@see BaseArraySubsetTrait} instead
  */
 trait ArraySubsetTrait
 {

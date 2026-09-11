@@ -18,7 +18,7 @@ use ApiPlatform\Test\ApiTestCase as BaseApiTestCase;
 trigger_deprecation('api-platform/core', '5.0', 'The "%s" class is deprecated, use "%s" instead.', ApiTestCase::class, BaseApiTestCase::class);
 
 /**
- * @deprecated since API Platform 5.0, use {@see \ApiPlatform\Test\ApiTestCase} instead
+ * @deprecated since API Platform 5.0, use {@see BaseApiTestCase} instead
  */
 abstract class ApiTestCase extends BaseApiTestCase
 {

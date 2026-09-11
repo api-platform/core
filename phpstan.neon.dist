@@ -40,6 +40,10 @@ parameters:
 		ApiPlatform\Metadata\Resource\ResourceMetadataCollection:
 			- handleNotFound
 	ignoreErrors:
+		# BC shims for the test helpers moved to api-platform/test in 5.0
+		-
+			identifier: trait.unused
+			path: src/Symfony/Bundle/Test/*
 		# ignore type todo remove in 5.0
 		-
 			message: '#Symfony\\Component\\PropertyInfo\\Type#'

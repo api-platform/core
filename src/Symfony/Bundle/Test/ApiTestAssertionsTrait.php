@@ -18,7 +18,7 @@ use ApiPlatform\Test\ApiTestAssertionsTrait as BaseApiTestAssertionsTrait;
 trigger_deprecation('api-platform/core', '5.0', 'The "%s" trait is deprecated, use "%s" instead.', ApiTestAssertionsTrait::class, BaseApiTestAssertionsTrait::class);
 
 /**
- * @deprecated since API Platform 5.0, use {@see \ApiPlatform\Test\ApiTestAssertionsTrait} instead
+ * @deprecated since API Platform 5.0, use {@see BaseApiTestAssertionsTrait} instead
  */
 trait ApiTestAssertionsTrait
 {
