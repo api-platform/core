@@ -37,6 +37,10 @@ final class UriVariableParameterProviderTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ('mongodb' === static::getContainer()->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
         $this->recreateSchema([Base64UriVariableDummy::class, Dummy::class]);
     }
 
@@ -45,11 +49,6 @@ final class UriVariableParameterProviderTest extends ApiTestCase
      */
     public function testLinkParameterProviderDecodesUriVariableBeforeQuery(): void
     {
-        $container = static::getContainer();
-        if ('mongodb' === $container->getParameter('kernel.environment')) {
-            $this->markTestSkipped();
-        }
-
         $manager = $this->getManager();
         $dummy = new Base64UriVariableDummy();
         $dummy->name = 'Blip';
@@ -63,11 +62,6 @@ final class UriVariableParameterProviderTest extends ApiTestCase
 
     public function testReadLinkParameterProviderWritesResolvedResourceWhenOptedIn(): void
     {
-        $container = static::getContainer();
-        if ('mongodb' === $container->getParameter('kernel.environment')) {
-            $this->markTestSkipped();
-        }
-
         $manager = $this->getManager();
         $dummy = new Dummy();
         $dummy->setName('hi');
