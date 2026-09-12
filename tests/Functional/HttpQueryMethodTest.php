@@ -67,14 +67,14 @@ final class HttpQueryMethodTest extends ApiTestCase
         $this->assertSame(2, $data['hydra:totalItems']);
     }
 
-    public function testMissingBodyContentTypeIsRejected(): void
+    public function testEmptyBodyWithoutContentTypeReturnsFullCollection(): void
     {
-        self::createClient()->request('QUERY', '/query_method_dummies', [
+        $response = self::createClient()->request('QUERY', '/query_method_dummies', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
 
-        $this->assertResponseStatusCodeSame(415);
-        $this->assertResponseHasHeader('Accept-Query');
+        $this->assertResponseIsSuccessful();
+        $this->assertSame(2, $response->toArray()['hydra:totalItems']);
     }
 
     public function testFiltersFromFormUrlencodedBody(): void
