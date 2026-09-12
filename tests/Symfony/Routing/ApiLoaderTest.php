@@ -282,12 +282,12 @@ class ApiLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_genid'));
     }
 
-    public function testApiLoaderUsesOperationPriority(): void
+    public function testApiLoaderUsesOperationRoutePriority(): void
     {
         $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
-                'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}')->withPriority(10),
-                'api_dummies_get_collection' => (new GetCollection())->withUriTemplate('/dummies'),
+                'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}')->withRoutePriority(10),
+                'api_dummies_get_collection' => (new GetCollection())->withUriTemplate('/dummies')->withPriority(10),
             ])),
         ]);
 

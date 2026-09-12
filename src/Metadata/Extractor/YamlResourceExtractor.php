@@ -365,6 +365,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'strictQueryParameterValidation' => $this->phpize($operation, 'strictQueryParameterValidation', 'bool'),
                 'hideHydraOperation' => $this->phpize($resource, 'hideHydraOperation', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $class,
             ]);
@@ -418,6 +419,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
             ]);
         }
