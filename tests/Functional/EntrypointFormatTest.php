@@ -90,7 +90,7 @@ final class EntrypointFormatTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
         $data = $response->toArray();
         $this->assertArrayHasKey('multipleResourceBook2', $data);
         $this->assertEquals('/multi_route_books', $data['multipleResourceBook2']);
@@ -104,7 +104,7 @@ final class EntrypointFormatTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/hal+json');
+        $this->assertResponseHeaderSame('content-type', 'application/hal+json; charset=utf-8');
         $data = $response->toArray();
         $this->assertArrayHasKey('_links', $data);
         $this->assertArrayHasKey('multipleResourceBook2', $data['_links']);
@@ -117,7 +117,7 @@ final class EntrypointFormatTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
         $data = $response->toArray();
         $this->assertArrayHasKey('links', $data);
         $this->assertArrayHasKey('multipleResourceBook2', $data['links']);

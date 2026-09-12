@@ -56,7 +56,7 @@ final class DenyTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
     }
 
     public function testCustomDataProviderGeneratorReturns200(): void

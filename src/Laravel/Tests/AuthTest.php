@@ -47,7 +47,7 @@ class AuthTest extends TestCase
     {
         $response = $this->get('/api/vaults', ['accept' => ['application/ld+json']]);
         $this->assertArraySubset(['detail' => 'Unauthenticated.'], $response->json());
-        $response->assertHeader('content-type', 'application/problem+json');
+        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
         $response->assertStatus(401);
     }
 

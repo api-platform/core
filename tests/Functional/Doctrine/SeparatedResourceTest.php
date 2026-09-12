@@ -55,7 +55,7 @@ final class SeparatedResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $data = $response->toArray();
         $this->assertSame('/contexts/'.$shortName, $data['@context']);
         $this->assertStringStartsWith($uri, $data['@id']);
@@ -78,7 +78,7 @@ final class SeparatedResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertSame('5', $response->toArray()['hydra:member'][0]['value']);
     }
 
@@ -95,7 +95,7 @@ final class SeparatedResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
     }
 
     public function testGetAllEntityClassAndCustomProviderResources(): void

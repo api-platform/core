@@ -42,7 +42,7 @@ final class NotExposedTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $data = $response->toArray();
         $this->assertSame('/contexts/Chair', $data['@context']);
         $this->assertSame('/chairs', $data['@id']);
@@ -153,7 +153,7 @@ final class NotExposedTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
             '@context' => '/contexts/Spoon',
             '@id' => '/cuillers/12345',

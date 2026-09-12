@@ -45,7 +45,7 @@ class HalTest extends TestCase
     {
         $response = $this->get('/api/', ['accept' => ['application/hal+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/hal+json');
+        $response->assertHeader('content-type', 'application/hal+json; charset=utf-8');
 
         $this->assertJsonContains(
             [
@@ -67,7 +67,7 @@ class HalTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/hal+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/hal+json');
+        $response->assertHeader('content-type', 'application/hal+json; charset=utf-8');
         $this->assertJsonContains(
             [
                 '_links' => [
@@ -88,7 +88,7 @@ class HalTest extends TestCase
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/hal+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/hal+json');
+        $response->assertHeader('content-type', 'application/hal+json; charset=utf-8');
         $this->assertJsonContains(
             [
                 'name' => $book->name, // @phpstan-ignore-line

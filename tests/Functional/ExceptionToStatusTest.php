@@ -51,7 +51,7 @@ final class ExceptionToStatusTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(404);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
     }
 
     public function testResourceExceptionToStatusMaps400(): void
@@ -62,7 +62,7 @@ final class ExceptionToStatusTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
     }
 
     public function testFilterValidationExceptionMaps400(): void
@@ -72,7 +72,7 @@ final class ExceptionToStatusTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
     }
 
     public function testOverrideValidationExceptionStatusOnDelete(): void

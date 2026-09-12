@@ -235,7 +235,7 @@ class RespondProcessorTest extends TestCase
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('application/ld+json', $response->headers->get('Content-Type'));
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
     }
 
     public function testDoesNotAddLinkedDataPlatformHeadersWithoutFactory(): void
