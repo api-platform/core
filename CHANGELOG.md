@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.4.0-beta.1
+
+### Features
+
+* [aadeacf81](https://github.com/api-platform/core/commit/aadeacf81193e33c1dc0bdfa80f050e355b4fa31) feat(doctrine): add ChainFilter to compose filters on one parameter (ORM + ODM) (#8416)
+* [cd67e0b23](https://github.com/api-platform/core/commit/cd67e0b237e54ab7467c54a2c00e95ab9e7c549d) feat(symfony): expose voter reasons (#8448)
+
+### Bug fixes
+
+* [493f99cfa](https://github.com/api-platform/core/commit/493f99cfabe12c03960967dcb806c39fc4bc2fc9) fix(state): only emit Content-Type charset for media types that define it (#8226)
+
+### Dependencies
+
+* The components now require each other with a `@beta` stability flag (for example `"api-platform/state": "^4.4@beta"`) instead of `@alpha`. Installing a 4.4 component no longer pulls a 4.4 alpha of its siblings.
+
+Also contains [v4.3.19 changes](#v4319).
+
 ## v4.4.0-alpha.4
 
 ### Bug fixes
