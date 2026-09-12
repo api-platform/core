@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Action;
 
+use ApiPlatform\Documentation\ApiCatalogFactory;
 use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -21,6 +22,8 @@ use ApiPlatform\OpenApi\Serializer\LegacyOpenApiNormalizer;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * Generates the API entrypoint.
@@ -36,6 +39,7 @@ final class EntrypointAction
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
         private readonly array $documentationFormats = [],
+        private readonly ?ApiCatalogFactory $apiCatalogFactory = null,
     ) {
     }
 
@@ -57,6 +61,12 @@ final class EntrypointAction
         $request->attributes->set('_api_operation', $operation);
         $body = $this->provider->provide($operation, [], $context);
         $operation = $request->attributes->get('_api_operation');
+
+        // RFC 9727, section 3: point the clients to the API catalog, wherever it is mounted
+        if ($this->apiCatalogFactory) {
+            $linkProvider = $request->attributes->get('_api_platform_links') ?? new GenericLinkProvider();
+            $request->attributes->set('_api_platform_links', $linkProvider->withLink(new Link('api-catalog', $this->apiCatalogFactory->getUrl())));
+        }
 
         return $this->processor->process($body, $operation, [], $context);
     }

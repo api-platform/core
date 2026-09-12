@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Documentation\ApiCatalogFactory;
 use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
@@ -22,6 +23,7 @@ use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
+use ApiPlatform\Symfony\Action\ApiCatalogAction;
 use ApiPlatform\Symfony\Action\DocumentationAction;
 use ApiPlatform\Symfony\Action\EntrypointAction;
 use ApiPlatform\Symfony\Action\PlaceholderAction;
@@ -198,7 +200,22 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_provider.documentation'),
             service('api_platform.state_processor.documentation'),
             '%api_platform.entrypoint_formats%',
+            service('api_platform.documentation.api_catalog_factory'),
         ]);
+
+    $services->set('api_platform.documentation.api_catalog_factory', ApiCatalogFactory::class)
+        ->args([
+            service('api_platform.metadata.resource.name_collection_factory'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.iri_converter'),
+            service('api_platform.router'),
+            '%api_platform.docs_formats%',
+            '%api_platform.enable_docs%',
+        ]);
+
+    $services->set('api_platform.action.api_catalog', ApiCatalogAction::class)
+        ->public()
+        ->args([service('api_platform.documentation.api_catalog_factory')]);
 
     $services->set('api_platform.action.documentation', DocumentationAction::class)
         ->public()

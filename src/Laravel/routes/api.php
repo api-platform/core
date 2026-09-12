@@ -11,8 +11,10 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Documentation\ApiCatalogFactory;
 use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\Laravel\ApiPlatformMiddleware;
+use ApiPlatform\Laravel\Controller\ApiCatalogController;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
@@ -118,6 +120,10 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
                 ->name('api_entrypoint');
         });
     });
+
+    // RFC 8615 roots well-known URIs at the host, so the API catalog lives outside the API prefix
+    Route::match(['GET', 'HEAD'], '/.well-known/api-catalog', ApiCatalogController::class)
+        ->name(ApiCatalogFactory::ROUTE_NAME);
 });
 
 // MCP endpoint (outside the API prefix)
