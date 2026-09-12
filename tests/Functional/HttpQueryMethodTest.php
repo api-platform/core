@@ -39,6 +39,10 @@ final class HttpQueryMethodTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('HTTP QUERY is tested with the ORM provider.');
+        }
+
         $this->recreateSchema([QueryMethodDummy::class]);
         $this->createDummy('foo');
         $this->createDummy('bar');

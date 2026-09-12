@@ -40,6 +40,10 @@ final class HttpQueryMethodInputDtoTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('HTTP QUERY input DTO is tested with the ORM provider.');
+        }
+
         $this->recreateSchema([QueryInputDummy::class]);
         $this->createDummy('foo');
         $this->createDummy('bar');
