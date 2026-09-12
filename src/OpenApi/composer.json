@@ -28,9 +28,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/json-schema": "^4.4@alpha",
-        "api-platform/metadata": "^4.4@alpha",
-        "api-platform/state": "^4.4@alpha",
+        "api-platform/json-schema": "^4.4@beta",
+        "api-platform/metadata": "^4.4@beta",
+        "api-platform/state": "^4.4@beta",
         "symfony/console": "^7.4 || ^8.0",
         "symfony/filesystem": "^7.4 || ^8.0",
         "symfony/property-access": "^7.4 || ^8.0",
@@ -40,10 +40,10 @@
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.5 || ^12.2",
-        "api-platform/doctrine-common": "^4.4@alpha",
-        "api-platform/doctrine-orm": "^4.4@alpha",
-        "api-platform/doctrine-odm": "^4.4@alpha",
-        "api-platform/serializer": "^4.4@alpha",
+        "api-platform/doctrine-common": "^4.4@beta",
+        "api-platform/doctrine-orm": "^4.4@beta",
+        "api-platform/doctrine-odm": "^4.4@beta",
+        "api-platform/serializer": "^4.4@beta",
         "symfony/type-info": "^7.4 || ^8.0"
     },
     "autoload": {
