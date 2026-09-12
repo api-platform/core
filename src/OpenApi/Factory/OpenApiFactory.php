@@ -503,7 +503,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             // RFC 10008: the HTTP QUERY method carries its criteria in the request body, not the URI
             // query string. The "in: query" parameters therefore become a request body schema, while
             // path and header parameters stay where they are.
-            if (HttpOperation::METHOD_QUERY === $method) {
+            if ('QUERY' === $method) {
                 $openapiOperation = $this->buildQueryRequestBody($openapiOperation, $operation, $resourceClass, $schema, $schemas, $schemaSerializerContext);
             }
 

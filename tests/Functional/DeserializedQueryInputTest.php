@@ -1,11 +1,19 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DeserializedQueryInput\DeserializedQueryCriteria;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DeserializedQueryInput\DeserializedQueryInput;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -22,14 +30,13 @@ final class DeserializedQueryInputTest extends ApiTestCase
 
     public function testProcessorReceivesDeserializedInput(): void
     {
-        DeserializedQueryInput::$processedData = null;
+        DeserializedQueryInput::$processedName = null;
 
         self::createClient()->request('QUERY', '/deserialized_query_input', [
             'headers' => ['Content-Type' => 'application/json'],
             'json' => ['name' => 'criteria'],
         ]);
 
-        $this->assertInstanceOf(DeserializedQueryCriteria::class, DeserializedQueryInput::$processedData);
-        $this->assertSame('criteria', DeserializedQueryInput::$processedData->name);
+        $this->assertSame('criteria', DeserializedQueryInput::$processedName);
     }
 }
