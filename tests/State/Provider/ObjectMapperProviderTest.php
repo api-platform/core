@@ -169,22 +169,24 @@ class ObjectMapperProviderTest extends TestCase
         $this->assertSame($targetResource2, $items[1]);
     }
 
-    public function testProvideIgnoresInputClassAndMapsToOutputClass(): void
+    public function testProvideIgnoresInputAndOutputClassesOnWrite(): void
     {
         $sourceEntity = new SourceEntity();
-        $outputResource = new OutputResource();
+        $targetResource = new TargetResource();
         $operation = new Patch(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->once())
             ->method('map')
-            ->with($sourceEntity, OutputResource::class)
-            ->willReturn($outputResource);
+            ->with($sourceEntity, TargetResource::class)
+            ->willReturn($targetResource);
         $decorated = $this->createStub(ProviderInterface::class);
         $decorated->method('provide')->willReturn($sourceEntity);
         $provider = new ObjectMapperProvider($objectMapper, $decorated);
 
+        // On a write operation the provided data is the deserialization target: it must be
+        // the resource class, the output class is only mapped to after persistence.
         $result = $provider->provide($operation);
-        $this->assertSame($outputResource, $result);
+        $this->assertSame($targetResource, $result);
     }
 
     public function testProvideMapsToOutputClassWhenNoInput(): void
