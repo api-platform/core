@@ -15,256 +15,136 @@ namespace ApiPlatform\Tests\State;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\State\Processor\RespondProcessor;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class ContentRangeHeaderTest extends TestCase
+final class ContentRangeHeaderTest extends TestCase
 {
-    use ProphecyTrait;
-
-    public function testContentRangeForPartialCollection(): void
+    public function testAdvertisesTheRangeUnitOnAFullResponse(): void
     {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
+        $response = $this->respond(new GetCollection(rangeUnit: 'books'), new ArrayPaginator(range(1, 201), 0, 30));
 
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertSame('books 0-29/201', $response->headers->get('Content-Range'));
-        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
+        $this->assertFalse($response->headers->has('Content-Range'), 'RFC 9110 §14.4: Content-Range is only meaningful on 206 and 416 responses.');
     }
 
-    public function testContentRangeForPageThree(): void
+    public function testAdvertisesTheRangeUnitOnAHeadResponse(): void
     {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
+        $response = $this->respond(new GetCollection(rangeUnit: 'books'), new ArrayPaginator(range(1, 201), 0, 30), Request::create('/books', 'HEAD'));
 
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(3.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
 
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
+    public function testDescribesThePartialContent(): void
+    {
+        $response = $this->respond(new GetCollection(rangeUnit: 'books', status: 206), new ArrayPaginator(range(1, 201), 60, 30));
 
+        $this->assertSame(206, $response->getStatusCode());
+        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
         $this->assertSame('books 60-89/201', $response->headers->get('Content-Range'));
-        $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testContentRangeForFullCollection(): void
+    public function testDescribesTheLastPartialContent(): void
     {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
+        $response = $this->respond(new GetCollection(rangeUnit: 'books', status: 206), new ArrayPaginator(range(1, 201), 180, 30));
 
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(3);
-        $paginator->getTotalItems()->willReturn(3.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertSame('books 0-2/3', $response->headers->get('Content-Range'));
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('books 180-200/201', $response->headers->get('Content-Range'));
     }
 
-    public function testContentRangeForPartialPaginatorUnknownTotal(): void
+    public function testDescribesThePartialContentOfUnknownCompleteLength(): void
     {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
-
-        $paginator = $this->prophesize(PartialPaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertSame('books 0-29/*', $response->headers->get('Content-Range'));
-        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
-        $this->assertSame(200, $response->getStatusCode());
-    }
-
-    public function testContentRangeForEmptyPageKnownTotal(): void
-    {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
-
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(0);
-        $paginator->getTotalItems()->willReturn(201.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertSame('books */201', $response->headers->get('Content-Range'));
-        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
-    }
-
-    public function testNoContentRangeForEmptyPageUnknownTotal(): void
-    {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
-
-        $paginator = $this->prophesize(PartialPaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertNull($response->headers->get('Content-Range'));
-        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
-    }
-
-    public function testContentRangeDoesNotAffectStatusCode(): void
-    {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
-
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('books 0-29/201', $response->headers->get('Content-Range'));
-    }
-
-    public function testNoContentRangeForNonCollectionOperation(): void
-    {
-        $operation = new Get(shortName: 'Book');
-
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertNull($response->headers->get('Content-Range'));
-        $this->assertNull($response->headers->get('Accept-Ranges'));
-    }
-
-    public function testContentRangeWithNoShortNameFallsBackToItems(): void
-    {
-        $operation = new GetCollection(shortName: null);
-
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertSame('items 0-29/201', $response->headers->get('Content-Range'));
-        $this->assertSame('items', $response->headers->get('Accept-Ranges'));
-    }
-
-    public function testHeadRequestOmitsContentRangeWithoutCountingCollection(): void
-    {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}');
-
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->shouldNotBeCalled();
-        $paginator->getItemsPerPage()->shouldNotBeCalled();
-        $paginator->count()->shouldNotBeCalled();
-        $paginator->getTotalItems()->shouldNotBeCalled();
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('', $operation, context: [
-            'request' => Request::create('/books', 'HEAD'),
-            'original_data' => $paginator->reveal(),
-        ]);
-
-        $this->assertNull($response->headers->get('Content-Range'));
-        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
-        $this->assertEmpty($response->getContent());
-    }
-
-    public function testStatus206WhenOperationStatusIsPartialContent(): void
-    {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}', status: 206);
-
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(1.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
-
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
-        ]);
+        $response = $this->respond(new GetCollection(rangeUnit: 'books', status: 206), $this->createPartialPaginator(range(31, 60), 2, 30));
 
         $this->assertSame(206, $response->getStatusCode());
-        $this->assertSame('books 0-29/201', $response->headers->get('Content-Range'));
-        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
+        $this->assertSame('books 30-59/*', $response->headers->get('Content-Range'));
     }
 
-    public function testStatus206ForPageTwo(): void
+    public function testDoesNotDescribeAnEmptyPartialContent(): void
     {
-        $operation = new GetCollection(shortName: 'Book', uriTemplate: '/books{._format}', status: 206);
+        $response = $this->respond(new GetCollection(rangeUnit: 'books', status: 206), new ArrayPaginator([], 0, 30));
 
-        $paginator = $this->prophesize(PaginatorInterface::class);
-        $paginator->getCurrentPage()->willReturn(2.0);
-        $paginator->getItemsPerPage()->willReturn(30.0);
-        $paginator->count()->willReturn(30);
-        $paginator->getTotalItems()->willReturn(201.0);
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
 
-        $respondProcessor = new RespondProcessor();
-        $response = $respondProcessor->process('content', $operation, context: [
-            'request' => new Request(),
-            'original_data' => $paginator->reveal(),
+    public function testDoesNothingWithoutARangeUnit(): void
+    {
+        $response = $this->respond(new GetCollection(status: 206), new ArrayPaginator(range(1, 201), 0, 30));
+
+        $this->assertFalse($response->headers->has('Accept-Ranges'));
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
+
+    public function testDoesNothingOnAnItemOperation(): void
+    {
+        $response = $this->respond((new Get())->withRangeUnit('books'), new ArrayPaginator(range(1, 201), 0, 30));
+
+        $this->assertFalse($response->headers->has('Accept-Ranges'));
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
+
+    public function testDoesNothingWhenTheProviderDoesNotPaginate(): void
+    {
+        $response = $this->respond(new GetCollection(rangeUnit: 'books', status: 206), [new \stdClass()]);
+
+        $this->assertSame('books', $response->headers->get('Accept-Ranges'));
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
+
+    public function testDoesNotAdvertiseTheRangeUnitOutsideOfASuccessfulResponse(): void
+    {
+        $response = $this->respond(new GetCollection(rangeUnit: 'books', status: 204), new ArrayPaginator(range(1, 201), 0, 30));
+
+        $this->assertFalse($response->headers->has('Accept-Ranges'));
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
+
+    private function respond(Get|GetCollection $operation, mixed $originalData, ?Request $request = null): Response
+    {
+        return (new RespondProcessor())->process('content', $operation, context: [
+            'request' => $request ?? Request::create('/books'),
+            'original_data' => $originalData,
         ]);
+    }
 
-        $this->assertSame(206, $response->getStatusCode());
-        $this->assertSame('books 30-59/201', $response->headers->get('Content-Range'));
+    /**
+     * @param list<int> $items
+     */
+    private function createPartialPaginator(array $items, int $currentPage, int $itemsPerPage): PartialPaginatorInterface
+    {
+        return new class($items, $currentPage, $itemsPerPage) implements \IteratorAggregate, PartialPaginatorInterface {
+            /**
+             * @param list<int> $items
+             */
+            public function __construct(private readonly array $items, private readonly int $currentPage, private readonly int $itemsPerPage)
+            {
+            }
+
+            public function getIterator(): \Traversable
+            {
+                return new \ArrayIterator($this->items);
+            }
+
+            public function count(): int
+            {
+                return \count($this->items);
+            }
+
+            public function getCurrentPage(): float
+            {
+                return $this->currentPage;
+            }
+
+            public function getItemsPerPage(): float
+            {
+                return $this->itemsPerPage;
+            }
+        };
     }
 }

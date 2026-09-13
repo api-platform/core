@@ -148,11 +148,15 @@ trait HttpResponseHeadersTrait
             $this->addLinkedDataPlatformHeaders($headers, $operation);
         }
 
-        if ($operation instanceof CollectionOperationInterface && $originalData instanceof PartialPaginatorInterface) {
-            $headers['Accept-Ranges'] = self::extractRangeUnit($operation);
+        if (
+            $operation instanceof CollectionOperationInterface
+            && null !== ($rangeUnit = $operation->getRangeUnit())
+            && \in_array($status, [Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT], true)
+        ) {
+            $headers['Accept-Ranges'] = $rangeUnit;
 
-            if ('HEAD' !== $method) {
-                $this->addContentRangeHeader($headers, $operation, $originalData);
+            if (Response::HTTP_PARTIAL_CONTENT === $status && $originalData instanceof PartialPaginatorInterface && $contentRange = $this->getContentRange($rangeUnit, $originalData)) {
+                $headers['Content-Range'] = $contentRange;
             }
         }
 
@@ -182,33 +186,17 @@ trait HttpResponseHeadersTrait
         return $mimeType;
     }
 
-    private function addContentRangeHeader(array &$headers, HttpOperation $operation, PartialPaginatorInterface $paginator): void
+    private function getContentRange(string $unit, PartialPaginatorInterface $paginator): ?string
     {
-        $unit = self::extractRangeUnit($operation);
-        $currentCount = $paginator->count();
-        $rangeStart = (int) (($paginator->getCurrentPage() - 1) * $paginator->getItemsPerPage());
-
-        if ($paginator instanceof PaginatorInterface) {
-            $totalItems = (int) $paginator->getTotalItems();
-            $headers['Content-Range'] = 0 === $currentCount
-                ? \sprintf('%s */%d', $unit, $totalItems)
-                : \sprintf('%s %d-%d/%d', $unit, $rangeStart, $rangeStart + $currentCount - 1, $totalItems);
-        } elseif (0 < $currentCount) {
-            $headers['Content-Range'] = \sprintf('%s %d-%d/*', $unit, $rangeStart, $rangeStart + $currentCount - 1);
-        }
-    }
-
-    private static function extractRangeUnit(HttpOperation $operation): string
-    {
-        if ($uriTemplate = $operation->getUriTemplate()) {
-            $path = strtok($uriTemplate, '{');
-            $segments = array_filter(explode('/', trim($path, '/')));
-            if ($last = end($segments)) {
-                return strtolower($last);
-            }
+        $count = \count($paginator);
+        if (0 === $count) {
+            return null;
         }
 
-        return strtolower($operation->getShortName() ?? 'items') ?: 'items';
+        $first = (int) (($paginator->getCurrentPage() - 1) * $paginator->getItemsPerPage());
+        $completeLength = $paginator instanceof PaginatorInterface ? (string) (int) $paginator->getTotalItems() : '*';
+
+        return \sprintf('%s %d-%d/%s', $unit, $first, $first + $count - 1, $completeLength);
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void

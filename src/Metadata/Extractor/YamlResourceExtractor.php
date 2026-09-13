@@ -366,6 +366,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'hideHydraOperation' => $this->phpize($resource, 'hideHydraOperation', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
+                'rangeUnit' => $this->phpize($operation, 'rangeUnit', 'string'),
                 'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $class,
             ]);
