@@ -52,7 +52,7 @@ return static function (ContainerConfigurator $container) {
     $services->alias(DenormalizationViolationFactoryInterface::class, 'api_platform.state.denormalization_violation_factory');
 
     $services->set('api_platform.state_provider.range_header', RangeHeaderProvider::class)
-        ->decorate('api_platform.state_provider.read', null, 1)
+        ->decorate('api_platform.state_provider.read', null, 120)
         ->args([
             service('api_platform.state_provider.range_header.inner'),
             service('api_platform.pagination'),

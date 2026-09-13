@@ -226,6 +226,7 @@ class HttpOperation extends Operation
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        protected ?string $rangeUnit = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -513,6 +514,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->acceptPatch = $acceptPatch;
+
+        return $self;
+    }
+
+    public function getRangeUnit(): ?string
+    {
+        return $this->rangeUnit;
+    }
+
+    public function withRangeUnit(?string $rangeUnit): static
+    {
+        $self = clone $this;
+        $self->rangeUnit = $rangeUnit;
 
         return $self;
     }
