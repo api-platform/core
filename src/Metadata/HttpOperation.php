@@ -227,6 +227,7 @@ class HttpOperation extends Operation
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        protected ?bool $paginationLinkHeader = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -514,6 +515,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->acceptPatch = $acceptPatch;
+
+        return $self;
+    }
+
+    public function getPaginationLinkHeader(): ?bool
+    {
+        return $this->paginationLinkHeader;
+    }
+
+    public function withPaginationLinkHeader(bool $paginationLinkHeader): static
+    {
+        $self = clone $this;
+        $self->paginationLinkHeader = $paginationLinkHeader;
 
         return $self;
     }
