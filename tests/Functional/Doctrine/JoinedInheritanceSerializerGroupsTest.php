@@ -14,10 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Doctrine;
 
 use ApiPlatform\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113\BarJoined;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113\BarJoinedA;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113\BarJoinedB;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113\Foo;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo as ExistingFoo;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups\BarJoined;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups\BarJoinedA;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups\BarJoinedB;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups\SerializerGroupsOwner;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -33,7 +34,7 @@ final class JoinedInheritanceSerializerGroupsTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, BarJoined::class, BarJoinedA::class, BarJoinedB::class];
+        return [ExistingFoo::class, SerializerGroupsOwner::class, BarJoined::class, BarJoinedA::class, BarJoinedB::class];
     }
 
     public function testJoinedInheritanceSubclassGroupsEmbedRelation(): void
@@ -42,27 +43,27 @@ final class JoinedInheritanceSerializerGroupsTest extends ApiTestCase
             $this->markTestSkipped('Not tested with mongodb.');
         }
 
-        $this->recreateSchema([Foo::class, BarJoined::class, BarJoinedA::class, BarJoinedB::class]);
+        $this->recreateSchema([SerializerGroupsOwner::class, BarJoined::class, BarJoinedA::class, BarJoinedB::class]);
 
         $manager = $this->getManager();
         $barJoinedA = new BarJoinedA();
         $barJoinedA->setY('y_value');
         $manager->persist($barJoinedA);
 
-        $foo = new Foo();
-        $foo->setBarJoined($barJoinedA);
-        $manager->persist($foo);
+        $serializerGroupsOwner = new SerializerGroupsOwner();
+        $serializerGroupsOwner->setBarJoined($barJoinedA);
+        $manager->persist($serializerGroupsOwner);
         $manager->flush();
 
-        $response = self::createClient()->request('GET', '/foos/1', [
+        $response = self::createClient()->request('GET', '/joined-inheritance-serializer-groups/1', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            '@id' => '/foos/1',
+            '@id' => '/joined-inheritance-serializer-groups/1',
             'barJoined' => [
-                '@type' => 'BarJoinedA',
+                '@type' => 'JoinedInheritanceSerializerGroupsBarA',
                 'y' => 'y_value',
             ],
         ]);

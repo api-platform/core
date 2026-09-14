@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource(operations: [new Get()])]
+#[ApiResource(operations: [new Get(shortName: 'JoinedInheritanceSerializerGroupsBase', uriTemplate: '/joined-inheritance-serializer-groups/base/{id}')])]
 #[ORM\Entity]
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]

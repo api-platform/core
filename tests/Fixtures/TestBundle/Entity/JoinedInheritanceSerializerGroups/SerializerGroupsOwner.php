@@ -11,16 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(operations: [new Get(normalizationContext: ['groups' => ['foo']])])]
+#[ApiResource(operations: [new Get(shortName: 'JoinedInheritanceSerializerGroupsOwner', uriTemplate: '/joined-inheritance-serializer-groups/{id}', normalizationContext: ['groups' => ['foo']])])]
 #[ORM\Entity]
-class Foo
+class SerializerGroupsOwner
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
