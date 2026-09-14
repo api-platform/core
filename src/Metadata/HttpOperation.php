@@ -28,6 +28,7 @@ class HttpOperation extends Operation
     public const METHOD_DELETE = 'DELETE';
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_OPTIONS = 'OPTIONS';
+    public const METHOD_QUERY = 'QUERY';
 
     /** @var array<int|string, string|string[]>|null */
     protected $formats;
