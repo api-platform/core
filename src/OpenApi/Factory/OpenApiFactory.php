@@ -266,7 +266,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = $paths->getPath($path) ?? new PathItem();
             }
 
-            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;
+            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && \in_array($method, ['GET', 'QUERY'], true);
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
 
@@ -425,6 +425,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         $successStatus = (string) $operation->getStatus() ?: 200;
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
                         break;
+                    case 'QUERY':
+                        $successStatus = (string) $operation->getStatus() ?: 200;
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s collection', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
+                        break;
                     case 'POST':
                         $successStatus = (string) $operation->getStatus() ?: 201;
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
@@ -495,6 +499,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 ));
             }
 
+            if ('QUERY' === $method) {
+                $openapiOperation = $this->buildQueryRequestBody($openapiOperation, $operation, $resourceClass, $schema, $schemas, $schemaSerializerContext);
+            }
+
             if ($openapiAttribute instanceof Webhook) {
                 $webhooks[$openapiAttribute->getName()] = $pathItem->{'with'.ucfirst($method)}($openapiOperation);
                 continue;
@@ -555,6 +563,44 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $content;
+    }
+
+    private function buildQueryRequestBody(Operation $openapiOperation, HttpOperation $operation, string $resourceClass, Schema $schema, \ArrayObject $schemas, ?array $schemaSerializerContext): Operation
+    {
+        $queryParameters = $keptParameters = [];
+        foreach ($openapiOperation->getParameters() ?? [] as $parameter) {
+            if ('query' === $parameter->getIn()) {
+                $queryParameters[] = $parameter;
+
+                continue;
+            }
+
+            $keptParameters[] = $parameter;
+        }
+
+        $input = $operation->getInput();
+        $inputClass = \is_array($input) ? ($input['class'] ?? null) : null;
+        if (null !== $inputClass && $inputClass !== $resourceClass) {
+            $inputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, 'json', Schema::TYPE_INPUT, $operation, $schema, $schemaSerializerContext);
+            $this->appendSchemaDefinitions($schemas, $inputSchema->getDefinitions());
+            $bodySchema = new \ArrayObject($inputSchema->getArrayCopy(false));
+        } else {
+            $properties = [];
+            foreach ($queryParameters as $parameter) {
+                $properties[$parameter->getName()] = $parameter->getSchema() ?: ['type' => 'string'];
+            }
+
+            $bodySchema = new \ArrayObject(['type' => 'object', 'properties' => $properties]);
+        }
+
+        $content = new \ArrayObject([
+            'application/x-www-form-urlencoded' => new MediaType(schema: $bodySchema),
+            'application/json' => new MediaType(schema: $bodySchema),
+        ]);
+
+        return $openapiOperation
+            ->withParameters($keptParameters)
+            ->withRequestBody(new RequestBody(description: 'Query criteria carried in the request body.', content: $content, required: false));
     }
 
     /**

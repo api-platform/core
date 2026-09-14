@@ -91,7 +91,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         // In case of FORCE_SUBSCHEMA an object can be writable through another class even though it has no POST operation
-        if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
+        if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT', 'QUERY'], true)) {
             return $schema;
         }
 
@@ -110,7 +110,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = $this->getSchemaUriPrefix($version).$definitionName;
-            if ($forceCollection || ('POST' !== $method && $operation instanceof CollectionOperationInterface)) {
+            if ($forceCollection || (!\in_array($method, ['POST', 'QUERY'], true) && $operation instanceof CollectionOperationInterface)) {
                 $schema['type'] = 'array';
                 $schema['items'] = ['$ref' => $ref];
             } else {
