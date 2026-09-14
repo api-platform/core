@@ -148,7 +148,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
 
         foreach ($uriVariables = $operation->getUriVariables() as $parameterName => $l) {
-            $link = null === $l->getFromClass() ? $l->withFromClass($operation->getClass()) : $l;
+            $link = null === $l->getFromClass() ? $l->withFromClass($operation->getApiClass()) : $l;
             $uriVariables[$parameterName] = $this->linkFactory->completeLink($link);
         }
         $operation = $operation->withUriVariables($uriVariables);
@@ -175,8 +175,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     }
 
                     $newUriVariables[$variable] = (new Link())
-                        ->withFromClass($operation->getClass())
-                        ->withIdentifiers([property_exists($operation->getClass(), $variable) ? $variable : 'id'])
+                        ->withFromClass($operation->getApiClass())
+                        ->withIdentifiers([property_exists($operation->getApiClass(), $variable) ? $variable : 'id'])
                         ->withParameterName($variable);
                 }
 
@@ -211,7 +211,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         $uriVariables = (array) ($operation->getUriVariables() ?? []);
 
         $normalizedUriVariables = [];
-        $resourceClass = $operation->getClass();
+        $resourceClass = $operation->getApiClass();
 
         foreach ($uriVariables as $parameterName => $uriVariable) {
             $normalizedParameterName = $parameterName;

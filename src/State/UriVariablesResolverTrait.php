@@ -64,7 +64,7 @@ trait UriVariablesResolverTrait
 
         if ($this->uriVariablesConverter) {
             $context = ['operation' => $operation, 'uri_variables_map' => $uriVariablesMap];
-            $identifiers = $this->uriVariablesConverter->convert($identifiers, $operation->getClass() ?? $resourceClass, $context);
+            $identifiers = $this->uriVariablesConverter->convert($identifiers, $operation->getApiClass() ?? $resourceClass, $context);
         }
 
         return $identifiers;

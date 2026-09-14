@@ -55,7 +55,7 @@ final class CollectionProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Paginator
     {
-        $resourceClass = $operation->getClass();
+        $resourceClass = $operation->getDataClass();
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {

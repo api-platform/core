@@ -41,7 +41,7 @@ final class PhpFileResourceNameCollectionFactory implements ResourceNameCollecti
         }
 
         foreach ($this->metadataExtractor->getResources() as $resource) {
-            $resourceClass = $resource->getClass();
+            $resourceClass = $resource->getApiClass();
 
             if (null === $resourceClass) {
                 continue;

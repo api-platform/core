@@ -47,7 +47,7 @@ final class PhpFileResourceMetadataCollectionFactory implements ResourceMetadata
         }
 
         foreach ($this->metadataExtractor->getResources() as $resource) {
-            if ($resourceClass !== $resource->getClass()) {
+            if ($resourceClass !== $resource->getApiClass()) {
                 continue;
             }
 

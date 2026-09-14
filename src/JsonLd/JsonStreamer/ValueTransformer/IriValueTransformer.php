@@ -35,7 +35,7 @@ final class IriValueTransformer implements ValueTransformerInterface
         }
 
         if ($options['_current_object'] instanceof Collection) {
-            return $this->iriConverter->getIriFromResource($options['operation']->getClass(), UrlGeneratorInterface::ABS_PATH, $options['operation']);
+            return $this->iriConverter->getIriFromResource($options['operation']->getApiClass(), UrlGeneratorInterface::ABS_PATH, $options['operation']);
         }
 
         return $this->iriConverter->getIriFromResource(

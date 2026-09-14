@@ -38,6 +38,6 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     "foo": "Lorem",
     "bar": "Ipsum"
 }
-JSON, $operation->getClass(), 'json');
+JSON, $operation->getApiClass(), 'json');
     }
 }

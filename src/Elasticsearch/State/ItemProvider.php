@@ -49,7 +49,7 @@ final class ItemProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $resourceClass = $operation->getClass();
+        $resourceClass = $operation->getDataClass();
         $options = $operation->getStateOptions();
         if (!$options instanceof Options) {
             $options = new Options(index: $this->getIndex($operation));

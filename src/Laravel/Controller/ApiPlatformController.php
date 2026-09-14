@@ -62,7 +62,7 @@ class ApiPlatformController extends Controller
         $context = [
             'request' => $request,
             'uri_variables' => $uriVariables,
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
         ];
 
         if (null === $operation->canValidate()) {

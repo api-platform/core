@@ -55,7 +55,7 @@ final class AccessCheckerProvider implements ProviderInterface
             'operation' => $operation,
         ];
 
-        if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $policy, $resourceAccessCheckerContext)) {
+        if (!$this->resourceAccessChecker->isGranted($operation->getApiClass(), $policy, $resourceAccessCheckerContext)) {
             throw $operation instanceof HttpOperation ? new AuthorizationException($message ?? 'Access Denied.') : new AccessDeniedHttpException($message ?? 'Access Denied.');
         }
 

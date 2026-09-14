@@ -330,13 +330,13 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 
         $this->assertCount(1, $collection);
         $resource = $collection[0];
-        $this->assertSame(ResourceClassPropagationTarget::class, $resource->getClass());
+        $this->assertSame(ResourceClassPropagationTarget::class, $resource->getApiClass());
 
         $operations = $resource->getOperations();
         $this->assertNotNull($operations);
         $this->assertGreaterThan(0, \count($operations));
         foreach ($operations as $operation) {
-            $this->assertSame(ResourceClassPropagationTarget::class, $operation->getClass());
+            $this->assertSame(ResourceClassPropagationTarget::class, $operation->getApiClass());
         }
     }
 
