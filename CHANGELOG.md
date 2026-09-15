@@ -76,6 +76,17 @@ Also contains [v4.4.0-alpha.4 changes](#v440-alpha4).
 
 * [88f458a11](https://github.com/api-platform/core/commit/88f458a1108ba2fcd052a58d7647f23dad1b186b) fix(jsonschema): drop removed getBuiltinTypes path in SchemaPropertyMetadataFactory
 
+## v4.4.0-beta.3
+
+### Bug fixes
+
+* [9b94d1493](https://github.com/api-platform/core/commit/9b94d1493722a4b01986dcd5e3f2034c9a4349ad) fix(doctrine): raise orm floor to ^3.3 (#8534)
+
+### Dependencies
+
+* `api-platform/doctrine-orm` now requires `doctrine/orm` `^2.17 || ^3.3`. The `PARTIAL` DQL grammar is absent from 3.0.0 through 3.2.3, so the `fetch_partial` option was silently a no-op on those versions.
+* `doctrine/doctrine-bundle` moves to `^2.11.1 || ^3.1`. 2.11.0 passes `$reportFieldsWhereDeclared` to `AttributeDriver`, which doctrine/orm 3 rejects.
+
 ## v4.4.0-beta.2
 
 ### Features
