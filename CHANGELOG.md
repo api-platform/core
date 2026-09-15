@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.4.0-beta.2
+
+### Features
+
+* [69e6a693c](https://github.com/api-platform/core/commit/69e6a693cd79f8573ceb430b85735a3e041bf864) feat: support the HTTP QUERY method (#8531)
+
+### Dependencies
+
+* `api-platform/state` now requires `api-platform/metadata` `^4.4.0-beta.2`. `ParameterProvider` reads `HttpOperation::METHOD_QUERY`, which was introduced in that version.
+
 ## v4.4.0-beta.1
 
 ### Features
