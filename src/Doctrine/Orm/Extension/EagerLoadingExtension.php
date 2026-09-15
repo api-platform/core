@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\AST\PartialObjectExpression;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
@@ -70,7 +71,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $options = [];
 
         $forceEager = $operation?->getForceEager() ?? $this->forceEager;
-        $fetchPartial = $operation?->getFetchPartial() ?? $this->fetchPartial;
+        $fetchPartial = class_exists(PartialObjectExpression::class) && ($operation?->getFetchPartial() ?? $this->fetchPartial);
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
