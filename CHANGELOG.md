@@ -1,5 +1,13 @@
 # Changelog
 
+## v5.0.0-beta.2
+
+### Dependencies
+
+* `api-platform/doctrine-orm` now requires `doctrine/orm` `^2.17 || ^3.3` and `doctrine/doctrine-bundle` `^2.11.1 || ^3.1`, as in 4.4.
+
+Also contains [v4.4.0-beta.2](#v440-beta2) and [v4.4.0-beta.3](#v440-beta3) changes.
+
 ## v5.0.0-beta.1
 
 ### Breaking changes
