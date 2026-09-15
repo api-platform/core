@@ -80,6 +80,13 @@ parameters:
 				- tests/Fixtures/TestBundle/Document/
 				- src/Metadata/Tests/Fixtures/ApiResource/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
+		# ORM 2 and 3 disagree on the shape of ClassMetadata::$associationMappings
+		# (raw arrays vs mapping objects). The extension reads them through
+		# ArrayAccess, so array fixtures are valid for both; composer still
+		# supports doctrine/orm ^2.17.
+		-
+			identifier: assign.propertyType
+			path: src/Doctrine/Orm/Tests/Extension/EagerLoadingExtensionTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
