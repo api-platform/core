@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8113;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\JoinedInheritanceSerializerGroups;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(operations: [new Get()])]
+#[ApiResource(operations: [new Get(shortName: 'JoinedInheritanceSerializerGroupsBarB', uriTemplate: '/joined-inheritance-serializer-groups/bar-b/{id}')])]
 #[ORM\Entity]
 class BarJoinedB extends BarJoined
 {
