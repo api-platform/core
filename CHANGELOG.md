@@ -77,6 +77,31 @@ Also contains [v4.3.18 changes](#v4318).
 * [c9e5071d9](https://github.com/api-platform/core/commit/c9e5071d973caedeb9b554f885dedbc89743b93d) feat(symfony): deprecate Symfony Security AccessDeniedException (#8318)
 * [cc0ae1254](https://github.com/api-platform/core/commit/cc0ae1254acaf9742c7f899dd24a14d46c89ca6e) feat: support dynamic HTTP response status code via request attribute (#7904)
 
+## v4.3.19
+
+### Bug fixes
+
+* [01252d141](https://github.com/api-platform/core/commit/01252d1413ee6130242fb04627076f230711a395) fix(mcp): forward Symfony HTTP exception messages as JSON-RPC errors (#8505)
+* [01a7b62f0](https://github.com/api-platform/core/commit/01a7b62f00248fdd456ea4acebebd35df47b3772) fix(symfony): support repeated global parameter classes (#8451)
+* [40165b672](https://github.com/api-platform/core/commit/40165b6728864400033bfbd1a1bdf1dad87a3ae6) fix(serializer): don't leak relation_native_type into embedded documents (#8508)
+* [574c84f8a](https://github.com/api-platform/core/commit/574c84f8a17d8f8a3a13b949811b54f40b4fc952) fix(doctrine): honor castToArray and schema in filter OpenAPI parameters (#8423)
+* [5ff064e87](https://github.com/api-platform/core/commit/5ff064e87b1d07b0beee762d076f2e2bd06b4a8d) fix(mcp): split nullable array `type` into anyOf branches for wider client compatibility (#8522)
+* [6024aa732](https://github.com/api-platform/core/commit/6024aa732dc210344c1bcda3b6b4981738b4b3a3) fix(laravel): accept boolean query literals (#8520)
+* [8f2cd5037](https://github.com/api-platform/core/commit/8f2cd503798306ff3ef9540aa5e403d52fc855c5) fix(mcp): skip ToolProvider mapping when the request carries no tool payload
+* [95ba47b49](https://github.com/api-platform/core/commit/95ba47b495b6f4444b19c70fd924eaa5e1ea74c8) fix(symfony): throw on route name collisions between resource classes (#8502)
+* [c75e1c11a](https://github.com/api-platform/core/commit/c75e1c11acc99800d1612750bade85b4e56dc6f2) fix(doctrine): keep zero-backed enum filter values (#8515)
+* [caf6b18ad](https://github.com/api-platform/core/commit/caf6b18ad771715a6e5fd1a7b60bb2d0ba25bd5e) fix(mcp): declare missing dependencies and run the component in CI
+* [d6efa9d80](https://github.com/api-platform/core/commit/d6efa9d80db21b67e1246bf73177d59ecdb62cc7) fix: add symfony/asset as a required dependency for Swagger UI (#8506)
+* [fc25beec2](https://github.com/api-platform/core/commit/fc25beec27b173f805d2d6ab46053e0680656219) fix(serializer): resolve IRIs on borrowed routes (#8521)
+
+### Features
+
+* [6dc491a4f](https://github.com/api-platform/core/commit/6dc491a4fb82008eb5cff6e4808204741b4a6820) feat(test): keep ApiTestCase BrowserKit assertions verbose for Symfony 8.2 (#8523)
+
+### Notes
+
+* The Content-Type charset change (#8226) was released in 4.3.18 and reverted in this version; it now ships in 4.4 only.
+
 ## v4.3.18
 
 ### Bug fixes
