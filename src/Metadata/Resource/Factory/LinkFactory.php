@@ -109,7 +109,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
                 $reflectionProperty = $reflectionClass->getProperty($property);
 
-                foreach ($reflectionProperty->getAttributes(Link::class) as $attributeLink) {
+                foreach ($reflectionProperty->getAttributes(Link::class, \ReflectionAttribute::IS_INSTANCEOF) as $attributeLink) {
                     $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
                     $attributeLink = $attributeLink->newInstance()
