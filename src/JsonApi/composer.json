@@ -22,11 +22,11 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/documentation": "^5.0@beta",
-        "api-platform/json-schema": "^5.0@beta",
-        "api-platform/metadata": "^5.0.0-beta.1",
-        "api-platform/serializer": "^5.0.0-beta.1",
-        "api-platform/state": "^5.0@beta",
+        "api-platform/documentation": "^5.0",
+        "api-platform/json-schema": "^5.0",
+        "api-platform/metadata": "^5.0",
+        "api-platform/serializer": "^5.0",
+        "api-platform/state": "^5.0",
         "symfony/error-handler": "^7.4 || ^8.0",
         "symfony/http-foundation": "^7.4 || ^8.0",
         "symfony/type-info": "^7.4 || ^8.0"

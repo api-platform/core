@@ -28,9 +28,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^5.0@beta",
-        "api-platform/json-schema": "^5.0@beta",
-        "api-platform/state": "^5.0@beta",
+        "api-platform/metadata": "^5.0",
+        "api-platform/json-schema": "^5.0",
+        "api-platform/state": "^5.0",
         "mcp/sdk": "^0.8",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "symfony/http-foundation": "^7.4 || ^8.0",

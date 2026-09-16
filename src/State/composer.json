@@ -28,15 +28,15 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^5.0@beta",
+        "api-platform/metadata": "^5.0",
         "psr/container": "^1.0 || ^2.0",
         "symfony/http-kernel": "^7.4 || ^8.0",
         "symfony/serializer": "^7.4 || ^8.0",
         "symfony/deprecation-contracts": "^3.1"
     },
     "require-dev": {
-        "api-platform/serializer": "^5.0@beta",
-        "api-platform/validator": "^5.0@beta",
+        "api-platform/serializer": "^5.0",
+        "api-platform/validator": "^5.0",
         "phpunit/phpunit": "^11.5 || ^12.2",
         "symfony/http-foundation": "^7.4 || ^8.0",
         "symfony/object-mapper": "^7.4 || ^8.0",
