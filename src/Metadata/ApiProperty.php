@@ -234,7 +234,7 @@ final class ApiProperty
         $this->nativeType = $nativeType;
 
         if ($this->builtinTypes) {
-            trigger_deprecation('api_platform/metadata', '4.2', \sprintf('The "builtinTypes" argument of "%s" is deprecated, use "nativeType" instead.', __CLASS__));
+            trigger_deprecation('api-platform/metadata', '4.2', \sprintf('The "builtinTypes" argument of "%s" is deprecated, use "nativeType" instead.', __CLASS__));
             $this->nativeType ??= PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($this->builtinTypes);
         } elseif ($this->nativeType && class_exists(LegacyType::class)) {
             $this->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($this->nativeType) ?? [];

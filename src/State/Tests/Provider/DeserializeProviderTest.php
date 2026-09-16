@@ -37,7 +37,7 @@ class DeserializeProviderTest extends TestCase
     #[IgnoreDeprecations]
     public function testDeserialize(): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/core 5.0: To assign an object to populate you should set "api_assign_object_to_populate" in your denormalizationContext, not defining it is deprecated.');
+        $this->expectUserDeprecationMessage('Since api-platform/core 4.4: To assign an object to populate you should set "api_assign_object_to_populate" in your denormalizationContext, not defining it is deprecated.');
         $objectToPopulate = new \stdClass();
         $serializerContext = [];
         $operation = new Post(deserialize: true, class: \stdClass::class);
@@ -143,7 +143,7 @@ class DeserializeProviderTest extends TestCase
     #[IgnoreDeprecations]
     public function testDeserializeTriggersDeprecationWhenContextNotSet(HttpOperation $operation): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/core 5.0: To assign an object to populate you should set "api_assign_object_to_populate" in your denormalizationContext, not defining it is deprecated.');
+        $this->expectUserDeprecationMessage('Since api-platform/core 4.4: To assign an object to populate you should set "api_assign_object_to_populate" in your denormalizationContext, not defining it is deprecated.');
 
         $objectToPopulate = new \stdClass();
         $serializerContext = [];

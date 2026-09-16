@@ -118,7 +118,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
 
         $this->constraintViolationList = new ConstraintViolationList();
 
-        trigger_deprecation('api_platform/core', '5.0', \sprintf('The "%s" exception will have a "%s" first argument in 5.x.', self::class, ConstraintViolationListInterface::class));
+        trigger_deprecation('api-platform/core', '4.4', \sprintf('The "%s" exception will have a "%s" first argument in 5.x.', self::class, ConstraintViolationListInterface::class));
         parent::__construct($message ?: $this->__toString(), $code ?? 0, $previous);
         $this->detail = $this->getMessage();
     }

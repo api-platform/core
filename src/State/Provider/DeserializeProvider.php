@@ -82,7 +82,7 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
 
             if ($assignObjectToPopulate) {
                 $serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] = true;
-                trigger_deprecation('api-platform/core', '5.0', 'To assign an object to populate you should set "%s" in your denormalizationContext, not defining it is deprecated.', SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE);
+                trigger_deprecation('api-platform/core', '4.4', 'To assign an object to populate you should set "%s" in your denormalizationContext, not defining it is deprecated.', SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE);
             }
         }
 

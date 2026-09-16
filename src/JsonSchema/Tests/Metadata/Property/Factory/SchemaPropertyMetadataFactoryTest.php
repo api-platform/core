@@ -38,7 +38,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         if (!class_exists(LegacyType::class)) {
             $this->markTestSkipped();
         }
-        $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
+        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(builtinTypes: [new LegacyType(builtinType: 'object', nullable: true, class: IntEnumAsIdentifier::class)]);
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
@@ -65,7 +65,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         if (!class_exists(LegacyType::class)) {
             $this->markTestSkipped();
         }
-        $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
+        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(
             builtinTypes: [new LegacyType(builtinType: 'object', nullable: true, class: IntEnumAsIdentifier::class)],
@@ -98,7 +98,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         if (!class_exists(LegacyType::class)) {
             $this->markTestSkipped();
         }
-        $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
+        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(
             openapiContext: ['description' => 'My description'],
