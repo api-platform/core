@@ -17,7 +17,7 @@ use ApiPlatform\OpenApi;
 use Symfony\Component\TypeInfo\Type;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
-final class Link extends Parameter
+class Link extends Parameter
 {
     public function __construct(
         private ?string $parameterName = null,
