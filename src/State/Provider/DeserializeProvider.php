@@ -15,17 +15,22 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\StopwatchAwareInterface;
 use ApiPlatform\State\StopwatchAwareTrait;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 final class DeserializeProvider implements ProviderInterface, StopwatchAwareInterface
 {
@@ -35,11 +40,13 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
-        ?TranslatorInterface $translator = null,
-        private readonly ?DenormalizationViolationFactoryInterface $violationFactory = null,
+        private ?TranslatorInterface $translator = null,
     ) {
-        if (null !== $translator) {
-            trigger_deprecation('api-platform/core', '4.4', 'Passing a "%s" to "%s" is deprecated and will be removed in 5.0. Translation is now handled by "%s".', TranslatorInterface::class, self::class, DenormalizationViolationFactoryInterface::class);
+        if (null === $this->translator) {
+            $this->translator = new class implements TranslatorInterface, LocaleAwareInterface {
+                use TranslatorTrait;
+            };
+            $this->translator->setLocale('en');
         }
     }
 
@@ -94,10 +101,31 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
 
         try {
             $data = $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);
-        } catch (PartialDenormalizationException|NotNormalizableValueException $e) {
-            $this->violationFactory?->handle($e, $operation);
+        } catch (PartialDenormalizationException $e) {
+            if (!class_exists(ConstraintViolationList::class)) {
+                throw $e;
+            }
 
-            throw $e;
+            $violations = new ConstraintViolationList();
+            foreach ($e->getErrors() as $exception) {
+                if (!$exception instanceof NotNormalizableValueException) {
+                    continue;
+                }
+                $violations->add($this->createViolationFromException($exception));
+            }
+            if (0 !== \count($violations)) {
+                throw new ValidationException($violations);
+            }
+        } catch (NotNormalizableValueException $e) {
+            // BackedEnum denormalization errors should surface as validation violations (422)
+            // rather than denormalization errors (400). See https://github.com/api-platform/core/issues/8183.
+            if (!class_exists(ConstraintViolationList::class) || !$this->isBackedEnumException($e)) {
+                throw $e;
+            }
+
+            $violations = new ConstraintViolationList();
+            $violations->add($this->createViolationFromException($e));
+            throw new ValidationException($violations);
         }
 
         $this->stopwatch?->stop('api_platform.provider.deserialize');
@@ -105,5 +133,69 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         $request->attributes->set('data', $data);
 
         return $data;
+    }
+
+    private function normalizeExpectedTypes(?array $expectedTypes = null): array
+    {
+        $normalizedTypes = [];
+
+        foreach ($expectedTypes ?? [] as $expectedType) {
+            $normalizedType = $expectedType;
+
+            if (class_exists($expectedType) || interface_exists($expectedType)) {
+                // A backed enum is sent over the wire as its backing scalar (e.g. "string"), not as the
+                // PHP enum class, so report the JSON-visible type rather than the internal FQCN (#8388).
+                if (is_subclass_of($expectedType, \BackedEnum::class) && ($backingType = (new \ReflectionEnum($expectedType))->getBackingType())) {
+                    $normalizedType = (string) $backingType;
+                } else {
+                    $normalizedType = (new \ReflectionClass($expectedType))->getShortName();
+                }
+            }
+
+            $normalizedTypes[] = $normalizedType;
+        }
+
+        return array_values(array_unique($normalizedTypes));
+    }
+
+    private function createViolationFromException(NotNormalizableValueException $exception): ConstraintViolation
+    {
+        $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
+        $parameters = [];
+        if ($exception->canUseMessageForUser()) {
+            $parameters['hint'] = $exception->getMessage();
+        }
+
+        if (!$expectedTypes && $exception->canUseMessageForUser()) {
+            $violationMessage = $exception->getMessage();
+
+            return new ConstraintViolation($violationMessage, $violationMessage, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR);
+        }
+
+        $message = (new Type($expectedTypes))->message;
+
+        return new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR);
+    }
+
+    private function isBackedEnumException(NotNormalizableValueException $exception): bool
+    {
+        foreach ($exception->getExpectedTypes() ?? [] as $expectedType) {
+            if (\is_string($expectedType) && (class_exists($expectedType) || interface_exists($expectedType)) && is_subclass_of($expectedType, \BackedEnum::class)) {
+                return true;
+            }
+        }
+
+        for ($previous = $exception->getPrevious(); $previous instanceof \Throwable; $previous = $previous->getPrevious()) {
+            if (!$previous instanceof NotNormalizableValueException) {
+                continue;
+            }
+            foreach ($previous->getExpectedTypes() ?? [] as $expectedType) {
+                if (\is_string($expectedType) && (class_exists($expectedType) || interface_exists($expectedType)) && is_subclass_of($expectedType, \BackedEnum::class)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

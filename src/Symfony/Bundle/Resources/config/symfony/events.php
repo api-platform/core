@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
@@ -32,7 +31,6 @@ use ApiPlatform\Symfony\EventListener\ReadListener;
 use ApiPlatform\Symfony\EventListener\RespondListener;
 use ApiPlatform\Symfony\EventListener\SerializeListener;
 use ApiPlatform\Symfony\EventListener\WriteListener;
-use ApiPlatform\Validator\DenormalizationViolationFactory;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -72,21 +70,12 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 4]);
 
-    $services->set('api_platform.state.denormalization_violation_factory', DenormalizationViolationFactory::class)
-        ->args([
-            service('validator'),
-            service('translator')->nullOnInvalid(),
-        ]);
-
-    $services->alias(DenormalizationViolationFactoryInterface::class, 'api_platform.state.denormalization_violation_factory');
-
     $services->set('api_platform.state_provider.deserialize', DeserializeProvider::class)
         ->args([
             null,
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
-            null,
-            service('api_platform.state.denormalization_violation_factory')->nullOnInvalid(),
+            service('translator')->nullOnInvalid(),
         ]);
 
     $services->set('api_platform.listener.request.deserialize', DeserializeListener::class)

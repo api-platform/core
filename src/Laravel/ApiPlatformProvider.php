@@ -108,7 +108,6 @@ use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
 use ApiPlatform\Laravel\Serializer\EloquentOperationResourceClassResolver;
 use ApiPlatform\Laravel\State\AccessCheckerProvider;
-use ApiPlatform\Laravel\State\DenormalizationViolationFactory as LaravelDenormalizationViolationFactory;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
@@ -162,7 +161,6 @@ use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
-use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
@@ -464,18 +462,8 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(DenormalizationViolationFactoryInterface::class, static function () {
-            return new LaravelDenormalizationViolationFactory();
-        });
-
         $this->app->singleton(DeserializeProvider::class, static function (Application $app) {
-            return new DeserializeProvider(
-                $app->make(SwaggerUiProvider::class),
-                $app->make(SerializerInterface::class),
-                $app->make(SerializerContextBuilderInterface::class),
-                null,
-                $app->make(DenormalizationViolationFactoryInterface::class),
-            );
+            return new DeserializeProvider($app->make(SwaggerUiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
         $this->app->singleton(ValidateProvider::class, static function (Application $app) {

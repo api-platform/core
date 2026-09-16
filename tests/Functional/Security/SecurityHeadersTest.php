@@ -55,7 +55,7 @@ final class SecurityHeadersTest extends ApiTestCase
             ],
         );
 
-        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseStatusCodeSame(400);
         $this->assertResponseHeaderSame('x-content-type-options', 'nosniff');
         $this->assertResponseHeaderSame('x-frame-options', 'deny');
     }
