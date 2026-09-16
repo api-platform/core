@@ -37,7 +37,7 @@
     "require-dev": {
         "api-platform/serializer": "^5.0",
         "api-platform/validator": "^5.0",
-        "phpunit/phpunit": "^11.5 || ^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "symfony/http-foundation": "^7.4 || ^8.0",
         "symfony/object-mapper": "^7.4 || ^8.0",
         "symfony/type-info": "^7.4 || ^8.0",
