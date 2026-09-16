@@ -67,7 +67,7 @@
     "require-dev": {
         "api-platform/json-schema": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.5 || ^12.2"
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0"
     },
     "minimum-stability": "beta",
     "prefer-stable": true
