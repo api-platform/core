@@ -1,88 +1,48 @@
 # Changelog
 
-## v5.0.0-beta.2
+## v5.0.0
 
-### Dependencies
-
-* `api-platform/doctrine-orm` now requires `doctrine/orm` `^2.17 || ^3.3` and `doctrine/doctrine-bundle` `^2.11.1 || ^3.1`, as in 4.4.
-
-Also contains [v4.4.0-beta.2](#v440-beta2) and [v4.4.0-beta.3](#v440-beta3) changes.
-
-## v5.0.0-beta.1
+API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the removals and breaking changes below.
 
 ### Breaking changes
 
-* JSON:API: `use_iri_as_id` now defaults to `false` instead of resolving to `true` with a deprecation, as announced in #8327. The `data.id` member carries the resource identifier and the IRI moves to `data.links.self`. Set `api_platform.jsonapi.use_iri_as_id` to `true` (Symfony) or `'jsonapi' => ['use_iri_as_id' => true]` in `config/api-platform.php` (Laravel) to keep the previous payload.
-* `ApiPlatform\State\Provider\DeserializeProvider` no longer accepts a `Symfony\Contracts\Translation\TranslatorInterface` as its fourth constructor argument, as announced by the deprecation added in 4.4. Denormalization violations and their translation are handled by `DenormalizationViolationFactoryInterface`, which moves from the fifth to the fourth position. Anyone constructing the provider by hand, or overriding the `api_platform.state_provider.deserialize` service definition, must drop the translator argument. `api-platform/state` no longer requires `symfony/translation-contracts`.
-* [906a36dca](https://github.com/api-platform/core/commit/906a36dca9b1a1e8e48fc7990c187331b72b370e) feat!: drop the `Request::getContentType()` fallbacks (#8517)
-
-### Features
-
-* [24871a9ac](https://github.com/api-platform/core/commit/24871a9ac05468cf864de6771ebceceb720fb273) feat(symfony): emit a csp nonce on the swagger ui and graphiql scripts (#8310)
-* [56c4ae204](https://github.com/api-platform/core/commit/56c4ae2040be32a42b8b42aec976697f0d82941d) feat(symfony): add routePriority to control route matching order (#8309)
-* [56daf41c4](https://github.com/api-platform/core/commit/56daf41c4de9e737f2374a2696f6016425958dad) feat: allow Parameter attributes on properties (#7870)
-* [711f00657](https://github.com/api-platform/core/commit/711f006577c2f60fa2c71755f1f27825bf9722ce) feat: extract ApiTestCase in its own api-platform/test package (#7887)
-* [826e847b6](https://github.com/api-platform/core/commit/826e847b6d1ee607f2f671d0a03d8f8ec0daa429) feat(metadata): resolve %param% in yaml/xml and attribute resource config (#8284)
-* [a8af8e1b9](https://github.com/api-platform/core/commit/a8af8e1b97601d94f10f8dfa057e827e5611c0d9) feat(doctrine): embed joined/sti relations when a discriminator subclass declares the group (#8283)
-* [c3b6bb41f](https://github.com/api-platform/core/commit/c3b6bb41f0afe6988356e5c5099f60e0524c7d96) feat: allow restricting operations for parameter attributes on properties (#7899)
-* [edead1f0c](https://github.com/api-platform/core/commit/edead1f0cd2375604d9929f16a005954d94b3a17) feat: HTTP QUERY method support (RFC 10008) (#8349)
-* [fce2bdfe6](https://github.com/api-platform/core/commit/fce2bdfe6a55c117014337c5339a98c6401609d4) feat(state): apply uri variable provider values (#8491)
-
-### Bug fixes
-
-* [239e44c44](https://github.com/api-platform/core/commit/239e44c44a6db7a399af463f4ff217483e75cc5b) fix(symfony): make api-platform/test a dev dependency (#8527)
-* [5ad54c9d9](https://github.com/api-platform/core/commit/5ad54c9d9803b124bc34af16553fa9eca0503dc9) fix(symfony): separate route priority (#8529)
-* [7afb7c8a7](https://github.com/api-platform/core/commit/7afb7c8a760b54324c49fa780be7320cc119d392) fix(test): restore main CI after the ApiTestCase extraction (#8526)
-* [88f98d961](https://github.com/api-platform/core/commit/88f98d9616f8fdbebd8308086c666882289f0959) fix(serializer): read Symfony attributes through their public properties (#8519)
-
-### Dependencies
-
-* The components now require each other with a `@beta` stability flag (for example `"api-platform/state": "^5.0@beta"`) instead of `@alpha`. Installing a 5.0 component no longer pulls a 5.0 alpha of its siblings.
-* `api-platform/test` is published for the first time: `ApiTestCase` moves out of `api-platform/symfony` into its own package (#7887), required as a dev dependency (#8527).
-
-### Notes
-
-* The internal `ApiPlatform\Symfony\Bundle\ArgumentResolver\CompatibleValueResolverInterface` is removed. It aliased either `ValueResolverInterface` or the Symfony 6 `ArgumentValueResolverInterface` depending on which existed; since the Symfony floor is `^7.4`, only the former can be installed, and Symfony 8 dropped the latter altogether. `PayloadArgumentResolver` now implements `ValueResolverInterface` directly.
-* `FilterInterface::getDescription()` removal is deferred to 6.0 (#8513); it stays deprecated in 5.0.
-
-Also contains [v4.4.0-beta.1 changes](#v440-beta1).
-
-## v5.0.0-alpha.3
-
-### Features
-
-* [672d48e25](https://github.com/api-platform/core/commit/672d48e2510ca08aed92958677c8f861cb36f959) feat(symfony): map UniqueConstraintViolationException to 422 by default (#8478)
-
-### Bug fixes
-
-* [78151b7d1](https://github.com/api-platform/core/commit/78151b7d19da1dfba9a37362bb23a9cb4ff4acd1) fix(mcp): return resource read results for resources (#8436)
-
-### Dependencies
-
-* The Doctrine (ORM, ODM, Common) and JSON:API components now require `api-platform/metadata` `^5.0.0-alpha.3`. Their filters instantiate `ApiPlatform\OpenApi\Model\Parameter`, which the metadata component only guards behind a `class_exists()` check from that version on, so an older metadata makes them fatal on an install without `api-platform/openapi`.
-
-### Notes
-
-* JSON-LD: `/contexts/Error` and `/contexts/ConstraintViolationList` are no longer special-cased to the base context; they are built like any other resource context, since exceptions have been resources since 3.2 (#8402).
-* `SerializerContextBuilder` no longer injects `uri_variables` into the serialization context — URI variables are parsed by the serializer processor instead (#8402).
-
-Also contains [v4.4.0-alpha.4 changes](#v440-alpha4).
-
-## v5.0.0-alpha.2
-
-### Breaking changes
-
+* [14ce74352](https://github.com/api-platform/core/commit/14ce74352510c8f2cff7256dcea9a72b6e52c4e8) feat(jsonapi)!: default use_iri_as_id to false (#8512)
+* [ce741c851](https://github.com/api-platform/core/commit/ce741c8515f7b4ce992b14efa236c1fa49f43160) feat(state)!: drop TranslatorInterface support from DeserializeProvider (#8514)
+* [906a36dca](https://github.com/api-platform/core/commit/906a36dca9b1a1e8e48fc7990c187331b72b370e) feat!: drop the Request::getContentType() fallbacks (#8517)
+* [cf1d5a9fc](https://github.com/api-platform/core/commit/cf1d5a9fc629876f031d3cbc9aabd692a97e790c) feat(symfony)!: drop the Symfony 6 value resolver shim (#8516)
 * [e22e74464](https://github.com/api-platform/core/commit/e22e74464e49d0dc0bd86e7407f1e19b6c5db9ca) feat!: remove deprecated APIs scheduled for 5.0 (#8367)
-* [4a9a14507](https://github.com/api-platform/core/commit/4a9a14507e5ca97c85fcf8dd1e240008f000c525) feat!: remove the legacy PropertyInfo Type system, use symfony/type-info (#8364)
-* [1e6d13ae1](https://github.com/api-platform/core/commit/1e6d13ae117471dd6e549cd1cc5dc8816d5804fd) feat!: core 5.0 cleanups — PropertyAwareFilterInterface::getProperties(), JSON:API status as string (#8366)
+* [4a9a14507](https://github.com/api-platform/core/commit/4a9a14507e5ca97c85fcf8dd1e240008f000c525) feat!: remove legacy PropertyInfo Type system (#8364)
+* [1e6d13ae1](https://github.com/api-platform/core/commit/1e6d13ae117471dd6e549cd1cc5dc8816d5804fd) feat!: core 5.0 cleanups (getProperties interface, json:api status string) (#8366)
+* Denormalization errors on a property carrying a Symfony Validator constraint now return `422` with a `ConstraintViolation` payload instead of `400` with a `hydra:Error` payload ([#8211](https://github.com/api-platform/core/pull/8211), [#8389](https://github.com/api-platform/core/pull/8389)). Properties without constraint metadata still return `400`. This shipped in the 4.4 betas and was moved to 5.0; there is no configuration flag, but the behaviour can be disabled by overriding the `api_platform.state.denormalization_violation_factory` service.
 
 ### Features
 
+* [edead1f0c](https://github.com/api-platform/core/commit/edead1f0cd2375604d9929f16a005954d94b3a17) feat: HTTP QUERY method support (RFC 10008) (#8349)
+* [826e847b6](https://github.com/api-platform/core/commit/826e847b6d1ee607f2f671d0a03d8f8ec0daa429) feat(metadata): resolve %param% in yaml/xml and attribute resource config (#8284)
+* [56c4ae204](https://github.com/api-platform/core/commit/56c4ae2040be32a42b8b42aec976697f0d82941d) feat(symfony): add routePriority to control route matching order (#8309)
+* [c3b6bb41f](https://github.com/api-platform/core/commit/c3b6bb41f0afe6988356e5c5099f60e0524c7d96) feat: allow restricting operations for parameter attributes on properties (#7899)
+* [fce2bdfe6](https://github.com/api-platform/core/commit/fce2bdfe6a55c117014337c5339a98c6401609d4) feat(state): apply uri variable provider values (#8491)
+* [56daf41c4](https://github.com/api-platform/core/commit/56daf41c4de9e737f2374a2696f6016425958dad) feat: allow Parameter attributes on properties (#7870)
+* [24871a9ac](https://github.com/api-platform/core/commit/24871a9ac05468cf864de6771ebceceb720fb273) feat(symfony): emit a csp nonce on the swagger ui and graphiql scripts (#8310)
+* [a8af8e1b9](https://github.com/api-platform/core/commit/a8af8e1b97601d94f10f8dfa057e827e5611c0d9) feat(doctrine): embed joined/sti relations when a discriminator subclass declares the group (#8283)
+* [711f00657](https://github.com/api-platform/core/commit/711f006577c2f60fa2c71755f1f27825bf9722ce) feat: extract ApiTestCase in its own api-platform/test package (#7887)
+* [672d48e25](https://github.com/api-platform/core/commit/672d48e2510ca08aed92958677c8f861cb36f959) feat(symfony): map UniqueConstraintViolationException to 422 by default (#8478)
 * [d37a75379](https://github.com/api-platform/core/commit/d37a753790f8a8e1481a118b6a8fc9a08f57e962) feat(doctrine): standalone Date/Exists filters, ComparisonFilter [between], deprecate RangeFilter (#8351)
 
 ### Bug fixes
 
+* [5ad54c9d9](https://github.com/api-platform/core/commit/5ad54c9d9803b124bc34af16553fa9eca0503dc9) fix(symfony): separate route priority (#8529)
+* [239e44c44](https://github.com/api-platform/core/commit/239e44c44a6db7a399af463f4ff217483e75cc5b) fix(symfony): make api-platform/test a dev dependency (#8527)
+* [7afb7c8a7](https://github.com/api-platform/core/commit/7afb7c8a760b54324c49fa780be7320cc119d392) fix(test): restore main CI after the ApiTestCase extraction (#8526)
+* [88f98d961](https://github.com/api-platform/core/commit/88f98d9616f8fdbebd8308086c666882289f0959) fix(serializer): read Symfony attributes through their public properties (#8519)
+* [78151b7d1](https://github.com/api-platform/core/commit/78151b7d19da1dfba9a37362bb23a9cb4ff4acd1) fix(mcp): return resource read results for resources (#8436)
+* [8360186ed](https://github.com/api-platform/core/commit/8360186eda109c3e3ed2dd22d054b6ce6cb7404a) fix(serializer): remove dead native-type guards in AbstractItemNormalizerTest
 * [88f458a11](https://github.com/api-platform/core/commit/88f458a1108ba2fcd052a58d7647f23dad1b186b) fix(jsonschema): drop removed getBuiltinTypes path in SchemaPropertyMetadataFactory
+
+### Dependencies
+
+* `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
+* Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
 
 ## v4.4.0
 
