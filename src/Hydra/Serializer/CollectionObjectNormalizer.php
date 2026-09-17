@@ -74,14 +74,11 @@ final class CollectionObjectNormalizer implements NormalizerInterface, Normalize
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']);
 
-        $normalized = [];
-        if ('VIRTUAL' !== $data->context) {
-            $normalized['@context'] = $data->context;
-        } else {
-            $normalized = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-        }
+        $normalized = null !== $data->context
+            ? ['@context' => $data->context]
+            : $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        $normalized['@id'] = 'VIRTUAL' !== $data->id ? $data->id : $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
+        $normalized['@id'] = $data->id ?? $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $normalized['@type'] = $hydraPrefix.$data->type;
 
         // "totalItems" is a non-nullable, uninitialized-by-default int: isset() is the only safe way to check it was set.
