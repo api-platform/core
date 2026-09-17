@@ -124,6 +124,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'paginationClientItemsPerPage' => $this->phpize($resource, 'paginationClientItemsPerPage', 'bool'),
             'paginationClientPartial' => $this->phpize($resource, 'paginationClientPartial', 'bool'),
             'paginationEnabled' => $this->phpize($resource, 'paginationEnabled', 'bool'),
+            'paginationLinkHeader' => $this->phpize($resource, 'paginationLinkHeader', 'bool'),
             'paginationFetchJoinCollection' => $this->phpize($resource, 'paginationFetchJoinCollection', 'bool'),
             'paginationUseOutputWalkers' => $this->phpize($resource, 'paginationUseOutputWalkers', 'bool'),
             'paginationItemsPerPage' => $this->phpize($resource, 'paginationItemsPerPage', 'integer'),
@@ -429,6 +430,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
+                'paginationLinkHeader' => $this->phpize($operation, 'paginationLinkHeader', 'bool'),
                 'name' => $this->phpize($operation, 'name', 'string'),
                 'routeName' => $this->phpize($operation, 'routeName', 'string'),
             ]);

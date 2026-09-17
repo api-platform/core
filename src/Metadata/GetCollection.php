@@ -107,6 +107,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $throwOnNotFound = null,
         private ?string $itemUriTemplate = null,
         ?bool $map = null,
+        ?bool $paginationLinkHeader = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -192,7 +193,8 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
-            map: $map
+            map: $map,
+            paginationLinkHeader: $paginationLinkHeader
         );
     }
 

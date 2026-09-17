@@ -169,6 +169,7 @@ use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\ObjectMapperInputProcessor;
 use ApiPlatform\State\Processor\ObjectMapperOutputProcessor;
+use ApiPlatform\State\Processor\PaginationLinkProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
@@ -552,7 +553,7 @@ class ApiPlatformProvider extends ServiceProvider
                 );
             }
 
-            return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
+            return new AddLinkHeaderProcessor(new PaginationLinkProcessor($decorated, $app->make(Pagination::class)), new HttpHeaderSerializer());
         });
 
         $this->app->singleton(SerializeProcessor::class, static function (Application $app) {
