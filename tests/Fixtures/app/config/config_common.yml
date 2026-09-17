@@ -147,6 +147,11 @@ services:
         tags:
             - name: 'api_platform.state_processor'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\LoginProcessor:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\LoginProcessor'
+        tags:
+            - name: 'api_platform.state_processor'
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\McpBookListProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\McpBookListProcessor'
         arguments: [ '@doctrine' ]
