@@ -47,7 +47,7 @@ class CollectionObjectNormalizerTest extends TestCase
         $this->assertSame([], $normalizer->getSupportedTypes('json'));
     }
 
-    public function testNormalizeUsesContextBuilderAndIriConverterWhenVirtual(): void
+    public function testNormalizeBuildsContextAndIdWhenNotSet(): void
     {
         $collection = new Collection();
         $collection->member = [];
