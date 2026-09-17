@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
+use ApiPlatform\Hydra\Serializer\CollectionObjectNormalizer;
 use ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer;
@@ -71,6 +72,15 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.serializer.default_context%',
         ])
         ->tag('serializer.normalizer', ['priority' => -985]);
+
+    $services->set('api_platform.hydra.normalizer.collection_object', CollectionObjectNormalizer::class)
+        ->args([
+            service('api_platform.jsonld.context_builder'),
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.iri_converter'),
+            '%api_platform.serializer.default_context%',
+        ])
+        ->tag('serializer.normalizer', ['priority' => -984]);
 
     $services->set('api_platform.hydra.normalizer.partial_collection_view', PartialCollectionViewNormalizer::class)
         ->decorate('api_platform.hydra.normalizer.collection', null, 0)
