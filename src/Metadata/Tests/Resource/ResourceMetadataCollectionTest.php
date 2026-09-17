@@ -90,4 +90,38 @@ final class ResourceMetadataCollectionTest extends TestCase
             $this->assertInstanceOf(OperationNotFoundException::class, $e);
         }
     }
+
+    public function testGetOperationResolvesUriTemplateWithoutFormatSuffix(): void
+    {
+        $operation = (new Get())->withUriTemplate('/one{._format}');
+        $resource = (new ApiResource())->withOperations(new Operations(['name' => $operation]));
+        $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
+
+        $this->assertSame($operation, $resourceMetadataCollection->getOperation('/one'));
+        $this->assertSame($operation, $resourceMetadataCollection->getOperation('/one.{_format}'));
+    }
+
+    public function testGetOperationExactMatchWinsOverLenientMatchRegardlessOfOrder(): void
+    {
+        $exact = (new Get())->withUriTemplate('/one');
+        $lenient = (new Get())->withUriTemplate('/one{._format}');
+
+        $resource = (new ApiResource())->withOperations(new Operations(['exact' => $exact, 'lenient' => $lenient]));
+        $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
+        $this->assertSame($exact, $resourceMetadataCollection->getOperation('/one'));
+
+        $resourceReversed = (new ApiResource())->withOperations(new Operations(['lenient' => $lenient, 'exact' => $exact]));
+        $resourceMetadataCollectionReversed = new ResourceMetadataCollection('class', [$resourceReversed]);
+        $this->assertSame($exact, $resourceMetadataCollectionReversed->getOperation('/one'));
+    }
+
+    public function testGetOperationReturnsNullForUnrelatedTemplate(): void
+    {
+        $operation = (new Get())->withUriTemplate('/one{._format}');
+        $resource = (new ApiResource())->withOperations(new Operations(['name' => $operation]));
+        $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
+
+        $this->expectException(OperationNotFoundException::class);
+        $resourceMetadataCollection->getOperation('/unrelated');
+    }
 }
