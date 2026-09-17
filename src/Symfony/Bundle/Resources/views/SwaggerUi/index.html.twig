@@ -111,6 +111,7 @@
     {% else %}
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui-login-plugin.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
         <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
     {% endif %}
     {% if not is_scalar %}
