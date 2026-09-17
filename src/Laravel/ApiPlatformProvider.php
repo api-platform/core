@@ -54,6 +54,7 @@ use ApiPlatform\HttpCache\State\AddHeadersProcessor;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraCollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
+use ApiPlatform\Hydra\Serializer\CollectionObjectNormalizer as HydraCollectionObjectNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormalizer;
 use ApiPlatform\Hydra\Serializer\HydraPrefixNameConverter;
@@ -1017,6 +1018,18 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(HydraCollectionObjectNormalizer::class, static function (Application $app) {
+            $config = $app['config'];
+            $defaultContext = $config->get('api-platform.serializer', []);
+
+            return new HydraCollectionObjectNormalizer(
+                $app->make(ContextBuilderInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(IriConverterInterface::class),
+                $defaultContext
+            );
+        });
+
         $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app) {
             return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
         });
@@ -1109,6 +1122,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
+            $list->insert($app->make(HydraCollectionObjectNormalizer::class), -984);
             $list->insert($app->make(HalCollectionNormalizer::class), -800);
             $list->insert($app->make(HalEntrypointNormalizer::class), -985);
             $list->insert($app->make(HalObjectNormalizer::class), -995);

@@ -17,8 +17,6 @@ use Symfony\Component\JsonStreamer\Attribute\StreamedName;
 
 /**
  * @template T
- *
- * @internal
  */
 class Collection
 {
@@ -37,7 +35,7 @@ class Collection
     public ?PartialCollectionView $view = null;
 
     /**
-     * @var list<T>
+     * @var iterable<T>
      */
     public iterable $member;
 }
