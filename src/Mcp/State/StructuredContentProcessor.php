@@ -63,7 +63,8 @@ final class StructuredContentProcessor implements ProcessorInterface
                 'operation' => $operation,
             ]);
             $serializerContext['uri_variables'] = $uriVariables;
-            $format = $request->getRequestFormat('') ?: 'jsonld';
+            $outputFormats = $operation->getOutputFormats() ?? [];
+            $format = $outputFormats ? array_key_first($outputFormats) : ($request->getRequestFormat('') ?: 'jsonld');
             $normalized = $this->serializer->normalize($result, $format, $serializerContext);
             $result = $this->serializer->encode($normalized, $format, $serializerContext);
 
