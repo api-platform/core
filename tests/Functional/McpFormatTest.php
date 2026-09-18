@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpFormatListTool;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpFormatTool;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\AI\McpBundle\McpBundle;
@@ -45,7 +46,41 @@ class McpFormatTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [McpFormatTool::class];
+        return [McpFormatTool::class, McpFormatListTool::class];
+    }
+
+    public function testAFormatDeclaredAsAListIsResolved(): void
+    {
+        $this->skipUnlessMcpIsUsable();
+
+        $client = self::createClient();
+
+        /** @var ResourceMetadataCollectionFactoryInterface $factory */
+        $factory = self::getContainer()->get('api_platform.metadata.resource.metadata_collection_factory');
+
+        $outputFormats = null;
+        foreach ($factory->create(McpFormatListTool::class) as $resource) {
+            foreach ($resource->getMcp() ?? [] as $name => $operation) {
+                if ('format_message_list' === $name) {
+                    $outputFormats = $operation->getOutputFormats();
+                }
+            }
+        }
+
+        self::assertSame(
+            ['json' => ['application/json']],
+            $outputFormats,
+            'A list form such as ["json"] must be resolved against api_platform.formats, '.
+            'exactly as normalizeFormats() does for every HTTP operation.',
+        );
+
+        $sessionId = $this->initializeMcpSession($client);
+        $res = $this->callTool($client, $sessionId, 'format_message_list', ['message' => 'hello']);
+
+        self::assertResponseIsSuccessful();
+        $result = $res->toArray(false);
+        self::assertArrayNotHasKey('error', $result, 'MCP error: '.json_encode($result['error'] ?? null));
+        self::assertStringNotContainsString('@context', (string) ($result['result']['content'][0]['text'] ?? ''));
     }
 
     public function testTheOperationMetadataCarriesTheDeclaredFormat(): void
