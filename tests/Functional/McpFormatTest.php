@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpFormatListTool;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpFormatTool;
+use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\AI\McpBundle\McpBundle;
 
@@ -37,6 +38,7 @@ use Symfony\AI\McpBundle\McpBundle;
  */
 class McpFormatTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
@@ -154,6 +156,13 @@ class McpFormatTest extends ApiTestCase
     {
         if (!class_exists(McpBundle::class)) {
             $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        // The MongoDB test app loads routing_mongodb.yml, which — unlike every other
+        // environment — does not import routing_test.php and therefore has no /mcp
+        // route. McpTest skips for the same reason.
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
         }
 
         try {
