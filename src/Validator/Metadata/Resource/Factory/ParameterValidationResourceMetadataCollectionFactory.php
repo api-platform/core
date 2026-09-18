@@ -53,9 +53,18 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
                     $parameters->add($key, $this->addSchemaValidation($parameter));
                 }
 
-                // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system
-                if ($operation->getFilters() && 0 === $parameters->count()) {
-                    $parameters = $this->addFilterValidation($operation);
+                // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system.
+                $explicitParametersCount = 0;
+                foreach ($parameters as $key => $parameter) {
+                    if (!\array_key_exists($key, $defaultParams)) {
+                        ++$explicitParametersCount;
+                    }
+                }
+
+                if ($operation->getFilters() && 0 === $explicitParametersCount) {
+                    foreach ($this->addFilterValidation($operation) as $key => $filterParameter) {
+                        $parameters->add($key, $filterParameter);
+                    }
                 }
 
                 if (\count($parameters) > 0) {

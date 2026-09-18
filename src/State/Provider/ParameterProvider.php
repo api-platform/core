@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
+use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use ApiPlatform\State\ProviderInterface;
@@ -40,7 +42,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
     use ParameterParserTrait;
     use StopwatchAwareTrait;
 
-    public function __construct(private readonly ?ProviderInterface $decorated = null, private readonly ?ContainerInterface $locator = null)
+    public function __construct(private readonly ?ProviderInterface $decorated = null, private readonly ?ContainerInterface $locator = null, private readonly ?PaginationOptions $paginationOptions = null)
     {
     }
 
@@ -67,6 +69,10 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             $keys = [];
             foreach ($parameters as $parameter) {
                 $keys[] = $parameter->getKey();
+            }
+
+            if ($operation instanceof CollectionOperationInterface) {
+                $keys = [...$keys, ...$this->getPaginationParameterNames($operation)];
             }
 
             foreach (array_keys($request->attributes->get('_api_query_parameters')) as $key) {
@@ -138,6 +144,36 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         }
 
         throw new UnsupportedMediaTypeHttpException(\sprintf('The content type "%s" is not supported for the HTTP QUERY method. Use "application/x-www-form-urlencoded" or a JSON-based media type.', $mimeType ?: 'none'), headers: ['Accept-Query' => 'application/x-www-form-urlencoded, application/json']);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getPaginationParameterNames(CollectionOperationInterface&HttpOperation $operation): array
+    {
+        if (!$this->paginationOptions) {
+            return [];
+        }
+
+        $names = [];
+
+        if ($operation->getPaginationEnabled() ?? $this->paginationOptions->isPaginationEnabled()) {
+            $names[] = $this->paginationOptions->getPaginationPageParameterName();
+
+            if ($operation->getPaginationClientItemsPerPage() ?? $this->paginationOptions->getClientItemsPerPage()) {
+                $names[] = $this->paginationOptions->getItemsPerPageParameterName();
+            }
+        }
+
+        if ($operation->getPaginationClientEnabled() ?? $this->paginationOptions->isPaginationClientEnabled()) {
+            $names[] = $this->paginationOptions->getPaginationClientEnabledParameterName();
+        }
+
+        if ($operation->getPaginationClientPartial() ?? $this->paginationOptions->isClientPartialPaginationEnabled()) {
+            $names[] = $this->paginationOptions->getPartialPaginationParameterName();
+        }
+
+        return $names;
     }
 
     /**
