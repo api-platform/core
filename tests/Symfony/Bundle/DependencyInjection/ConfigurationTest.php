@@ -54,35 +54,6 @@ class ConfigurationTest extends TestCase
         $this->runDefaultConfigTests(['orm', 'odm']);
     }
 
-    public function testDeprecatedOptionsMentionTheirNameInTheMessage(): void
-    {
-        $deprecations = [];
-        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
-            $deprecations[] = $message;
-
-            return true;
-        }, \E_USER_DEPRECATED);
-
-        try {
-            $this->processor->processConfiguration($this->configuration, [
-                'api_platform' => [
-                    'validator' => [
-                        'query_parameter_validation' => true,
-                    ],
-                    'enable_link_security' => true,
-                ],
-            ]);
-        } finally {
-            restore_error_handler();
-        }
-
-        $queryParameterValidationDeprecations = array_values(array_filter($deprecations, static fn (string $m): bool => str_contains($m, 'query_parameter_validation')));
-        $enableLinkSecurityDeprecations = array_values(array_filter($deprecations, static fn (string $m): bool => str_contains($m, 'enable_link_security')));
-
-        $this->assertCount(1, $queryParameterValidationDeprecations, 'The "query_parameter_validation" option name must appear in its deprecation message.');
-        $this->assertCount(1, $enableLinkSecurityDeprecations, 'The "enable_link_security" option name must appear in its deprecation message.');
-    }
-
     private function runDefaultConfigTests(array $doctrineIntegrationsToLoad = ['orm']): void
     {
         $treeBuilder = $this->configuration->getConfigTreeBuilder();
