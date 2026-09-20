@@ -127,6 +127,14 @@ services:
         autowire: true
         autoconfigure: true
 
+    # Registered as services so the #[Map] attributes they carry are collected the way an
+    # application collects them: that is what feeds Symfony's reverse class map, and with it
+    # the entity -> resource direction on read.
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ManagedRelation\:
+        resource: '../../TestBundle/ApiResource/ManagedRelation'
+        autowire: true
+        autoconfigure: true
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider'
         tags:
