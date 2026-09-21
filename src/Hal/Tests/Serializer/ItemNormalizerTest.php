@@ -506,8 +506,13 @@ class ItemNormalizerTest extends TestCase
         });
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $serializer = $this->createMockForIntersectionOfInterfaces([SerializerInterface::class, NormalizerInterface::class]);
-        $serializer->method('normalize')->with(null, null, self::anything())->willReturn(null);
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, NormalizerInterface::class]);
+        $serializer->method('normalize')->willReturnCallback(static function (mixed $data, ?string $format): null {
+            self::assertNull($data);
+            self::assertNull($format);
+
+            return null;
+        });
 
         $nameConverter = self::createMock(NameConverterInterface::class);
         $nameConverter->method('normalize')->willReturnCallback(static function ($propertyName) {
