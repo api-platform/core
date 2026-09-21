@@ -23,6 +23,7 @@ use ApiPlatform\Symfony\Controller\MainController;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use GraphQL\GraphQL;
@@ -594,6 +595,7 @@ final class Configuration implements ConfigurationInterface
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                         OptimisticLockException::class => Response::HTTP_CONFLICT,
                         UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
+                        ForeignKeyConstraintViolationException::class => Response::HTTP_CONFLICT,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)

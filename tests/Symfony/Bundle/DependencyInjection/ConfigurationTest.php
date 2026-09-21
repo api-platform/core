@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -103,6 +104,7 @@ class ConfigurationTest extends TestCase
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
                 UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
+                ForeignKeyConstraintViolationException::class => Response::HTTP_CONFLICT,
             ],
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
             'inflector' => 'api_platform.metadata.inflector',
