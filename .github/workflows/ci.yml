@@ -628,6 +628,9 @@ jobs:
             # Custom directives, see https://mercure.rocks/docs/hub/config
             anonymous
             cors_origins *
+            # Mercure 1.0 wraps the JWT keys in an issuer block, so it refuses the
+            # token this job publishes with, which carries no iss claim.
+            protocol_version_compatibility 8
         ports:
           - 1337:1337
     steps:
