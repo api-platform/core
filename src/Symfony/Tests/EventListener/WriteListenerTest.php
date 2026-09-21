@@ -101,7 +101,7 @@ class WriteListenerTest extends TestCase
                 $controllerResult
             )
         );
-        $this->assertEquals($returnValue, $request->attributes->get('original_data'));
+        $this->assertSame($returnValue, $request->attributes->get('original_data'));
     }
 
     #[DataProvider('provideNonApiAttributes')]

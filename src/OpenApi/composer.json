@@ -44,6 +44,7 @@
         "api-platform/doctrine-orm": "^5.0",
         "api-platform/doctrine-odm": "^5.0",
         "api-platform/serializer": "^5.0",
+        "api-platform/test": "^5.0",
         "symfony/type-info": "^7.4 || ^8.0"
     },
     "autoload": {

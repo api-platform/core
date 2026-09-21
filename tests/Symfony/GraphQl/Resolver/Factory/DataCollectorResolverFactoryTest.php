@@ -46,7 +46,7 @@ class DataCollectorResolverFactoryTest extends TestCase
 
         $result = $this->dataCollectorResolverFactory->__invoke(Dummy::class)(null, ['bar'], [], $this->prophesize(ResolveInfo::class)->reveal());
 
-        $this->assertEquals(['bar'], $result);
-        $this->assertEquals([Dummy::class => ['bar']], $request->attributes->get('_graphql_args'));
+        $this->assertSame(['bar'], $result);
+        $this->assertSame([Dummy::class => ['bar']], $request->attributes->get('_graphql_args'));
     }
 }

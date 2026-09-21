@@ -87,7 +87,7 @@ class EntrypointNormalizerTest extends TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)->willReturn('http://localhost/api')->shouldBeCalled();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'links' => [
                     'self' => 'http://localhost/api',

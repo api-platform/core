@@ -394,7 +394,7 @@ JSON
 
         $data = $response->toArray(false);
         $this->assertArrayHasKey('hello', $data);
-        $this->assertEquals($data['hello'], 'world');
+        $this->assertSame($data['hello'], 'world');
     }
 
     public function testMissingMethod(): void

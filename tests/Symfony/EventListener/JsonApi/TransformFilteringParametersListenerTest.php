@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class TransformFilteringParametersListenerTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private TransformFilteringParametersListener $listener;
@@ -45,7 +48,7 @@ class TransformFilteringParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequestWithInvalidFilter(): void
@@ -59,7 +62,7 @@ class TransformFilteringParametersListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
 
         $expectedRequest = $expectedRequest->duplicate(['filter' => 'foo']);
 
@@ -67,7 +70,7 @@ class TransformFilteringParametersListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequest(): void
@@ -83,6 +86,6 @@ class TransformFilteringParametersListenerTest extends TestCase
         $expectedRequest = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']], [], ['_api_filters' => ['foo' => 'bar', 'baz' => 'qux']]);
         $expectedRequest->setRequestFormat('jsonapi');
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 }

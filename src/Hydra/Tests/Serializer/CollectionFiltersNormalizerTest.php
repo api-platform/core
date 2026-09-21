@@ -91,7 +91,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             $normalizedNotAResourceA,
             $normalizedNotAResourceB,
         ], $actual);
@@ -144,7 +144,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             'api_sub_level' => true,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             $normalizedFooOne,
             $normalizedFooThree,
         ], $actual);
@@ -186,7 +186,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             'api_sub_level' => true,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             $normalizedNotAResourceA,
             $normalizedNotAResourceB,
         ], $actual);
@@ -221,7 +221,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(ContainerInterface::class)->reveal()
         );
 
-        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+        $this->assertSame(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
             'operation_name' => 'get',
             'resource_class' => Dummy::class,
         ]));
@@ -259,7 +259,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $filterLocatorProphecy->reveal()
         );
 
-        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+        $this->assertSame(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
             'resource_class' => Dummy::class,
             'operation_name' => 'get',
         ]));
@@ -302,7 +302,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $filterLocatorProphecy->reveal()
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => 'foo',
             'hydra:search' => [
                 '@type' => 'hydra:IriTemplate',
@@ -361,7 +361,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $filterLocatorProphecy->reveal(),
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => 'foo',
             'hydra:search' => [
                 '@type' => 'hydra:IriTemplate',
@@ -415,7 +415,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $filterLocatorProphecy->reveal(),
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => 'foo',
         ], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foo?bar=baz',

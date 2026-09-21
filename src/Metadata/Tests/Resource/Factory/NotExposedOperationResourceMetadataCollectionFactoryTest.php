@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\Metadata\Get as CustomGet;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -34,6 +35,8 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     public function testItIgnoresClassesWithoutResources(): void
@@ -47,10 +50,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $factory = new NotExposedOperationResourceMetadataCollectionFactory($linkFactoryProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, []),
-            $factory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [])), self::toComparableArray($factory->create(AttributeResource::class)));
     }
 
     public function testItIgnoresResourcesWithAnItemOperation(): void
@@ -79,25 +79,22 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $factory = new NotExposedOperationResourceMetadataCollectionFactory($linkFactoryProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [],
-                    class: AttributeResource::class
-                ),
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [
-                        '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new Get(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                    ],
-                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
-                    class: AttributeResource::class
-                ),
-            ]),
-            $factory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [],
+                class: AttributeResource::class
+            ),
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [
+                    '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                    '_api_AttributeResource_get' => new Get(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                ],
+                uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
+                class: AttributeResource::class
+            ),
+        ])), self::toComparableArray($factory->create(AttributeResource::class)));
     }
 
     public function testItIgnoresResourcesWithAnItemOperationUsingCustomClass(): void
@@ -126,25 +123,22 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $factory = new NotExposedOperationResourceMetadataCollectionFactory($linkFactoryProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [],
-                    class: AttributeResource::class
-                ),
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [
-                        '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new CustomGet(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                    ],
-                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
-                    class: AttributeResource::class
-                ),
-            ]),
-            $factory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [],
+                class: AttributeResource::class
+            ),
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [
+                    '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                    '_api_AttributeResource_get' => new CustomGet(uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])], controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                ],
+                uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
+                class: AttributeResource::class
+            ),
+        ])), self::toComparableArray($factory->create(AttributeResource::class)));
     }
 
     public function testItAddsANotExposedOperationWithoutRouteNameOnTheLastResource(): void
@@ -171,24 +165,21 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $factory = new NotExposedOperationResourceMetadataCollectionFactory($linkFactoryProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [],
-                    class: AttributeResource::class
-                ),
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [
-                        '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new NotExposed(controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false, extraProperties: ['generated_operation' => true]),
-                    ],
-                    class: AttributeResource::class
-                ),
-            ]),
-            $factory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [],
+                class: AttributeResource::class
+            ),
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [
+                    '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                    '_api_AttributeResource_get' => new NotExposed(controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false, extraProperties: ['generated_operation' => true]),
+                ],
+                class: AttributeResource::class
+            ),
+        ])), self::toComparableArray($factory->create(AttributeResource::class)));
     }
 
     public function testItAddsANotExposedOperationWithRouteNameOnTheLastResource(): void
@@ -218,26 +209,23 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $factory = new NotExposedOperationResourceMetadataCollectionFactory($linkFactoryProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    operations: [],
-                    class: AttributeResource::class
-                ),
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    uriTemplate: '/custom_api_resources',
-                    uriVariables: ['slug'],
-                    types: ['https://schema.org/Book'],
-                    operations: [
-                        '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new NotExposed(uriTemplate: '/.well-known/genid/{id}', uriVariables: [], controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false, extraProperties: ['generated_operation' => true], types: ['https://schema.org/Book']),
-                    ],
-                    class: AttributeResource::class
-                ),
-            ]),
-            $factory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                operations: [],
+                class: AttributeResource::class
+            ),
+            new ApiResource(
+                shortName: 'AttributeResource',
+                uriTemplate: '/custom_api_resources',
+                uriVariables: ['slug'],
+                types: ['https://schema.org/Book'],
+                operations: [
+                    '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
+                    '_api_AttributeResource_get' => new NotExposed(uriTemplate: '/.well-known/genid/{id}', uriVariables: [], controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false, extraProperties: ['generated_operation' => true], types: ['https://schema.org/Book']),
+                ],
+                class: AttributeResource::class
+            ),
+        ])), self::toComparableArray($factory->create(AttributeResource::class)));
     }
 }

@@ -51,6 +51,6 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
 
     public function testCreate(): void
     {
-        self::assertEquals(['uniqueItems' => true], $this->propertySchemaUniqueRestriction->create(new Unique(), new ApiProperty()));
+        self::assertSame(['uniqueItems' => true], $this->propertySchemaUniqueRestriction->create(new Unique(), new ApiProperty()));
     }
 }

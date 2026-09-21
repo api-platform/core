@@ -99,7 +99,7 @@ class ExactFilterTest extends TestCase
         // Nested property adds $lookup + $unwind stages
         $this->assertCount(2, $pipeline);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$lookup' => [
                 'from' => 'RelatedDummy',
                 'localField' => 'relatedDummy',
@@ -160,7 +160,7 @@ class ExactFilterTest extends TestCase
         // 2 lookup+unwind pairs = 4 stages
         $this->assertCount(4, $pipeline);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$lookup' => [
                 'from' => 'RelatedDummy',
                 'localField' => 'relatedDummy',
@@ -171,7 +171,7 @@ class ExactFilterTest extends TestCase
 
         $this->assertArrayHasKey('$unwind', $pipeline[1]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$lookup' => [
                 'from' => 'ThirdLevel',
                 'localField' => 'relatedDummy_lkup.thirdLevel',

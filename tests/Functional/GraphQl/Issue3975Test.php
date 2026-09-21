@@ -45,7 +45,7 @@ GRAPHQL,
         $this->assertResponseIsSuccessful();
         $json = $response->toArray(false);
         $this->assertArrayNotHasKey('errors', $json);
-        $this->assertEquals('test', $json['data']['getActionSimulation']['simulation']);
+        $this->assertSame('test', $json['data']['getActionSimulation']['simulation']);
     }
 
     public function testGraphQlOnlyQueryWithId(): void
@@ -65,6 +65,6 @@ GRAPHQL,
         $json = $response->toArray(false);
         $this->assertArrayNotHasKey('errors', $json);
         $this->assertNotNull($json['data']['getActionSimulation']['id']);
-        $this->assertEquals('test', $json['data']['getActionSimulation']['simulation']);
+        $this->assertSame('test', $json['data']['getActionSimulation']['simulation']);
     }
 }

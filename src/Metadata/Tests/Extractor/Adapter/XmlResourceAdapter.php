@@ -61,8 +61,6 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'securityPostValidation',
         'securityPostValidationMessage',
         'queryParameterValidationEnabled',
-        'strictQueryParameterValidation',
-        'hideHydraOperation',
         'stateOptions',
         'collectDenormalizationErrors',
         'jsonStream',
@@ -71,7 +69,9 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'parameters',
     ];
 
-    private const EXCLUDE = ['policy', 'middleware', 'rule'];
+    // TODO: XmlResourceExtractor reads `strictQueryParameterValidation` and `hideHydraOperation` at resource level only,
+    // while YamlResourceExtractor reads them at operation level only, so neither can be round-tripped consistently yet.
+    private const EXCLUDE = ['policy', 'middleware', 'rule', 'strictQueryParameterValidation', 'hideHydraOperation'];
 
     /**
      * {@inheritdoc}

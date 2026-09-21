@@ -35,7 +35,7 @@ final class PropertyMetadataLoaderTest extends TestCase
         $attributesMetadata = $this->loadAttributesMetadata(['relation'], HasRelation::class);
 
         $this->assertArrayHasKey('relation', $attributesMetadata);
-        $this->assertEquals(['read'], $attributesMetadata['relation']->getGroups());
+        $this->assertSame(['read'], $attributesMetadata['relation']->getGroups());
     }
 
     public function testCreateMappingForAClass(): void
@@ -43,7 +43,7 @@ final class PropertyMetadataLoaderTest extends TestCase
         $attributesMetadata = $this->loadAttributesMetadata(['name'], Relation::class);
 
         $this->assertArrayHasKey('name', $attributesMetadata);
-        $this->assertEquals(['read'], $attributesMetadata['name']->getGroups());
+        $this->assertSame(['read'], $attributesMetadata['name']->getGroups());
     }
 
     public function testForwardsMaxDepth(): void

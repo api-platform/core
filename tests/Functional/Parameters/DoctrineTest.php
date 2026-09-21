@@ -98,13 +98,13 @@ final class DoctrineTest extends ApiTestCase
         $manager->flush();
         $response = self::createClient()->request('GET', 'filter_with_state_options?date[before]='.$d->format('Y-m-d'));
         $a = $response->toArray();
-        $this->assertEquals('/filter_with_state_options{?date[before],date[strictly_before],date[after],date[strictly_after]}', $a['hydra:search']['hydra:template']);
+        $this->assertSame('/filter_with_state_options{?date[before],date[strictly_before],date[after],date[strictly_after]}', $a['hydra:search']['hydra:template']);
         $this->assertCount(1, $a['hydra:member']);
-        $this->assertEquals('current', $a['hydra:member'][0]['name']);
+        $this->assertSame('current', $a['hydra:member'][0]['name']);
         $response = self::createClient()->request('GET', 'filter_with_state_options?date[strictly_after]='.$d->format('Y-m-d'));
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
-        $this->assertEquals('after', $a['hydra:member'][0]['name']);
+        $this->assertSame('after', $a['hydra:member'][0]['name']);
     }
 
     public function testStateOptionsAndNoApiFilter(): void
@@ -154,13 +154,13 @@ final class DoctrineTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/product_with_query_parameters?search[title]=Awesome');
         $this->assertResponseIsSuccessful();
         $this->assertCount(1, $response->toArray()['hydra:member']);
-        $this->assertEquals('Awesome Widget', $response->toArray()['hydra:member'][0]['title']);
+        $this->assertSame('Awesome Widget', $response->toArray()['hydra:member'][0]['title']);
 
         // Test search[:property] with 'description'
         $response = self::createClient()->request('GET', '/product_with_query_parameters?search[description]=super');
         $this->assertResponseIsSuccessful();
         $this->assertCount(1, $response->toArray()['hydra:member']);
-        $this->assertEquals('Super Gadget', $response->toArray()['hydra:member'][0]['title']);
+        $this->assertSame('Super Gadget', $response->toArray()['hydra:member'][0]['title']);
 
         // Test filter[:property] with 'category'
         $response = self::createClient()->request('GET', '/product_with_query_parameters?filter[category]=Electronics');
@@ -171,16 +171,16 @@ final class DoctrineTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/product_with_query_parameters?filter[brand]=BrandY');
         $this->assertResponseIsSuccessful();
         $this->assertCount(1, $response->toArray()['hydra:member']);
-        $this->assertEquals('Super Gadget', $response->toArray()['hydra:member'][0]['title']);
+        $this->assertSame('Super Gadget', $response->toArray()['hydra:member'][0]['title']);
 
         // Test order[:property] with 'rating'
         $response = self::createClient()->request('GET', '/product_with_query_parameters?order[rating]=desc');
         $this->assertResponseIsSuccessful();
         $members = $response->toArray()['hydra:member'];
         $this->assertCount(3, $members);
-        $this->assertEquals('Awesome Widget', $members[0]['title']);
-        $this->assertEquals('Super Gadget', $members[1]['title']);
-        $this->assertEquals('Mega Device', $members[2]['title']);
+        $this->assertSame('Awesome Widget', $members[0]['title']);
+        $this->assertSame('Super Gadget', $members[1]['title']);
+        $this->assertSame('Mega Device', $members[2]['title']);
     }
 
     private function loadProductFixtures(string $resourceClass): void

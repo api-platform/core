@@ -126,7 +126,7 @@ class CollectionProviderTest extends TestCase
         $extensionProphecy->getResult($aggregationBuilder, ProviderDocument::class, $operation, [])->willReturn([])->shouldBeCalled();
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals([], $dataProvider->provide($operation, []));
+        $this->assertSame([], $dataProvider->provide($operation, []));
     }
 
     public function testCannotCreateAggregationBuilder(): void
@@ -143,7 +143,7 @@ class CollectionProviderTest extends TestCase
 
         $dataProvider = new CollectionProvider($this->resourceMetadataFactoryProphecy->reveal(), $this->managerRegistryProphecy->reveal());
         $operation = (new GetCollection())->withName('foo')->withClass(ProviderDocument::class);
-        $this->assertEquals([], $dataProvider->provide($operation, []));
+        $this->assertSame([], $dataProvider->provide($operation, []));
     }
 
     public function testOperationNotFound(): void

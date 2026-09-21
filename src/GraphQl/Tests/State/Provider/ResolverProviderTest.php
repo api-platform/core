@@ -36,7 +36,7 @@ class ResolverProviderTest extends TestCase
         $resolverLocator = $this->createMock(ContainerInterface::class);
         $resolverLocator->expects($this->once())->method('get')->with('foo')->willReturn($resolverMock);
         $provider = new ResolverProvider($decorated, $resolverLocator);
-        $this->assertEquals($res, $provider->provide($operation, [], $context));
+        $this->assertSame($res, $provider->provide($operation, [], $context));
     }
 
     public function testProvideInheritedClass(): void
@@ -50,6 +50,6 @@ class ResolverProviderTest extends TestCase
         $resolverLocator = $this->createMock(ContainerInterface::class);
         $resolverLocator->expects($this->once())->method('get')->with('foo')->willReturn($resolverMock);
         $provider = new ResolverProvider($decorated, $resolverLocator);
-        $this->assertEquals($res, $provider->provide($operation, [], $context));
+        $this->assertSame($res, $provider->provide($operation, [], $context));
     }
 }

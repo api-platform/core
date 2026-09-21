@@ -33,7 +33,7 @@ class CallableProviderTest extends TestCase
     public function testCallable(): void
     {
         $operation = new Get(name: 'hello', provider: static fn () => ['ok']);
-        $this->assertEquals((new CallableProvider())->provide($operation), ['ok']);
+        $this->assertSame((new CallableProvider())->provide($operation), ['ok']);
     }
 
     public function testCallableServiceLocator(): void
@@ -44,6 +44,6 @@ class CallableProviderTest extends TestCase
         $container = $this->createStub(ContainerInterface::class);
         $container->method('has')->willReturnMap([['provider', true]]);
         $container->method('get')->willReturnMap([['provider', $provider]]);
-        $this->assertEquals((new CallableProvider($container))->provide($operation), ['ok']);
+        $this->assertSame((new CallableProvider($container))->provide($operation), ['ok']);
     }
 }

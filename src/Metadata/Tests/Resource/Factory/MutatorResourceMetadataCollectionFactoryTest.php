@@ -75,7 +75,7 @@ final class MutatorResourceMetadataCollectionFactoryTest extends TestCase
 
         $resource = $resourceMetadataCollection->getIterator()->current();
         $this->assertInstanceOf(ApiResource::class, $resource);
-        $this->assertEquals('custom_dummy', $resourceMetadataCollection->getOperation('_api_Dummy_get')->getShortName());
+        $this->assertSame('custom_dummy', $resourceMetadataCollection->getOperation('_api_Dummy_get')->getShortName());
     }
 }
 

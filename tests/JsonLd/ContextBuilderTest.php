@@ -80,7 +80,7 @@ class ContextBuilderTest extends TestCase
             'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
+        $this->assertSame($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
     public function testIriOnlyResourceContext(): void
@@ -104,7 +104,7 @@ class ContextBuilderTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
+        $this->assertSame($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
     public function testResourceContextWithJsonldContext(): void
@@ -130,7 +130,7 @@ class ContextBuilderTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
+        $this->assertSame($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
     public function testGetEntryPointContext(): void
@@ -151,12 +151,12 @@ class ContextBuilderTest extends TestCase
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'dummyEntity' => [
-                '@type' => '@id',
                 '@id' => 'Entrypoint/dummyEntity',
+                '@type' => '@id',
             ],
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getEntrypointContext());
+        $this->assertSame($expected, $contextBuilder->getEntrypointContext());
     }
 
     public function testResourceContextWithReverse(): void
@@ -176,12 +176,12 @@ class ContextBuilderTest extends TestCase
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'dummyPropertyA' => [
-                '@id' => 'DummyEntity/dummyPropertyA',
                 '@reverse' => 'parent',
+                '@id' => 'DummyEntity/dummyPropertyA',
             ],
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
+        $this->assertSame($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
     public function testAnonymousResourceContext(): void
@@ -197,7 +197,7 @@ class ContextBuilderTest extends TestCase
         $context = $contextBuilder->getAnonymousResourceContext($dummy);
         $this->assertSame('Dummy', $context['@type']);
         $this->assertStringStartsWith('/.well-known/genid', $context['@id']);
-        $this->assertEquals([
+        $this->assertSame([
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'dummyPropertyA' => 'Dummy/dummyPropertyA',
@@ -219,11 +219,11 @@ class ContextBuilderTest extends TestCase
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',
                 'dummyPropertyA' => 'OutputDto/dummyPropertyA',
             ],
-            '@id' => '/dummies',
             '@type' => 'OutputDto',
+            '@id' => '/dummies',
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy']));
+        $this->assertSame($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy']));
     }
 
     public function testResourceContextWithoutHydraPrefix(): void
@@ -245,6 +245,6 @@ class ContextBuilderTest extends TestCase
             'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
         ];
 
-        $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
+        $this->assertSame($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 }

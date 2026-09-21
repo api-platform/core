@@ -24,6 +24,6 @@ final class BooleanFilterTest extends TestCase
     {
         $f = new BooleanFilter();
         $builder = $this->createStub(Builder::class);
-        $this->assertEquals($builder, $f->apply($builder, ['is_active' => 'true'], new QueryParameter(key: 'isActive', property: 'is_active')));
+        $this->assertSame($builder, $f->apply($builder, ['is_active' => 'true'], new QueryParameter(key: 'isActive', property: 'is_active')));
     }
 }

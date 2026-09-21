@@ -51,7 +51,7 @@ class SortExtensionTest extends TestCase
 
         $sortExtension = new SortExtension($this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
-        self::assertEquals(['sort' => [['name' => ['order' => 'asc']], ['bar' => ['order' => 'desc']]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['name', 'bar' => 'desc'])));
+        self::assertSame(['sort' => [['name' => ['order' => 'asc']], ['bar' => ['order' => 'desc']]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['name', 'bar' => 'desc'])));
     }
 
     #[IgnoreDeprecations]
@@ -71,7 +71,7 @@ class SortExtensionTest extends TestCase
 
         $sortExtension = new SortExtension($propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
-        self::assertEquals(['sort' => [['foo.bar' => ['order' => 'desc', 'nested' => ['path' => 'foo']]]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['foo.bar' => 'desc'])));
+        self::assertSame(['sort' => [['foo.bar' => ['order' => 'desc', 'nested' => ['path' => 'foo']]]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['foo.bar' => 'desc'])));
     }
 
     public function testApplyToCollectionWithDefaultDirection(): void
@@ -81,7 +81,7 @@ class SortExtensionTest extends TestCase
 
         $sortExtension = new SortExtension($this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
-        self::assertEquals(['sort' => [['id' => ['order' => 'asc']]]], $sortExtension->applyToCollection([], Foo::class));
+        self::assertSame(['sort' => [['id' => ['order' => 'asc']]]], $sortExtension->applyToCollection([], Foo::class));
     }
 
     public function testApplyToCollectionWithNoOrdering(): void

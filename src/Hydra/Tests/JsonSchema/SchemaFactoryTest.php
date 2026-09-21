@@ -96,11 +96,11 @@ class SchemaFactoryTest extends TestCase
 
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['allOf'][1]['properties']));
-        $this->assertEquals($definitions[$rootDefinitionKey]['allOf'][0], ['$ref' => '#/definitions/HydraItemBaseSchema']);
+        $this->assertSame($definitions[$rootDefinitionKey]['allOf'][0], ['$ref' => '#/definitions/HydraItemBaseSchema']);
 
         $properties = $definitions['HydraItemBaseSchema']['properties'];
         $this->assertArrayHasKey('@context', $properties);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'oneOf' => [
                     ['type' => 'string'],
@@ -158,7 +158,7 @@ class SchemaFactoryTest extends TestCase
         }
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, null, true);
-        $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
+        $this->assertSame($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
     }
 
     // gen_id=false output schema must not require `@id` (e.g. an operation whose serializer omits the IRI).

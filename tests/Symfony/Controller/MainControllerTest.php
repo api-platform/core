@@ -59,7 +59,7 @@ class MainControllerTest extends TestCase
             ->method('process')
             ->willReturn($response);
 
-        $this->assertEquals($response, $controller->__invoke($request));
+        $this->assertSame($response, $controller->__invoke($request));
     }
 
     public function testControllerWithNonExistentUriVariables(): void
@@ -99,7 +99,7 @@ class MainControllerTest extends TestCase
             ->method('process')
             ->willReturn($response);
 
-        $this->assertEquals($response, $controller->__invoke($request));
+        $this->assertSame($response, $controller->__invoke($request));
     }
 
     public function testControllerErrorWithUriVariables(): void
@@ -123,7 +123,7 @@ class MainControllerTest extends TestCase
             ->method('process')
             ->willReturn($response);
 
-        $this->assertEquals($response, $controller->__invoke($request));
+        $this->assertSame($response, $controller->__invoke($request));
     }
 
     public function testControllerErrorWithUriVariablesDuringProvider(): void
@@ -154,6 +154,6 @@ class MainControllerTest extends TestCase
             ->method('process')
             ->willReturn($response);
 
-        $this->assertEquals($response, $controller->__invoke($request));
+        $this->assertSame($response, $controller->__invoke($request));
     }
 }

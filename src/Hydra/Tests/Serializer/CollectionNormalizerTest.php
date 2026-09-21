@@ -112,15 +112,15 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 2,
             'hydra:member' => [
                 $normalizedFooOne,
                 $normalizedFooThree,
             ],
-            'hydra:totalItems' => 2,
         ], $actual);
     }
 
@@ -172,10 +172,11 @@ class CollectionNormalizerTest extends TestCase
             CollectionNormalizer::PRESERVE_COLLECTION_KEYS => $preserveKeys,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 2,
             'hydra:member' => $preserveKeys ? [
                 $normalizedFooOne,
                 3 => $normalizedFooThree,
@@ -183,7 +184,6 @@ class CollectionNormalizerTest extends TestCase
                 $normalizedFooOne,
                 $normalizedFooThree,
             ],
-            'hydra:totalItems' => 2,
         ], $actual);
     }
 
@@ -197,18 +197,18 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizePaginator(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '@context' => '/contexts/Foo',
                 '@id' => '/foo/1',
                 '@type' => 'hydra:Collection',
+                'hydra:totalItems' => 1312.,
                 'hydra:member' => [
                     [
                         'name' => 'Kévin',
                         'friend' => 'Smail',
                     ],
                 ],
-                'hydra:totalItems' => 1312.,
             ],
             $this->normalizePaginator()
         );
@@ -216,7 +216,7 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizePartialPaginator(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '@context' => '/contexts/Foo',
                 '@id' => '/foo/1',
@@ -311,15 +311,15 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 2,
             'hydra:member' => [
                 '/foos/1',
                 '/foos/3',
             ],
-            'hydra:totalItems' => 2,
         ], $actual);
     }
 
@@ -364,7 +364,7 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => Foo::class,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '@context' => [
                 '@vocab' => 'http://localhost:8080/docs.jsonld#',
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',
@@ -374,11 +374,11 @@ class CollectionNormalizerTest extends TestCase
             ],
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 2,
             'hydra:member' => [
                 '/foos/1',
                 '/foos/3',
             ],
-            'hydra:totalItems' => 2,
         ], $actual);
     }
 
@@ -434,15 +434,15 @@ class CollectionNormalizerTest extends TestCase
             ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
             '@type' => 'Collection',
+            'totalItems' => 2,
             'member' => [
                 $normalizedFooOne,
                 $normalizedFooThree,
             ],
-            'totalItems' => 2,
         ], $actual);
     }
 }

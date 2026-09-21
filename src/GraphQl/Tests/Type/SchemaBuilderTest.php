@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Test\ComparableObjectTrait;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type as GraphQLType;
@@ -41,6 +42,8 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 class SchemaBuilderTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private ObjectProphecy $resourceNameCollectionFactoryProphecy;
@@ -92,9 +95,9 @@ class SchemaBuilderTest extends TestCase
         }
 
         $schema = $this->schemaBuilder->getSchema();
-        $this->assertEquals($expectedQueryType, $schema->getQueryType());
-        $this->assertEquals($expectedMutationType, $schema->getMutationType());
-        $this->assertEquals($expectedSubscriptionType, $schema->getSubscriptionType());
+        $this->assertSame(self::toComparableArray($expectedQueryType), self::toComparableArray($schema->getQueryType()));
+        $this->assertSame(self::toComparableArray($expectedMutationType), self::toComparableArray($schema->getMutationType()));
+        $this->assertSame(self::toComparableArray($expectedSubscriptionType), self::toComparableArray($schema->getSubscriptionType()));
         $this->assertSame($type, $schema->getType('MyType'));
         $this->assertSame($typeFoo, $schema->getType('Foo'));
     }

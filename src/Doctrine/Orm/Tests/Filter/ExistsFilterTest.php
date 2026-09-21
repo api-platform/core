@@ -32,7 +32,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'exists[id]' => [
                 'property' => 'id',
                 'type' => 'bool',

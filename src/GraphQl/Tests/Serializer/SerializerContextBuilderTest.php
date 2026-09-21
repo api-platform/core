@@ -108,7 +108,7 @@ class SerializerContextBuilderTest extends TestCase
         $context = $serializerContextBuilder->create($resourceClass, $operation, $resolverContext, true);
 
         unset($context['operation']);
-        $this->assertEquals($expectedContext, $context);
+        $this->assertSame($expectedContext, $context);
     }
 
     public static function createNormalizationContextProvider(): iterable
@@ -301,7 +301,7 @@ class SerializerContextBuilderTest extends TestCase
         $context = $this->serializerContextBuilder->create($resourceClass, $operation, [], false);
 
         unset($context['operation']);
-        $this->assertEquals($expectedContext, $context);
+        $this->assertSame($expectedContext, $context);
     }
 
     public static function createDenormalizationContextProvider(): array

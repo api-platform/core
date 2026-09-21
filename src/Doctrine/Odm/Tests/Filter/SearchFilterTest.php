@@ -40,7 +40,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
     {
         $filter = self::buildSearchFilter($this, $this->managerRegistry);
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',

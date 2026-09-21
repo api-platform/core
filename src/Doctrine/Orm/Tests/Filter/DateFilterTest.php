@@ -39,7 +39,7 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
         $filter = new DateFilter($this->managerRegistry, null, ['dummyDate' => null]);
         $filter->apply($queryBuilder, new QueryNameGenerator(), DummyDate::class, null, ['filters' => $filters]);
 
-        $this->assertEquals(new \DateTime('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
+        $this->assertSame(new \DateTime('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
         $this->assertInstanceOf(\DateTime::class, $queryBuilder->getParameters()[0]->getValue());
     }
 
@@ -52,7 +52,7 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
         $filter = new DateFilter($this->managerRegistry, null, ['dummyDate' => null]);
         $filter->apply($queryBuilder, new QueryNameGenerator(), DummyImmutableDate::class, null, ['filters' => $filters]);
 
-        $this->assertEquals(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
+        $this->assertSame(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
         $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
     }
 

@@ -70,7 +70,7 @@ class CollectionProviderTest extends TestCase
         $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
 
         $dataProvider = new CollectionProvider($resourceMetadataCollectionFactory, $managerRegistry, [$extension]);
-        $this->assertEquals([], $dataProvider->provide($operation));
+        $this->assertSame([], $dataProvider->provide($operation));
     }
 
     public function testQueryResultExtension(): void
@@ -115,7 +115,7 @@ class CollectionProviderTest extends TestCase
             [$extensionMock]
         );
 
-        $this->assertEquals([], $dataProvider->provide($operation));
+        $this->assertSame([], $dataProvider->provide($operation));
     }
 
     public function testCannotCreateQueryBuilder(): void
@@ -133,7 +133,7 @@ class CollectionProviderTest extends TestCase
 
         $dataProvider = new CollectionProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistryProphecy->reveal());
         $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
-        $this->assertEquals([], $dataProvider->provide($operation));
+        $this->assertSame([], $dataProvider->provide($operation));
     }
 
     public function testHandleLinksCallable(): void

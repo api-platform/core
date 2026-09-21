@@ -27,6 +27,6 @@ class AddLinkHeaderProcessorTest extends TestCase
         $decorated = $this->createStub(ProcessorInterface::class);
         $decorated->method('process')->willReturn($data);
         $processor = new AddLinkHeaderProcessor($decorated);
-        $this->assertEquals($data, $processor->process($data, $operation));
+        $this->assertSame($data, $processor->process($data, $operation));
     }
 }

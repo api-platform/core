@@ -87,7 +87,7 @@ final class DocumentNormalizerTest extends TestCase
         $expectedFoo->setName('Caroline');
         $expectedFoo->setBar('Chaverot');
 
-        self::assertEquals($expectedFoo, $normalizer->denormalize($document, Foo::class, DocumentNormalizer::FORMAT));
+        self::assertSame((array) $expectedFoo, (array) $normalizer->denormalize($document, Foo::class, DocumentNormalizer::FORMAT));
     }
 
     public function testDenormalizeCoercesIdentifierToDeclaredType(): void

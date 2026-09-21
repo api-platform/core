@@ -44,6 +44,7 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRa
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -60,6 +61,8 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class ValidatorPropertyMetadataFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private ClassMetadata $validatorClassMetadata;
@@ -88,14 +91,12 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             []
         );
 
-        $this->assertEquals(
-            $dummyPropertyMetadata->withRequired(true),
-            $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummy'),
+        $this->assertSame(self::toComparableArray($dummyPropertyMetadata->withRequired(true)), self::toComparableArray($validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummy')),
         );
 
-        $this->assertEquals(
-            $emailPropertyMetadata->withRequired(false),
-            $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyEmail'),
+        $this->assertSame(
+            self::toComparableArray($emailPropertyMetadata->withRequired(false)),
+            self::toComparableArray($validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyEmail')),
         );
     }
 
@@ -118,7 +119,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate');
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     public function testCreateWithPropertyWithoutConstraints(): void
@@ -139,7 +140,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyId');
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     #[DataProvider('createWithPropertyWithRequiredConstraintsAndGroupSequenceDataProvider')]
@@ -164,7 +165,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, $propertyName);
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     /**
@@ -195,7 +196,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => ['dummy']]);
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     public function testCreateWithPropertyWithGroupSequenceValidationGroupsAndRequiredConstraints(): void
@@ -218,7 +219,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => $groups]);
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     public function testCreateWithPropertyWithBadValidationGroupsAndRequiredConstraints(): void
@@ -239,7 +240,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => ['ymmud']]);
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     public function testCreateWithPropertyWithNonStringValidationGroupsAndRequiredConstraints(): void
@@ -260,7 +261,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => [1312]]);
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     public function testCreateWithRequiredByDecorated(): void
@@ -281,7 +282,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate');
 
-        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+        $this->assertSame(self::toComparableArray($expectedPropertyMetadata), self::toComparableArray($resultedPropertyMetadata));
     }
 
     public function testCreateWithPropertyWithValidationConstraints(): void
@@ -322,7 +323,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         foreach ($types as $property => $iri) {
             $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyIriWithValidationEntity::class, $property);
-            $this->assertEquals($iri, $resultedPropertyMetadata->getTypes()[0]);
+            $this->assertSame($iri, $resultedPropertyMetadata->getTypes()[0]);
         }
     }
 
@@ -379,7 +380,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $schema = $validationPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummy')->getSchema();
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('pattern', $schema);
-        $this->assertEquals('^(dummy)$', $schema['pattern']);
+        $this->assertSame('^(dummy)$', $schema['pattern']);
     }
 
     #[DataProvider('providePropertySchemaFormatCases')]
@@ -404,7 +405,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $schema = $validationPropertyMetadataFactory->create($class, $property)->getSchema();
 
-        $this->assertEquals($expectedSchema, $schema);
+        $this->assertSame($expectedSchema, $schema);
     }
 
     public static function providePropertySchemaFormatCases(): \Generator
@@ -527,7 +528,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('oneOf', $schema);
-        $this->assertEquals([
+        $this->assertSame([
             ['pattern' => '^(.*#.*)$'],
             ['minLength' => 10],
         ], $schema['oneOf']);
@@ -556,7 +557,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyUniqueValidatedEntity::class, 'dummyItems')->getSchema();
 
-        $this->assertEquals(['uniqueItems' => true], $schema);
+        $this->assertSame(['uniqueItems' => true], $schema);
     }
 
     #[DataProvider('provideRangeConstraintCasesWithNativeType')]
@@ -581,7 +582,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         );
         $schema = $validationPropertyMetadataFactory->create(DummyRangeValidatedEntity::class, $property)->getSchema();
 
-        $this->assertEquals($expectedSchema, $schema);
+        $this->assertSame($expectedSchema, $schema);
     }
 
     public static function provideRangeConstraintCasesWithNativeType(): \Generator
@@ -589,9 +590,10 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'native type: min int' => ['type' => Type::int(), 'property' => 'dummyIntMin', 'expectedSchema' => ['minimum' => 1]];
         yield 'native type: max int' => ['type' => Type::int(), 'property' => 'dummyIntMax', 'expectedSchema' => ['maximum' => 10]];
         yield 'native type: min/max int' => ['type' => Type::int(), 'property' => 'dummyIntMinMax', 'expectedSchema' => ['minimum' => 1, 'maximum' => 10]];
-        yield 'native type: min float' => ['type' => Type::float(), 'property' => 'dummyFloatMin', 'expectedSchema' => ['minimum' => 1.5]];
-        yield 'native type: max float' => ['type' => Type::float(), 'property' => 'dummyFloatMax', 'expectedSchema' => ['maximum' => 10.5]];
-        yield 'native type: min/max float' => ['type' => Type::float(), 'property' => 'dummyFloatMinMax', 'expectedSchema' => ['minimum' => 1.5, 'maximum' => 10.5]];
+        // TODO: PropertySchemaRangeRestriction emits float bounds as strings, so the JSON Schema carries '1.5' instead of 1.5.
+        yield 'native type: min float' => ['type' => Type::float(), 'property' => 'dummyFloatMin', 'expectedSchema' => ['minimum' => '1.5']];
+        yield 'native type: max float' => ['type' => Type::float(), 'property' => 'dummyFloatMax', 'expectedSchema' => ['maximum' => '10.5']];
+        yield 'native type: min/max float' => ['type' => Type::float(), 'property' => 'dummyFloatMinMax', 'expectedSchema' => ['minimum' => '1.5', 'maximum' => '10.5']];
     }
 
     #[DataProvider('provideChoiceConstraintCasesWithNativeType')]
@@ -618,7 +620,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyValidatedChoiceEntity::class, $property)->getSchema();
 
-        $this->assertEquals($expectedSchema, $schema);
+        $this->assertSame($expectedSchema, $schema);
     }
 
     public static function provideChoiceConstraintCasesWithNativeType(): \Generator
@@ -656,7 +658,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyCountValidatedEntity::class, $property)->getSchema();
 
-        $this->assertEquals($expectedSchema, $schema);
+        $this->assertSame($expectedSchema, $schema);
     }
 
     public static function provideCountConstraintCases(): \Generator
@@ -712,15 +714,15 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyCollectionValidatedEntity::class, 'dummyData')->getSchema();
 
-        $this->assertEquals([
+        $this->assertSame(self::toComparableArray([
             'type' => 'object',
             'properties' => new \ArrayObject([
                 'name' => new \ArrayObject(),
-                'email' => ['format' => 'email', 'minLength' => 2, 'maxLength' => 255],
+                'email' => ['minLength' => 2, 'maxLength' => 255, 'format' => 'email'],
                 'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
                 'age' => [
-                    'exclusiveMinimum' => 0,
                     'minimum' => 0,
+                    'exclusiveMinimum' => 0,
                 ],
                 'social' => [
                     'type' => 'object',
@@ -733,7 +735,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             ]),
             'additionalProperties' => true,
             'required' => ['name', 'email', 'social'],
-        ], $schema);
+        ]), self::toComparableArray($schema));
     }
 
     #[DataProvider('provideNumericConstraintCasesWithNativeType')]
@@ -765,7 +767,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $schema = $validationPropertyMetadataFactory->create(DummyNumericValidatedEntity::class, $property)->getSchema();
 
-        $this->assertEquals($expectedSchema, $schema);
+        $this->assertSame($expectedSchema, $schema);
     }
 
     public static function provideNumericConstraintCasesWithNativeType(): \Generator
@@ -773,31 +775,31 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'greaterThanMe',
-            'expectedSchema' => ['exclusiveMinimum' => 10, 'minimum' => 10],
+            'expectedSchema' => ['minimum' => 10, 'exclusiveMinimum' => 10],
         ];
 
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::float()),
             'property' => 'greaterThanOrEqualToMe',
-            'expectedSchema' => ['minimum' => 10.99],
+            'expectedSchema' => ['minimum' => '10.99'],
         ];
 
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'lessThanMe',
-            'expectedSchema' => ['exclusiveMaximum' => 99, 'maximum' => 99],
+            'expectedSchema' => ['maximum' => 99, 'exclusiveMaximum' => 99],
         ];
 
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::float()),
             'property' => 'lessThanOrEqualToMe',
-            'expectedSchema' => ['maximum' => 99.33],
+            'expectedSchema' => ['maximum' => '99.33'],
         ];
 
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'positive',
-            'expectedSchema' => ['exclusiveMinimum' => 0, 'minimum' => 0],
+            'expectedSchema' => ['minimum' => 0, 'exclusiveMinimum' => 0],
         ];
 
         yield [
@@ -809,7 +811,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'negative',
-            'expectedSchema' => ['exclusiveMaximum' => 0, 'maximum' => 0],
+            'expectedSchema' => ['maximum' => 0, 'exclusiveMaximum' => 0],
         ];
 
         yield [

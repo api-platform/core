@@ -57,7 +57,7 @@ final class UriVariableParameterProviderTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/base64_uri_variable_dummies/encoded/'.base64_encode('Blip'));
         self::assertResponseStatusCodeSame(200);
-        self::assertEquals('Blip', $response->toArray()['name']);
+        self::assertSame('Blip', $response->toArray()['name']);
     }
 
     public function testReadLinkParameterProviderWritesResolvedResourceWhenOptedIn(): void
@@ -70,6 +70,6 @@ final class UriVariableParameterProviderTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/write_uri_variable_link_resources/'.$dummy->getId());
         self::assertResponseStatusCodeSame(200);
-        self::assertEquals('hi', $response->toArray()['dummyName']);
+        self::assertSame('hi', $response->toArray()['dummyName']);
     }
 }

@@ -175,7 +175,7 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['id' => 1], $context));
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testCannotCreateAggregationBuilder(): void

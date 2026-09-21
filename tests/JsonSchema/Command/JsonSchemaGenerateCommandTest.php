@@ -141,7 +141,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['SaveProduct']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode');
+        $this->assertSame($json['definitions']['SaveProduct']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode');
     }
 
     /**
@@ -153,8 +153,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['allOf'][1]['properties']['itemDto']['$ref']);
-        $this->assertEquals('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['allOf'][1]['properties']['collectionDto']['items']['$ref']);
+        $this->assertSame('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['allOf'][1]['properties']['itemDto']['$ref']);
+        $this->assertSame('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['allOf'][1]['properties']['collectionDto']['items']['$ref']);
     }
 
     /**
@@ -203,8 +203,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $ressourceDefinitions = $definitions['TestApiDocHashmapArrayObjectIssue.jsonld']['allOf'][1];
 
-        $this->assertEquals('object', $ressourceDefinitions['type']);
-        $this->assertEquals($expectedProperties, $ressourceDefinitions['properties'][$propertyName]);
+        $this->assertSame('object', $ressourceDefinitions['type']);
+        $this->assertSame($expectedProperties, $ressourceDefinitions['properties'][$propertyName]);
     }
 
     public static function arrayPropertyTypeSyntaxProvider(): \Generator

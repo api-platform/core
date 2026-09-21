@@ -19,6 +19,7 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFo
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -40,6 +41,8 @@ use Symfony\Component\Validator\Constraints\Type;
  */
 final class PropertySchemaCollectionRestrictionTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private PropertySchemaCollectionRestriction $propertySchemaCollectionRestriction;
@@ -71,7 +74,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
     #[DataProvider('createProvider')]
     public function testCreate(Collection $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
-        self::assertEquals($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
+        self::assertSame(self::toComparableArray($expectedResult), self::toComparableArray($this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata)));
     }
 
     public static function createProvider(): \Generator
@@ -105,7 +108,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             'name' => new \ArrayObject(),
             'email' => ['minLength' => 2, 'maxLength' => 255, 'format' => 'email'],
             'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
-            'age' => ['exclusiveMinimum' => 0, 'minimum' => 0],
+            'age' => ['minimum' => 0, 'exclusiveMinimum' => 0],
             'social' => ['type' => 'object', 'properties' => new \ArrayObject(['githubUsername' => new \ArrayObject()]), 'additionalProperties' => false, 'required' => ['githubUsername']],
         ]);
         $required = ['name', 'email', 'social'];

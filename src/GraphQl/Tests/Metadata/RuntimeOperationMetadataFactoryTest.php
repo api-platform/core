@@ -49,7 +49,7 @@ class RuntimeOperationMetadataFactoryTest extends TestCase
             ]);
 
         $factory = new RuntimeOperationMetadataFactory($resourceMetadataCollectionFactory, $router);
-        $this->assertEquals($operation, $factory->create('/dummies/1'));
+        $this->assertSame($operation, $factory->create('/dummies/1'));
     }
 
     public function testCreateThrowsExceptionWhenRouteNotFound(): void

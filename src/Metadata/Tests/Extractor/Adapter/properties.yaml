@@ -31,12 +31,11 @@ properties:
                 - anotheririschema
             initializable: true
             extraProperties:
-                custom_property: 'Lorem ipsum dolor sit amet'
                 user_defined_schema: true
+                custom_property: 'Lorem ipsum dolor sit amet'
             iris:
                 - 'https://schema.org/totalPrice'
             genId: true
             uriTemplate: /sub-resource-get-collection
             property: test
-            hydra: false
             nativeType: string

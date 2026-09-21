@@ -22,7 +22,7 @@ trait ExistsFilterTestTrait
     {
         $filter = $this->buildFilter(['name' => null, 'description' => null]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'exists[description]' => [
                 'property' => 'description',
                 'type' => 'bool',

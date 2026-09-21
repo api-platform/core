@@ -61,7 +61,7 @@ class OrderFilterTest extends TestCase
             ['name' => 'asc']
         );
 
-        self::assertEquals(
+        self::assertSame(
             [['name' => ['order' => 'asc']]],
             $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => null]]])
         );
@@ -92,7 +92,7 @@ class OrderFilterTest extends TestCase
             ['foo.bar' => null]
         );
 
-        self::assertEquals(
+        self::assertSame(
             [['foo.bar' => ['order' => 'asc', 'nested' => ['path' => 'foo']]]],
             $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['foo.bar' => 'asc']]])
         );
@@ -108,7 +108,7 @@ class OrderFilterTest extends TestCase
             'order'
         );
 
-        self::assertEquals([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => 'error']]));
+        self::assertSame([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => 'error']]));
     }
 
     public function testApplyWithInvalidTypeAndInvalidDirection(): void
@@ -128,7 +128,7 @@ class OrderFilterTest extends TestCase
             'order'
         );
 
-        self::assertEquals(
+        self::assertSame(
             [],
             $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => 'error', 'bar' => 'asc']]])
         );
@@ -149,6 +149,6 @@ class OrderFilterTest extends TestCase
             ['name' => 'asc', 'bar' => null]
         );
 
-        self::assertEquals(['order[name]' => ['property' => 'name', 'type' => 'string', 'required' => false]], $orderFilter->getDescription(Foo::class));
+        self::assertSame(['order[name]' => ['property' => 'name', 'type' => 'string', 'required' => false]], $orderFilter->getDescription(Foo::class));
     }
 }

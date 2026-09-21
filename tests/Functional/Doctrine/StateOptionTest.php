@@ -89,6 +89,6 @@ final class StateOptionTest extends ApiTestCase
         $this->assertCount(1, $manager->getRepository(Issue7689Product::class)->findAll());
         $product = $manager->getRepository(Issue7689Product::class)->findOneBy(['name' => 'product']);
         $this->assertNotNull($product->category);
-        $this->assertEquals(1, $product->category->getId());
+        $this->assertSame(1, $product->category->getId());
     }
 }

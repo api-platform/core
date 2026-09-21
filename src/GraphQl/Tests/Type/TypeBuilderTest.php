@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\Test\ComparableObjectTrait;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -48,6 +49,8 @@ use Psr\Container\ContainerInterface;
  */
 class TypeBuilderTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private ObjectProphecy $typesContainerProphecy;
@@ -285,7 +288,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertEquals([], $resourceObjectType->config['interfaces']);
+        $this->assertSame([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (not using wrapped type)
@@ -316,7 +319,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertEquals([], $resourceObjectType->config['interfaces']);
+        $this->assertSame([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (using wrapped type)
@@ -384,7 +387,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertEquals([], $resourceObjectType->config['interfaces']);
+        $this->assertSame([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (not using wrapped type)
@@ -417,7 +420,7 @@ class TypeBuilderTest extends TestCase
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
-        $this->assertEquals([], $resourceObjectType->config['interfaces']);
+        $this->assertSame([], $resourceObjectType->config['interfaces']);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (using wrapped type)
@@ -599,10 +602,10 @@ class TypeBuilderTest extends TestCase
         $fieldsBuilderProphecy->getEnumFields($enumClass)->willReturn($enumValues);
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->willReturn($fieldsBuilderProphecy->reveal());
 
-        self::assertEquals(new EnumType([
+        self::assertSame(self::toComparableArray(new EnumType([
             'name' => 'GamePlayMode',
-            'description' => $enumDescription,
             'values' => $enumValues,
-        ]), $this->typeBuilder->getEnumType($operation));
+            'description' => $enumDescription,
+        ])), self::toComparableArray($this->typeBuilder->getEnumType($operation)));
     }
 }

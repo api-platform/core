@@ -57,8 +57,8 @@ final class IriProviderParameterTest extends ApiTestCase
 
         $iri = $container->get('api_platform.iri_converter')->getIriFromResource($dummy);
         $response = self::createClient()->request('GET', '/with_parameters_iris?dummy='.$iri);
-        $this->assertEquals('hi', $response->toArray()['name']);
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame('hi', $response->toArray()['name']);
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testReadDummyIrisFromQueryParameter(): void
@@ -81,8 +81,8 @@ final class IriProviderParameterTest extends ApiTestCase
         $iri = $container->get('api_platform.iri_converter')->getIriFromResource($dummy);
         $response = self::createClient()->request('GET', \sprintf('/with_parameters_iris?dummy[]=%s&dummy[]=%s', $iri2, $iri));
         $res = $response->toArray();
-        $this->assertEquals('ho', $res['hydra:member'][0]['name']);
-        $this->assertEquals('hi', $res['hydra:member'][1]['name']);
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame('ho', $res['hydra:member'][0]['name']);
+        $this->assertSame('hi', $res['hydra:member'][1]['name']);
+        self::assertSame(200, $response->getStatusCode());
     }
 }

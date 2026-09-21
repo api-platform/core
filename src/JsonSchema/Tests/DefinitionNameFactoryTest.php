@@ -130,22 +130,22 @@ final class DefinitionNameFactoryTest extends TestCase
     {
         $definitionNameFactory = new DefinitionNameFactory();
 
-        self::assertEquals(
+        self::assertSame(
             'DummyClass.jsonapi',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonapi')
         );
 
-        self::assertEquals(
+        self::assertSame(
             'Module.DummyClass.jsonapi',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceB\Module\DummyClass::class, 'jsonapi')
         );
 
-        self::assertEquals(
+        self::assertSame(
             'NamespaceC.Module.DummyClass.jsonapi',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, 'jsonapi')
         );
 
-        self::assertEquals(
+        self::assertSame(
             'DummyClass.jsonhal',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonhal')
         );
@@ -184,17 +184,17 @@ final class DefinitionNameFactoryTest extends TestCase
     {
         $definitionNameFactory = new DefinitionNameFactory();
 
-        self::assertEquals(
+        self::assertSame(
             'DummyClass.jsonapi',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, shortName: 'DummyClass'))
         );
 
-        self::assertEquals(
+        self::assertSame(
             'Module.DummyClass.jsonapi',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceB\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceB\Module\DummyClass::class, shortName: 'DummyClass'))
         );
 
-        self::assertEquals(
+        self::assertSame(
             'NamespaceC.Module.DummyClass.jsonapi',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, shortName: 'DummyClass'))
         );

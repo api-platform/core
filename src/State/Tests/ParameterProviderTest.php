@@ -61,11 +61,11 @@ final class ParameterProviderTest extends TestCase
         $parameterProvider->provide($operation, [], $context);
         $operation = $request->attributes->get('_api_operation');
 
-        $this->assertEquals('ok', $operation->getName());
-        $this->assertEquals(['foo' => 'asc'], $operation->getParameters()->get('order', QueryParameter::class)->getValue());
-        $this->assertEquals(['a' => 'bar'], $operation->getParameters()->get('search[:property]', QueryParameter::class)->getValue());
-        $this->assertEquals('t42', $operation->getParameters()->get('baz', QueryParameter::class)->getValue());
-        $this->assertEquals(new ParameterNotFound(), $operation->getParameters()->get('fas', QueryParameter::class)->getValue());
+        $this->assertSame('ok', $operation->getName());
+        $this->assertSame(['foo' => 'asc'], $operation->getParameters()->get('order', QueryParameter::class)->getValue());
+        $this->assertSame(['a' => 'bar'], $operation->getParameters()->get('search[:property]', QueryParameter::class)->getValue());
+        $this->assertSame('t42', $operation->getParameters()->get('baz', QueryParameter::class)->getValue());
+        $this->assertInstanceOf(ParameterNotFound::class, $operation->getParameters()->get('fas', QueryParameter::class)->getValue());
     }
 
     public static function provide(): void

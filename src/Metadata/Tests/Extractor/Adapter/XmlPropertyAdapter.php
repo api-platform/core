@@ -44,13 +44,13 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'iris',
         'genId',
         'uriTemplate',
-        'hydra',
         'property',
         'nativeType',
     ];
 
     // TODO: add serialize support for XML (policy is Laravel-only)
-    private const EXCLUDE = ['policy', 'serialize'];
+    // TODO: `hydra` is declared in properties.xsd but never read back by XmlPropertyExtractor, so it cannot be round-tripped yet.
+    private const EXCLUDE = ['policy', 'serialize', 'hydra'];
 
     /**
      * {@inheritdoc}

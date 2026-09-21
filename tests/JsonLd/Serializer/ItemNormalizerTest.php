@@ -96,6 +96,6 @@ class ItemNormalizerTest extends TestCase
             '@type' => 'Dummy',
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy));
+        $this->assertSame($expected, $normalizer->normalize($dummy));
     }
 }

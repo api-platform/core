@@ -19,12 +19,15 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class OperationNameResourceMetadataFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     #[DataProvider('operationProvider')]
@@ -38,7 +41,7 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
         $operationNameResourceMetadataFactory = new OperationNameResourceMetadataCollectionFactory($decorated->reveal());
         $result = $operationNameResourceMetadataFactory->create('a');
 
-        $this->assertEquals($operation->withName($expectedOperationName), $result->getOperation($expectedOperationName));
+        $this->assertSame(self::toComparableArray($operation->withName($expectedOperationName)->withPriority(0)), self::toComparableArray($result->getOperation($expectedOperationName)));
     }
 
     public static function operationProvider(): array

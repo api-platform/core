@@ -93,6 +93,6 @@ class PurgerTest extends TestCase
     private function assertTagsWerePurged(array $expectedTags): void
     {
         sort($expectedTags);
-        $this->assertEquals($expectedTags, MockPurger::getPurgedTags());
+        $this->assertSame($expectedTags, MockPurger::getPurgedTags());
     }
 }

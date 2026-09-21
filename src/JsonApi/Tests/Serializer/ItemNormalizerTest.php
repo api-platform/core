@@ -115,8 +115,8 @@ class ItemNormalizerTest extends TestCase
 
         $expected = [
             'data' => [
-                'type' => 'Dummy',
                 'id' => '/dummies/10',
+                'type' => 'Dummy',
                 'attributes' => [
                     '_id' => 10,
                     'name' => 'hello',
@@ -124,7 +124,7 @@ class ItemNormalizerTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
     }
 
     public function testCacheKeyIsFalseWhenAPropertyHasSecurity(): void
@@ -772,7 +772,7 @@ class ItemNormalizerTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
     }
 
     public function testNormalizeRelationWithEntityIdentifier(): void

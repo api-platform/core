@@ -24,6 +24,6 @@ class DateFilterTest extends TestCase
     {
         $f = new DateFilter();
         $builder = $this->createStub(Builder::class);
-        $this->assertEquals($builder, $f->apply($builder, ['neq' => '2020-02-02'], new QueryParameter(key: 'date', property: 'date')));
+        $this->assertSame($builder, $f->apply($builder, ['neq' => '2020-02-02'], new QueryParameter(key: 'date', property: 'date')));
     }
 }

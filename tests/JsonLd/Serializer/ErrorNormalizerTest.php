@@ -26,11 +26,11 @@ final class ErrorNormalizerTest extends TestCase
         $provider->method('normalize')->willReturn(['@type' => 'Error', 'title' => 'foo', 'description' => 'bar']);
         $errorNormalizer = new ErrorNormalizer($provider, ['hydra_prefix' => ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX]);
         $res = $errorNormalizer->normalize(new \stdClass());
-        $this->assertEquals('hydra:Error', $res['@type']);
+        $this->assertSame('hydra:Error', $res['@type']);
         $this->assertArrayHasKey('hydra:description', $res);
-        $this->assertEquals($res['hydra:description'], 'bar');
+        $this->assertSame($res['hydra:description'], 'bar');
         $this->assertArrayHasKey('hydra:title', $res);
-        $this->assertEquals($res['hydra:title'], 'foo');
+        $this->assertSame($res['hydra:title'], 'foo');
         $this->assertArrayNotHasKey('title', $res);
         $this->assertArrayNotHasKey('description', $res);
     }

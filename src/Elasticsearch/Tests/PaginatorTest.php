@@ -153,12 +153,12 @@ class PaginatorTest extends TestCase
         // set local cache
         iterator_to_array($this->paginator);
 
-        self::assertEquals(
+        self::assertSame(
             array_map(
-                fn (array $document): Foo => $this->denormalizeFoo($document['_source']),
+                fn (array $document): array => (array) $this->denormalizeFoo($document['_source']),
                 self::DOCUMENTS['hits']['hits']
             ),
-            iterator_to_array($this->paginator)
+            array_map(static fn (Foo $foo): array => (array) $foo, iterator_to_array($this->paginator))
         );
     }
 

@@ -70,10 +70,10 @@ class GraphQlTest extends TestCase
         $data = $response->json();
         $this->assertArrayHasKey('data', $data);
         $this->assertCount(3, $data['data']['simplePaginationBooks']['collection']);
-        $this->assertEquals(3, $data['data']['simplePaginationBooks']['paginationInfo']['itemsPerPage']);
-        $this->assertEquals(1, $data['data']['simplePaginationBooks']['paginationInfo']['currentPage']);
-        $this->assertEquals(3, $data['data']['simplePaginationBooks']['paginationInfo']['lastPage']);
-        $this->assertEquals(9, $data['data']['simplePaginationBooks']['paginationInfo']['totalCount']);
+        $this->assertSame(3, $data['data']['simplePaginationBooks']['paginationInfo']['itemsPerPage']);
+        $this->assertSame(1, $data['data']['simplePaginationBooks']['paginationInfo']['currentPage']);
+        $this->assertSame(3, $data['data']['simplePaginationBooks']['paginationInfo']['lastPage']);
+        $this->assertSame(9, $data['data']['simplePaginationBooks']['paginationInfo']['totalCount']);
         $this->assertTrue($data['data']['simplePaginationBooks']['paginationInfo']['hasNextPage']);
         $this->assertArrayNotHasKey('errors', $data);
     }
@@ -108,9 +108,9 @@ class GraphQlTest extends TestCase
         $data = $response->json();
         $this->assertArrayHasKey('data', $data);
         $this->assertCount(3, $data['data']['books']['edges']);
-        $this->assertEquals('q', $data['data']['books']['edges'][0]['node']['name']);
-        $this->assertEquals('r', $data['data']['books']['edges'][1]['node']['name']);
-        $this->assertEquals('s', $data['data']['books']['edges'][2]['node']['name']);
+        $this->assertSame('q', $data['data']['books']['edges'][0]['node']['name']);
+        $this->assertSame('r', $data['data']['books']['edges'][1]['node']['name']);
+        $this->assertSame('s', $data['data']['books']['edges'][2]['node']['name']);
         $this->assertArrayNotHasKey('errors', $data);
     }
 

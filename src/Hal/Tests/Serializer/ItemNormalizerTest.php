@@ -167,7 +167,7 @@ class ItemNormalizerTest extends TestCase
             ],
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy));
+        $this->assertSame($expected, $normalizer->normalize($dummy));
     }
 
     public function testCacheKeyIsFalseWhenAPropertyHasSecurity(): void
@@ -272,7 +272,7 @@ class ItemNormalizerTest extends TestCase
             'author' => null,
             'library' => null,
         ];
-        $this->assertEquals($expected, $normalizer->normalize($book));
+        $this->assertSame($expected, $normalizer->normalize($book));
     }
 
     public function testNormalizeWithoutCache(): void
@@ -335,7 +335,7 @@ class ItemNormalizerTest extends TestCase
             ],
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['not_serializable' => static function (): void {}]));
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, ['not_serializable' => static function (): void {}]));
     }
 
     public function testMaxDepth(): void
@@ -425,20 +425,20 @@ class ItemNormalizerTest extends TestCase
                                     'href' => '/max_depth_dummies/3',
                                 ],
                             ],
-                            'id' => 3,
+                            'id' => '3',
                             'name' => 'level 3',
                         ],
                     ],
-                    'id' => 2,
+                    'id' => '2',
                     'name' => 'level 2',
                 ],
             ],
-            'id' => 1,
+            'id' => '1',
             'name' => 'level 1',
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT));
-        $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => false]));
+        $this->assertSame($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT));
+        $this->assertSame($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => false]));
 
         $expected = [
             '_links' => [
@@ -456,15 +456,15 @@ class ItemNormalizerTest extends TestCase
                             'href' => '/max_depth_dummies/2',
                         ],
                     ],
-                    'id' => 2,
+                    'id' => '2',
                     'name' => 'level 2',
                 ],
             ],
-            'id' => 1,
+            'id' => '1',
             'name' => 'level 1',
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => true]));
+        $this->assertSame($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => true]));
     }
 
     /**

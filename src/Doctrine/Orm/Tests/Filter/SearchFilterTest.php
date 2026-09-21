@@ -42,7 +42,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
     {
         $filter = self::buildSearchFilter($this, $this->managerRegistry);
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',

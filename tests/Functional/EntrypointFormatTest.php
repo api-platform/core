@@ -93,7 +93,7 @@ final class EntrypointFormatTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertArrayHasKey('multipleResourceBook2', $data);
-        $this->assertEquals('/multi_route_books', $data['multipleResourceBook2']);
+        $this->assertSame('/multi_route_books', $data['multipleResourceBook2']);
         $this->assertStringNotContainsString('resourceNameCollection', $response->getContent());
     }
 

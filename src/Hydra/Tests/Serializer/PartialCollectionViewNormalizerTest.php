@@ -43,7 +43,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
-        $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['jsonld_sub_level' => true]));
+        $this->assertSame(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['jsonld_sub_level' => true]));
     }
 
     public function testNormalizeDoesNotChangeWhenNoFilterNorPagination(): void
@@ -53,15 +53,15 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
-        $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
+        $this->assertSame(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
     }
 
     public function testNormalizePaginator(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
-                'hydra:totalItems' => 40,
                 'foo' => 'bar',
+                'hydra:totalItems' => 40,
                 'hydra:view' => [
                     '@id' => '/?_page=3',
                     '@type' => 'hydra:PartialCollectionView',
@@ -77,7 +77,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
     public function testNormalizePartialPaginator(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'foo' => 'bar',
                 'hydra:view' => [
@@ -93,15 +93,15 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
     public function testNormalizeWithCursorBasedPagination(): void
     {
-        self::assertEquals(
+        self::assertSame(
             [
                 'foo' => 'bar',
                 'hydra:totalItems' => 40,
                 'hydra:view' => [
                     '@id' => '/',
                     '@type' => 'hydra:PartialCollectionView',
-                    'hydra:previous' => '/?id%5Bgt%5D=1',
                     'hydra:next' => '/?id%5Blt%5D=2',
+                    'hydra:previous' => '/?id%5Bgt%5D=1',
                 ],
             ],
             $this->normalizePaginator(false, true)
@@ -169,7 +169,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
             $resourceMetadataFactory
         );
 
-        self::assertEquals(
+        self::assertSame(
             [
                 'foo' => 'bar',
                 'hydra:view' => [

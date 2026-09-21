@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformSortingParametersListener;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class TransformSortingParametersListenerTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private TransformSortingParametersListener $listener;
@@ -45,7 +48,7 @@ class TransformSortingParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequestWithInvalidFilter(): void
@@ -59,7 +62,7 @@ class TransformSortingParametersListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
 
         $expectedRequest = $expectedRequest->duplicate(['sort' => ['foo', '-bar']]);
 
@@ -67,7 +70,7 @@ class TransformSortingParametersListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequest(): void
@@ -83,6 +86,6 @@ class TransformSortingParametersListenerTest extends TestCase
         $expectedRequest = new Request(['sort' => 'foo,-bar,-baz,qux'], [], ['_api_filters' => ['order' => ['foo' => 'asc', 'bar' => 'desc', 'baz' => 'desc', 'qux' => 'asc']]]);
         $expectedRequest->setRequestFormat('jsonapi');
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 }

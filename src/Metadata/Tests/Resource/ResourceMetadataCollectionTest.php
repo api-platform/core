@@ -68,9 +68,9 @@ final class ResourceMetadataCollectionTest extends TestCase
 
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
-        $this->assertEquals($resourceMetadataCollection->getOperation(), $defaultOperation);
-        $this->assertEquals($resourceMetadataCollection->getOperation(null, true), $defaultCollectionOperation);
-        $this->assertEquals($resourceMetadataCollection->getOperation(null, false, true), $defaultOperation);
+        $this->assertSame($resourceMetadataCollection->getOperation(), $defaultOperation);
+        $this->assertSame($resourceMetadataCollection->getOperation(null, true), $defaultCollectionOperation);
+        $this->assertSame($resourceMetadataCollection->getOperation(null, false, true), $defaultOperation);
 
         $resource = new ApiResource(
             graphQlOperations: [
@@ -81,8 +81,8 @@ final class ResourceMetadataCollectionTest extends TestCase
 
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
-        $this->assertEquals($resourceMetadataCollection->getOperation(), $defaultGqlOperation);
-        $this->assertEquals($resourceMetadataCollection->getOperation(null, true), $defaultGqlCollectionOperation);
+        $this->assertSame($resourceMetadataCollection->getOperation(), $defaultGqlOperation);
+        $this->assertSame($resourceMetadataCollection->getOperation(null, true), $defaultGqlCollectionOperation);
 
         try {
             $resourceMetadataCollection->getOperation(null, false, true);

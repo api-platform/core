@@ -94,6 +94,6 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $this->assertFalse($metadata->isIdentifier());
         $this->assertSame('Default', $metadata->getDefault());
         $this->assertSame('Example', $metadata->getExample());
-        $this->assertEquals(['https://example.com'], $metadata->getTypes());
+        $this->assertSame(['https://example.com'], $metadata->getTypes());
     }
 }

@@ -26,13 +26,13 @@ class RequestAttributesExtractorTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'post']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'post',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
@@ -40,13 +40,13 @@ class RequestAttributesExtractorTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
@@ -54,35 +54,35 @@ class RequestAttributesExtractorTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_receive' => '0']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => false,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_receive' => '1']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
@@ -90,35 +90,35 @@ class RequestAttributesExtractorTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_respond' => '0']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => false,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_respond' => '1']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
@@ -126,35 +126,35 @@ class RequestAttributesExtractorTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_persist' => '0']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => false,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_persist' => '1']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
@@ -173,14 +173,14 @@ class RequestAttributesExtractorTest extends TestCase
         $object = new \stdClass();
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', 'previous_data' => $object]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => false,
             'operation_name' => 'get',
+            'previous_data' => $object,
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'previous_data' => $object,
-            'has_composite_identifier' => false,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 
@@ -188,13 +188,13 @@ class RequestAttributesExtractorTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_identifiers' => ['test'], '_api_has_composite_identifier' => true]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'resource_class' => 'Foo',
+            'has_composite_identifier' => true,
             'operation_name' => 'get',
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'has_composite_identifier' => true,
         ], RequestAttributesExtractor::extractAttributes($request));
     }
 }

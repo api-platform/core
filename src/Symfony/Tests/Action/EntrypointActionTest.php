@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Action\EntrypointAction;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,6 +28,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class EntrypointActionTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     public function testGetEntrypointWithProviderProcessor(): void
     {
         $expected = new Entrypoint(new ResourceNameCollection(['dummies']));
@@ -41,7 +44,7 @@ class EntrypointActionTest extends TestCase
         $processor->expects($this->once())->method('process')->willReturnArgument(0);
 
         $entrypoint = new EntrypointAction($resourceNameCollectionFactory, $provider, $processor);
-        $this->assertEquals($expected, $entrypoint(Request::create('/')));
+        $this->assertSame($expected, $entrypoint(Request::create('/')));
     }
 
     public function testInvokeCachesResourceNameCollection(): void
@@ -98,15 +101,13 @@ class EntrypointActionTest extends TestCase
         $action2($request);
 
         // Verification of isolation:
-        $this->assertEquals(
-            new ResourceNameCollection(['ResourceA']),
-            $action1->provide()->getResourceNameCollection(),
+        $this->assertSame(self::toComparableArray(new ResourceNameCollection(['ResourceA'])), self::toComparableArray($action1->provide()->getResourceNameCollection()),
             'Instance 1 was polluted by Instance 2 (likely due to a static property)'
         );
 
-        $this->assertEquals(
-            new ResourceNameCollection(['ResourceB']),
-            $action2->provide()->getResourceNameCollection(),
+        $this->assertSame(
+            self::toComparableArray(new ResourceNameCollection(['ResourceB'])),
+            self::toComparableArray($action2->provide()->getResourceNameCollection()),
             'Instance 2 has incorrect state.'
         );
     }

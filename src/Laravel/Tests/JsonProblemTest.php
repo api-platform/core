@@ -68,14 +68,14 @@ class JsonProblemTest extends TestCase
     public function testRetrieveError(string $format, string $status, array $expected): void
     {
         $response = $this->get('/api/errors/'.$status, ['accept' => $format]);
-        $this->assertEquals($expected, $response->json());
+        $this->assertSame($expected, $response->json());
     }
 
     #[DefineEnvironment('useProductionMode')]
     public function testRetrieveErrorHtml(): void
     {
         $response = $this->get('/api/errors/403', ['accept' => 'text/html']);
-        $this->assertEquals('<!DOCTYPE html>
+        $this->assertSame('<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
@@ -115,7 +115,7 @@ class JsonProblemTest extends TestCase
                             'detail' => 'Unauthorized',
                             'type' => 'about:blank',
                             'title' => 'Error 401',
-                            'status' => 401,
+                            'status' => '401',
                             'code' => '401',
                             'links' => [
                                 'type' => 'about:blank',
@@ -133,7 +133,7 @@ class JsonProblemTest extends TestCase
                     '@id' => '/api/errors/401',
                     'detail' => 'Unauthorized',
                     'title' => 'Error 401',
-                    'status' => 401,
+                    'status' => '401',
                     'type' => 'about:blank',
                 ],
             ],

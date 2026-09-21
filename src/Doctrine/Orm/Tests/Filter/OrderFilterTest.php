@@ -34,7 +34,7 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'order[id]' => [
                 'property' => 'id',
                 'type' => 'string',
@@ -206,7 +206,7 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
             ],
         ], $filter->getDescription($this->resourceClass));
 
-        $this->assertEquals([
+        $this->assertSame([
             'order[id]' => [
                 'property' => 'id',
                 'type' => 'string',

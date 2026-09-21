@@ -167,7 +167,7 @@ final class ParameterValidatorProviderTest extends TestCase
         try {
             $provider->provide($operation, [], ['request' => $request]);
         } catch (ValidationException $e) {
-            $this->assertEquals('foo[bar]', $e->getConstraintViolationList()->get(0)->getPropertyPath());
+            $this->assertSame('foo[bar]', $e->getConstraintViolationList()->get(0)->getPropertyPath());
         }
     }
 }

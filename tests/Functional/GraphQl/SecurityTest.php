@@ -54,7 +54,7 @@ QUERY,
         ]]);
 
         $d = $response->toArray();
-        $this->assertEquals('Access Denied.', $d['errors'][0]['message']);
+        $this->assertSame('Access Denied.', $d['errors'][0]['message']);
     }
 
     public function testCreateItemUnauthorized(): void
@@ -76,7 +76,7 @@ QUERY,
         ]]);
 
         $d = $response->toArray();
-        $this->assertEquals('Only admins can create a secured dummy.', $d['errors'][0]['message']);
+        $this->assertSame('Only admins can create a secured dummy.', $d['errors'][0]['message']);
     }
 
     public function testQueryItemWithNode(): void
@@ -98,7 +98,7 @@ QUERY,
         ]]);
 
         $d = $response->toArray();
-        $this->assertEquals('Access Denied.', $d['errors'][0]['message']);
+        $this->assertSame('Access Denied.', $d['errors'][0]['message']);
     }
 
     public function loadFixtures(string $resourceClass): void

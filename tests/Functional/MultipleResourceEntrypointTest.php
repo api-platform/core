@@ -58,13 +58,13 @@ class MultipleResourceEntrypointTest extends ApiTestCase
 
         $this->assertArrayHasKey('multipleResourceBook', $context);
         $this->assertIsArray($context['multipleResourceBook']);
-        $this->assertEquals('Entrypoint/multipleResourceBook', $context['multipleResourceBook']['@id']);
-        $this->assertEquals('@id', $context['multipleResourceBook']['@type']);
+        $this->assertSame('Entrypoint/multipleResourceBook', $context['multipleResourceBook']['@id']);
+        $this->assertSame('@id', $context['multipleResourceBook']['@type']);
 
         $this->assertArrayHasKey('multipleResourceBook2', $context);
         $this->assertIsArray($context['multipleResourceBook2']);
-        $this->assertEquals('Entrypoint/multipleResourceBook2', $context['multipleResourceBook2']['@id']);
-        $this->assertEquals('@id', $context['multipleResourceBook2']['@type']);
+        $this->assertSame('Entrypoint/multipleResourceBook2', $context['multipleResourceBook2']['@id']);
+        $this->assertSame('@id', $context['multipleResourceBook2']['@type']);
     }
 
     /**
@@ -80,10 +80,10 @@ class MultipleResourceEntrypointTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertArrayHasKey('multipleResourceBook', $data);
-        $this->assertEquals('/admin/multi_route_books', $data['multipleResourceBook']);
+        $this->assertSame('/admin/multi_route_books', $data['multipleResourceBook']);
 
         $this->assertArrayHasKey('multipleResourceBook2', $data);
-        $this->assertEquals('/multi_route_books', $data['multipleResourceBook2']);
+        $this->assertSame('/multi_route_books', $data['multipleResourceBook2']);
     }
 
     /**

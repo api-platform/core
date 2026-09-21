@@ -106,7 +106,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']));
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
         $this->assertArrayHasKey('data', $properties);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'type' => 'object',
                 'properties' => [
@@ -136,7 +136,7 @@ class SchemaFactoryTest extends TestCase
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
         $this->assertTrue(isset($resultSchema['allOf'][0]['$ref']));
-        $this->assertEquals($resultSchema['allOf'][0]['$ref'], '#/definitions/JsonApiCollectionBaseSchema');
+        $this->assertSame($resultSchema['allOf'][0]['$ref'], '#/definitions/JsonApiCollectionBaseSchema');
 
         $jsonApiCollectionBaseSchemaNoPagination = $resultSchema['definitions']['JsonApiCollectionBaseSchemaNoPagination'];
         $this->assertTrue(isset($jsonApiCollectionBaseSchemaNoPagination['properties']));
@@ -172,7 +172,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('attributes', $properties['data']['items']['properties']);
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
-        $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
+        $this->assertSame($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
     }
 
     public function testPostInputSchemaDoesNotRequireId(): void

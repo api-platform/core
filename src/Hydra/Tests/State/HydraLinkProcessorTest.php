@@ -39,6 +39,9 @@ class HydraLinkProcessorTest extends TestCase
 
         $linkProvider = $request->attributes->get('_api_platform_links');
         $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
-        $this->assertEquals([new Link('a', 'b'), new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', '/docs')], $linkProvider->getLinks());
+        $this->assertSame(
+            array_map(static fn (Link $link): array => [$link->getRels(), $link->getHref()], [new Link('a', 'b'), new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', '/docs')]),
+            array_map(static fn (Link $link): array => [$link->getRels(), $link->getHref()], $linkProvider->getLinks())
+        );
     }
 }

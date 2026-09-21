@@ -34,7 +34,7 @@ class CloneTraitTest extends TestCase
         $result = $this->clone($data);
 
         $this->assertNotSame($data, $result);
-        $this->assertEquals($data, $result);
+        $this->assertSame((array) $data, (array) $result);
     }
 
     public function testGeneratorClone(): void

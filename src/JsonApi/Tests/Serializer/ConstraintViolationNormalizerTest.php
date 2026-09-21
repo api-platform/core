@@ -67,7 +67,7 @@ class ConstraintViolationNormalizerTest extends TestCase
             new ConstraintViolation('Unknown violation.', 'Unknown violation.', [], $dummy, '', ''),
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'errors' => [
                     [
@@ -107,7 +107,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 
         $result = $normalizer->normalize($constraintViolationList);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'errors' => [
                     [
@@ -136,7 +136,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         // This should not throw a TypeError and should handle the null root gracefully
         $result = $normalizer->normalize($constraintViolationList);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'errors' => [
                     [

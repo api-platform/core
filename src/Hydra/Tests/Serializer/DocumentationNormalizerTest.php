@@ -132,20 +132,20 @@ class DocumentationNormalizerTest extends TestCase
             '@type' => 'hydra:ApiDocumentation',
             'hydra:title' => 'Test Api',
             'hydra:description' => 'test ApiGerard',
+            'hydra:entrypoint' => '/',
             'hydra:supportedClass' => [
                 [
                     '@id' => '#dummy',
                     '@type' => 'hydra:Class',
                     'hydra:title' => 'dummy',
-                    'hydra:description' => 'dummy',
                     'hydra:supportedProperty' => [
                         [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#dummy/name',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name',
                                 'domain' => '#dummy',
+                                'label' => 'name',
                                 'range' => 'xsd:string',
                             ],
                             'hydra:title' => 'name',
@@ -159,8 +159,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/description',
                                 '@type' => 'rdf:Property',
-                                'label' => 'description',
                                 'domain' => '#dummy',
+                                'label' => 'description',
                                 'range' => '@id',
                             ],
                             'hydra:title' => 'description',
@@ -174,8 +174,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/name_converted',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name_converted',
                                 'domain' => '#dummy',
+                                'label' => 'name_converted',
                                 'range' => 'xsd:string',
                             ],
                             'hydra:title' => 'name_converted',
@@ -189,8 +189,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/relatedDummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'relatedDummy',
                                 'domain' => '#dummy',
+                                'label' => 'relatedDummy',
                                 'range' => '#relatedDummy',
                             ],
                             'hydra:title' => 'relatedDummy',
@@ -204,34 +204,34 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => 'https://schema.org/Dummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'iri',
                                 'domain' => '#dummy',
+                                'label' => 'iri',
                             ],
                             'hydra:title' => 'iri',
-                            'hydra:required' => null,
+                            'hydra:required' => false,
                             'hydra:readable' => null,
                             'hydra:writeable' => false,
                         ],
                     ],
-
                     'hydra:supportedOperation' => [
                         [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
+                            'hydra:description' => 'Retrieves a dummy resource.',
+                            'hydra:foo' => 'bar',
                             'hydra:method' => 'GET',
                             'hydra:title' => 'foobar',
                             'returns' => 'dummy',
-                            'hydra:foo' => 'bar',
-                            'hydra:description' => 'Retrieves a dummy resource.',
                         ],
                         [
                             '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                             'expects' => 'dummy',
+                            'hydra:description' => 'Replaces the dummy resource.',
                             'hydra:method' => 'PUT',
                             'hydra:title' => 'putdummy',
-                            'hydra:description' => 'Replaces the dummy resource.',
                             'returns' => 'dummy',
                         ],
                     ],
+                    'hydra:description' => 'dummy',
                 ],
                 [
                     '@id' => '#relatedDummy',
@@ -243,8 +243,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#relatedDummy/name',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name',
                                 'domain' => '#relatedDummy',
+                                'label' => 'name',
                                 'range' => 'xsd:string',
                             ],
                             'hydra:title' => 'name',
@@ -258,8 +258,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#relatedDummy/description',
                                 '@type' => 'rdf:Property',
-                                'label' => 'description',
                                 'domain' => '#relatedDummy',
+                                'label' => 'description',
                                 'range' => '@id',
                             ],
                             'hydra:title' => 'description',
@@ -273,8 +273,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#relatedDummy/name_converted',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name_converted',
                                 'domain' => '#relatedDummy',
+                                'label' => 'name_converted',
                                 'range' => 'xsd:string',
                             ],
                             'hydra:title' => 'name_converted',
@@ -288,8 +288,8 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#relatedDummy/relatedDummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'relatedDummy',
                                 'domain' => '#relatedDummy',
+                                'label' => 'relatedDummy',
                                 'range' => '#relatedDummy',
                             ],
                             'hydra:title' => 'relatedDummy',
@@ -303,11 +303,11 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => 'https://schema.org/Dummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'iri',
                                 'domain' => '#relatedDummy',
+                                'label' => 'iri',
                             ],
                             'hydra:title' => 'iri',
-                            'hydra:required' => null,
+                            'hydra:required' => false,
                             'hydra:readable' => null,
                             'hydra:writeable' => false,
                         ],
@@ -315,9 +315,9 @@ class DocumentationNormalizerTest extends TestCase
                     'hydra:supportedOperation' => [
                         [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
+                            'hydra:description' => 'Retrieves a relatedDummy resource.',
                             'hydra:method' => 'GET',
                             'hydra:title' => 'getrelatedDummy',
-                            'hydra:description' => 'Retrieves a relatedDummy resource.',
                             'returns' => 'relatedDummy',
                         ],
                     ],
@@ -342,17 +342,17 @@ class DocumentationNormalizerTest extends TestCase
                                 'hydra:supportedOperation' => [
                                     [
                                         '@type' => ['hydra:Operation', 'schema:FindAction'],
+                                        'hydra:description' => 'Retrieves the collection of dummy resources.',
                                         'hydra:method' => 'GET',
                                         'hydra:title' => 'getdummyCollection',
-                                        'hydra:description' => 'Retrieves the collection of dummy resources.',
                                         'returns' => 'hydra:Collection',
                                     ],
                                     [
                                         '@type' => ['hydra:Operation', 'schema:CreateAction'],
                                         'expects' => 'dummy',
+                                        'hydra:description' => 'Creates a dummy resource.',
                                         'hydra:method' => 'POST',
                                         'hydra:title' => 'postdummy',
-                                        'hydra:description' => 'Creates a dummy resource.',
                                         'returns' => 'dummy',
                                     ],
                                 ],
@@ -408,10 +408,9 @@ class DocumentationNormalizerTest extends TestCase
                     ],
                 ],
             ],
-            'hydra:entrypoint' => '/',
         ];
 
-        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation));
+        $this->assertSame($expected, $documentationNormalizer->normalize($documentation));
         $this->assertTrue($documentationNormalizer->supportsNormalization($documentation, 'jsonld'));
         $this->assertFalse($documentationNormalizer->supportsNormalization($documentation, 'hal'));
         $this->assertEmpty($documentationNormalizer->getSupportedTypes('json'));
@@ -472,8 +471,8 @@ class DocumentationNormalizerTest extends TestCase
                     'hydra:property' => [
                         '@id' => '#dummy/a',
                         '@type' => 'rdf:Property',
-                        'label' => 'a',
                         'domain' => '#dummy',
+                        'label' => 'a',
                         'range' => 'xsd:string',
                     ],
                     'hydra:title' => 'a',
@@ -487,8 +486,8 @@ class DocumentationNormalizerTest extends TestCase
                     'hydra:property' => [
                         '@id' => '#dummy/b',
                         '@type' => 'rdf:Property',
-                        'label' => 'b',
                         'domain' => '#dummy',
+                        'label' => 'b',
                         'range' => 'xsd:string',
                     ],
                     'hydra:title' => 'b',
@@ -502,8 +501,8 @@ class DocumentationNormalizerTest extends TestCase
                     'hydra:property' => [
                         '@id' => '#dummy/c',
                         '@type' => 'rdf:Property',
-                        'label' => 'c',
                         'domain' => '#dummy',
+                        'label' => 'c',
                         'range' => 'xsd:string',
                     ],
                     'hydra:title' => 'c',
@@ -517,8 +516,8 @@ class DocumentationNormalizerTest extends TestCase
                     'hydra:property' => [
                         '@id' => '#dummy/d',
                         '@type' => 'rdf:Property',
-                        'label' => 'd',
                         'domain' => '#dummy',
+                        'label' => 'd',
                         'range' => 'xsd:string',
                     ],
                     'hydra:title' => 'd',
@@ -534,9 +533,9 @@ class DocumentationNormalizerTest extends TestCase
                         'hydra:Operation',
                         'schema:FindAction',
                     ],
+                    'hydra:description' => 'Retrieves a dummy resource.',
                     'hydra:method' => 'GET',
                     'hydra:title' => 'getdummy',
-                    'hydra:description' => 'Retrieves a dummy resource.',
                     'returns' => 'dummy',
                 ],
                 [
@@ -545,9 +544,9 @@ class DocumentationNormalizerTest extends TestCase
                         'schema:ReplaceAction',
                     ],
                     'expects' => 'owl:Nothing',
+                    'hydra:description' => 'Replaces the dummy resource.',
                     'hydra:method' => 'PUT',
                     'hydra:title' => 'putdummy',
-                    'hydra:description' => 'Replaces the dummy resource.',
                     'returns' => 'dummy',
                 ],
             ],
@@ -555,7 +554,7 @@ class DocumentationNormalizerTest extends TestCase
         ];
 
         $doc = $documentationNormalizer->normalize($documentation);
-        $this->assertEquals($expected, $doc['hydra:supportedClass'][0]);
+        $this->assertSame($expected, $doc['hydra:supportedClass'][0]);
     }
 
     public function testHasHydraContext(): void
@@ -605,11 +604,11 @@ class DocumentationNormalizerTest extends TestCase
             $urlGenerator->reveal()
         );
 
-        $this->assertEquals([
-            '@id' => '#dummy/name',
+        $this->assertSame([
             '@type' => 'https://schema.org/Enumeration',
-            'label' => 'name',
+            '@id' => '#dummy/name',
             'domain' => '#dummy',
+            'label' => 'name',
             'range' => 'xsd:string',
         ], $documentationNormalizer->normalize($documentation)['hydra:supportedClass'][0]['hydra:supportedProperty'][0]['hydra:property']);
     }
@@ -693,20 +692,20 @@ class DocumentationNormalizerTest extends TestCase
             '@type' => 'ApiDocumentation',
             'title' => 'Test Api',
             'description' => 'test ApiGerard',
+            'entrypoint' => '/',
             'supportedClass' => [
                 [
                     '@id' => '#dummy',
                     '@type' => 'Class',
                     'title' => 'dummy',
-                    'description' => 'dummy',
                     'supportedProperty' => [
                         [
                             '@type' => 'SupportedProperty',
                             'property' => [
                                 '@id' => '#dummy/name',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name',
                                 'domain' => '#dummy',
+                                'label' => 'name',
                                 'range' => 'xsd:string',
                             ],
                             'title' => 'name',
@@ -720,8 +719,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/description',
                                 '@type' => 'rdf:Property',
-                                'label' => 'description',
                                 'domain' => '#dummy',
+                                'label' => 'description',
                                 'range' => '@id',
                             ],
                             'title' => 'description',
@@ -735,8 +734,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/name_converted',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name_converted',
                                 'domain' => '#dummy',
+                                'label' => 'name_converted',
                                 'range' => 'xsd:string',
                             ],
                             'title' => 'name_converted',
@@ -750,8 +749,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/relatedDummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'relatedDummy',
                                 'domain' => '#dummy',
+                                'label' => 'relatedDummy',
                                 'range' => '#relatedDummy',
                             ],
                             'title' => 'relatedDummy',
@@ -765,34 +764,34 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => 'https://schema.org/Dummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'iri',
                                 'domain' => '#dummy',
+                                'label' => 'iri',
                             ],
                             'title' => 'iri',
-                            'required' => null,
+                            'required' => false,
                             'readable' => null,
                             'writeable' => false,
                         ],
                     ],
-
                     'supportedOperation' => [
                         [
                             '@type' => ['Operation', 'schema:FindAction'],
-                            'method' => 'GET',
-                            'title' => 'foobar',
-                            'returns' => 'dummy',
-                            'foo' => 'bar',
                             'description' => 'Retrieves a dummy resource.',
+                            'foo' => 'bar',
+                            'method' => 'GET',
+                            'returns' => 'dummy',
+                            'title' => 'foobar',
                         ],
                         [
                             '@type' => ['Operation', 'schema:ReplaceAction'],
+                            'description' => 'Replaces the dummy resource.',
                             'expects' => 'dummy',
                             'method' => 'PUT',
-                            'title' => 'putdummy',
-                            'description' => 'Replaces the dummy resource.',
                             'returns' => 'dummy',
+                            'title' => 'putdummy',
                         ],
                     ],
+                    'description' => 'dummy',
                 ],
                 [
                     '@id' => '#relatedDummy',
@@ -804,8 +803,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#relatedDummy/name',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name',
                                 'domain' => '#relatedDummy',
+                                'label' => 'name',
                                 'range' => 'xsd:string',
                             ],
                             'title' => 'name',
@@ -819,8 +818,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#relatedDummy/description',
                                 '@type' => 'rdf:Property',
-                                'label' => 'description',
                                 'domain' => '#relatedDummy',
+                                'label' => 'description',
                                 'range' => '@id',
                             ],
                             'title' => 'description',
@@ -834,8 +833,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#relatedDummy/name_converted',
                                 '@type' => 'rdf:Property',
-                                'label' => 'name_converted',
                                 'domain' => '#relatedDummy',
+                                'label' => 'name_converted',
                                 'range' => 'xsd:string',
                             ],
                             'title' => 'name_converted',
@@ -849,8 +848,8 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#relatedDummy/relatedDummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'relatedDummy',
                                 'domain' => '#relatedDummy',
+                                'label' => 'relatedDummy',
                                 'range' => '#relatedDummy',
                             ],
                             'title' => 'relatedDummy',
@@ -864,11 +863,11 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => 'https://schema.org/Dummy',
                                 '@type' => 'rdf:Property',
-                                'label' => 'iri',
                                 'domain' => '#relatedDummy',
+                                'label' => 'iri',
                             ],
                             'title' => 'iri',
-                            'required' => null,
+                            'required' => false,
                             'readable' => null,
                             'writeable' => false,
                         ],
@@ -876,10 +875,10 @@ class DocumentationNormalizerTest extends TestCase
                     'supportedOperation' => [
                         [
                             '@type' => ['Operation', 'schema:FindAction'],
-                            'method' => 'GET',
-                            'title' => 'getrelatedDummy',
                             'description' => 'Retrieves a relatedDummy resource.',
+                            'method' => 'GET',
                             'returns' => 'relatedDummy',
+                            'title' => 'getrelatedDummy',
                         ],
                     ],
                 ],
@@ -903,18 +902,18 @@ class DocumentationNormalizerTest extends TestCase
                                 'supportedOperation' => [
                                     [
                                         '@type' => ['Operation', 'schema:FindAction'],
-                                        'method' => 'GET',
-                                        'title' => 'getdummyCollection',
                                         'description' => 'Retrieves the collection of dummy resources.',
+                                        'method' => 'GET',
                                         'returns' => 'Collection',
+                                        'title' => 'getdummyCollection',
                                     ],
                                     [
                                         '@type' => ['Operation', 'schema:CreateAction'],
+                                        'description' => 'Creates a dummy resource.',
                                         'expects' => 'dummy',
                                         'method' => 'POST',
-                                        'title' => 'postdummy',
-                                        'description' => 'Creates a dummy resource.',
                                         'returns' => 'dummy',
+                                        'title' => 'postdummy',
                                     ],
                                 ],
                             ],
@@ -969,10 +968,9 @@ class DocumentationNormalizerTest extends TestCase
                     ],
                 ],
             ],
-            'entrypoint' => '/',
         ];
 
-        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
+        $this->assertSame($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
     }
 
     public function testNormalizeSubClassOfWithSchemaOrgTypes(): void
@@ -1160,6 +1158,6 @@ class DocumentationNormalizerTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
+        $this->assertSame($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
     }
 }

@@ -36,8 +36,8 @@ class ObjectMapperTest extends TestCase
         $data = $response->json();
         $this->assertArrayHasKey('name', $data);
         $this->assertArrayHasKey('price', $data);
-        $this->assertEquals('Test Product', $data['name']);
-        $this->assertEquals(19.99, $data['price']);
+        $this->assertSame('Test Product', $data['name']);
+        $this->assertSame(19.99, $data['price']);
     }
 
     public function testObjectMapperMapsCollectionOfModels(): void
@@ -51,7 +51,7 @@ class ObjectMapperTest extends TestCase
         $data = $response->json();
         $this->assertArrayHasKey('member', $data);
         $this->assertCount(2, $data['member']);
-        $this->assertEquals('Product 1', $data['member'][0]['name']);
-        $this->assertEquals('Product 2', $data['member'][1]['name']);
+        $this->assertSame('Product 1', $data['member'][0]['name']);
+        $this->assertSame('Product 2', $data['member'][1]['name']);
     }
 }

@@ -41,6 +41,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameDifferentMethodOpera
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -49,13 +50,15 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private function getDefaultGraphqlOperations(string $shortName, string $class, mixed $provider = null): array
     {
         return [
-            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
             'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
+            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
             'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName.", provider: $provider),
             'delete' => new DeleteMutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'delete', description: "Deletes a $shortName.", provider: $provider),
             'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName.", provider: $provider),
@@ -66,94 +69,88 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
 
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    normalizationContext: ['skip_null_values' => true],
-                    class: AttributeResource::class,
-                    provider: AttributeResourceProvider::class,
-                    operations: [
-                        '_api_AttributeResource_get' => new Get(
-                            shortName: 'AttributeResource',
-                            class: AttributeResource::class,
-                            normalizationContext: ['skip_null_values' => true],
-                            priority: 1,
-                            provider: AttributeResourceProvider::class,
-                        ),
-                        '_api_AttributeResource_put' => new Put(
-                            shortName: 'AttributeResource',
-                            class: AttributeResource::class,
-                            normalizationContext: ['skip_null_values' => true],
-                            priority: 2,
-                            provider: AttributeResourceProvider::class,
-                        ),
-                        '_api_AttributeResource_delete' => new Delete(
-                            shortName: 'AttributeResource',
-                            class: AttributeResource::class,
-                            normalizationContext: ['skip_null_values' => true],
-                            priority: 3,
-                            provider: AttributeResourceProvider::class,
-                        ),
-                    ],
-                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class, AttributeResourceProvider::class)
-                ),
-                new ApiResource(
-                    shortName: 'AttributeResource2',
-                    class: AttributeResource::class,
-                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
-                    operations: [
-                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_get' => new Get(
-                            class: AttributeResource::class,
-                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
-                            shortName: 'AttributeResource2',
-                            inputFormats: ['json' => ['application/merge-patch+json']],
-                            priority: 4,
-                            status: 301,
-                            provider: AttributeResourceProvider::class,
-                            processor: [AttributeResourceProcessor::class, 'process']
-                        ),
-                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_patch' => new Patch(
-                            class: AttributeResource::class,
-                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
-                            shortName: 'AttributeResource2',
-                            inputFormats: ['json' => ['application/merge-patch+json']],
-                            priority: 5,
-                            status: 301,
-                            provider: AttributeResourceProvider::class,
-                            processor: [AttributeResourceProcessor::class, 'process']
-                        ),
-                    ],
-                    inputFormats: ['json' => ['application/merge-patch+json']],
-                    status: 301,
-                    provider: AttributeResourceProvider::class,
-                    processor: [AttributeResourceProcessor::class, 'process']
-                ),
-            ]),
-            $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                normalizationContext: ['skip_null_values' => true],
+                class: AttributeResource::class,
+                provider: AttributeResourceProvider::class,
+                operations: [
+                    '_api_AttributeResource_get' => new Get(
+                        shortName: 'AttributeResource',
+                        class: AttributeResource::class,
+                        normalizationContext: ['skip_null_values' => true],
+                        priority: 1,
+                        provider: AttributeResourceProvider::class,
+                    ),
+                    '_api_AttributeResource_put' => new Put(
+                        shortName: 'AttributeResource',
+                        class: AttributeResource::class,
+                        normalizationContext: ['skip_null_values' => true],
+                        priority: 2,
+                        provider: AttributeResourceProvider::class,
+                    ),
+                    '_api_AttributeResource_delete' => new Delete(
+                        shortName: 'AttributeResource',
+                        class: AttributeResource::class,
+                        normalizationContext: ['skip_null_values' => true],
+                        priority: 3,
+                        provider: AttributeResourceProvider::class,
+                    ),
+                ],
+                graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class, AttributeResourceProvider::class)
+            ),
+            new ApiResource(
+                shortName: 'AttributeResource2',
+                class: AttributeResource::class,
+                uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
+                operations: [
+                    '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_get' => new Get(
+                        class: AttributeResource::class,
+                        uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
+                        shortName: 'AttributeResource2',
+                        inputFormats: ['json' => ['application/merge-patch+json']],
+                        priority: 4,
+                        status: 301,
+                        provider: AttributeResourceProvider::class,
+                        processor: [AttributeResourceProcessor::class, 'process']
+                    ),
+                    '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_patch' => new Patch(
+                        class: AttributeResource::class,
+                        uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
+                        shortName: 'AttributeResource2',
+                        inputFormats: ['json' => ['application/merge-patch+json']],
+                        priority: 5,
+                        status: 301,
+                        provider: AttributeResourceProvider::class,
+                        processor: [AttributeResourceProcessor::class, 'process']
+                    ),
+                ],
+                inputFormats: ['json' => ['application/merge-patch+json']],
+                status: 301,
+                provider: AttributeResourceProvider::class,
+                processor: [AttributeResourceProcessor::class, 'process']
+            ),
+        ])), self::toComparableArray($attributeResourceMetadataCollectionFactory->create(AttributeResource::class)));
 
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResources::class, [
-                new ApiResource(
-                    uriTemplate: '/attribute_resources{._format}',
-                    shortName: 'AttributeResources',
-                    normalizationContext: ['skip_null_values' => true],
-                    class: AttributeResources::class,
-                    provider: AttributeResourceProvider::class,
-                    operations: [
-                        '_api_/attribute_resources{._format}_get_collection' => new GetCollection(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources{._format}', normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
-                        ),
-                        '_api_/attribute_resources{._format}_post' => new Post(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources{._format}', normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
-                        ),
-                    ],
-                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class, AttributeResourceProvider::class)
-                ),
-            ]),
-            $attributeResourceMetadataCollectionFactory->create(AttributeResources::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResources::class, [
+            new ApiResource(
+                uriTemplate: '/attribute_resources{._format}',
+                shortName: 'AttributeResources',
+                normalizationContext: ['skip_null_values' => true],
+                class: AttributeResources::class,
+                provider: AttributeResourceProvider::class,
+                operations: [
+                    '_api_/attribute_resources{._format}_get_collection' => new GetCollection(
+                        shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources{._format}', normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
+                    ),
+                    '_api_/attribute_resources{._format}_post' => new Post(
+                        shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources{._format}', normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
+                    ),
+                ],
+                graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class, AttributeResourceProvider::class)
+            ),
+        ])), self::toComparableArray($attributeResourceMetadataCollectionFactory->create(AttributeResources::class)));
     }
 
     public function testCreateWithDefaults(): void
@@ -169,9 +166,9 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]);
 
         // Check the AttributeDefaultOperations it specifies a shared_max_age that should not be overridden
-        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true], paginationItemsPerPage: 10, extraProperties: ['non_existing_attribute' => 'foo', 'generated_operation' => true, 'standard_put' => true]);
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true], paginationItemsPerPage: 10, extraProperties: ['standard_put' => true, 'non_existing_attribute' => 'foo', 'generated_operation' => true]);
 
-        $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',
                 class: AttributeDefaultOperations::class,
@@ -185,16 +182,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 ],
                 cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true],
                 paginationItemsPerPage: 10,
-                extraProperties: ['non_existing_attribute' => 'foo', 'standard_put' => true]
+                extraProperties: ['standard_put' => true, 'non_existing_attribute' => 'foo']
             ),
-        ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+        ])), self::toComparableArray($attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class)));
     }
 
     public function testCreateWithConfigOperations(): void
     {
         $attributesResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: ['operations' => [Get::class, Post::class]]);
 
-        $this->assertEquals(new ResourceMetadataCollection(AttributeConfigOperations::class, [
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeConfigOperations::class, [
             new ApiResource(
                 shortName: 'AttributeConfigOperations',
                 operations: [
@@ -203,7 +200,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 ],
                 class: AttributeConfigOperations::class,
             ),
-        ]), $attributesResourceMetadataCollectionFactory->create(AttributeConfigOperations::class));
+        ])), self::toComparableArray($attributesResourceMetadataCollectionFactory->create(AttributeConfigOperations::class)));
     }
 
     public function testCreateShouldNotOverrideWithDefault(): void
@@ -215,7 +212,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, paginationItemsPerPage: 10, cacheHeaders: ['shared_max_age' => 60], extraProperties: ['generated_operation' => true]);
-        $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',
                 class: AttributeDefaultOperations::class,
@@ -230,7 +227,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 graphQlOperations: [],
                 paginationItemsPerPage: 10
             ),
-        ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+        ])), self::toComparableArray($attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class)));
     }
 
     public function testExtraProperties(): void
@@ -238,8 +235,8 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
         $extraPropertiesResource = $attributeResourceMetadataCollectionFactory->create(ExtraPropertiesResource::class);
 
-        $this->assertEquals($extraPropertiesResource[0]->getExtraProperties(), ['foo' => 'bar']);
-        $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
+        $this->assertSame($extraPropertiesResource[0]->getExtraProperties(), ['foo' => 'bar']);
+        $this->assertSame($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
     }
 
     public function testOverrideNameWithoutOperations(): void
@@ -247,7 +244,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
 
         $operation = new HttpOperation(shortName: 'AttributeOnlyOperation', class: AttributeOnlyOperation::class);
-        $this->assertEquals(new ResourceMetadataCollection(AttributeOnlyOperation::class, [
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeOnlyOperation::class, [
             new ApiResource(
                 shortName: 'AttributeOnlyOperation',
                 class: AttributeOnlyOperation::class,
@@ -255,7 +252,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     'my own name' => (new Get(name: 'my own name', priority: 1))->withOperation($operation),
                 ]
             ),
-        ]), $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperation::class));
+        ])), self::toComparableArray($attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperation::class)));
     }
 
     /**

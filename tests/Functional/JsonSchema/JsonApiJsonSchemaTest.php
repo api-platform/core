@@ -58,7 +58,7 @@ class JsonApiJsonSchemaTest extends ApiTestCase
     public function testJsonApi(): void
     {
         $speciesSchema = $this->schemaFactory->buildSchema(Issue6317::class, 'jsonapi', Schema::TYPE_OUTPUT);
-        $this->assertEquals('#/definitions/Issue6317.jsonapi', $speciesSchema['$ref']);
+        $this->assertSame('#/definitions/Issue6317.jsonapi', $speciesSchema['$ref']);
         $data = $speciesSchema['definitions']['Issue6317.jsonapi']['properties']['data'];
         $this->assertSame('object', $data['type']);
         $this->assertSame(['type' => 'string'], $data['properties']['id']);

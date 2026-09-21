@@ -65,6 +65,7 @@ use ApiPlatform\OpenApi\Tests\Fixtures\Issue6872\Diamond;
 use ApiPlatform\OpenApi\Tests\Fixtures\OutputDto;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\Test\ComparableObjectTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
@@ -76,6 +77,8 @@ use Symfony\Component\TypeInfo\Type;
 
 class OpenApiFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private const OPERATION_FORMATS = [
@@ -580,6 +583,41 @@ class OpenApiFactoryTest extends TestCase
             'properties' => [
                 'id' => new \ArrayObject([
                     'type' => 'integer',
+                    'readOnly' => true,
+                    'description' => 'This is an id.',
+                ]),
+                'name' => new \ArrayObject([
+                    'minLength' => 3,
+                    'maxLength' => 20,
+                    'pattern' => '^dummyPattern$',
+                    'description' => 'This is a name.',
+                    'type' => 'string',
+                ]),
+                'description' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an initializable but not writable property.',
+                ]),
+                'dummy_date' => new \ArrayObject([
+                    'type' => ['string', 'null'],
+                    'description' => 'This is a \DateTimeInterface object.',
+                    'format' => 'date-time',
+                ]),
+                'enum' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an enum.',
+                    'enum' => ['one', 'two'],
+                    'example' => 'one',
+                ]),
+            ],
+        ]));
+        $dummyOutputDtoSchema = new Schema('openapi');
+        $dummyOutputDtoSchema->setDefinitions(new \ArrayObject([
+            'type' => 'object',
+            'description' => 'This is a dummy',
+            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+            'properties' => [
+                'id' => new \ArrayObject([
+                    'type' => 'integer',
                     'description' => 'This is an id.',
                     'readOnly' => true,
                 ]),
@@ -596,14 +634,14 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 'dummy_date' => new \ArrayObject([
                     'type' => ['string', 'null'],
-                    'description' => 'This is a \DateTimeInterface object.',
                     'format' => 'date-time',
+                    'description' => 'This is a \DateTimeInterface object.',
                 ]),
                 'enum' => new \ArrayObject([
                     'type' => 'string',
+                    'description' => 'This is an enum.',
                     'enum' => ['one', 'two'],
                     'example' => 'one',
-                    'description' => 'This is an enum.',
                 ]),
             ],
         ]));
@@ -641,8 +679,8 @@ class OpenApiFactoryTest extends TestCase
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $this->assertInstanceOf(OpenApi::class, $openApi);
-        $this->assertEquals($openApi->getInfo(), new Info('Test API', '1.2.3', 'This is a test API.'));
-        $this->assertEquals($openApi->getServers(), [new Server('/app_dev.php/')]);
+        $this->assertSame((array) $openApi->getInfo(), (array) new Info('Test API', '1.2.3', 'This is a test API.'));
+        $this->assertSame(array_map(static fn (Server $server): array => (array) $server, $openApi->getServers()), array_map(static fn (Server $server): array => (array) $server, [new Server('/app_dev.php/')]));
 
         $webhooks = $openApi->getWebhooks();
         $this->assertCount(2, $webhooks);
@@ -658,27 +696,27 @@ class OpenApiFactoryTest extends TestCase
         $this->assertInstanceOf(Components::class, $components);
 
         $parameterSchema = $dummySchema->getDefinitions();
-        $this->assertEquals($components->getSchemas(), new \ArrayObject([
+        $this->assertSame(self::toComparableArray($components->getSchemas()), self::toComparableArray(new \ArrayObject([
             'Dummy' => $dummySchema->getDefinitions(),
-            'Dummy.OutputDto' => $dummySchema->getDefinitions(),
-            'Dummy.OutputDto.csv' => $dummySchema->getDefinitions(),
-            'Dummy.jsonld' => $dummySchema->getDefinitions(),
+            'Dummy.OutputDto' => $dummyOutputDtoSchema->getDefinitions(),
+            'Dummy.OutputDto.csv' => $dummyOutputDtoSchema->getDefinitions(),
+            'Dummy.OutputDto.jsonld' => $dummyOutputDtoSchema->getDefinitions(),
             'Dummy.csv' => $dummySchema->getDefinitions(),
-            'Dummy.OutputDto.jsonld' => $dummySchema->getDefinitions(),
-            'Parameter.jsonld' => $parameterSchema,
+            'Dummy.jsonld' => $dummySchema->getDefinitions(),
             'DummyErrorResource' => $dummyErrorSchema->getDefinitions(),
             'Error' => $errorSchema,
-        ]));
+            'Parameter.jsonld' => $parameterSchema,
+        ])));
 
-        $this->assertEquals($components->getSecuritySchemes(), new \ArrayObject([
+        $this->assertSame(self::toComparableArray($components->getSecuritySchemes()), self::toComparableArray(new \ArrayObject([
             'oauth' => new SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, null, null, new OAuthFlows(null, null, null, new OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', new \ArrayObject(['scope param'])))),
             'header' => new SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header'),
             'query' => new SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
             'bearer' => new SecurityScheme('http', 'Value for the http bearer parameter.', null, null, 'bearer', 'JWT'),
             'basic' => new SecurityScheme('http', 'Value for the http basic parameter.', null, null, 'basic', null),
-        ]));
+        ])));
 
-        $this->assertEquals([
+        $this->assertSame([
             ['oauth' => []],
             ['header' => []],
             ['query' => []],
@@ -693,7 +731,7 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummiesPath->{'get'.$method}());
         }
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'getDummyCollection',
             ['Dummy'],
             [
@@ -721,9 +759,9 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ]
-        ), $dummiesPath->getGet());
+        )), self::toComparableArray($dummiesPath->getGet()));
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyCollection',
             ['Dummy'],
             [
@@ -757,7 +795,7 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             )
-        ), $dummiesPath->getPost());
+        )), self::toComparableArray($dummiesPath->getPost()));
 
         $dummyPath = $paths->getPath('/dummies/{id}');
         $this->assertNotNull($dummyPath);
@@ -765,7 +803,7 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummyPath->{'get'.$method}());
         }
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'getDummyItem',
             ['Dummy'],
             [
@@ -785,9 +823,9 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves a Dummy resource.',
             null,
             [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
-        ), $dummyPath->getGet());
+        )), self::toComparableArray($dummyPath->getGet()));
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'putDummyItem',
             ['Dummy'],
             [
@@ -826,9 +864,9 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             )
-        ), $dummyPath->getPut());
+        )), self::toComparableArray($dummyPath->getPut()));
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'deleteDummyItem',
             ['Dummy'],
             [
@@ -843,10 +881,10 @@ class OpenApiFactoryTest extends TestCase
             'Removes the Dummy resource.',
             null,
             [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
-        ), $dummyPath->getDelete());
+        )), self::toComparableArray($dummyPath->getDelete()));
 
         $customPath = $paths->getPath('/foo/{id}');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'customDummyItem',
             ['Dummy', 'Profile'],
             [
@@ -888,13 +926,13 @@ class OpenApiFactoryTest extends TestCase
             null,
             null,
             ['x-visibility' => 'hide']
-        ), $customPath->getHead());
+        )), self::toComparableArray($customPath->getHead()));
 
         $prefixPath = $paths->getPath('/prefix/dummies');
         $this->assertNotNull($prefixPath);
 
         $formattedPath = $paths->getPath('/formatted/{id}');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'formatsDummyItem',
             ['Dummy'],
             [
@@ -935,10 +973,10 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             )
-        ), $formattedPath->getPut());
+        )), self::toComparableArray($formattedPath->getPut()));
 
         $filteredPath = $paths->getPath('/filtered');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'filteredDummyCollection',
             ['Dummy'],
             [
@@ -980,10 +1018,10 @@ class OpenApiFactoryTest extends TestCase
                     'enum' => ['asc', 'desc'],
                 ], 'form', false),
             ],
-        ), $filteredPath->getGet());
+        )), self::toComparableArray($filteredPath->getGet()));
 
         $paginatedPath = $paths->getPath('/paginated');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'paginatedDummyCollection',
             ['Dummy'],
             [
@@ -1015,10 +1053,10 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ]
-        ), $paginatedPath->getGet());
+        )), self::toComparableArray($paginatedPath->getGet()));
 
         $requestBodyPath = $paths->getPath('/dummiesRequestBody');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyCollectionWithRequestBody',
             ['Dummy'],
             [
@@ -1066,10 +1104,10 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 false
             ),
-        ), $requestBodyPath->getPost());
+        )), self::toComparableArray($requestBodyPath->getPost()));
 
         $requestBodyPath = $paths->getPath('/dummiesRequestBodyWithoutContent');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyCollectionWithRequestBodyWithoutContent',
             ['Dummy'],
             [
@@ -1103,10 +1141,10 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 false
             ),
-        ), $requestBodyPath->getPost());
+        )), self::toComparableArray($requestBodyPath->getPost()));
 
         $dummyItemPath = $paths->getPath('/dummyitems/{id}');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'putDummyItemWithResponse',
             ['Dummy'],
             [
@@ -1151,10 +1189,10 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             ),
-        ), $dummyItemPath->getPut());
+        )), self::toComparableArray($dummyItemPath->getPut()));
 
         $dummyItemPath = $paths->getPath('/dummyitems');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyItemWithResponse',
             ['Dummy'],
             [
@@ -1194,11 +1232,11 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             ),
-        ), $dummyItemPath->getPost());
+        )), self::toComparableArray($dummyItemPath->getPost()));
 
         $dummyItemPath = $paths->getPath('/dummyitems/{id}/images');
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'getDummyItemImageCollection',
             ['Dummy'],
             [
@@ -1224,10 +1262,10 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ]
-        ), $dummyItemPath->getGet());
+        )), self::toComparableArray($dummyItemPath->getGet()));
 
         $emptyReponsePath = $paths->getPath('/dummyitems/noresponse');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyItemWithEmptyResponse',
             ['Dummy'],
             [
@@ -1258,10 +1296,10 @@ class OpenApiFactoryTest extends TestCase
                     'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
             ),
-        ), $emptyReponsePath->getPost());
+        )), self::toComparableArray($emptyReponsePath->getPost()));
 
         $emptyRequestBodyPath = $paths->getPath('/dummyitem/noinput');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyItemWithoutInput',
             ['Dummy'],
             [
@@ -1289,10 +1327,10 @@ class OpenApiFactoryTest extends TestCase
             null,
             [],
             null
-        ), $emptyRequestBodyPath->getPost());
+        )), self::toComparableArray($emptyRequestBodyPath->getPost()));
 
         $emptyResponsePath = $paths->getPath('/dummyitem/nooutput');
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'postDummyItemWithoutOutput',
             ['Dummy'],
             [
@@ -1326,17 +1364,17 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 required: true
             )
-        ), $emptyResponsePath->getPost());
+        )), self::toComparableArray($emptyResponsePath->getPost()));
 
         $parameter = $paths->getPath('/uri_variable_uuid')->getGet()->getParameters()[0];
-        $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
+        $this->assertSame(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
 
         $parameter = $paths->getPath('/parameters')->getPut()->getParameters()[0];
-        $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
-        $this->assertEquals('header', $parameter->getIn());
-        $this->assertEquals('hi', $parameter->getDescription());
+        $this->assertSame(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
+        $this->assertSame('header', $parameter->getIn());
+        $this->assertSame('hi', $parameter->getDescription());
 
-        $this->assertEquals(new Operation(
+        $this->assertSame(self::toComparableArray(new Operation(
             'getDummyCollectionWithErrors',
             ['Dummy'],
             [
@@ -1373,7 +1411,7 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ],
-        ), $paths->getPath('/erroredDummies')->getGet());
+        )), self::toComparableArray($paths->getPath('/erroredDummies')->getGet()));
 
         $diamondsGetPath = $paths->getPath('/diamonds');
         $diamondGetOperation = $diamondsGetPath->getGet();

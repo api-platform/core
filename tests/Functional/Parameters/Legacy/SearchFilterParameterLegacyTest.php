@@ -52,8 +52,8 @@ final class SearchFilterParameterLegacyTest extends ApiTestCase
         $response = self::createClient()->request('GET', $route.'?foo=bar');
         $a = $response->toArray();
         $this->assertCount(2, $a['hydra:member']);
-        $this->assertEquals('bar', $a['hydra:member'][0]['foo']);
-        $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
+        $this->assertSame('bar', $a['hydra:member'][0]['foo']);
+        $this->assertSame('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
             'hydra:template' => \sprintf('/%s{?foo,fooAlias,q,order[id],order[foo],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],search[foo],search[createdAt],id,createdAt}', $route),
@@ -64,12 +64,12 @@ final class SearchFilterParameterLegacyTest extends ApiTestCase
         $response = self::createClient()->request('GET', $route.'?fooAlias=baz');
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
-        $this->assertEquals('baz', $a['hydra:member'][0]['foo']);
+        $this->assertSame('baz', $a['hydra:member'][0]['foo']);
 
         $response = self::createClient()->request('GET', $route.'?order[foo]=asc');
-        $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'bar');
+        $this->assertSame($response->toArray()['hydra:member'][0]['foo'], 'bar');
         $response = self::createClient()->request('GET', $route.'?order[foo]=desc');
-        $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'foo');
+        $this->assertSame($response->toArray()['hydra:member'][0]['foo'], 'foo');
 
         $response = self::createClient()->request('GET', $route.'?searchPartial[foo]=az');
         $members = $response->toArray()['hydra:member'];
@@ -95,17 +95,17 @@ final class SearchFilterParameterLegacyTest extends ApiTestCase
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
             'query' => \sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object),
         ]]);
-        $this->assertEquals('bar', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+        $this->assertSame('bar', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
 
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
             'query' => \sprintf('{ %s(searchPartial: {foo: "az"}) { edges { node { id foo createdAt } } } }', $object),
         ]]);
-        $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+        $this->assertSame('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
 
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
             'query' => \sprintf('{ %s(searchExact: {foo: "baz"}) { edges { node { id foo createdAt } } } }', $object),
         ]]);
-        $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
+        $this->assertSame('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
 
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
             'query' => \sprintf('{ %s(searchOnTextAndDate: {foo: "bar", createdAt: {before: "2024-01-21"}}) { edges { node { id foo createdAt } } } }', $object),
@@ -122,7 +122,7 @@ final class SearchFilterParameterLegacyTest extends ApiTestCase
         $route = 'legacy_search_filter_parameter';
         $response = self::createClient()->request('GET', $route.'?foo=baz');
         $a = $response->toArray();
-        $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
+        $this->assertSame($a['hydra:member'][0]['foo'], 'baz');
     }
 
     #[DataProvider('partialFilterParameterProviderForSearchFilterParameter')]

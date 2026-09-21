@@ -50,7 +50,7 @@ class SortFilterExtensionTest extends TestCase
 
         $sortFilterExtension = new SortFilterExtension($containerProphecy->reveal());
 
-        self::assertEquals(['sort' => [['id' => ['order' => 'desc']]]], $sortFilterExtension->applyToCollection([], Foo::class, $operation, ['filters' => ['order' => ['id' => 'desc']]]));
+        self::assertSame(['sort' => [['id' => ['order' => 'desc']]]], $sortFilterExtension->applyToCollection([], Foo::class, $operation, ['filters' => ['order' => ['id' => 'desc']]]));
     }
 
     public function testApplyToCollectionWithNoFilters(): void

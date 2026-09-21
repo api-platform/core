@@ -38,8 +38,8 @@ class BackwardCompatibleSchemaFactoryTest extends TestCase
 
         $this->assertTrue($schema['properties']['foo']['exclusiveMinimum']);
         $this->assertTrue($schema['properties']['foo']['exclusiveMaximum']);
-        $this->assertEquals($schema['properties']['foo']['minimum'], 0);
-        $this->assertEquals($schema['properties']['foo']['maximum'], 1);
+        $this->assertSame($schema['properties']['foo']['minimum'], 0);
+        $this->assertSame($schema['properties']['foo']['maximum'], 1);
     }
 
     public function testWithMultipleType(): void
@@ -60,8 +60,8 @@ class BackwardCompatibleSchemaFactoryTest extends TestCase
 
         $this->assertTrue($schema['properties']['foo']['exclusiveMinimum']);
         $this->assertTrue($schema['properties']['foo']['exclusiveMaximum']);
-        $this->assertEquals($schema['properties']['foo']['minimum'], 0);
-        $this->assertEquals($schema['properties']['foo']['maximum'], 1);
+        $this->assertSame($schema['properties']['foo']['minimum'], 0);
+        $this->assertSame($schema['properties']['foo']['maximum'], 1);
     }
 
     public function testWithoutNumber(): void
@@ -80,8 +80,8 @@ class BackwardCompatibleSchemaFactoryTest extends TestCase
         $schema = $schemaFactory->buildSchema('a', serializerContext: [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
         $schema = $schema->getDefinitions()['a'];
 
-        $this->assertEquals($schema['properties']['foo']['exclusiveMinimum'], 0);
-        $this->assertEquals($schema['properties']['foo']['exclusiveMaximum'], 1);
+        $this->assertSame($schema['properties']['foo']['exclusiveMinimum'], 0);
+        $this->assertSame($schema['properties']['foo']['exclusiveMaximum'], 1);
     }
 
     public function testWithoutFlag(): void
@@ -100,7 +100,7 @@ class BackwardCompatibleSchemaFactoryTest extends TestCase
         $schema = $schemaFactory->buildSchema('a', serializerContext: [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => false]);
         $schema = $schema->getDefinitions()['a'];
 
-        $this->assertEquals($schema['properties']['foo']['exclusiveMinimum'], 0);
-        $this->assertEquals($schema['properties']['foo']['exclusiveMaximum'], 1);
+        $this->assertSame($schema['properties']['foo']['exclusiveMinimum'], 0);
+        $this->assertSame($schema['properties']['foo']['exclusiveMaximum'], 1);
     }
 }

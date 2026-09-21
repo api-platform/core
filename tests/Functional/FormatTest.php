@@ -36,7 +36,7 @@ final class FormatTest extends ApiTestCase
     {
         $r = self::createClient()->request('GET', '/accept_html', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseIsSuccessful();
-        $this->assertEquals($r->getContent(), '<h1>hello</h1>');
+        $this->assertSame($r->getContent(), '<h1>hello</h1>');
     }
 
     /**

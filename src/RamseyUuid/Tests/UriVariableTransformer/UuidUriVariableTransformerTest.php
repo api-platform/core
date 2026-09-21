@@ -25,7 +25,7 @@ class UuidUriVariableTransformerTest extends TestCase
         $uuid = Uuid::uuid4();
         $normalizer = new UuidUriVariableTransformer();
         $this->assertTrue($normalizer->supportsTransformation($uuid->toString(), [Uuid::class]));
-        $this->assertEquals($uuid, $normalizer->transform($uuid->toString(), [Uuid::class]));
+        $this->assertSame($uuid->toString(), $normalizer->transform($uuid->toString(), [Uuid::class])->toString());
     }
 
     public function testNoSupportDenormalizeUuid(): void

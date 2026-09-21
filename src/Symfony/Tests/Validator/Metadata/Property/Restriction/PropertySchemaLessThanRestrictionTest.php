@@ -56,19 +56,19 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
 
     public function testCreateWithNativeType(): void
     {
-        self::assertEquals([
-            'exclusiveMaximum' => 10,
+        self::assertSame([
             'maximum' => 10,
+            'exclusiveMaximum' => 10,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(value: 10), (new ApiProperty())->withNativeType(Type::int())));
 
-        self::assertEquals([
-            'exclusiveMaximum' => 0,
+        self::assertSame([
             'maximum' => 0,
+            'exclusiveMaximum' => 0,
         ], $this->propertySchemaLessThanRestriction->create(new Negative(), (new ApiProperty())->withNativeType(Type::int())));
 
-        self::assertEquals([
-            'exclusiveMaximum' => 10.99,
+        self::assertSame([
             'maximum' => 10.99,
+            'exclusiveMaximum' => 10.99,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(value: 10.99), (new ApiProperty())->withNativeType(Type::float())));
     }
 }

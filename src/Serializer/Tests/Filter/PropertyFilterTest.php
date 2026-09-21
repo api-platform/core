@@ -33,7 +33,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter();
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'qux', 'foo', 'bar', 'baz']], $context);
+        $this->assertSame(['attributes' => ['foo', 'qux', 'foo', 'bar', 'baz']], $context);
     }
 
     public function testApplyWithOverriding(): void
@@ -44,7 +44,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('custom_properties', true);
         $propertyFilter->apply($request, false, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'bar', 'baz']], $context);
+        $this->assertSame(['attributes' => ['foo', 'bar', 'baz']], $context);
     }
 
     public function testApplyWithoutPropertiesInRequest(): void
@@ -54,7 +54,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter();
         $propertyFilter->apply(new Request(), false, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'bar']], $context);
+        $this->assertSame(['attributes' => ['foo', 'bar']], $context);
     }
 
     public function testApplyWithPropertiesWhitelist(): void
@@ -65,7 +65,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, ['bar', 'fuz', 'foo']);
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['qux', 'foo', 'bar']], $context);
+        $this->assertSame(['attributes' => ['qux', 'foo', 'bar']], $context);
     }
 
     public function testApplyWithPropertiesWhitelistAndNestedProperty(): void
@@ -76,7 +76,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, ['foo' => null, 'group' => ['baz' => ['qux']]]);
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['qux', 'foo', 'group' => ['baz' => ['qux']]]], $context);
+        $this->assertSame(['attributes' => ['qux', 'foo', 'group' => ['baz' => ['qux']]]], $context);
     }
 
     public function testApplyWithPropertiesWhitelistNotMatchingAnyProperty(): void
@@ -87,7 +87,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, ['fuz', 'fiz']);
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['qux']], $context);
+        $this->assertSame(['attributes' => ['qux']], $context);
     }
 
     public function testApplyWithPropertiesWhitelistAndOverriding(): void
@@ -98,7 +98,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', true, ['foo', 'baz']);
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'baz']], $context);
+        $this->assertSame(['attributes' => ['foo', 'baz']], $context);
     }
 
     public function testApplyWithPropertiesInPropertyFilterAttribute(): void
@@ -109,7 +109,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter();
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'qux', 'fooz']], $context);
+        $this->assertSame(['attributes' => ['foo', 'qux', 'fooz']], $context);
     }
 
     public function testApplyWithInvalidPropertiesInRequest(): void
@@ -120,7 +120,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter();
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'bar']], $context);
+        $this->assertSame(['attributes' => ['foo', 'bar']], $context);
     }
 
     public function testApplyWithNameConverter(): void
@@ -131,7 +131,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, null, new CustomConverter());
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'name_converted', 'foo', 'bar', 'nameConverted']], $context);
+        $this->assertSame(['attributes' => ['foo', 'name_converted', 'foo', 'bar', 'nameConverted']], $context);
     }
 
     public function testApplyWithOverridingAndNameConverter(): void
@@ -142,7 +142,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('custom_properties', true, null, new CustomConverter());
         $propertyFilter->apply($request, false, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'bar', 'nameConverted']], $context);
+        $this->assertSame(['attributes' => ['foo', 'bar', 'nameConverted']], $context);
     }
 
     public function testApplyWithoutPropertiesInRequestAndNameConverter(): void
@@ -152,7 +152,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, null, new CustomConverter());
         $propertyFilter->apply(new Request(), false, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'name_converted']], $context);
+        $this->assertSame(['attributes' => ['foo', 'name_converted']], $context);
     }
 
     public function testApplyWithPropertiesWhitelistAndNameConverter(): void
@@ -163,7 +163,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, ['nameConverted', 'fuz', 'foo'], new CustomConverter());
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['qux', 'foo', 'nameConverted']], $context);
+        $this->assertSame(['attributes' => ['qux', 'foo', 'nameConverted']], $context);
     }
 
     public function testApplyWithPropertiesWhitelistWithNestedPropertyAndNameConverter(): void
@@ -174,7 +174,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, ['foo' => null, 'nameConverted' => ['baz' => ['nameConverted']]], new CustomConverter());
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['qux', 'foo', 'nameConverted' => ['baz' => ['nameConverted']]]], $context);
+        $this->assertSame(['attributes' => ['qux', 'foo', 'nameConverted' => ['baz' => ['nameConverted']]]], $context);
     }
 
     public function testApplyWithPropertiesWhitelistNotMatchingAnyPropertyAndNameConverter(): void
@@ -185,7 +185,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, ['fuz', 'fiz'], new CustomConverter());
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['qux']], $context);
+        $this->assertSame(['attributes' => ['qux']], $context);
     }
 
     public function testApplyWithPropertiesWhitelistAndOverridingAndNameConverter(): void
@@ -196,7 +196,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', true, ['foo', 'nameConverted'], new CustomConverter());
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'nameConverted']], $context);
+        $this->assertSame(['attributes' => ['foo', 'nameConverted']], $context);
     }
 
     public function testApplyWithPropertiesInPropertyFilterAttributeAndNameConverter(): void
@@ -207,7 +207,7 @@ class PropertyFilterTest extends TestCase
         $propertyFilter = new PropertyFilter('properties', false, null, new CustomConverter());
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['foo', 'qux', 'nameConverted']], $context);
+        $this->assertSame(['attributes' => ['foo', 'qux', 'nameConverted']], $context);
     }
 
     public function testGetDescription(): void
@@ -233,6 +233,15 @@ class PropertyFilterTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedDescription, $propertyFilter->getDescription(DummyProperty::class));
+        $description = $propertyFilter->getDescription(DummyProperty::class);
+
+        $this->assertInstanceOf(Parameter::class, $description['custom_properties[]']['openapi']);
+        $this->assertSame(
+            (array) $expectedDescription['custom_properties[]']['openapi'],
+            (array) $description['custom_properties[]']['openapi']
+        );
+
+        unset($expectedDescription['custom_properties[]']['openapi'], $description['custom_properties[]']['openapi']);
+        $this->assertSame($expectedDescription, $description);
     }
 }

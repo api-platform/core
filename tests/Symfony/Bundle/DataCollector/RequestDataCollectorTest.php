@@ -75,8 +75,8 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
-        $this->assertEquals([], $dataCollector->getResources());
+        $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
+        $this->assertSame([], $dataCollector->getResources());
     }
 
     public function testNotCallingCollect(): void
@@ -89,8 +89,8 @@ class RequestDataCollectorTest extends TestCase
             $this->filterLocator->reveal()
         );
 
-        $this->assertEquals([], $dataCollector->getAcceptableContentTypes());
-        $this->assertEquals([], $dataCollector->getResources());
+        $this->assertSame([], $dataCollector->getAcceptableContentTypes());
+        $this->assertSame([], $dataCollector->getResources());
     }
 
     public function testWithResource(): void
@@ -112,12 +112,12 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
+        $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
 
         $resource = $dataCollector->getResources()[0];
         $this->assertSame(DummyEntity::class, $resource->getResourceClass());
-        $this->assertEquals([['foo' => null, 'a_filter' => \stdClass::class]], $resource->getFilters());
-        $this->assertEquals(['ignored_filters' => 1], $resource->getCounters());
+        $this->assertSame([['foo' => null, 'a_filter' => \stdClass::class]], $resource->getFilters());
+        $this->assertSame(['ignored_filters' => 1], $resource->getCounters());
         $this->assertInstanceOf(Data::class, $resource->getResourceMetadataCollection());
     }
 

@@ -53,7 +53,7 @@ final class BackedEnumFilterLegacyTest extends ApiTestCase
         $response = self::createClient()->request('GET', 'legacy_backed_enum_filter?stringBackedEnum='.StringBackedEnum::One->value);
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
-        $this->assertEquals(StringBackedEnum::One->value, $a['hydra:member'][0]['stringBackedEnum']);
+        $this->assertSame(StringBackedEnum::One->value, $a['hydra:member'][0]['stringBackedEnum']);
     }
 
     public function testFilterIntegerBackedEnum(): void
@@ -67,7 +67,7 @@ final class BackedEnumFilterLegacyTest extends ApiTestCase
         $response = self::createClient()->request('GET', 'legacy_backed_enum_filter?integerBackedEnum='.IntegerBackedEnum::Two->value);
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
-        $this->assertEquals(IntegerBackedEnum::Two->value, $a['hydra:member'][0]['integerBackedEnum']);
+        $this->assertSame(IntegerBackedEnum::Two->value, $a['hydra:member'][0]['integerBackedEnum']);
     }
 
     public function loadFixtures(): void

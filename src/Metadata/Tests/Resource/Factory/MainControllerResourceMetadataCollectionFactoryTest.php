@@ -39,6 +39,6 @@ class MainControllerResourceMetadataCollectionFactoryTest extends TestCase
         $apiResource = (new MainControllerResourceMetadataCollectionFactory($decorated))->create(\stdClass::class);
         $operation = $apiResource->getOperation();
         $this->assertInstanceOf(HttpOperation::class, $operation);
-        $this->assertEquals($operation->getController(), 'api_platform.symfony.main_controller');
+        $this->assertSame($operation->getController(), 'api_platform.symfony.main_controller');
     }
 }

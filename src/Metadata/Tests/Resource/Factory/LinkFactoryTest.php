@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ScopedLinkResource;
 use ApiPlatform\Metadata\Tests\Fixtures\Metadata\ScopedLink;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -37,6 +38,8 @@ use Symfony\Component\TypeInfo\Type;
 
 final class LinkFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     #[DataProvider('provideCreateLinksFromIdentifiersCases')]
@@ -53,10 +56,7 @@ final class LinkFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
-        self::assertEquals(
-            $expectedLinks,
-            $linkFactory->createLinksFromIdentifiers((new Get())->withClass(AttributeResource::class))
-        );
+        self::assertSame(self::toComparableArray($expectedLinks), self::toComparableArray($linkFactory->createLinksFromIdentifiers((new Get())->withClass(AttributeResource::class))));
     }
 
     public static function provideCreateLinksFromIdentifiersCases(): \Generator
@@ -104,10 +104,7 @@ final class LinkFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
-        self::assertEquals(
-            $expectedLinks,
-            $linkFactory->createLinksFromAttributes((new Get())->withClass(AttributeResource::class))
-        );
+        self::assertSame(self::toComparableArray($expectedLinks), self::toComparableArray($linkFactory->createLinksFromAttributes((new Get())->withClass(AttributeResource::class))));
     }
 
     public static function provideCreateLinksFromAttributesCases(): \Generator
@@ -137,10 +134,7 @@ final class LinkFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
-        self::assertEquals(
-            (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['composite1', 'composite2'])->withCompositeIdentifier(true),
-            $linkFactory->completeLink((new Link())->withFromClass(AttributeResource::class))
-        );
+        self::assertSame(self::toComparableArray((new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['composite1', 'composite2'])->withCompositeIdentifier(true)), self::toComparableArray($linkFactory->completeLink((new Link())->withFromClass(AttributeResource::class))));
     }
 
     public function testCreateLinksFromAttributesWithExtendedLink(): void
@@ -174,9 +168,6 @@ final class LinkFactoryTest extends TestCase
 
         $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
-        self::assertEquals(
-            new Link(fromClass: RelatedDummy::class, toProperty: 'test', identifiers: ['id'], parameterName: 'test'),
-            $linkFactory->createLinkFromProperty(new Get(class: Dummy::class), 'test')
-        );
+        self::assertSame(self::toComparableArray(new Link(fromClass: RelatedDummy::class, toProperty: 'test', identifiers: ['id'], parameterName: 'test')), self::toComparableArray($linkFactory->createLinkFromProperty(new Get(class: Dummy::class), 'test')));
     }
 }
