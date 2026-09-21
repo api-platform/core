@@ -15,8 +15,16 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Polymorphism;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
-#[ApiResource]
+#[ApiResource(
+    uriTemplate: '/polymorphism_authors',
+    operations: [
+        new GetCollection(),
+        new Get(uriTemplate: '/polymorphism_authors/{id}'),
+    ],
+)]
 class Author
 {
     #[ApiProperty(identifier: true)]
