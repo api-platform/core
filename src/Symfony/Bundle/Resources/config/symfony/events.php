@@ -59,6 +59,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             null,
             tagged_locator('api_platform.parameter_provider', 'key'),
+            service('api_platform.pagination_options'),
         ]);
 
     $services->set('api_platform.listener.request.read', ReadListener::class)
