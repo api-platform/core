@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ManagedRelation;
 
-use ApiPlatform\Doctrine\Common\State\ManagedEntityTransform;
+use ApiPlatform\Doctrine\Orm\State\ManagedEntityTransform;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;

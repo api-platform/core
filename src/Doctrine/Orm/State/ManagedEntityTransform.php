@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Common\State;
+namespace ApiPlatform\Doctrine\Orm\State;
 
 use ApiPlatform\Metadata\Exception\ExceptionInterface as MetadataExceptionInterface;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;

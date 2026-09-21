@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests\State;
 
-use ApiPlatform\Doctrine\Common\State\ManagedEntityTransform;
+use ApiPlatform\Doctrine\Orm\State\ManagedEntityTransform;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
 use ApiPlatform\Metadata\ApiResource;
