@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Common\Tests\State;
+namespace ApiPlatform\Doctrine\Orm\Tests\State;
 
 use ApiPlatform\Doctrine\Common\State\ManagedEntityTransform;
-use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Get;
