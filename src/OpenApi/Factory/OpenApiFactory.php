@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -349,7 +350,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                                 $name = str_replace($prop, $key, $name);
                             }
 
-                            $openapiParameters[] = $this->getFilterParameter($name, $description, $operation->getShortName(), $f);
+                            $filterParameter = $this->getFilterParameter($name, $description, $operation->getShortName(), $f);
+
+                            if ($key === $name) {
+                                $filterParameter = $this->applyUserParameterMetadata($filterParameter, $p);
+                            }
+
+                            $openapiParameters[] = $filterParameter;
                         }
 
                         continue;
@@ -760,6 +767,58 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * The user's explicit description/openApi metadata on a QueryParameter always overrides
+     * what its string filter service id generated, unlike mergeParameter() which only fills gaps.
+     */
+    private function applyUserParameterMetadata(Parameter $filterParameter, MetadataParameter $p): Parameter
+    {
+        if (($openApi = $p->getOpenApi()) instanceof Parameter) {
+            $filterParameter = $this->overrideParameterFields($filterParameter, $openApi);
+        }
+
+        if (null !== ($description = $p->getDescription())) {
+            $filterParameter = $filterParameter->withDescription($description);
+        }
+
+        return $filterParameter;
+    }
+
+    /**
+     * Applies only the fields the user actually set on their `openApi:` Parameter onto the
+     * filter-generated one, so fields the filter alone computes (schema, style, explode...) survive
+     * when the user leaves them unset. `name`/`in` are intentionally excluded: they're required
+     * constructor arguments with no "unset" state, so the filter-computed ones must always win to
+     * keep the generated parameter's identity (and the fan-out name match) correct.
+     */
+    private function overrideParameterFields(Parameter $filterParameter, Parameter $openApi): Parameter
+    {
+        $unset = new Parameter($filterParameter->getName(), $filterParameter->getIn());
+
+        foreach (
+            [
+                'Description',
+                'Required',
+                'Deprecated',
+                'AllowEmptyValue',
+                'Schema',
+                'Style',
+                'Explode',
+                'AllowReserved',
+                'Example',
+                'Examples',
+                'Content',
+            ] as $field
+        ) {
+            $value = $openApi->{"get$field"}();
+            if ($unset->{"get$field"}() !== $value) {
+                $filterParameter = $filterParameter->{"with$field"}($value);
+            }
+        }
+
+        return $filterParameter;
     }
 
     /**

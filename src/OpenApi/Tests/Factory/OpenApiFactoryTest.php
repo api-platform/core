@@ -1498,4 +1498,187 @@ class OpenApiFactoryTest extends TestCase
 
         $factory->__invoke();
     }
+
+    public function testStringFilterWithUserDescriptionOverridesFilterDescription(): void
+    {
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->method('has')->with('f1')->willReturn(true);
+        $filterLocator->method('get')->with('f1')->willReturn(new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string', 'required' => true, 'strategy' => 'exact'],
+        ]));
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f1', description: 'User description wins')],
+            $filterLocator,
+        );
+
+        $this->assertSame('User description wins', $this->getParameterByName($parameters, 'name')->getDescription());
+    }
+
+    public function testStringFilterWithUserOpenApiOverridesFilterOpenApi(): void
+    {
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->method('has')->with('f2')->willReturn(true);
+        $filterLocator->method('get')->with('f2')->willReturn(new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+        ]));
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f2', openApi: new Parameter(name: 'name', in: 'query', description: 'User OpenApi description', deprecated: true, example: 'foo'))],
+            $filterLocator,
+        );
+
+        $parameter = $this->getParameterByName($parameters, 'name');
+        $this->assertSame('User OpenApi description', $parameter->getDescription());
+        $this->assertTrue($parameter->getDeprecated());
+        $this->assertSame('foo', $parameter->getExample());
+        $this->assertSame(['type' => 'string'], $parameter->getSchema());
+    }
+
+    public function testFilterInstanceWithUserMetadataStillHonoured(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'foo' => new QueryParameter(
+                filter: new DummyFilter(['foo' => ['property' => 'foo', 'type' => 'string']]),
+                description: 'Instance filter description',
+                openApi: new Parameter(name: 'foo', in: 'query', description: 'Instance filter openapi override'),
+            ),
+        ], null);
+
+        $this->assertSame('Instance filter openapi override', $this->getParameterByName($parameters, 'foo')->getDescription());
+    }
+
+    public function testStringFilterFanOutOnlyOverridesTheMatchingGeneratedParameter(): void
+    {
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->method('has')->with('f4fanout')->willReturn(true);
+        $filterLocator->method('get')->with('f4fanout')->willReturn(new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+            'description' => ['property' => 'description', 'type' => 'string'],
+        ]));
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['order[name]' => new QueryParameter(filter: 'f4fanout', property: 'name', description: 'Fan-out matched description')],
+            $filterLocator,
+        );
+
+        $this->assertSame('Fan-out matched description', $this->getParameterByName($parameters, 'order[name]')->getDescription());
+        $this->assertSame('', $this->getParameterByName($parameters, 'description')->getDescription());
+    }
+
+    public function testStringFilterWithoutUserMetadataIsUnchanged(): void
+    {
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->method('has')->with('f5nometa')->willReturn(true);
+        $filterLocator->method('get')->with('f5nometa')->willReturn(new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+        ]));
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f5nometa')],
+            $filterLocator,
+        );
+
+        $parameter = $this->getParameterByName($parameters, 'name');
+        $this->assertSame('', $parameter->getDescription());
+        $this->assertSame(['type' => 'string'], $parameter->getSchema());
+    }
+
+    /**
+     * Fan-out with no name match: a generic, non property-templated QueryParameter cannot be matched to any of the
+     * filter's generated parameter names, so its user metadata is silently ignored. See OpenApiFactoryTest report.
+     */
+    public function testStringFilterFanOutWithNoMatchLeavesGeneratedParametersUntouched(): void
+    {
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->method('has')->with('f6nomatch')->willReturn(true);
+        $filterLocator->method('get')->with('f6nomatch')->willReturn(new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+            'description' => ['property' => 'description', 'type' => 'string'],
+        ]));
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['search' => new QueryParameter(filter: 'f6nomatch', description: 'Should NOT apply, no matching name')],
+            $filterLocator,
+        );
+
+        $this->assertSame('', $this->getParameterByName($parameters, 'name')->getDescription());
+        $this->assertSame('', $this->getParameterByName($parameters, 'description')->getDescription());
+    }
+
+    /**
+     * @param Parameter[] $parameters
+     */
+    private function getParameterByName(array $parameters, string $name): Parameter
+    {
+        foreach ($parameters as $parameter) {
+            if ($parameter->getName() === $name) {
+                return $parameter;
+            }
+        }
+
+        $this->fail(\sprintf('No OpenAPI parameter named "%s" was generated.', $name));
+    }
+
+    /**
+     * @param array<string, \ApiPlatform\Metadata\Parameter> $parameters
+     *
+     * @return Parameter[]
+     */
+    private function getGeneratedQueryParameters(array $parameters, ?ContainerInterface $filterLocator): array
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory([]);
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            (new GetCollection())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('api_dummies_get_collection')
+                ->withUriTemplate('/dummies')
+                ->withParameters($parameters),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->expects($this->once())
+            ->method('create')
+            ->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $filterLocator,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        return $openApi->getPaths()->getPath('/dummies')->getGet()->getParameters() ?? [];
+    }
 }
