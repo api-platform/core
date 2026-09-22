@@ -224,7 +224,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
         if (isset($openapi->parameters->parameter)) {
             foreach ($openapi->parameters->parameter as $parameter) {
-                $data['parameters'][(string) $parameter->attributes()->name] = new OpenApiParameter(
+                $data['parameters'][] = new OpenApiParameter(
                     name: $this->phpize($parameter, 'name', 'string'),
                     in: $this->phpize($parameter, 'in', 'string'),
                     description: $this->phpize($parameter, 'description', 'string'),
