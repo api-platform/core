@@ -76,5 +76,6 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.state_provider.parameter.inner'),
             tagged_locator('api_platform.parameter_provider', 'key'),
+            service('api_platform.pagination_options'),
         ]);
 };

@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -490,5 +491,20 @@ class XmlExtractorTest extends TestCase
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(Comment::class);
+    }
+
+    public function testOpenApiParametersAreAList(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_parameters.xml']);
+        $resources = $extractor->getResources();
+
+        $operation = $resources[Program::class][0]['operations'][0]['openapi'];
+        $parameters = $operation->getParameters();
+
+        $this->assertTrue(array_is_list($parameters));
+        $this->assertEquals('author', $parameters[0]->getName());
+        $this->assertEquals('path', $parameters[0]->getIn());
+        $this->assertEquals('john-doe', $parameters[0]->getExample());
+        $this->assertEquals('format', $parameters[1]->getName());
     }
 }
