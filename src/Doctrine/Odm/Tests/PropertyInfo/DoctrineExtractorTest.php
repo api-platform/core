@@ -345,6 +345,12 @@ class DoctrineExtractorTest extends TestCase
         $this->assertTrue($type->isNullable());
     }
 
+    public function testNullableEnumByPhpType(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineTypedNullability::class, 'nullableEnumByPhpType');
+        $this->assertTrue($type->isNullable());
+    }
+
     private function createExtractor(): DoctrineExtractor
     {
         $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR], true);

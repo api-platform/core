@@ -25,14 +25,17 @@ class DoctrineTypedNullability
     public $id;
 
     #[Field(type: 'string')]
-    private ?string $nullableByPhpType;
+    private ?string $nullableByPhpType; // @phpstan-ignore-line
 
     #[Field(type: 'string', nullable: true)]
-    private string $notNullableByPhpType;
+    private string $notNullableByPhpType; // @phpstan-ignore-line
 
     #[Field(type: 'string', nullable: true)]
-    private $untypedNullableByMapping;
+    private $untypedNullableByMapping; // @phpstan-ignore-line
 
     #[ReferenceOne(targetDocument: DoctrineRelation::class)]
-    private ?DoctrineRelation $nullableReference;
+    private ?DoctrineRelation $nullableReference; // @phpstan-ignore-line
+
+    #[Field(enumType: EnumString::class)]
+    private ?EnumString $nullableEnumByPhpType; // @phpstan-ignore-line
 }
