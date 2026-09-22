@@ -67,11 +67,11 @@ final class CachedResourceMetadataCollectionFactoryTest extends TestCase
         $cacheItem->expects($this->once())->method('set')->with((array) $collection)->willReturnSelf();
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemPool->method('getItem')->with($this->isString())->willReturn($cacheItem);
+        $cacheItemPool->method('getItem')->willReturn($cacheItem);
         $cacheItemPool->expects($this->once())->method('save')->with($cacheItem)->willReturn(true);
 
         $decorated = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $decorated->expects(null !== $expectedCreateCalls ? $this->exactly($expectedCreateCalls) : $this->any())
+        $decorated->expects(null !== $expectedCreateCalls ? $this->exactly($expectedCreateCalls) : $this->atLeastOnce())
             ->method('create')
             ->with('class')
             ->willReturn($collection);

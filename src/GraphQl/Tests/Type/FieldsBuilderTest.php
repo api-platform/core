@@ -125,7 +125,7 @@ class FieldsBuilderTest extends TestCase
 
         $queryFields = $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
 
-        $this->assertEquals($expectedQueryFields, $queryFields);
+        $this->assertQueryFieldsEqual($expectedQueryFields, $queryFields);
     }
 
     public static function itemQueryFieldsProvider(): array
@@ -217,7 +217,7 @@ class FieldsBuilderTest extends TestCase
 
         $queryFields = $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
 
-        $this->assertEquals($expectedQueryFields, $queryFields);
+        $this->assertQueryFieldsEqual($expectedQueryFields, $queryFields);
     }
 
     public static function collectionQueryFieldsProvider(): array
@@ -472,8 +472,8 @@ class FieldsBuilderTest extends TestCase
             return \in_array($class, [$resourceClass, 'nestedResourceClass', 'nestedResourceNoQueryClass'], true);
         });
 
-        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->method('create')->with($resourceClass)->willReturn(new PropertyNameCollection(array_keys($properties)));
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnMap([[$resourceClass, new PropertyNameCollection(array_keys($properties))]]);
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->method('create')->willReturnCallback(static function ($class, $propertyName) use ($properties, $resourceClass) {
@@ -517,13 +517,11 @@ class FieldsBuilderTest extends TestCase
         });
 
         $nestedResourceQueryOperation = new Query();
-        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->method('create')->with('nestedResourceClass')->willReturn(
-            new ResourceMetadataCollection('nestedResourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])])
-        );
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturnMap([['nestedResourceClass', new ResourceMetadataCollection('nestedResourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])])]]);
 
-        $typesContainer = $this->createMock(TypesContainerInterface::class);
-        $typesContainer->method('has')->with('NotRegisteredType')->willReturn(false);
+        $typesContainer = $this->createStub(TypesContainerInterface::class);
+        $typesContainer->method('has')->willReturnMap([['NotRegisteredType', false]]);
         $typesContainer->method('all')->willReturn([]);
 
         $typeBuilder = $this->createMock(ContextAwareTypeBuilderInterface::class);
@@ -575,8 +573,8 @@ class FieldsBuilderTest extends TestCase
     public static function resourceObjectTypeFieldsProvider(): iterable
     {
         $advancedNameConverterFactory = static function (self $that): NameConverterInterface {
-            $nameConverter = $that->createMock(NameConverterInterface::class);
-            $nameConverter->method('normalize')->with('field', \stdClass::class)->willReturn('normalizedField');
+            $nameConverter = $that->createStub(NameConverterInterface::class);
+            $nameConverter->method('normalize')->willReturnMap([['field', \stdClass::class, 'normalizedField']]);
 
             return $nameConverter;
         };
@@ -938,5 +936,21 @@ class FieldsBuilderTest extends TestCase
             [['customArg' => []], [], 'The argument "customArg" of the custom operation "operation" in shortName needs a "type" option.'],
             [['customArg' => ['type' => 'a type']], ['customArg' => ['type' => GraphQLType::string()]]],
         ];
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $expectedQueryFields
+     * @param array<string, array<string, mixed>> $queryFields
+     */
+    private function assertQueryFieldsEqual(array $expectedQueryFields, array $queryFields): void
+    {
+        foreach ($expectedQueryFields as $fieldName => $expectedQueryField) {
+            $this->assertArrayHasKey($fieldName, $queryFields);
+            $this->assertArrayHasKey('resolve', $queryFields[$fieldName]);
+            $this->assertSame($expectedQueryField['resolve'], $queryFields[$fieldName]['resolve']);
+            unset($expectedQueryFields[$fieldName]['resolve'], $queryFields[$fieldName]['resolve']);
+        }
+
+        $this->assertEquals($expectedQueryFields, $queryFields);
     }
 }
