@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -80,10 +81,14 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
+        $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
         /** @var HttpOperation $operation */
-        $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
+        $operation = $resourceMetadataCollection->getOperation(null, false, true);
 
-        return $this->getResourceContextFromOperation($operation, $resourceClass, $referenceType);
+        // Every operation resolves to this same /contexts/{shortName} URI, so union their groups.
+        $sharedGroups = $this->getOperationsGroups($resourceMetadataCollection, $operation->getShortName());
+
+        return $this->buildOperationContext($operation, $resourceClass, $referenceType, $sharedGroups);
     }
 
     /**
@@ -157,6 +162,11 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
      */
     public function getResourceContextFromOperation(HttpOperation $operation, string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
+        return $this->buildOperationContext($operation, $resourceClass, $referenceType);
+    }
+
+    private function buildOperationContext(HttpOperation $operation, string $resourceClass, int $referenceType, ?array $additionalGroups = []): array
+    {
         if (null === $shortName = $operation->getShortName()) {
             return [];
         }
@@ -169,7 +179,35 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
             return $context;
         }
 
-        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation);
+        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation, $additionalGroups);
+    }
+
+    /**
+     * Null when an operation declares no normalization groups: it serializes everything, so nothing can be filtered.
+     */
+    private function getOperationsGroups(ResourceMetadataCollection $resourceMetadataCollection, ?string $shortName): ?array
+    {
+        $groups = [];
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getOperations() ?? [] as $operation) {
+                if (!$operation instanceof HttpOperation || $operation->getShortName() !== $shortName) {
+                    continue;
+                }
+
+                if (null === ($operation->getNormalizationContext()['groups'] ?? null)) {
+                    return null;
+                }
+
+                foreach ((array) $operation->getNormalizationContext()['groups'] as $group) {
+                    $groups[$group] = true;
+                }
+                foreach ((array) ($operation->getDenormalizationContext()['groups'] ?? []) as $group) {
+                    $groups[$group] = true;
+                }
+            }
+        }
+
+        return array_keys($groups);
     }
 
     private function generateContextUri(?string $shortName, ?int $referenceType): string
@@ -177,7 +215,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
         return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $shortName], $referenceType ?? UrlGeneratorInterface::ABS_PATH);
     }
 
-    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null): array
+    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null, ?array $additionalGroups = []): array
     {
         $context = $this->getBaseContext($referenceType);
 
@@ -185,9 +223,19 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
             $context = array_merge($context, $jsonldContext);
         }
 
-        $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
+        $normalizationGroups = $operation?->getNormalizationContext()['groups'] ?? null;
+        $denormalizationGroups = $operation?->getDenormalizationContext()['groups'] ?? null;
+        $propertyContext = $operation ? ['normalization_groups' => $normalizationGroups, 'denormalization_groups' => $denormalizationGroups] : ['normalization_groups' => [], 'denormalization_groups' => []];
 
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+        // A property in none of these groups is never serialized, so it has no place in the @context.
+        if (null === $additionalGroups) {
+            $propertyNameCollectionContext = [];
+        } else {
+            $serializerGroups = array_unique([...(array) $normalizationGroups, ...(array) $denormalizationGroups, ...$additionalGroups]);
+            $propertyNameCollectionContext = $serializerGroups ? ['serializer_groups' => $serializerGroups] : [];
+        }
+
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $propertyNameCollectionContext) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
 
             if ($propertyMetadata->isIdentifier() && true !== $propertyMetadata->isWritable()) {
