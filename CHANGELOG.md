@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.4.1
+
+### Bug fixes
+
+* [09ec897c7](https://github.com/api-platform/core/commit/09ec897c763739ea8f7867cdd69a452d7efc6f11) fix(openapi): user metadata wins over filter doc (#8562)
+* [3c04e0c80](https://github.com/api-platform/core/commit/3c04e0c80bee65c92ecc1e4847d9ce6cc978ecf1) fix(metadata): xml openapi parameters as a list (#8561)
+* [95074ced7](https://github.com/api-platform/core/commit/95074ced7a727badc8e8d7a1bce9068742646162) fix: name deprecated option in message (#8545)
+* [d59d95dc9](https://github.com/api-platform/core/commit/d59d95dc99223b678645006c3a80ad74b63382d5) fix(validator): strict query param validation rejecting pagination params (#8544)
+
 ## v4.4.0
 
 ### Features
