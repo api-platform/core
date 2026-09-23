@@ -298,7 +298,7 @@ class EagerLoadingExtensionTest extends TestCase
 
     public function testCreateItemWithOperation(): void
     {
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
         $propertyNameCollectionFactoryMock = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryMock = $this->createMock(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryMock->expects($this->atLeastOnce())->method('create')->with(Dummy::class, 'foo', ['serializer_groups' => ['foo']])->willReturn(new ApiProperty());
@@ -310,17 +310,17 @@ class EagerLoadingExtensionTest extends TestCase
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, false, true);
-        $eagerExtensionTest->applyToItem($queryBuilderMock, new QueryNameGenerator(), Dummy::class, [], new Get(name: 'item_operation'), ['groups' => ['foo']]);
+        $eagerExtensionTest->applyToItem($queryBuilderStub, new QueryNameGenerator(), Dummy::class, [], new Get(name: 'item_operation'), ['groups' => ['foo']]);
     }
 
     public function testCreateCollectionWithOperation(): void
     {
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
         $propertyNameCollectionFactoryMock = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryMock = $this->createMock(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryMock->expects($this->atLeastOnce())->method('create')->with(Dummy::class, 'foo', ['serializer_groups' => ['foo']])->willReturn(new ApiProperty());
@@ -332,12 +332,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, false, true);
-        $eagerExtensionTest->applyToCollection($queryBuilderMock, new QueryNameGenerator(), Dummy::class, new GetCollection(name: 'collection_operation'), ['groups' => ['foo']]);
+        $eagerExtensionTest->applyToCollection($queryBuilderStub, new QueryNameGenerator(), Dummy::class, new GetCollection(name: 'collection_operation'), ['groups' => ['foo']]);
     }
 
     public function testDenormalizeItemWithCorrectResourceClass(): void
@@ -351,13 +351,13 @@ class EagerLoadingExtensionTest extends TestCase
         // Dummy is the correct class for the denormalization context serialization groups, and we're fetching RelatedDummy
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(RelatedDummy::class)->willReturn($classMetadataMock);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, false, true);
-        $eagerExtensionTest->applyToItem($queryBuilderMock, new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], new Get(name: 'get', normalizationContext: ['groups' => ['foo']]), ['resource_class' => Dummy::class]);
+        $eagerExtensionTest->applyToItem($queryBuilderStub, new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], new Get(name: 'get', normalizationContext: ['groups' => ['foo']]), ['resource_class' => Dummy::class]);
     }
 
     public function testDenormalizeItemWithExistingGroups(): void
@@ -371,13 +371,13 @@ class EagerLoadingExtensionTest extends TestCase
         // groups exist from the context, we don't need to compute them again
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(RelatedDummy::class)->willReturn($classMetadataMock);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, false, true);
-        $eagerExtensionTest->applyToItem($queryBuilderMock, new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], new Get(name: 'item_operation', normalizationContext: ['groups' => ['foo']]), [AbstractNormalizer::GROUPS => 'some_groups']);
+        $eagerExtensionTest->applyToItem($queryBuilderStub, new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], new Get(name: 'item_operation', normalizationContext: ['groups' => ['foo']]), [AbstractNormalizer::GROUPS => 'some_groups']);
     }
 
     public function testContextSwitch(): void
@@ -607,37 +607,37 @@ class EagerLoadingExtensionTest extends TestCase
             [RelatedDummy::class, 'dummy', ['serializer_groups' => ['foo']], $relatedPropertyMetadata],
         ]);
 
-        $classMetadataMock = $this->createMock(ClassMetadata::class);
-        $classMetadataMock->associationMappings = [
+        $classMetadataStub = $this->createStub(ClassMetadata::class);
+        $classMetadataStub->associationMappings = [
             'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [new JoinColumn(nullable: false)], 'targetEntity' => RelatedDummy::class],
         ];
-        $classMetadataMock->method('hasField')->with('relatedDummy')->willReturn(true);
+        $classMetadataStub->method('hasField')->willReturnMap([['relatedDummy', true]]);
 
-        $relatedClassMetadataMock = $this->createMock(ClassMetadata::class);
-        $relatedClassMetadataMock->associationMappings = [
+        $relatedClassMetadataStub = $this->createStub(ClassMetadata::class);
+        $relatedClassMetadataStub->associationMappings = [
             'dummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [new JoinColumn(nullable: false)], 'targetEntity' => Dummy::class],
         ];
-        $relatedClassMetadataMock->method('hasField')->with('dummy')->willReturn(true);
+        $relatedClassMetadataStub->method('hasField')->willReturnMap([['dummy', true]]);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->willReturnMap([
-            [Dummy::class, $classMetadataMock],
-            [RelatedDummy::class, $relatedClassMetadataMock],
+            [Dummy::class, $classMetadataStub],
+            [RelatedDummy::class, $relatedClassMetadataStub],
         ]);
 
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
-        $queryBuilderMock->method('innerJoin')->with($this->isString(), $this->isString())->willReturn($queryBuilderMock);
-        $queryBuilderMock->method('addSelect')->with($this->isString())->willReturn($queryBuilderMock);
-        $queryBuilderMock->method('getDQLPart')->willReturnMap([
+        $queryBuilderStub->method('innerJoin')->willReturn($queryBuilderStub);
+        $queryBuilderStub->method('addSelect')->willReturn($queryBuilderStub);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([
             ['select', []],
             ['join', []],
         ]);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, false, true);
-        $eagerExtensionTest->applyToCollection($queryBuilderMock, new QueryNameGenerator(), Dummy::class, null, ['groups' => ['foo']]);
+        $eagerExtensionTest->applyToCollection($queryBuilderStub, new QueryNameGenerator(), Dummy::class, null, ['groups' => ['foo']]);
     }
 
     public function testMaxDepth(): void
@@ -664,17 +664,17 @@ class EagerLoadingExtensionTest extends TestCase
             [RelatedDummy::class, 'dummy', ['serializer_groups' => ['foo'], 'normalization_groups' => ['foo']], $relatedPropertyMetadata],
         ]);
 
-        $classMetadataMock = $this->createMock(ClassMetadata::class);
-        $classMetadataMock->associationMappings = [
+        $classMetadataStub = $this->createStub(ClassMetadata::class);
+        $classMetadataStub->associationMappings = [
             'relatedDummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [new JoinColumn(nullable: false)], 'targetEntity' => RelatedDummy::class],
         ];
-        $classMetadataMock->method('hasField')->with('relatedDummy')->willReturn(true);
+        $classMetadataStub->method('hasField')->willReturnMap([['relatedDummy', true]]);
 
-        $relatedClassMetadataMock = $this->createMock(ClassMetadata::class);
-        $relatedClassMetadataMock->associationMappings = [
+        $relatedClassMetadataStub = $this->createStub(ClassMetadata::class);
+        $relatedClassMetadataStub->associationMappings = [
             'dummy' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [new JoinColumn(nullable: false)], 'targetEntity' => Dummy::class],
         ];
-        $relatedClassMetadataMock->method('hasField')->with('dummy')->willReturn(true);
+        $relatedClassMetadataStub->method('hasField')->willReturnMap([['dummy', true]]);
 
         $dummyClassMetadataInterfaceMock = $this->createMock(ClassMetadataInterface::class);
         $relatedClassMetadataInterfaceMock = $this->createMock(ClassMetadataInterface::class);
@@ -696,8 +696,8 @@ class EagerLoadingExtensionTest extends TestCase
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->willReturnMap([
-            [Dummy::class, $classMetadataMock],
-            [RelatedDummy::class, $relatedClassMetadataMock],
+            [Dummy::class, $classMetadataStub],
+            [RelatedDummy::class, $relatedClassMetadataStub],
         ]);
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
@@ -772,7 +772,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyMetadataFactoryMock->expects($this->atLeastOnce())->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foobar'], 'normalization_groups' => 'foobar'])->willReturn($relationPropertyMetadata);
 
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
 
         $classMetadataMock = $this->createMock(ClassMetadata::class);
         $classMetadataMock->associationMappings = [
@@ -785,12 +785,12 @@ class EagerLoadingExtensionTest extends TestCase
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
 
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderMock, new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foobar']));
+        $orderExtensionTest->applyToItem($queryBuilderStub, new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foobar']));
     }
 
     public function testResourceClassNotFoundException(): void
@@ -798,7 +798,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryMock = $this->createMock(PropertyNameCollectionFactoryInterface::class);
 
         $propertyMetadataFactoryMock = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryMock->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willThrowException(new ResourceClassNotFoundException());
+        $propertyMetadataFactoryMock->expects($this->once())->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willThrowException(new ResourceClassNotFoundException());
 
         $classMetadataMock = $this->createMock(ClassMetadata::class);
         $classMetadataMock->associationMappings = [
@@ -806,13 +806,13 @@ class EagerLoadingExtensionTest extends TestCase
         ];
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderMock, new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $orderExtensionTest->applyToItem($queryBuilderStub, new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testPropertyNotFoundException(): void
@@ -820,7 +820,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryMock = $this->createMock(PropertyNameCollectionFactoryInterface::class);
 
         $propertyMetadataFactoryMock = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryMock->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willThrowException(new PropertyNotFoundException());
+        $propertyMetadataFactoryMock->expects($this->once())->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willThrowException(new PropertyNotFoundException());
 
         $classMetadataMock = $this->createMock(ClassMetadata::class);
         $classMetadataMock->associationMappings = [
@@ -828,24 +828,24 @@ class EagerLoadingExtensionTest extends TestCase
         ];
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderMock, new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $orderExtensionTest->applyToItem($queryBuilderStub, new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testResourceClassNotFoundExceptionPropertyNameCollection(): void
     {
         $propertyNameCollectionFactoryMock = $this->createMock(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryMock->method('create')->with(UnknownDummy::class)->willThrowException(new ResourceClassNotFoundException());
+        $propertyNameCollectionFactoryMock->expects($this->once())->method('create')->with(UnknownDummy::class)->willThrowException(new ResourceClassNotFoundException());
 
         $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
         $propertyMetadataFactoryMock = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryMock->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willReturn($relationPropertyMetadata);
+        $propertyMetadataFactoryMock->expects($this->once())->method('create')->with(Dummy::class, 'relation', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willReturn($relationPropertyMetadata);
 
         $classMetadataMock = $this->createMock(ClassMetadata::class);
         $classMetadataMock->associationMappings = [
@@ -956,7 +956,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyMetadataFactoryMock->expects($this->atLeastOnce())->method('create')->with(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willReturn($relationPropertyMetadata);
 
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderStub = $this->createStub(QueryBuilder::class);
 
         $classMetadataMock = $this->createMock(ClassMetadata::class);
         $classMetadataMock->associationMappings = [
@@ -969,11 +969,11 @@ class EagerLoadingExtensionTest extends TestCase
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
 
-        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
-        $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
+        $queryBuilderStub->method('getRootAliases')->willReturn(['o']);
+        $queryBuilderStub->method('getDQLPart')->willReturnMap([['select', []]]);
+        $queryBuilderStub->method('getEntityManager')->willReturn($emMock);
 
-        $queryBuilder = $queryBuilderMock;
+        $queryBuilder = $queryBuilderStub;
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryMock, $propertyMetadataFactoryMock, 30, false, true);
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo', AbstractNormalizer::ATTRIBUTES => ['relatedDummy']]));
     }
@@ -1231,7 +1231,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn($classMetadataMock);
 
         $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
+        $queryBuilderMock->method('getDQLPart')->willReturnMap([['select', []]]);
         $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
 
         $queryBuilderMock->expects($this->never())->method('leftJoin')->with('o.relatedDummy', 'relatedDummy_a1');
@@ -1267,7 +1267,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emMock->expects($this->atLeastOnce())->method('getClassMetadata')->with(PropertyCollectionIriOnly::class)->willReturn($classMetadataMock);
 
         $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('getDQLPart')->with('select')->willReturn([]);
+        $queryBuilderMock->method('getDQLPart')->willReturnMap([['select', []]]);
         $queryBuilderMock->method('getEntityManager')->willReturn($emMock);
 
         $queryBuilderMock->expects($this->never())->method('leftJoin')->with('o.propertyCollectionIriOnlyRelation', 'propertyCollectionIriOnlyRelation_a1');

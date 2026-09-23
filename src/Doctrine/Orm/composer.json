@@ -34,7 +34,7 @@
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.11.1 || ^3.1",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.5 || ^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
         "symfony/cache": "^7.4 || ^8.0",

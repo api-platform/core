@@ -189,13 +189,18 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
         }
 
         $message = $this->resolveMessage($constraint, $expectedTypes);
+        $renderedMessage = $message;
         $translationParameters = [];
-        if ($expectedTypes && str_contains($message, '{{ type }}')) {
-            $translationParameters['{{ type }}'] = implode('|', $expectedTypes);
+        if (str_contains($message, '{{ type }}')) {
+            if ($expectedTypes) {
+                $translationParameters['{{ type }}'] = implode('|', $expectedTypes);
+            } elseif ($exception->canUseMessageForUser()) {
+                $renderedMessage = $exception->getMessage();
+            }
         }
 
         return new ConstraintViolation(
-            $this->translator->trans($message, $translationParameters, 'validators'),
+            $this->translator->trans($renderedMessage, $translationParameters, 'validators'),
             $message,
             $parameters,
             null,

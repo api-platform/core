@@ -87,6 +87,30 @@ final class DenormalizationViolationFactoryTest extends TestCase
         }
     }
 
+    public function testEmptyExpectedTypesDoesNotLeaveTypePlaceholderUnresolved(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType(
+            'The data must be one of the following values: "a", "b".',
+            'invalid',
+            [],
+            'choice',
+            true,
+        );
+
+        try {
+            $this->factory->handle($exception, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violation = $e->getConstraintViolationList()[0];
+            $this->assertSame(
+                'The data must be one of the following values: "a", "b".',
+                (string) $violation->getMessage(),
+            );
+            $this->assertSame('This value should be of type {{ type }}.', $violation->getMessageTemplate());
+            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violation->getCode());
+        }
+    }
+
     public function testWrongTypeWithoutConstraintReturnsVoid(): void
     {
         $exception = NotNormalizableValueException::createForUnexpectedDataType('Type error.', 'abc', ['float'], 'rawFloat');

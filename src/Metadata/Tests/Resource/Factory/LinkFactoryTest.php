@@ -146,8 +146,8 @@ final class LinkFactoryTest extends TestCase
     public function testCreateLinksFromAttributesWithExtendedLink(): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
-        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->with(ScopedLinkResource::class, 'dummy')->willReturn((new ApiProperty())->withNativeType(Type::object(Dummy::class)));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnMap([[ScopedLinkResource::class, 'dummy', (new ApiProperty())->withNativeType(Type::object(Dummy::class))]]);
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);
 

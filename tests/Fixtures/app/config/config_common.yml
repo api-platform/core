@@ -2,7 +2,7 @@ parameters:
     container.autowiring.strict_mode: true
     .container.dumper.inline_class_loader: true
     env(MERCURE_URL): http://localhost:1337/.well-known/mercure
-    env(MERCURE_JWT_SECRET): eyJhbGciOiJIUzI1NiJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdLCJzdWJzY3JpYmUiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbS9teS1wcml2YXRlLXRvcGljIiwie3NjaGVtZX06Ly97K2hvc3R9L2RlbW8vYm9va3Mve2lkfS5qc29ubGQiLCIvLndlbGwta25vd24vbWVyY3VyZS9zdWJzY3JpcHRpb25zey90b3BpY317L3N1YnNjcmliZXJ9Il0sInBheWxvYWQiOnsidXNlciI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXNlcnMvZHVuZ2xhcyIsInJlbW90ZUFkZHIiOiIxMjcuMC4wLjEifX19.KKPIikwUzRuB3DTpVw6ajzwSChwFw5omBMmMcWKiDcM
+    env(MERCURE_JWT_SECRET): '!ChangeThisMercureHubJWTSecretKey!'
     # Only config_mercure.yml (APP_ENV=mercure) runs a hub and flips this on.
     app.mercure.publish_to_hub: false
 
@@ -28,7 +28,16 @@ mercure:
     hubs:
         default:
             url: '%env(MERCURE_URL)%'
-            jwt: '%env(MERCURE_JWT_SECRET)%'
+            protocol_version: '1.0'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                publish: ['*']
+                subscribe: ['https://example.com/my-private-topic']
+                # "iss" must match the hub's MERCURE_TRUSTED_ISSUERS; "sub"/"client_id" are required by RFC 9068.
+                claims:
+                    iss: 'https://api-platform.com'
+                    sub: 'https://api-platform.com'
+                    client_id: 'api-platform-tests'
 
 api_platform:
     title:                             'My Dummy API'

@@ -39,7 +39,7 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.5 || ^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "api-platform/doctrine-common": "^5.0",
         "api-platform/doctrine-orm": "^5.0",
         "api-platform/doctrine-odm": "^5.0",

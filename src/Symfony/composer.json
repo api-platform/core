@@ -59,7 +59,7 @@
         "api-platform/json-api": "^5.0",
         "api-platform/test": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.5 || ^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "symfony/expression-language": "^7.4 || ^8.0",
         "symfony/intl": "^7.4 || ^8.0",
         "symfony/mercure-bundle": "^0.4.3|^0.5",

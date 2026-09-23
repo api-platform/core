@@ -40,9 +40,9 @@ class CallableProcessorTest extends TestCase
         $operation = new Get(name: 'hello', processor: 'processor');
         $provider = $this->createMock(ProcessorInterface::class);
         $provider->method('process')->willReturn(['ok']);
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with('processor')->willReturn(true);
-        $container->method('get')->with('processor')->willReturn($provider);
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnMap([['processor', true]]);
+        $container->method('get')->willReturnMap([['processor', $provider]]);
         $this->assertEquals((new CallableProcessor($container))->process(new \stdClass(), $operation), ['ok']);
     }
 
@@ -51,8 +51,8 @@ class CallableProcessorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Processor "processor" not found on operation "hello"');
         $operation = new Get(name: 'hello', processor: 'processor');
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with('processor')->willReturn(false);
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnMap([['processor', false]]);
         (new CallableProcessor($container))->process(new \stdClass(), $operation);
     }
 }

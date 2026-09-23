@@ -672,12 +672,13 @@ jobs:
     env:
       APP_ENV: mercure
       MERCURE_URL: 'http://localhost:1337/.well-known/mercure'
-      MERCURE_JWT_SECRET: 'eyJhbGciOiJIUzI1NiJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOlsiKiJdLCJzdWJzY3JpYmUiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbS9teS1wcml2YXRlLXRvcGljIiwie3NjaGVtZX06Ly97K2hvc3R9L2RlbW8vYm9va3Mve2lkfS5qc29ubGQiLCIvLndlbGwta25vd24vbWVyY3VyZS9zdWJzY3JpcHRpb25zey90b3BpY317L3N1YnNjcmliZXJ9Il0sInBheWxvYWQiOnsidXNlciI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXNlcnMvZHVuZ2xhcyIsInJlbW90ZUFkZHIiOiIxMjcuMC4wLjEifX19.KKPIikwUzRuB3DTpVw6ajzwSChwFw5omBMmMcWKiDcM'
+      MERCURE_JWT_SECRET: '!ChangeThisMercureHubJWTSecretKey!'
     services:
       mercure:
-        image: dunglas/mercure
+        image: dunglas/mercure:v1.0
         env:
           SERVER_NAME: :1337
+          MERCURE_TRUSTED_ISSUERS: 'https://api-platform.com'
           MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
           MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
           MERCURE_EXTRA_DIRECTIVES: |

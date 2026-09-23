@@ -81,6 +81,7 @@ use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
@@ -155,7 +156,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                         $app->make(ResourceAccessCheckerInterface::class)
                     ),
                 ),
-                new ServiceLocator($tagged)
+                new ServiceLocator($tagged),
+                $app->make(PaginationOptions::class)
             );
         });
 

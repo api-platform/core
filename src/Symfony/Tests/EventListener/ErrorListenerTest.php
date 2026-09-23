@@ -173,15 +173,12 @@ class ErrorListenerTest extends TestCase
     {
         $exception = new \Exception();
         $operation = new Get(name: '_api_errors_problem', priority: 0, status: 400);
-        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactory->method('create')
-                                          ->with(Error::class)
-                                          ->willReturn(
-                                              new ResourceMetadataCollection(Error::class, [new ApiResource(operations: [$operation])])
-                                          );
+                                          ->willReturnMap([[Error::class, new ResourceMetadataCollection(Error::class, [new ApiResource(operations: [$operation])])]]);
 
-        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolver->method('isResourceClass')->with($exception::class)->willReturn(false);
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnMap([[$exception::class, false]]);
 
         $kernel = $this->createStub(KernelInterface::class);
         $kernel->method('handle')->willReturn(new Response());

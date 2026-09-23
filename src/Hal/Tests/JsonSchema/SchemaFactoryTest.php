@@ -35,19 +35,16 @@ class SchemaFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->method('create')
-            ->with(Dummy::class)
-            ->willReturn(
-                new ResourceMetadataCollection(Dummy::class, [
-                    (new ApiResource())->withOperations(new Operations([
-                        'get' => (new Get())->withName('get'),
-                    ])),
-                ])
-            );
+            ->willReturnMap([[Dummy::class, new ResourceMetadataCollection(Dummy::class, [
+                (new ApiResource())->withOperations(new Operations([
+                    'get' => (new Get())->withName('get'),
+                ])),
+            ])]]);
 
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->method('create')
+        $propertyNameCollectionFactory->expects($this->atLeastOnce())->method('create')
             ->with(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])
             ->willReturn(new PropertyNameCollection());
 
