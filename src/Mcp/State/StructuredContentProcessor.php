@@ -54,7 +54,11 @@ final class StructuredContentProcessor implements ProcessorInterface
         $request = $context['request'] ?? null;
         $context['original_data'] = $result;
         $class = $operation->getClass();
-        $includeStructuredContent = $operation instanceof McpTool || $operation instanceof McpResource ? $operation->getStructuredContent() ?? true : false;
+        $isMcpOperation = $operation instanceof McpTool || $operation instanceof McpResource;
+        $includeStructuredContent = $isMcpOperation ? $operation->getStructuredContent() ?? true : false;
+        // Only an HttpOperation carries formats, and the base Operation type does not
+        // declare getOutputFormats().
+        $outputFormats = $isMcpOperation ? $operation->getOutputFormats() ?? [] : [];
         $structuredContent = null;
 
         if ($request && $this->serializer instanceof NormalizerInterface && $this->serializer instanceof EncoderInterface) {
@@ -63,7 +67,7 @@ final class StructuredContentProcessor implements ProcessorInterface
                 'operation' => $operation,
             ]);
             $serializerContext['uri_variables'] = $uriVariables;
-            $format = $request->getRequestFormat('') ?: 'jsonld';
+            $format = $outputFormats ? array_key_first($outputFormats) : ($request->getRequestFormat('') ?: 'jsonld');
             $normalized = $this->serializer->normalize($result, $format, $serializerContext);
             $result = $this->serializer->encode($normalized, $format, $serializerContext);
 
