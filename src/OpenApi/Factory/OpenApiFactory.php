@@ -492,6 +492,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
+                    if ($openApiHeader = $responseHeader->getOpenApiHeader()) {
+                        $documentedHeaders[$name] = $openApiHeader;
+                        continue;
+                    }
+
                     $documentedHeaders[$name] = new Header(
                         description: $responseHeader->getDescription() ?? '',
                         required: $responseHeader->getRequired() ?? false,

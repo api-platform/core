@@ -67,6 +67,22 @@ final class ResponseHeaderTest extends ApiTestCase
         $this->assertResponseHeaderSame('x-empty-header', '');
     }
 
+    public function testCustomOpenApiHeaderOverridesTheGeneratedOne(): void
+    {
+        $response = self::createClient()->request('GET', 'docs', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
+        $this->assertResponseIsSuccessful();
+
+        $headers = $response->toArray()['paths']['/with_response_headers/{id}']['get']['responses']['200']['headers'];
+
+        $this->assertArrayHasKey('X-Custom-Documented', $headers);
+        $this->assertSame('Fully custom documentation', $headers['X-Custom-Documented']['description']);
+        $this->assertTrue($headers['X-Custom-Documented']['required']);
+        $this->assertTrue($headers['X-Custom-Documented']['deprecated']);
+        $this->assertSame(['type' => 'string', 'format' => 'uuid'], $headers['X-Custom-Documented']['schema']);
+
+        $this->assertArrayNotHasKey('X-Frame-Options', $headers);
+    }
+
     public function testOpenApiDocumentsResponseHeaders(): void
     {
         $response = self::createClient()->request('GET', 'docs', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);

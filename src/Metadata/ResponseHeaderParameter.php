@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\OpenApi\Model\Header;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterProviderInterface;
 
@@ -26,6 +27,9 @@ use ApiPlatform\State\ParameterProviderInterface;
  *   {@see Parameter::setValue()}.
  * - A header that resolves to no value is not emitted. Use an empty string to produce
  *   an empty header value.
+ * - `$openApiHeader` overrides the generated OpenAPI documentation entirely. It is named
+ *   apart from the inherited `$openApi` because the latter is a promoted property of
+ *   {@see Parameter} and cannot be re-typed to carry a {@see Header}.
  */
 final class ResponseHeaderParameter extends Parameter
 {
@@ -43,6 +47,7 @@ final class ResponseHeaderParameter extends Parameter
         ?bool $required = null,
         private ?bool $deprecated = null,
         OpenApiParameter|array|false|null $openApi = null,
+        private ?Header $openApiHeader = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -55,6 +60,19 @@ final class ResponseHeaderParameter extends Parameter
             extraProperties: $extraProperties,
             default: $default,
         );
+    }
+
+    public function getOpenApiHeader(): ?Header
+    {
+        return $this->openApiHeader;
+    }
+
+    public function withOpenApiHeader(Header $openApiHeader): static
+    {
+        $self = clone $this;
+        $self->openApiHeader = $openApiHeader;
+
+        return $self;
     }
 
     public function getDeprecated(): ?bool

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\ResponseHeaderParameter;
+use ApiPlatform\OpenApi\Model\Header;
 use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider;
 
 #[Get(
@@ -37,6 +38,17 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider;
             schema: ['type' => 'string'],
             description: 'Static header value',
             default: 'static-value',
+        ),
+        'X-Custom-Documented' => new ResponseHeaderParameter(
+            schema: ['type' => 'integer'],
+            description: 'Overridden by the custom OpenAPI header',
+            default: 'custom-value',
+            openApiHeader: new Header(
+                description: 'Fully custom documentation',
+                required: true,
+                deprecated: true,
+                schema: ['type' => 'string', 'format' => 'uuid'],
+            ),
         ),
         'X-Empty-Header' => new ResponseHeaderParameter(
             description: 'Resolved to an empty value',
