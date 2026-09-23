@@ -1501,11 +1501,11 @@ class OpenApiFactoryTest extends TestCase
 
     public function testStringFilterWithUserDescriptionOverridesFilterDescription(): void
     {
-        $filterLocator = $this->createMock(ContainerInterface::class);
-        $filterLocator->method('has')->with('f1')->willReturn(true);
-        $filterLocator->method('get')->with('f1')->willReturn(new DummyFilter([
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f1', true]]);
+        $filterLocator->method('get')->willReturnMap([['f1', new DummyFilter([
             'name' => ['property' => 'name', 'type' => 'string', 'required' => true, 'strategy' => 'exact'],
-        ]));
+        ])]]);
 
         $parameters = $this->getGeneratedQueryParameters(
             ['name' => new QueryParameter(filter: 'f1', description: 'User description wins')],
@@ -1517,11 +1517,11 @@ class OpenApiFactoryTest extends TestCase
 
     public function testStringFilterWithUserOpenApiOverridesFilterOpenApi(): void
     {
-        $filterLocator = $this->createMock(ContainerInterface::class);
-        $filterLocator->method('has')->with('f2')->willReturn(true);
-        $filterLocator->method('get')->with('f2')->willReturn(new DummyFilter([
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f2', true]]);
+        $filterLocator->method('get')->willReturnMap([['f2', new DummyFilter([
             'name' => ['property' => 'name', 'type' => 'string'],
-        ]));
+        ])]]);
 
         $parameters = $this->getGeneratedQueryParameters(
             ['name' => new QueryParameter(filter: 'f2', openApi: new Parameter(name: 'name', in: 'query', description: 'User OpenApi description', deprecated: true, example: 'foo'))],
@@ -1550,12 +1550,12 @@ class OpenApiFactoryTest extends TestCase
 
     public function testStringFilterFanOutOnlyOverridesTheMatchingGeneratedParameter(): void
     {
-        $filterLocator = $this->createMock(ContainerInterface::class);
-        $filterLocator->method('has')->with('f4fanout')->willReturn(true);
-        $filterLocator->method('get')->with('f4fanout')->willReturn(new DummyFilter([
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f4fanout', true]]);
+        $filterLocator->method('get')->willReturnMap([['f4fanout', new DummyFilter([
             'name' => ['property' => 'name', 'type' => 'string'],
             'description' => ['property' => 'description', 'type' => 'string'],
-        ]));
+        ])]]);
 
         $parameters = $this->getGeneratedQueryParameters(
             ['order[name]' => new QueryParameter(filter: 'f4fanout', property: 'name', description: 'Fan-out matched description')],
@@ -1568,11 +1568,11 @@ class OpenApiFactoryTest extends TestCase
 
     public function testStringFilterWithoutUserMetadataIsUnchanged(): void
     {
-        $filterLocator = $this->createMock(ContainerInterface::class);
-        $filterLocator->method('has')->with('f5nometa')->willReturn(true);
-        $filterLocator->method('get')->with('f5nometa')->willReturn(new DummyFilter([
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f5nometa', true]]);
+        $filterLocator->method('get')->willReturnMap([['f5nometa', new DummyFilter([
             'name' => ['property' => 'name', 'type' => 'string'],
-        ]));
+        ])]]);
 
         $parameters = $this->getGeneratedQueryParameters(
             ['name' => new QueryParameter(filter: 'f5nometa')],
@@ -1590,12 +1590,12 @@ class OpenApiFactoryTest extends TestCase
      */
     public function testStringFilterFanOutWithNoMatchLeavesGeneratedParametersUntouched(): void
     {
-        $filterLocator = $this->createMock(ContainerInterface::class);
-        $filterLocator->method('has')->with('f6nomatch')->willReturn(true);
-        $filterLocator->method('get')->with('f6nomatch')->willReturn(new DummyFilter([
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f6nomatch', true]]);
+        $filterLocator->method('get')->willReturnMap([['f6nomatch', new DummyFilter([
             'name' => ['property' => 'name', 'type' => 'string'],
             'description' => ['property' => 'description', 'type' => 'string'],
-        ]));
+        ])]]);
 
         $parameters = $this->getGeneratedQueryParameters(
             ['search' => new QueryParameter(filter: 'f6nomatch', description: 'Should NOT apply, no matching name')],
@@ -1631,7 +1631,7 @@ class OpenApiFactoryTest extends TestCase
         $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
             (new GetCollection())
