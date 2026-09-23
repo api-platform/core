@@ -83,7 +83,6 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
-use ApiPlatform\State\ResponseHeaderProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
@@ -163,7 +162,6 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         });
 
         $this->autoconfigure($classes, ParameterProviderInterface::class, [SerializerFilterParameterProvider::class, SortFilterParameterProvider::class, SparseFieldsetParameterProvider::class]);
-        $this->autoconfigure($classes, ResponseHeaderProviderInterface::class, []);
 
         $this->app->bind(FilterQueryExtension::class, static function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));

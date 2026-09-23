@@ -50,13 +50,13 @@ final class JsonStreamerProcessor implements ProcessorInterface
         ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly bool $enableHeadRequestOptimization = true,
-        ?ContainerInterface $responseHeaderProviderLocator = null,
+        ?ContainerInterface $parameterProviderLocator = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
         $this->operationMetadataFactory = $operationMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->responseHeaderProviderLocator = $responseHeaderProviderLocator;
+        $this->parameterProviderLocator = $parameterProviderLocator;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

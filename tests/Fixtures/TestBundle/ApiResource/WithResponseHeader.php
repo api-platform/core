@@ -15,31 +15,49 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\ResponseHeader;
+use ApiPlatform\Metadata\ResponseHeaderParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider;
 
 #[Get(
     uriTemplate: 'with_response_headers/{id}',
     responseHeaders: [
-        'RateLimit-Limit' => new ResponseHeader(
+        'RateLimit-Limit' => new ResponseHeaderParameter(
             schema: ['type' => 'integer'],
             description: 'Maximum number of requests per window',
             provider: RateLimitHeaderProvider::class,
         ),
-        'RateLimit-Remaining' => new ResponseHeader(
+        'RateLimit-Remaining' => new ResponseHeaderParameter(
             schema: ['type' => 'integer'],
             description: 'Remaining requests in current window',
             provider: RateLimitHeaderProvider::class,
         ),
-        'X-Static-Header' => new ResponseHeader(
-            value: 'static-value',
+        'X-Static-Header' => new ResponseHeaderParameter(
             schema: ['type' => 'string'],
             description: 'Static header value',
+            default: 'static-value',
         ),
-        'X-Frame-Options' => new ResponseHeader(
-            description: 'Cleared by callable provider',
-            provider: [self::class, 'clearHeader'],
+        'X-Empty-Header' => new ResponseHeaderParameter(
+            description: 'Resolved to an empty value',
+            provider: [self::class, 'provideEmptyValue'],
+        ),
+        'X-Frame-Options' => new ResponseHeaderParameter(
+            description: 'Never emitted, the provider resolves no value',
+            provider: [self::class, 'provideNoValue'],
+            openApi: false,
+        ),
+    ],
+    provider: [self::class, 'provide'],
+)]
+#[Get(
+    uriTemplate: 'with_streamed_response_headers/{id}',
+    jsonStream: true,
+    responseHeaders: [
+        'RateLimit-Limit' => new ResponseHeaderParameter(
+            schema: ['type' => 'integer'],
+            description: 'Maximum number of requests per window',
+            provider: RateLimitHeaderProvider::class,
         ),
     ],
     provider: [self::class, 'provide'],
@@ -47,7 +65,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider;
 #[Post(
     uriTemplate: 'with_response_headers',
     responseHeaders: [
-        'RateLimit-Limit' => new ResponseHeader(
+        'RateLimit-Limit' => new ResponseHeaderParameter(
             schema: ['type' => 'integer'],
             description: 'Maximum number of requests per window',
             provider: RateLimitHeaderProvider::class,
@@ -66,7 +84,14 @@ class WithResponseHeader
         return new self($uriVariables['id'] ?? '1');
     }
 
-    public static function clearHeader(): null
+    public static function provideEmptyValue(Parameter $parameter): null
+    {
+        $parameter->setValue('');
+
+        return null;
+    }
+
+    public static function provideNoValue(): null
     {
         return null;
     }

@@ -29,8 +29,8 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\HttpResponseHeadersTrait;
-use Psr\Container\ContainerInterface;
 use ApiPlatform\State\Util\HttpResponseStatusTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
@@ -61,13 +61,13 @@ final class JsonStreamerProcessor implements ProcessorInterface
         private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         private readonly bool $enableHeadRequestOptimization = true,
-        ?ContainerInterface $responseHeaderProviderLocator = null,
+        ?ContainerInterface $parameterProviderLocator = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
         $this->operationMetadataFactory = $operationMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->responseHeaderProviderLocator = $responseHeaderProviderLocator;
+        $this->parameterProviderLocator = $parameterProviderLocator;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

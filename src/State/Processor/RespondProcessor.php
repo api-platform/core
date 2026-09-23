@@ -43,13 +43,13 @@ final class RespondProcessor implements ProcessorInterface, StopwatchAwareInterf
         ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        ?ContainerInterface $responseHeaderProviderLocator = null,
+        ?ContainerInterface $parameterProviderLocator = null,
     ) {
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMetadataFactory = $operationMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->responseHeaderProviderLocator = $responseHeaderProviderLocator;
+        $this->parameterProviderLocator = $parameterProviderLocator;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

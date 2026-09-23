@@ -71,8 +71,8 @@ class HttpOperation extends Operation
      *     no_transform?: bool,
      *     immutable?: bool,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
-     * @param array<string, string>|null         $headers
-     * @param array<string, ResponseHeader>|null $responseHeaders
+     * @param array<string, string>|null                  $headers
+     * @param array<string, ResponseHeaderParameter>|null $responseHeaders
      * @param list<array{
      *     field: string,
      *     direction: string,
@@ -591,7 +591,7 @@ class HttpOperation extends Operation
     }
 
     /**
-     * @return array<string, ResponseHeader>|null
+     * @return array<string, ResponseHeaderParameter>|null
      */
     public function getResponseHeaders(): ?array
     {
@@ -599,7 +599,7 @@ class HttpOperation extends Operation
     }
 
     /**
-     * @param array<string, ResponseHeader> $responseHeaders
+     * @param array<string, ResponseHeaderParameter> $responseHeaders
      */
     public function withResponseHeaders(array $responseHeaders): static
     {

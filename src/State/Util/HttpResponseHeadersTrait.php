@@ -23,11 +23,13 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Metadata\ResponseHeader;
+use ApiPlatform\Metadata\ResponseHeaderParameter;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
-use ApiPlatform\State\ResponseHeaderProviderInterface;
+use ApiPlatform\State\Exception\ProviderNotFoundException;
+use ApiPlatform\State\ParameterNotFound;
+use ApiPlatform\State\ParameterProviderInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +48,7 @@ trait HttpResponseHeadersTrait
     private ?OperationMetadataFactoryInterface $operationMetadataFactory;
     private ?ResourceClassResolverInterface $resourceClassResolver;
     private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
-    private ?ContainerInterface $responseHeaderProviderLocator = null;
+    private ?ContainerInterface $parameterProviderLocator = null;
 
     /**
      * @param array<string, mixed> $context
@@ -150,17 +152,12 @@ trait HttpResponseHeadersTrait
         }
 
         foreach ($operation->getResponseHeaders() ?? [] as $name => $responseHeader) {
-            if (null === $responseHeader->getKey()) {
-                $responseHeader = $responseHeader->withKey($name);
-            }
-
-            $resolved = $this->resolveResponseHeader($responseHeader, $operation, $context);
-            if (null === $resolved) {
-                unset($headers[$name]);
+            $value = $this->resolveResponseHeader($responseHeader->withKey($responseHeader->getKey() ?? $name), $operation, $request);
+            if ($value instanceof ParameterNotFound) {
                 continue;
             }
 
-            $headers[$name] = $resolved;
+            $headers[$name] = $value;
         }
 
         return $headers;
@@ -190,36 +187,29 @@ trait HttpResponseHeadersTrait
     }
 
     /**
-     * @param array<string, mixed> $context
-     *
-     * @return string|array<int, string>|null
+     * @return string|array<int, string>|ParameterNotFound
      */
-    private function resolveResponseHeader(ResponseHeader $header, HttpOperation $operation, array $context): string|array|null
+    private function resolveResponseHeader(ResponseHeaderParameter $parameter, HttpOperation $operation, Request $request): string|array|ParameterNotFound
     {
-        $provider = $header->getProvider();
+        $provider = $parameter->getProvider();
 
-        if (null === $provider) {
-            return $header->getValue();
-        }
-
-        if (\is_string($provider) && $this->responseHeaderProviderLocator?->has($provider)) {
-            $service = $this->responseHeaderProviderLocator->get($provider);
-            if (!$service instanceof ResponseHeaderProviderInterface) {
-                throw new RuntimeException(\sprintf('Service "%s" must implement "%s".', $provider, ResponseHeaderProviderInterface::class));
+        if (\is_string($provider)) {
+            if (!$this->parameterProviderLocator?->has($provider)) {
+                throw new ProviderNotFoundException(\sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
             }
 
-            return $service->provide($header, $operation, $context);
+            $provider = $this->parameterProviderLocator->get($provider);
         }
 
-        if ($provider instanceof ResponseHeaderProviderInterface) {
-            return $provider->provide($header, $operation, $context);
+        if ($provider instanceof ParameterProviderInterface) {
+            $provider->provide($parameter, [], ['operation' => $operation, 'request' => $request]);
+        } elseif (\is_callable($provider)) {
+            $provider($parameter, [], ['operation' => $operation, 'request' => $request]);
+        } elseif (null !== $provider) {
+            throw new RuntimeException(\sprintf('Response header "%s" provider is not callable nor a registered "%s" service.', $parameter->getKey() ?? '', ParameterProviderInterface::class));
         }
 
-        if (\is_callable($provider)) {
-            return $provider($header, $operation, $context);
-        }
-
-        throw new RuntimeException(\sprintf('Response header "%s" provider is not callable nor a registered "%s" service.', $header->getKey() ?? '', ResponseHeaderProviderInterface::class));
+        return $parameter->getValue();
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void

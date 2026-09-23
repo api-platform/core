@@ -525,7 +525,7 @@ services:
 
     ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider:
         tags:
-            - name: 'api_platform.response_header_provider'
+            - name: 'api_platform.parameter_provider'
               key: 'ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider'
 
     app.graphql.mutation_resolver.activity_log:

@@ -13,18 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Parameter;
 
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\ResponseHeader;
-use ApiPlatform\State\ResponseHeaderProviderInterface;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\State\ParameterProviderInterface;
 
-final class RateLimitHeaderProvider implements ResponseHeaderProviderInterface
+final class RateLimitHeaderProvider implements ParameterProviderInterface
 {
-    public function provide(ResponseHeader $header, HttpOperation $operation, array $context = []): string|array|null
+    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
     {
-        return match ($header->getKey()) {
+        $value = match ($parameter->getKey()) {
             'RateLimit-Limit' => '100',
             'RateLimit-Remaining' => '99',
             default => null,
         };
+
+        if (null !== $value) {
+            $parameter->setValue($value);
+        }
+
+        return $context['operation'] ?? null;
     }
 }

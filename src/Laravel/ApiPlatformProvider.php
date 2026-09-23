@@ -167,6 +167,7 @@ use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\ObjectMapperInputProcessor;
 use ApiPlatform\State\Processor\ObjectMapperOutputProcessor;
@@ -175,7 +176,6 @@ use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
-use ApiPlatform\State\ResponseHeaderProviderInterface;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
@@ -531,9 +531,9 @@ class ApiPlatformProvider extends ServiceProvider
         }
 
         $this->app->singleton(RespondProcessor::class, static function (Application $app) {
-            $responseHeaderProviders = [];
-            foreach ($app->tagged(ResponseHeaderProviderInterface::class) as $provider) {
-                $responseHeaderProviders[$provider::class] = $provider;
+            $parameterProviders = [];
+            foreach ($app->tagged(ParameterProviderInterface::class) as $provider) {
+                $parameterProviders[$provider::class] = $provider;
             }
 
             $decorated = new RespondProcessor(
@@ -541,7 +541,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(OperationMetadataFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                new ServiceLocator($responseHeaderProviders),
+                new ServiceLocator($parameterProviders),
             );
 
             if (class_exists(AddHeadersProcessor::class)) {

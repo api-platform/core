@@ -31,7 +31,14 @@ final class ResponseHeaderTest extends ApiTestCase
         return [WithResponseHeader::class];
     }
 
-    public function testServiceProviderSetsResponseHeaders(): void
+    public function testStaticValueWithoutProvider(): void
+    {
+        self::createClient()->request('GET', 'with_response_headers/1');
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('x-static-header', 'static-value');
+    }
+
+    public function testProviderResolvedThroughTheParameterProviderLocator(): void
     {
         self::createClient()->request('GET', 'with_response_headers/1');
         $this->assertResponseIsSuccessful();
@@ -39,18 +46,25 @@ final class ResponseHeaderTest extends ApiTestCase
         $this->assertResponseHeaderSame('ratelimit-remaining', '99');
     }
 
-    public function testStaticResponseHeader(): void
+    public function testProviderResolvedThroughTheParameterProviderLocatorWhenStreaming(): void
     {
-        self::createClient()->request('GET', 'with_response_headers/1');
+        self::createClient()->request('GET', 'with_streamed_response_headers/1');
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('x-static-header', 'static-value');
+        $this->assertResponseHeaderSame('ratelimit-limit', '100');
     }
 
-    public function testCallableProviderReturningNullRemovesHeader(): void
+    public function testProviderResolvingNoValueLeavesTheExistingHeaderUntouched(): void
     {
         self::createClient()->request('GET', 'with_response_headers/1');
         $this->assertResponseIsSuccessful();
-        $this->assertResponseNotHasHeader('x-frame-options');
+        $this->assertResponseHeaderSame('x-frame-options', 'deny');
+    }
+
+    public function testProviderResolvingAnEmptyStringEmitsAnEmptyHeader(): void
+    {
+        self::createClient()->request('GET', 'with_response_headers/1');
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('x-empty-header', '');
     }
 
     public function testOpenApiDocumentsResponseHeaders(): void
@@ -68,6 +82,7 @@ final class ResponseHeaderTest extends ApiTestCase
         $this->assertArrayHasKey('RateLimit-Limit', $successResponse['headers']);
         $this->assertArrayHasKey('RateLimit-Remaining', $successResponse['headers']);
         $this->assertArrayHasKey('X-Static-Header', $successResponse['headers']);
+        $this->assertArrayNotHasKey('X-Frame-Options', $successResponse['headers']);
         $this->assertSame('integer', $successResponse['headers']['RateLimit-Limit']['schema']['type']);
         $this->assertSame('Maximum number of requests per window', $successResponse['headers']['RateLimit-Limit']['description']);
 
