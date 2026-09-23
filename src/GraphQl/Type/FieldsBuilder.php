@@ -237,7 +237,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
 
                     // guess union/intersect types: check each type until finding a valid one
                     foreach ($propertyTypes as $propertyType) {
-                        if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
+                        if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity() || ($input && null !== $propertyMetadata->getDefault()))) {
                             $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
                             // stop at the first valid type
                             break;
@@ -252,7 +252,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                         continue;
                     }
 
-                    if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
+                    if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity() || ($input && null !== $propertyMetadata->getDefault()))) {
                         $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
                     }
                 }
