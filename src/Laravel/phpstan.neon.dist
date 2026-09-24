@@ -19,3 +19,8 @@ parameters:
 		- Tests
 	ignoreErrors:
 	  - '#Cannot call method expectsQuestion#'
+	  # Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
+	  -
+	      identifier: method.alreadyNarrowedType
+	      paths:
+	          - Tests
