@@ -17,16 +17,14 @@ use Symfony\Component\JsonStreamer\Attribute\StreamedName;
 
 /**
  * @template T
- *
- * @internal
  */
 class Collection
 {
     #[StreamedName('@context')]
-    public string $context = 'VIRTUAL';
+    public ?string $context = null;
 
     #[StreamedName('@id')]
-    public string $id = 'VIRTUAL';
+    public ?string $id = null;
 
     #[StreamedName('@type')]
     public string $type = 'Collection';
@@ -37,7 +35,7 @@ class Collection
     public ?PartialCollectionView $view = null;
 
     /**
-     * @var list<T>
+     * @var iterable<T>
      */
     public iterable $member;
 }
