@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
 use ApiPlatform\Test\Client;
