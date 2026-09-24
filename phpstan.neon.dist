@@ -49,7 +49,11 @@ parameters:
 		# False positives
 		-   message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\).#'
 		-
-			message: '#but database expects#'
+			identifier: doctrine.columnType
+			paths:
+				- tests/Fixtures/TestBundle/Entity/
+		-
+			identifier: doctrine.associationType
 			paths:
 				- tests/Fixtures/TestBundle/Entity/
 		- '#Cannot call method add\(\) on iterable.#'
