@@ -75,9 +75,22 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
                 $mcpFormats = [$this->mcpFormat => $this->formats[$this->mcpFormat]];
                 $newMcp = [];
                 foreach ($mcp as $key => $operation) {
-                    if (($operation instanceof McpTool || $operation instanceof McpResource) && null === $operation->getFormats() && null === $operation->getInputFormats() && null === $operation->getOutputFormats()) {
-                        $operation = $operation->withInputFormats($mcpFormats)->withOutputFormats($mcpFormats);
+                    if (!$operation instanceof McpTool && !$operation instanceof McpResource) {
+                        $newMcp[$key] = $operation;
+                        continue;
                     }
+
+                    // Same normalization as HTTP operations get in normalize(), with the
+                    // MCP format standing in for the resource-level defaults: without it a
+                    // format declared as a list (["json"]) would never be resolved against
+                    // api_platform.formats and would stay as [0 => "json"].
+                    if ($operation->getFormats()) {
+                        $operation = $operation->withFormats($this->normalizeFormats($operation->getFormats()));
+                    }
+
+                    $operation = $operation->withInputFormats($operation->getInputFormats() ? $this->normalizeFormats($operation->getInputFormats()) : $operation->getFormats() ?? $mcpFormats);
+                    $operation = $operation->withOutputFormats($operation->getOutputFormats() ? $this->normalizeFormats($operation->getOutputFormats()) : $operation->getFormats() ?? $mcpFormats);
+
                     $newMcp[$key] = $operation;
                 }
                 $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withMcp($newMcp);
