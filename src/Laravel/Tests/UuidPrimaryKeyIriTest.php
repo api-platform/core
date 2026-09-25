@@ -48,7 +48,7 @@ class UuidPrimaryKeyIriTest extends TestCase
 
     public function testCollectionItemsHaveWellFormedIriWithUuidPrimaryKeyInJsonApi(): void
     {
-        $buildings = BuildingFactory::new()->count(3)->create();
+        $buildings = BuildingFactory::new()->createMany(3);
 
         $response = $this->get('/api/buildings', ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(200);
