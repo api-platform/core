@@ -21,6 +21,7 @@ use ApiPlatform\State\Processor\WriteProcessor;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\Provider\RangeHeaderProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\Symfony\Action\DocumentationAction;
 use ApiPlatform\Symfony\Action\EntrypointAction;
@@ -56,6 +57,13 @@ return static function (ContainerConfigurator $container) {
         ->arg(0, service('api_platform.state_provider.locator'))
         ->arg(1, service('api_platform.serializer.context_builder'))
         ->arg('$logger', service('logger')->nullOnInvalid());
+
+    $services->set('api_platform.state_provider.range_header', RangeHeaderProvider::class)
+        ->decorate('api_platform.state_provider.read', null, 120)
+        ->args([
+            service('api_platform.state_provider.range_header.inner'),
+            service('api_platform.pagination'),
+        ]);
 
     // Outermost decorator of the read chain (access checkers sit at 0) so parameters are
     // resolved, and their values propagated to the uriVariables, before anything reads them.

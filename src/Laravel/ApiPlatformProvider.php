@@ -178,6 +178,7 @@ use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\Provider\RangeHeaderProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
@@ -452,12 +453,16 @@ class ApiPlatformProvider extends ServiceProvider
             return new ReadProvider($app->make(CallableProvider::class));
         });
 
+        $this->app->singleton(RangeHeaderProvider::class, static function (Application $app) {
+            return new RangeHeaderProvider($app->make(ReadProvider::class), $app->make(Pagination::class));
+        });
+
         $this->app->singleton(SwaggerUiProvider::class, static function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new SwaggerUiProvider(
-                decorated: $app->make(ReadProvider::class),
+                decorated: $app->make(RangeHeaderProvider::class),
                 openApiFactory: $app->make(OpenApiFactoryInterface::class),
                 swaggerUiEnabled: $config->get('api-platform.swagger_ui.enabled', false),
                 scalarEnabled: $config->get('api-platform.scalar.enabled', false),

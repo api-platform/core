@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Util;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -26,6 +27,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -145,6 +148,18 @@ trait HttpResponseHeadersTrait
             $this->addLinkedDataPlatformHeaders($headers, $operation);
         }
 
+        if (
+            $operation instanceof CollectionOperationInterface
+            && null !== ($rangeUnit = $operation->getRangeUnit())
+            && \in_array($status, [Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT], true)
+        ) {
+            $headers['Accept-Ranges'] = $rangeUnit;
+
+            if (Response::HTTP_PARTIAL_CONTENT === $status && $originalData instanceof PartialPaginatorInterface && $contentRange = $this->getContentRange($rangeUnit, $originalData)) {
+                $headers['Content-Range'] = $contentRange;
+            }
+        }
+
         return $headers;
     }
 
@@ -169,6 +184,19 @@ trait HttpResponseHeadersTrait
         }
 
         return $mimeType;
+    }
+
+    private function getContentRange(string $unit, PartialPaginatorInterface $paginator): ?string
+    {
+        $count = \count($paginator);
+        if (0 === $count) {
+            return null;
+        }
+
+        $first = (int) (($paginator->getCurrentPage() - 1) * $paginator->getItemsPerPage());
+        $completeLength = $paginator instanceof PaginatorInterface ? (string) (int) $paginator->getTotalItems() : '*';
+
+        return \sprintf('%s %d-%d/%s', $unit, $first, $first + $count - 1, $completeLength);
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void
