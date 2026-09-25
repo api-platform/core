@@ -27,24 +27,22 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 trait PurgeResponsesTrait
 {
     /**
-     * @param list<array{ResponseInterface, string, string}> $requests each response with the header name and value it was sent with
-     *
-     * @throws PurgeFailedException when at least one request failed
+     * @param list<ResponseInterface> $responses
      */
-    private function assertPurgeSucceeded(array $requests): void
+    private function assertPurgeSucceeded(array $responses): void
     {
         $failures = [];
-        foreach ($requests as [$response, $headerName, $headerValue]) {
+        foreach ($responses as $response) {
             try {
-                // getHeaders() throws on transport errors and on 3xx/4xx/5xx statuses, as the response destructor did
                 $response->getHeaders();
             } catch (ExceptionInterface $e) {
+                [$headerName, $headerValue] = $response->getInfo('user_data');
                 $failures[] = new PurgeFailure($response->getInfo('url'), $headerName, $headerValue, $e);
             }
         }
 
         if ($failures) {
-            throw new PurgeFailedException($failures, \count($requests));
+            throw new PurgeFailedException($failures, \count($responses));
         }
     }
 }

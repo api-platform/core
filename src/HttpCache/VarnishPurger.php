@@ -76,12 +76,12 @@ final class VarnishPurger implements PurgerInterface
 
         $chunkSize = $this->determineTagsPerHeader($iris, '|');
 
-        $requests = [];
+        $responses = [];
         foreach (array_chunk($iris, $chunkSize) as $irisChunk) {
-            array_push($requests, ...$this->purgeRequest($irisChunk));
+            array_push($responses, ...$this->purgeRequest($irisChunk));
         }
 
-        $this->assertPurgeSucceeded($requests);
+        $this->assertPurgeSucceeded($responses);
     }
 
     /**
@@ -93,7 +93,7 @@ final class VarnishPurger implements PurgerInterface
     }
 
     /**
-     * @return list<array{ResponseInterface, string, string}>
+     * @return list<ResponseInterface>
      */
     private function purgeRequest(array $iris): array
     {
@@ -101,26 +101,26 @@ final class VarnishPurger implements PurgerInterface
         $parts = array_map(static fn ($iri): string => // here we should remove the prefix as it's not discriminent and cost a lot to compute
 preg_quote($iri), $iris);
 
-        $requests = [];
+        $responses = [];
         foreach ($this->chunkRegexParts($parts) as $regex) {
             $regex = \sprintf(self::REGEXP_PATTERN, $regex);
-            array_push($requests, ...$this->banRegex($regex));
+            array_push($responses, ...$this->banRegex($regex));
         }
 
-        return $requests;
+        return $responses;
     }
 
     /**
-     * @return list<array{ResponseInterface, string, string}>
+     * @return list<ResponseInterface>
      */
     private function banRegex(string $regex): array
     {
-        $requests = [];
+        $responses = [];
         foreach ($this->clients as $client) {
-            $requests[] = [$client->request('BAN', '', ['headers' => [self::BAN_HEADER => $regex]]), self::BAN_HEADER, $regex];
+            $responses[] = $client->request('BAN', '', ['headers' => [self::BAN_HEADER => $regex], 'user_data' => [self::BAN_HEADER, $regex]]);
         }
 
-        return $requests;
+        return $responses;
     }
 
     private function chunkRegexParts(array $parts): iterable

@@ -73,22 +73,18 @@ class SurrogateKeysPurger implements PurgerInterface
             }
         }
 
-        $requests = [];
+        $responses = [];
         foreach ($chunks as $chunk) {
             foreach ($this->clients as $client) {
-                $requests[] = [
-                    $client->request(
-                        $this->method,
-                        '',
-                        ['headers' => [$this->header => $chunk]]
-                    ),
-                    $this->header,
-                    $chunk,
-                ];
+                $responses[] = $client->request(
+                    $this->method,
+                    '',
+                    ['headers' => [$this->header => $chunk], 'user_data' => [$this->header, $chunk]]
+                );
             }
         }
 
-        $this->assertPurgeSucceeded($requests);
+        $this->assertPurgeSucceeded($responses);
     }
 
     /**

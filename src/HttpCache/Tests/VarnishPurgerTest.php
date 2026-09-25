@@ -37,20 +37,20 @@ class VarnishPurgerTest extends TestCase
     public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo|/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo|/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy3 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy4 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $purger = new VarnishPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);
@@ -169,7 +169,7 @@ class VarnishPurgerTest extends TestCase
     public function testConstructor(): void
     {
         $clientProphecy = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
         $purger = new VarnishPurger(new RewindableGenerator(static function () use ($clientProphecy) {
             yield $clientProphecy->reveal();
         }, 1));
