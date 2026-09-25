@@ -332,10 +332,6 @@ class JsonApiTest extends TestCase
         $this->assertArrayHasKey('name', $included);
     }
 
-    // #7267: SparseFieldsetParameterProvider must scope fields[TYPE] against the
-    // RELATED resource's own allowed properties, not the host operation's. "created_at"
-    // exists on Author but not on Book's $visible list, so a host-scoped check filters
-    // it out entirely regardless of what the related resource actually allows.
     public function testSparseFieldsetOnIncludedResourceUsesItsOwnAllowedProperties(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->create();

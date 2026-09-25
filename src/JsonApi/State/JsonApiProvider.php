@@ -127,10 +127,7 @@ final class JsonApiProvider implements ProviderInterface
         }
 
         $resourceShortName = $operation->getShortName() ?? '';
-        // Per the JSON:API spec, fields[TYPE] takes a resource TYPE while include takes a
-        // relation NAME — they're different namespaces. Map each included relation's target
-        // type to its relation name so a spec-correct fields[TYPE] still flags the inclusion,
-        // in addition to the legacy fields[relationName] match kept below for compatibility.
+        // Per the JSON:API spec, fields[TYPE] takes a resource TYPE while include takes a relation NAME.
         $includedRelationTypes = $this->resolveIncludedRelationTypes($includeParameter, $operation->getClass());
 
         $properties = [];
@@ -144,8 +141,7 @@ final class JsonApiProvider implements ProviderInterface
                 $properties[$resourceType] = $fields;
                 $included[] = $resourceType;
             } elseif (null !== ($relationPath = $includedRelationTypes[$resourceType] ?? null)) {
-                // The serializer's ATTRIBUTES context is keyed by property NAME on the parent
-                // object, never by resource TYPE, so key by the relation name, not $resourceType.
+                // The serializer's ATTRIBUTES context is keyed by property NAME, not resource TYPE.
                 $properties[explode('.', $relationPath, 2)[0]] = $fields;
                 $included[] = $relationPath;
             } else {
@@ -159,7 +155,7 @@ final class JsonApiProvider implements ProviderInterface
     /**
      * @param list<string> $includeParameter
      *
-     * @return array<string, string> resource type short name => raw include entry (relation name, possibly dotted)
+     * @return array<string, string>
      */
     private function resolveIncludedRelationTypes(array $includeParameter, ?string $resourceClass): array
     {

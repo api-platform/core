@@ -55,9 +55,6 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             } else {
                 $properties[$resource] = [];
                 $p = &$properties[$resource];
-                // fields[TYPE] scopes a RELATED resource type, not the host operation's
-                // resource, so its properties must be resolved and validated against that
-                // related resource's own metadata instead of the host's allowed properties.
                 $resourceAllowedProperties = $this->getAllowedProperties((string) $resource);
             }
 
