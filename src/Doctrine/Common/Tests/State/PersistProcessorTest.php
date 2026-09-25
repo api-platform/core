@@ -158,8 +158,8 @@ class PersistProcessorTest extends TestCase
         $unitOfWork->expects($this->once())->method('getEntityState')->with($relation)->willReturn(ORMUnitOfWork::STATE_NEW);
 
         $relationManager = $this->createMock(EntityManagerInterface::class);
-        $relationManager->method('contains')->with($relation)->willReturn(false);
-        $relationManager->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createOrmRelationMetadata());
+        $relationManager->expects($this->any())->method('contains')->with($relation)->willReturn(false);
+        $relationManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createOrmRelationMetadata());
         $relationManager->method('getUnitOfWork')->willReturn($unitOfWork);
         $relationManager->expects($this->never())->method('getReference');
 
@@ -177,8 +177,8 @@ class PersistProcessorTest extends TestCase
         $unitOfWork->expects($this->once())->method('getDocumentState')->with($relation)->willReturn(ODMUnitOfWork::STATE_NEW);
 
         $relationManager = $this->createMockForIntersectionOfInterfaces([ObjectManager::class, PersistProcessorTestDocumentManagerStub::class]);
-        $relationManager->method('contains')->with($relation)->willReturn(false);
-        $relationManager->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createRelationMetadata());
+        $relationManager->expects($this->any())->method('contains')->with($relation)->willReturn(false);
+        $relationManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createRelationMetadata());
         $relationManager->method('getUnitOfWork')->willReturn($unitOfWork);
         $relationManager->expects($this->never())->method('getReference');
 
@@ -194,8 +194,8 @@ class PersistProcessorTest extends TestCase
         $data = new PersistProcessorTestObjectWithRelationStub($relation);
 
         $relationManager = $this->createMockForIntersectionOfInterfaces([ObjectManager::class, PersistProcessorTestReferenceManagerStub::class]);
-        $relationManager->method('contains')->with($relation)->willReturn(false);
-        $relationManager->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createRelationMetadata());
+        $relationManager->expects($this->any())->method('contains')->with($relation)->willReturn(false);
+        $relationManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createRelationMetadata());
         $relationManager->expects($this->once())->method('getReference')->with(PersistProcessorTestRelationStub::class, ['id' => 'relation-id'])->willReturn($reference);
 
         $this->processObjectWithRelation($data, $relationManager);
@@ -270,8 +270,8 @@ class PersistProcessorTest extends TestCase
     private function processObjectWithRelation(PersistProcessorTestObjectWithRelationStub $data, ObjectManager $relationManager): void
     {
         $dataManager = $this->createMock(ObjectManager::class);
-        $dataManager->method('getClassMetadata')->with(PersistProcessorTestObjectWithRelationStub::class)->willReturn($this->createStub(PersistenceClassMetadata::class));
-        $dataManager->method('contains')->with($data)->willReturn(false);
+        $dataManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestObjectWithRelationStub::class)->willReturn($this->createStub(PersistenceClassMetadata::class));
+        $dataManager->expects($this->any())->method('contains')->with($data)->willReturn(false);
         $dataManager->expects($this->once())->method('persist')->with($data);
         $dataManager->expects($this->once())->method('flush');
         $dataManager->expects($this->once())->method('refresh')->with($data);

@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.0.1
+
+API Platform 5.0.1 contains every change shipped in [v4.4.1](#v441) and [v4.4.2](#v442), plus the fixes below.
+
+### Bug fixes
+
+* [1dc16378c](https://github.com/api-platform/core/commit/1dc16378cb8370be4c9b8930a905720a110b628a) fix(symfony): use StrictUnifiedDiffOutputBuilder in api:upgrade-filter (#8559)
+* [27153419c](https://github.com/api-platform/core/commit/27153419c4bacb2445d4d67b4f6bf51800ceec9b) fix(symfony,graphql): resolve twig runtime csp_nonce function (#8575)
+* [6f9837b25](https://github.com/api-platform/core/commit/6f9837b256dc6a66028da8976f1fbff753a06ff0) fix(metadata): format-agnostic uriTemplate match (#8540)
+* [a4b814308](https://github.com/api-platform/core/commit/a4b81430828b0eec51d53688f262140b777019eb) fix(symfony): guard test client service when api-platform/test is absent (#8574)
+* [c5e19e1a6](https://github.com/api-platform/core/commit/c5e19e1a6ae819aeb623b110cde71d032b1dfc93) fix(mongodb): nullable from php type, not mapping (#8298)
+* [ca8c8fc4b](https://github.com/api-platform/core/commit/ca8c8fc4bab33cd822cb6f2714181c3e5e383cf0) fix(validator): do not emit an unresolved {{ type }} placeholder (#8546)
+* [fe9a06c71](https://github.com/api-platform/core/commit/fe9a06c71ac80887bd88670542411087bf0c3cb9) fix(redoc): update ReDoc to 2.5.4 to fix crash on OpenAPI 3.2 documents (#8569)
+
 ## v5.0.0
 
 API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the removals and breaking changes below.
