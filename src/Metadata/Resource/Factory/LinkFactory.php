@@ -177,6 +177,12 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             return $this->localIdentifiersPerResourceClassCache[$resourceClass] = ['value'];
         }
 
+        // Don't cache an empty result: identifiers may not be resolvable yet (e.g. Eloquent
+        // model metadata race before migrations run), and this factory is a long-lived singleton.
+        if (!$identifiers) {
+            return $identifiers;
+        }
+
         return $this->localIdentifiersPerResourceClassCache[$resourceClass] = $identifiers;
     }
 
