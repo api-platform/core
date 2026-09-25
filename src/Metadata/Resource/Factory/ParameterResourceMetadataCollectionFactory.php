@@ -274,9 +274,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $filter = $this->getFilterInstance($parameter->getFilter());
 
-            // The filter has a parameter provider. getParameterProvider() is static by interface contract, so this
-            // works even when the filter is a class-string that getFilterInstance() could not resolve (e.g. a
-            // filter that doesn't implement FilterInterface and is therefore never tagged in the filter locator).
+            // The filter has a parameter provider
             if (null === $parameter->getProvider() && ($f = $parameter->getFilter()) && is_a($f, ParameterProviderFilterInterface::class, true)) {
                 $parameter = $parameter->withProvider($f::getParameterProvider());
             }
