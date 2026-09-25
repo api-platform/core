@@ -22,10 +22,10 @@ return static function (ContainerConfigurator $container) {
         ->decorate('api_platform.state_provider.read', null, 0)
         ->args([
             service('api_platform.jsonapi.state_provider.inner'),
-            '%api_platform.collection.order_parameter_name%',
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.jsonapi.resource_linkage_resolver'),
+            '%api_platform.collection.order_parameter_name%',
         ]);
 };

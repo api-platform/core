@@ -25,11 +25,11 @@ final class JsonApiProvider implements ProviderInterface
 {
     public function __construct(
         private readonly ProviderInterface $decorated,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ResourceLinkageResolver $resourceLinkageResolver,
         private readonly string $orderParameterName = 'order',
-        private readonly ?PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory = null,
-        private readonly ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null,
-        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
-        private readonly ?ResourceLinkageResolver $resourceLinkageResolver = null,
     ) {
     }
 
@@ -163,14 +163,7 @@ final class JsonApiProvider implements ProviderInterface
      */
     private function resolveIncludedRelationTypes(array $includeParameter, ?string $resourceClass): array
     {
-        if (
-            !$includeParameter
-            || null === $resourceClass
-            || null === $this->propertyNameCollectionFactory
-            || null === $this->propertyMetadataFactory
-            || null === $this->resourceMetadataCollectionFactory
-            || null === $this->resourceLinkageResolver
-        ) {
+        if (!$includeParameter || null === $resourceClass) {
             return [];
         }
 
