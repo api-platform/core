@@ -46,6 +46,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'paginationClientItemsPerPage',
         'paginationClientPartial',
         'paginationEnabled',
+        'paginationLinkHeader',
         'paginationFetchJoinCollection',
         'paginationUseOutputWalkers',
         'paginationItemsPerPage',

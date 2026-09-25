@@ -90,6 +90,7 @@ resources:
                     paginationViaCursor:
                         userId: DESC
                     paginationEnabled: false
+                    paginationLinkHeader: false
                     paginationFetchJoinCollection: false
                     paginationUseOutputWalkers: false
                     paginationItemsPerPage: 54
@@ -350,3 +351,4 @@ resources:
                     'Lorem ipsum': 'Dolor sit amet'
             map: null
             mcp: null
+            paginationLinkHeader: true

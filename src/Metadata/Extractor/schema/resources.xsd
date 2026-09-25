@@ -540,6 +540,7 @@
         <xsd:attribute type="xsd:boolean" name="stateless"/>
         <xsd:attribute type="xsd:string" name="sunset"/>
         <xsd:attribute type="xsd:string" name="acceptPatch"/>
+        <xsd:attribute type="xsd:boolean" name="paginationLinkHeader"/>
         <xsd:attribute type="xsd:positiveInteger" name="status"/>
         <xsd:attribute type="xsd:string" name="host"/>
         <xsd:attribute type="xsd:string" name="condition"/>

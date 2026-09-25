@@ -982,6 +982,7 @@ class ApiResource extends Metadata
         protected array $extraProperties = [],
         ?bool $map = null,
         protected ?array $mcp = null,
+        protected ?bool $paginationLinkHeader = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1269,6 +1270,19 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->acceptPatch = $acceptPatch;
+
+        return $self;
+    }
+
+    public function getPaginationLinkHeader(): ?bool
+    {
+        return $this->paginationLinkHeader;
+    }
+
+    public function withPaginationLinkHeader(bool $paginationLinkHeader): static
+    {
+        $self = clone $this;
+        $self->paginationLinkHeader = $paginationLinkHeader;
 
         return $self;
     }

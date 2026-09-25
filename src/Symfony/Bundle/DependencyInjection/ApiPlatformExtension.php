@@ -360,6 +360,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('state/processor.php');
         }
         $loader->load('state/parameter_provider.php');
+        $loader->load('state/pagination_link.php');
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
