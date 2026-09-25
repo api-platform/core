@@ -819,8 +819,11 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame(['authToken'], $authParam->getProperties());
     }
 
-    public function testQueryParameterOnPropertiesWithOperations(): void
+    public function testQueryParameterOnPropertiesThrowsExceptionWhenOperationIsNotDeclared(): void
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Parameter attribute on property "id" is restricted to the operation "%s" which is not declared on the resource "%s".', Patch::class, QueryParameterOnPropertiesWithOperations::class));
+
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
 
@@ -839,22 +842,7 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
             $filterLocator
         );
 
-        $resourceMetadataCollection = $parameterFactory->create(QueryParameterOnPropertiesWithOperations::class);
-        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
-
-        $this->assertCount(2, $operations);
-
-        $collectionOperation = $operations[0];
-        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
-        $collectionParameters = $collectionOperation->getParameters();
-        $this->assertTrue($collectionParameters->has('search'));
-        $this->assertFalse($collectionParameters->has('filter_id'));
-
-        $getOperation = $operations[1];
-        $this->assertInstanceOf(Get::class, $getOperation);
-        $getParameters = $getOperation->getParameters();
-        $this->assertTrue($getParameters->has('search'));
-        $this->assertTrue($getParameters->has('filter_id'));
+        $parameterFactory->create(QueryParameterOnPropertiesWithOperations::class);
     }
 
     public function testHeaderParameterOnPropertiesWithOperations(): void
