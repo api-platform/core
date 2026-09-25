@@ -133,15 +133,15 @@ trait LinksHandlerTrait
 
     private function getLinkFromClass(Link $link, Operation $operation): string
     {
-        $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $documentClass = $operation->getDataClass();
         $fromClass = $link->getFromClass();
-        if ($fromClass === $operation->getClass() && $documentClass) {
+        if ($fromClass === $operation->getApiClass() && $documentClass) {
             return $documentClass;
         }
 
         $operation = $this->resourceMetadataCollectionFactory->create($fromClass)->getOperation();
 
-        if ($documentClass = $this->getStateOptionsClass($operation, null, Options::class)) {
+        if ($documentClass = $operation->getDataClass()) {
             return $documentClass;
         }
 

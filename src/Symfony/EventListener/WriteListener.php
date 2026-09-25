@@ -71,7 +71,7 @@ final class WriteListener
         $uriVariables = $request->attributes->get('_api_uri_variables') ?? [];
         if (!$uriVariables && !$operation instanceof Error) {
             try {
-                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getApiClass());
             } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                 throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
             }
@@ -80,7 +80,7 @@ final class WriteListener
         $data = $this->processor->process($event->getControllerResult(), $operation, $uriVariables, [
             'request' => $request,
             'uri_variables' => $uriVariables,
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
             'previous_data' => false === $operation->canRead() ? null : $request->attributes->get('previous_data'), // this is a clone
             'read_data' => false === $operation->canRead() ? null : $request->attributes->get('read_data'), // this is what we read
             'data' => false === $operation->canRead() ? null : $request->attributes->get('data'), // this should be the same as getControllerResult but is the result of deserialization

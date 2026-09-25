@@ -113,7 +113,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass);
         if ($isResourceClass && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
-            if (isset($context['operation']) && $context['operation'] instanceof HttpOperation && $context['operation']->getClass() !== $resourceClass) {
+            if (isset($context['operation']) && $context['operation'] instanceof HttpOperation && $context['operation']->getApiClass() !== $resourceClass) {
                 $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
             }
             $context = $this->initContext($resourceClass, $context);
@@ -174,7 +174,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     $types = [$operation->getShortName()];
                 } else {
                     // Use resource-level shortName to avoid operation-specific overrides
-                    $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                    $typeClass = $isResourceClass ? $resourceClass : ($operation->getApiClass() ?? $resourceClass);
                     try {
                         $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
                     } catch (\Exception) {

@@ -63,8 +63,8 @@ final class AddTagsProcessor implements ProcessorInterface
         $resources = $request->attributes->get('_resources', []);
         if ($operation instanceof CollectionOperationInterface) {
             // Allows to purge collections
-            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
-            $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
+            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getApiClass());
+            $iri = $this->iriConverter->getIriFromResource($operation->getApiClass(), UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
 
             $resources[$iri] = $iri;
         }

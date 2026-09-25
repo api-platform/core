@@ -205,7 +205,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
         /** @var FieldsBuilderEnumInterface $fieldsBuilder */
         $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
         $enumCases = [];
-        $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
+        $enumCases = $fieldsBuilder->getEnumFields($operation->getDataClass());
 
         $enumConfig = [
             'name' => $enumName,
@@ -311,15 +311,13 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
     private function getResourceObjectTypeConfiguration(string $shortName, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, array $context = []): InputObjectType|ObjectType
     {
         $operationName = $operation->getName();
-        $resourceClass = $operation->getClass();
         $input = $context['input'];
         $depth = $context['depth'] ?? 0;
         $wrapped = $context['wrapped'] ?? false;
 
-        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
-        }
+        $resourceClass = $input ? $operation->getInputClass() : $operation->getOutputClass();
+        // Always pass ['class' => ...] so FieldsBuilder can detect disabled output/input (null class).
+        $ioMetadata = ['class' => $resourceClass];
 
         $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;
 
@@ -343,7 +341,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
                     // The query type can only be reused when both operations produce the same output class.
                     // A mutation declaring its own output class must expose that class on its payload.
-                    if (!$useWrappedType && ($operation->getOutput()['class'] ?? null) !== ($queryOperation?->getOutput()['class'] ?? null)) {
+                    if (!$useWrappedType && $operation->getOutputClass() !== ($queryOperation?->getOutputClass())) {
                         $useWrappedType = true;
                     }
 

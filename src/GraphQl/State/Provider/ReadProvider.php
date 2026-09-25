@@ -53,7 +53,7 @@ final class ReadProvider implements ProviderInterface
 
         if ($this->serializerContextBuilder) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
-            $context += $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, true);
+            $context += $this->serializerContextBuilder->create($operation->getApiClass(), $operation, $context, true);
         }
 
         if (!$operation instanceof CollectionOperationInterface) {
@@ -78,7 +78,7 @@ final class ReadProvider implements ProviderInterface
                     throw new NotFoundHttpException(\sprintf('Item "%s" not found.', $args['input']['id']));
                 }
 
-                if ($operation->getClass() !== $this->getObjectClass($item)) {
+                if ($operation->getDataClass() !== $this->getObjectClass($item)) {
                     throw new \UnexpectedValueException(\sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $operation->getShortName()));
                 }
             }

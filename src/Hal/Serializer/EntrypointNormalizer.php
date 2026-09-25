@@ -53,7 +53,7 @@ final class EntrypointNormalizer implements NormalizerInterface
                     }
 
                     try {
-                        $href = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
+                        $href = $this->iriConverter->getIriFromResource($operation->getApiClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                         $entrypoint['_links'][lcfirst($operation->getShortName())]['href'] = $href;
                     } catch (InvalidArgumentException) {
                         // Ignore resources without GET operations

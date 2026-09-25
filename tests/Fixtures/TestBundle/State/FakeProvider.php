@@ -20,7 +20,7 @@ final class FakeProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $className = $operation->getClass();
+        $className = $operation->getApiClass();
         $data = [
             '12345' => new $className('12345', 'Vincent'),
             '67890' => new $className('67890', 'Grégoire'),
