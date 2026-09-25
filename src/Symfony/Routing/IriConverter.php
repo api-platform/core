@@ -189,6 +189,17 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
+        // The IRI of an item operation with a custom URI template points to the operation declared with "canonicalUriTemplate".
+        // This runs after the fallback above so that relations, which come without an operation, get the canonical IRI too.
+        if (!isset($context['item_uri_template']) && $this->operationMetadataFactory && $operation instanceof HttpOperation && !$operation instanceof CollectionOperationInterface && null !== ($canonicalUriTemplate = $operation->getCanonicalUriTemplate()) && $canonicalUriTemplate !== $operation->getUriTemplate()) {
+            // An unresolvable template leaves the operation alone rather than breaking every IRI of the resource
+            if ($canonicalOperation = $this->operationMetadataFactory->create($canonicalUriTemplate)) {
+                $operation = $canonicalOperation;
+                $identifiersExtractorOperation = $operation;
+                $context['item_uri_template'] = $canonicalUriTemplate;
+            }
+        }
+
         if (!$operation->getName() || ($operation instanceof HttpOperation && $operation->getUriTemplate() && str_starts_with($operation->getUriTemplate(), SkolemIriConverter::$skolemUriTemplate))) {
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }

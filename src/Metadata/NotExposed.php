@@ -111,6 +111,7 @@ final class NotExposed extends HttpOperation
         array $extraProperties = [],
         ?OptionsInterface $stateOptions = null,
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: $method,
@@ -189,7 +190,8 @@ final class NotExposed extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate
         );
     }
 }

@@ -107,6 +107,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $throwOnNotFound = null,
         private ?string $itemUriTemplate = null,
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -192,13 +193,15 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
-            map: $map
+            map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate
         );
     }
 
     public function getItemUriTemplate(): ?string
     {
-        return $this->itemUriTemplate;
+        // the items fall back to the canonical URI template of the resource when none is given for them
+        return $this->itemUriTemplate ?? $this->canonicalUriTemplate;
     }
 
     public function withItemUriTemplate(string $itemUriTemplate): self

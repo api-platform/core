@@ -181,6 +181,7 @@ class McpTool extends HttpOperation
         ?bool $jsonStream = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: $method,
@@ -267,6 +268,7 @@ class McpTool extends HttpOperation
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
             map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate,
         );
     }
 

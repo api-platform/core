@@ -107,6 +107,7 @@ final class Post extends HttpOperation
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: 'POST',
@@ -193,13 +194,15 @@ final class Post extends HttpOperation
             jsonStream: $jsonStream,
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate
         );
     }
 
     public function getItemUriTemplate(): ?string
     {
-        return $this->itemUriTemplate;
+        // the items fall back to the canonical URI template of the resource when none is given for them
+        return $this->itemUriTemplate ?? $this->canonicalUriTemplate;
     }
 
     public function withItemUriTemplate(string $itemUriTemplate): self
