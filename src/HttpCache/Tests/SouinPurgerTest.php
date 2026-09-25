@@ -32,12 +32,12 @@ class SouinPurgerTest extends TestCase
     public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo']])->shouldBeCalled();
-        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar']])->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo']])->shouldBeCalled();
-        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar']])->shouldBeCalled();
+        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $purger = new SouinPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);
@@ -154,7 +154,7 @@ class SouinPurgerTest extends TestCase
     public function testPurgeWithCustomHttpMethod(): void
     {
         $clientProphecy = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy->request('DELETE', '', ['headers' => ['Surrogate-Key' => '/foo']])->shouldBeCalled();
+        $clientProphecy->request('DELETE', '', ['headers' => ['Surrogate-Key' => '/foo']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $purger = new SouinPurger([$clientProphecy->reveal()], method: Request::METHOD_DELETE);
         $purger->purge(['/foo']);
