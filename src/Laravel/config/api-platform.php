@@ -162,6 +162,19 @@ return [
         // ],
         //
         // 'with_credentials' => true,
+        //
+        // Extra options passed to the Swagger UI configuration object, see https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
+        // 'extra_configuration' => [
+        //     // Login plugin: "Login" dialog next to "Authorize" and "Authorize" / "Logout" button on login responses
+        //     // (login operations can also be marked with the "x-apiplatform-login" OpenAPI extension)
+        //     'apiPlatformLogin' => [
+        //         'operations' => [
+        //             ['operationId' => 'api_login_post', 'securityScheme' => 'Personal Access Token', 'tokenPath' => 'token'],
+        //         ],
+        //         'dialog' => true,
+        //         'responseButton' => true,
+        //     ],
+        // ],
     ],
 
     // 'openapi' => [

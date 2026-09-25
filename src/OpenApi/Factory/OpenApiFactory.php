@@ -75,6 +75,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     public const BASE_URL = 'base_url';
     public const API_PLATFORM_TAG = 'x-apiplatform-tag';
+    /**
+     * Vendor extension marking a login operation for the Swagger UI login plugin.
+     * Value: `['securityScheme' => 'JWT', 'tokenPath' => 'token']` (or a list of such mappings).
+     */
+    public const API_PLATFORM_LOGIN = 'x-apiplatform-login';
     public const OVERRIDE_OPENAPI_RESPONSES = 'open_api_override_responses';
     private readonly Options $openApiOptions;
     private readonly PaginationOptions $paginationOptions;

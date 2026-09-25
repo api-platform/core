@@ -844,6 +844,7 @@ class ApiPlatformProvider extends ServiceProvider
                 redocEnabled: $config->get('api-platform.redoc.enabled', false),
                 graphQlEnabled: $graphQlEnabled,
                 graphiQlEnabled: $graphQlEnabled && (bool) $config->get('api-platform.graphiql.enabled', true),
+                swaggerUiExtraConfiguration: $config->get('api-platform.swagger_ui.extra_configuration', []),
             );
         });
 
