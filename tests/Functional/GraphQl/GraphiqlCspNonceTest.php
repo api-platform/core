@@ -43,14 +43,34 @@ final class GraphiqlCspNonceTwigExtension extends AbstractExtension
     }
 }
 
+final class CspNonceRuntime
+{
+    public function getCSPNonce(string $directive = 'script'): string
+    {
+        return 'runtime-nonce-'.$directive;
+    }
+}
+
+final class CspNonceRuntimeTwigExtension extends AbstractExtension
+{
+    public function getFunctions(): array
+    {
+        // Registered like NelmioSecurityBundle's csp_nonce: a Twig runtime function whose callable
+        // is [RuntimeClass, 'method'] and must be resolved through the runtime loader.
+        return [
+            new TwigFunction('csp_nonce', [CspNonceRuntime::class, 'getCSPNonce']),
+        ];
+    }
+}
+
 class GraphiqlCspNonceAppKernel extends \AppKernel
 {
     public static bool $requestNonceEnabled = false;
-    public static bool $cspNonceFunctionEnabled = false;
+    public static string $cspNonceMode = 'none'; // none|function|runtime
 
     private function suffix(): string
     {
-        return (self::$requestNonceEnabled ? 'req_' : 'no_req_').(self::$cspNonceFunctionEnabled ? 'fn' : 'no_fn');
+        return (self::$requestNonceEnabled ? 'req_' : 'no_req_').self::$cspNonceMode;
     }
 
     public function getCacheDir(): string
@@ -79,8 +99,17 @@ class GraphiqlCspNonceAppKernel extends \AppKernel
                     ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST, 'priority' => 256]);
             }
 
-            if (GraphiqlCspNonceAppKernel::$cspNonceFunctionEnabled) {
+            if ('function' === GraphiqlCspNonceAppKernel::$cspNonceMode) {
                 $container->register('test.csp_nonce_twig_extension', GraphiqlCspNonceTwigExtension::class)
+                    ->setPublic(true)
+                    ->addTag('twig.extension');
+            }
+
+            if ('runtime' === GraphiqlCspNonceAppKernel::$cspNonceMode) {
+                $container->register(CspNonceRuntime::class, CspNonceRuntime::class)
+                    ->setPublic(true)
+                    ->addTag('twig.runtime');
+                $container->register('test.csp_nonce_runtime_twig_extension', CspNonceRuntimeTwigExtension::class)
                     ->setPublic(true)
                     ->addTag('twig.extension');
             }
@@ -100,7 +129,7 @@ final class GraphiqlCspNonceTest extends ApiTestCase
     protected function tearDown(): void
     {
         GraphiqlCspNonceAppKernel::$requestNonceEnabled = false;
-        GraphiqlCspNonceAppKernel::$cspNonceFunctionEnabled = false;
+        GraphiqlCspNonceAppKernel::$cspNonceMode = 'none';
 
         parent::tearDown();
     }
@@ -108,7 +137,7 @@ final class GraphiqlCspNonceTest extends ApiTestCase
     public function testRequestAttributeNonceIsEmittedOnScripts(): void
     {
         GraphiqlCspNonceAppKernel::$requestNonceEnabled = true;
-        GraphiqlCspNonceAppKernel::$cspNonceFunctionEnabled = false;
+        GraphiqlCspNonceAppKernel::$cspNonceMode = 'none';
 
         $client = self::createClient();
         $client->request('GET', '/graphql/graphiql', ['headers' => ['Accept' => 'text/html']]);
@@ -124,7 +153,7 @@ final class GraphiqlCspNonceTest extends ApiTestCase
     public function testCspNonceFunctionIsEmittedOnScripts(): void
     {
         GraphiqlCspNonceAppKernel::$requestNonceEnabled = false;
-        GraphiqlCspNonceAppKernel::$cspNonceFunctionEnabled = true;
+        GraphiqlCspNonceAppKernel::$cspNonceMode = 'function';
 
         $client = self::createClient();
         $client->request('GET', '/graphql/graphiql', ['headers' => ['Accept' => 'text/html']]);
@@ -136,10 +165,25 @@ final class GraphiqlCspNonceTest extends ApiTestCase
         $this->assertStringContainsString('init-graphiql.js" nonce="function-nonce-script"', $content);
     }
 
+    public function testCspNonceRuntimeFunctionIsEmittedOnScripts(): void
+    {
+        GraphiqlCspNonceAppKernel::$requestNonceEnabled = false;
+        GraphiqlCspNonceAppKernel::$cspNonceMode = 'runtime';
+
+        $client = self::createClient();
+        $client->request('GET', '/graphql/graphiql', ['headers' => ['Accept' => 'text/html']]);
+
+        $this->assertResponseIsSuccessful();
+        $content = $client->getResponse()->getContent();
+
+        $this->assertStringContainsString('<script type="importmap" nonce="runtime-nonce-script">', $content);
+        $this->assertStringContainsString('init-graphiql.js" nonce="runtime-nonce-script"', $content);
+    }
+
     public function testRequestAttributeNonceTakesPrecedenceOverFunction(): void
     {
         GraphiqlCspNonceAppKernel::$requestNonceEnabled = true;
-        GraphiqlCspNonceAppKernel::$cspNonceFunctionEnabled = true;
+        GraphiqlCspNonceAppKernel::$cspNonceMode = 'function';
 
         $client = self::createClient();
         $client->request('GET', '/graphql/graphiql', ['headers' => ['Accept' => 'text/html']]);
@@ -154,7 +198,7 @@ final class GraphiqlCspNonceTest extends ApiTestCase
     public function testNoNonceIsEmittedWhenNoMechanismAvailable(): void
     {
         GraphiqlCspNonceAppKernel::$requestNonceEnabled = false;
-        GraphiqlCspNonceAppKernel::$cspNonceFunctionEnabled = false;
+        GraphiqlCspNonceAppKernel::$cspNonceMode = 'none';
 
         $client = self::createClient();
         $client->request('GET', '/graphql/graphiql', ['headers' => ['Accept' => 'text/html']]);

@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
+use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -1073,6 +1074,51 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertNotNull($param);
         $this->assertArrayNotHasKey('nested_properties_info', $param->getExtraProperties());
     }
+
+    public function testProviderAttachedForClassStringFilterNotRegisteredAsFilterInterface(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(readable: true));
+
+        // Mirrors ApiPlatform\JsonApi\Filter\SparseFieldset: implements ParameterProviderFilterInterface
+        // but not FilterInterface, so the filter locator never has it and getFilterInstance() returns null
+        // for its class-string.
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $collection = $parameterFactory->create(HasClassStringParameterProviderFilter::class);
+        $operation = $collection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $param = $parameters->get('sparse');
+        $this->assertNotNull($param);
+        $this->assertSame(ClassStringParameterProviderFilter::getParameterProvider(), $param->getProvider());
+    }
+}
+
+class ClassStringParameterProviderFilter implements ParameterProviderFilterInterface
+{
+    public static function getParameterProvider(): string
+    {
+        return 'test_class_string_filter_provider';
+    }
+}
+
+#[ApiResource]
+#[QueryParameter(key: 'sparse', filter: ClassStringParameterProviderFilter::class)]
+class HasClassStringParameterProviderFilter
+{
+    public $id;
 }
 
 class RepeatedPlaceholderExactFilter implements FilterInterface

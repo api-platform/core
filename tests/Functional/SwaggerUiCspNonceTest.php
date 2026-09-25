@@ -43,14 +43,34 @@ final class CspNonceTwigExtension extends AbstractExtension
     }
 }
 
+final class CspNonceRuntime
+{
+    public function getCSPNonce(string $directive = 'script'): string
+    {
+        return 'runtime-nonce-'.$directive;
+    }
+}
+
+final class CspNonceRuntimeTwigExtension extends AbstractExtension
+{
+    public function getFunctions(): array
+    {
+        // Registered like NelmioSecurityBundle's csp_nonce: a Twig runtime function whose callable
+        // is [RuntimeClass, 'method'] and must be resolved through the runtime loader.
+        return [
+            new TwigFunction('csp_nonce', [CspNonceRuntime::class, 'getCSPNonce']),
+        ];
+    }
+}
+
 class SwaggerUiCspNonceAppKernel extends \AppKernel
 {
     public static bool $requestNonceEnabled = false;
-    public static bool $cspNonceFunctionEnabled = false;
+    public static string $cspNonceMode = 'none'; // none|function|runtime
 
     private function suffix(): string
     {
-        return (self::$requestNonceEnabled ? 'req_' : 'no_req_').(self::$cspNonceFunctionEnabled ? 'fn' : 'no_fn');
+        return (self::$requestNonceEnabled ? 'req_' : 'no_req_').self::$cspNonceMode;
     }
 
     public function getCacheDir(): string
@@ -81,8 +101,17 @@ class SwaggerUiCspNonceAppKernel extends \AppKernel
                     ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST, 'priority' => 256]);
             }
 
-            if (SwaggerUiCspNonceAppKernel::$cspNonceFunctionEnabled) {
+            if ('function' === SwaggerUiCspNonceAppKernel::$cspNonceMode) {
                 $container->register('test.csp_nonce_twig_extension', CspNonceTwigExtension::class)
+                    ->setPublic(true)
+                    ->addTag('twig.extension');
+            }
+
+            if ('runtime' === SwaggerUiCspNonceAppKernel::$cspNonceMode) {
+                $container->register(CspNonceRuntime::class, CspNonceRuntime::class)
+                    ->setPublic(true)
+                    ->addTag('twig.runtime');
+                $container->register('test.csp_nonce_runtime_twig_extension', CspNonceRuntimeTwigExtension::class)
                     ->setPublic(true)
                     ->addTag('twig.extension');
             }
@@ -102,7 +131,7 @@ final class SwaggerUiCspNonceTest extends ApiTestCase
     protected function tearDown(): void
     {
         SwaggerUiCspNonceAppKernel::$requestNonceEnabled = false;
-        SwaggerUiCspNonceAppKernel::$cspNonceFunctionEnabled = false;
+        SwaggerUiCspNonceAppKernel::$cspNonceMode = 'none';
 
         parent::tearDown();
     }
@@ -110,7 +139,7 @@ final class SwaggerUiCspNonceTest extends ApiTestCase
     public function testRequestAttributeNonceIsEmittedOnScripts(): void
     {
         SwaggerUiCspNonceAppKernel::$requestNonceEnabled = true;
-        SwaggerUiCspNonceAppKernel::$cspNonceFunctionEnabled = false;
+        SwaggerUiCspNonceAppKernel::$cspNonceMode = 'none';
 
         $client = self::createClient();
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
@@ -127,7 +156,7 @@ final class SwaggerUiCspNonceTest extends ApiTestCase
     public function testCspNonceFunctionIsEmittedOnScripts(): void
     {
         SwaggerUiCspNonceAppKernel::$requestNonceEnabled = false;
-        SwaggerUiCspNonceAppKernel::$cspNonceFunctionEnabled = true;
+        SwaggerUiCspNonceAppKernel::$cspNonceMode = 'function';
 
         $client = self::createClient();
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
@@ -139,10 +168,25 @@ final class SwaggerUiCspNonceTest extends ApiTestCase
         $this->assertStringContainsString('swagger-ui-bundle.js" nonce="function-nonce-script"', $content);
     }
 
+    public function testCspNonceRuntimeFunctionIsEmittedOnScripts(): void
+    {
+        SwaggerUiCspNonceAppKernel::$requestNonceEnabled = false;
+        SwaggerUiCspNonceAppKernel::$cspNonceMode = 'runtime';
+
+        $client = self::createClient();
+        $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
+
+        $this->assertResponseIsSuccessful();
+        $content = $client->getResponse()->getContent();
+
+        $this->assertStringContainsString('nonce="runtime-nonce-script"', $content);
+        $this->assertStringContainsString('swagger-ui-bundle.js" nonce="runtime-nonce-script"', $content);
+    }
+
     public function testRequestAttributeNonceTakesPrecedenceOverFunction(): void
     {
         SwaggerUiCspNonceAppKernel::$requestNonceEnabled = true;
-        SwaggerUiCspNonceAppKernel::$cspNonceFunctionEnabled = true;
+        SwaggerUiCspNonceAppKernel::$cspNonceMode = 'function';
 
         $client = self::createClient();
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
@@ -157,7 +201,7 @@ final class SwaggerUiCspNonceTest extends ApiTestCase
     public function testNoNonceIsEmittedWhenNoMechanismAvailable(): void
     {
         SwaggerUiCspNonceAppKernel::$requestNonceEnabled = false;
-        SwaggerUiCspNonceAppKernel::$cspNonceFunctionEnabled = false;
+        SwaggerUiCspNonceAppKernel::$cspNonceMode = 'none';
 
         $client = self::createClient();
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);

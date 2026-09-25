@@ -69,7 +69,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             }
 
             if ($metadata->isSingleValuedAssociation($property)) {
-                $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+                $nullable = $this->isPropertyNullable($metadata, $property);
 
                 return $nullable ? Type::nullable(Type::object($class)) : Type::object($class);
             }
@@ -87,7 +87,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             return null;
         }
 
-        $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+        $nullable = $this->isPropertyNullable($metadata, $property);
         $enumType = null;
 
         if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
@@ -135,7 +135,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             }
 
             if ($metadata->isSingleValuedAssociation($property)) {
-                $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+                $nullable = $this->isPropertyNullable($metadata, $property);
 
                 return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, $class)];
             }
@@ -156,7 +156,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
-            $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+            $nullable = $this->isPropertyNullable($metadata, $property);
             $enumType = null;
             if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
                 $enumType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
@@ -214,6 +214,38 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         }
 
         return false;
+    }
+
+    /**
+     * ODM's "nullable" mapping flag is a persistence concern (omit the key when null), not a type constraint,
+     * so the PHP property type is the source of truth for nullability; the mapping flag is only a fallback
+     * for untyped properties.
+     */
+    private function isPropertyNullable(ClassMetadata $metadata, string $property): bool
+    {
+        if ($metadata instanceof MongoDbClassMetadata && null !== $reflectionType = $this->getPropertyReflectionType($metadata, $property)) {
+            return $reflectionType->allowsNull();
+        }
+
+        return $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+    }
+
+    /**
+     * Walks the class hierarchy with plain reflection instead of ODM's ClassMetadata::getReflectionProperty():
+     * for enum-typed fields, that method returns a Doctrine\Persistence\Reflection\EnumReflectionProperty
+     * decorator on some doctrine/persistence versions, whose native getType() is unusable (it never calls
+     * ReflectionProperty's constructor). A plain \ReflectionClass::getProperty() finds the same private
+     * properties declared on parent classes without ever going through that decorator.
+     */
+    private function getPropertyReflectionType(MongoDbClassMetadata $metadata, string $property): ?\ReflectionType
+    {
+        for ($class = $metadata->getReflectionClass(); $class; $class = $class->getParentClass()) {
+            if ($class->hasProperty($property)) {
+                return $class->getProperty($property)->getType();
+            }
+        }
+
+        return null;
     }
 
     private function getMetadata(string $class): ?ClassMetadata
