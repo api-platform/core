@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
+use Doctrine\ODM\MongoDB\UnitOfWork as OdmUnitOfWork;
+use Doctrine\ORM\UnitOfWork as OrmUnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
@@ -221,9 +223,38 @@ final class PersistProcessor implements ProcessorInterface
                 continue;
             }
 
+            // Do not get reference for new objects with application-assigned identifiers (e.g. UUID generated in the constructor):
+            // the object does not exist in the database yet and must be handled by cascade persist
+            if ($this->isNewObject($relManager, $value)) {
+                continue;
+            }
+
             \assert(method_exists($relManager, 'getReference'));
 
             $reflectionProperty->setValue($data, $relManager->getReference($relClass, $identifiers));
         }
+    }
+
+    /**
+     * Checks if an object holding identifiers is new (not yet in the database) according to the unit of work.
+     * Objects with database-generated identifiers are never considered new here since Doctrine assumes they exist.
+     */
+    private function isNewObject(DoctrineObjectManager $manager, object $object): bool
+    {
+        if (!method_exists($manager, 'getUnitOfWork')) {
+            return false;
+        }
+
+        $unitOfWork = $manager->getUnitOfWork();
+
+        if (method_exists($unitOfWork, 'getEntityState')) {
+            return OrmUnitOfWork::STATE_NEW === $unitOfWork->getEntityState($object);
+        }
+
+        if (method_exists($unitOfWork, 'getDocumentState')) {
+            return OdmUnitOfWork::STATE_NEW === $unitOfWork->getDocumentState($object);
+        }
+
+        return false;
     }
 }

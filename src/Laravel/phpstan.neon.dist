@@ -20,3 +20,8 @@ parameters:
 	ignoreErrors:
 	  - '#Cannot call method expectsQuestion#'
 	  - "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Exception\\\\PartialDenormalizationException and 'getNotNormalizableV…' will always evaluate to true\\.#"
+	  # Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
+	  -
+	      identifier: method.alreadyNarrowedType
+	      paths:
+	          - Tests

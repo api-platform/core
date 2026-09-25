@@ -61,7 +61,7 @@ class JsonApiTest extends TestCase
 
     public function testGetEntrypoint(): void
     {
-        $response = $this->get('/api/', ['accept' => ['application/vnd.api+json']]);
+        $response = $this->get('http://localhost/api/', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.api+json');
         $this->assertJsonContains(

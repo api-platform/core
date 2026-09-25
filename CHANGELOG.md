@@ -44,6 +44,17 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
 
+## v4.4.2
+
+### Bug fixes
+
+* [19b068cbc](https://github.com/api-platform/core/commit/19b068cbcf03f9843f67ca6dc5915e0eb2004d1a) fix(mcp): fix ignored output format (#8542)
+* [332cb1bed](https://github.com/api-platform/core/commit/332cb1bed375a017acc44e3b81142c69d356015f) fix(metadata): resolve uri variable identifiers from metadata (#8578)
+* [824466ba4](https://github.com/api-platform/core/commit/824466ba4ad4daa31887151889c1f74f623c9ca2) fix(doctrine): watch new relations for assigned ids by reference (#8498)
+* [99b67ca3c](https://github.com/api-platform/core/commit/99b67ca3c773198bebf1e0ba85f93cd915f1252c) fix(graphql): nullable input fields with a default (#8568)
+* [9a9e684dd](https://github.com/api-platform/core/commit/9a9e684dd4fe22d162bb2d63b2a3ed08a6c3b8a0) fix(metadata): attach provider for class-string filters (#8583)
+* [dce757ca9](https://github.com/api-platform/core/commit/dce757ca924b4de043e764134e666fa9c6180783) fix(jsonapi): use the serialized key for client-generated ids (#8577)
+
 ## v4.4.1
 
 ### Bug fixes
@@ -108,6 +119,12 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 * Symfony is now required at `^7.4 || ^8.0` across all components; support for `6.4` is dropped ([#8397](https://github.com/api-platform/core/pull/8397)).
 * `api-platform/doctrine-orm` requires `doctrine/orm` `^2.17 || ^3.3`. The `PARTIAL` DQL grammar is absent from 3.0.0 through 3.2.3, so the `fetch_partial` option was silently a no-op on those versions.
 * `doctrine/doctrine-bundle` moves to `^2.11.1 || ^3.1`. 2.11.0 passes `$reportFieldsWhereDeclared` to `AttributeDriver`, which doctrine/orm 3 rejects.
+
+## v4.3.20
+
+### Bug fixes
+
+* [17035672e](https://github.com/api-platform/core/commit/17035672e1079647f2dedffa808f62cd5db6bf96) fix(symfony): hide graphiql link when graphql is disabled (#8576)
 
 ## v4.3.19
 
