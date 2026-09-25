@@ -39,6 +39,7 @@
         "ramsey/uuid-doctrine": "^2.0",
         "symfony/cache": "^7.4 || ^8.0",
         "symfony/framework-bundle": "^7.4 || ^8.0",
+        "symfony/object-mapper": "^7.4 || ^8.0",
         "symfony/property-access": "^7.4 || ^8.0",
         "symfony/serializer": "^7.4 || ^8.0",
         "symfony/property-info": "^7.4 || ^8.0",
@@ -80,5 +81,8 @@
         "test": "./vendor/bin/phpunit"
     },
     "minimum-stability": "beta",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "conflict": {
+        "symfony/object-mapper": "<7.3.4"
+    }
 }

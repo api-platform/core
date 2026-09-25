@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Doctrine\Common\Metadata\Property\DoctrineDiscriminatorSerializerPropertyMetadataFactory;
+use ApiPlatform\Doctrine\Orm\State\ManagedEntityTransform;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
@@ -42,6 +43,7 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\State\LinksHandler;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Symfony\Component\ObjectMapper\TransformCallableInterface;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -302,4 +304,18 @@ return function (ContainerConfigurator $container) {
             service('doctrine'),
         ])
         ->tag('api_platform.doctrine.orm.links_handler', ['key' => 'api_platform.doctrine.orm.links_handler']);
+
+    if (interface_exists(TransformCallableInterface::class)) {
+        // Registered under its own class name: the object mapper resolves a `transform` by the
+        // string it is given, and that is the class name users write in the attribute.
+        $services->set(ManagedEntityTransform::class)
+            ->args([
+                service('doctrine'),
+                service('api_platform.metadata.resource.metadata_collection_factory'),
+                service('api_platform.api.identifiers_extractor'),
+            ])
+            ->tag('object_mapper.transform_callable');
+
+        $services->alias('api_platform.doctrine.orm.object_mapper.managed_entity_transform', ManagedEntityTransform::class);
+    }
 };
