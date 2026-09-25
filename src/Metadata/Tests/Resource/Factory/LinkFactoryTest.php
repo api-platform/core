@@ -164,13 +164,13 @@ final class LinkFactoryTest extends TestCase
     public function testCompleteLinkDoesNotCacheEmptyIdentifiers(): void
     {
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->method('create')->with(AttributeResource::class)->willReturnOnConsecutiveCalls(
+        $propertyNameCollectionFactory->expects($this->any())->method('create')->with(AttributeResource::class)->willReturnOnConsecutiveCalls(
             new PropertyNameCollection([]),
             new PropertyNameCollection(['uuid']),
         );
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->with(AttributeResource::class, 'uuid')->willReturn((new ApiProperty())->withIdentifier(true));
+        $propertyMetadataFactory->expects($this->any())->method('create')->with(AttributeResource::class, 'uuid')->willReturn((new ApiProperty())->withIdentifier(true));
 
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);

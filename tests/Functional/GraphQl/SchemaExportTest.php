@@ -59,18 +59,33 @@ final class SchemaExportTest extends ApiTestCase
 
         $output = $this->tester->getDisplay();
 
-        $this->assertStringContainsString(<<<'SDL'
-            "Dummy Friend."
-            type DummyFriend implements Node {
-              id: ID!
+        if ($this->isMongoDB()) {
+            $this->assertStringContainsString(<<<'SDL'
+                "Dummy Friend."
+                type DummyFriend implements Node {
+                  id: ID!
 
-              "The id"
-              _id: Int!
+                  "The id"
+                  _id: Int
 
-              "The dummy name"
-              name: String!
-            }
-            SDL, $output);
+                  "The dummy name"
+                  name: String
+                }
+                SDL, $output);
+        } else {
+            $this->assertStringContainsString(<<<'SDL'
+                "Dummy Friend."
+                type DummyFriend implements Node {
+                  id: ID!
+
+                  "The id"
+                  _id: Int!
+
+                  "The dummy name"
+                  name: String!
+                }
+                SDL, $output);
+        }
 
         $this->assertStringContainsString(<<<'SDL'
             "Cursor connection for DummyFriend."
@@ -143,20 +158,37 @@ final class SchemaExportTest extends ApiTestCase
             }
             SDL, $output);
 
-        $this->assertStringContainsString(<<<'SDL'
-            "Creates a DummyFriend."
-            input createDummyFriendInput {
-              "The dummy name"
-              name: String!
-              clientMutationId: String
-            }
+        if ($this->isMongoDB()) {
+            $this->assertStringContainsString(<<<'SDL'
+                "Creates a DummyFriend."
+                input createDummyFriendInput {
+                  "The dummy name"
+                  name: String
+                  clientMutationId: String
+                }
 
-            "Creates a DummyFriend."
-            type createDummyFriendPayload {
-              dummyFriend: DummyFriend
-              clientMutationId: String
-            }
-            SDL, $output);
+                "Creates a DummyFriend."
+                type createDummyFriendPayload {
+                  dummyFriend: DummyFriend
+                  clientMutationId: String
+                }
+                SDL, $output);
+        } else {
+            $this->assertStringContainsString(<<<'SDL'
+                "Creates a DummyFriend."
+                input createDummyFriendInput {
+                  "The dummy name"
+                  name: String!
+                  clientMutationId: String
+                }
+
+                "Creates a DummyFriend."
+                type createDummyFriendPayload {
+                  dummyFriend: DummyFriend
+                  clientMutationId: String
+                }
+                SDL, $output);
+        }
 
         $this->assertStringContainsString(<<<'SDL'
             "Updates a OptionalRequiredDummy."
@@ -170,5 +202,10 @@ final class SchemaExportTest extends ApiTestCase
               clientMutationId: String
             }
             SDL, $output);
+    }
+
+    private function isMongoDB(): bool
+    {
+        return 'mongodb' === static::getContainer()->getParameter('kernel.environment');
     }
 }
