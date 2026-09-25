@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use Illuminate\Support\Facades\Cache;
@@ -27,6 +28,7 @@ final class CachePropertyNameCollectionMetadataFactory implements PropertyNameCo
     public function __construct(
         private readonly PropertyNameCollectionFactoryInterface $decorated,
         private readonly string $cacheStore,
+        private readonly ?ModelMetadata $modelMetadata = null,
     ) {
     }
 
@@ -34,8 +36,25 @@ final class CachePropertyNameCollectionMetadataFactory implements PropertyNameCo
     {
         $key = hash('xxh3', serialize(['resource_class' => $resourceClass] + $options));
 
-        return $this->localCache[$key] ??= Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $options) {
-            return $this->decorated->create($resourceClass, $options);
-        });
+        if (isset($this->localCache[$key])) {
+            return $this->localCache[$key];
+        }
+
+        $store = Cache::store($this->cacheStore);
+        if (null !== $propertyNameCollection = $store->get($key)) {
+            return $this->localCache[$key] = $propertyNameCollection;
+        }
+
+        $missingTableReads = $this->modelMetadata?->getMissingTableReads();
+        $propertyNameCollection = $this->decorated->create($resourceClass, $options);
+
+        // built from a missing table: the next call, maybe in another process, has to read it again
+        if ($missingTableReads !== $this->modelMetadata?->getMissingTableReads()) {
+            return $propertyNameCollection;
+        }
+
+        $store->forever($key, $propertyNameCollection);
+
+        return $this->localCache[$key] = $propertyNameCollection;
     }
 }

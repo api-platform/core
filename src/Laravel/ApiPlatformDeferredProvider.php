@@ -37,6 +37,7 @@ use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource\EloquentResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
 use ApiPlatform\Laravel\Eloquent\State\LinksHandler;
@@ -276,7 +277,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                     ),
                     (bool) $config->get('api-platform.partial_patch_validation', false)
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file'),
+                $app->make(ModelMetadata::class)
             );
         });
 
