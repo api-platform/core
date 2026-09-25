@@ -18,8 +18,8 @@ resources:
                     types:
                         - Comment
                     formats:
-                        json: null
-                        jsonld: null
+                        json: ''
+                        jsonld: ''
                         xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
                     inputFormats:
                         jsonld: application/merge-patch+json+ld
@@ -103,8 +103,6 @@ resources:
                     exceptionToStatus:
                         Symfony\Component\Serializer\Exception\ExceptionInterface: 404
                     queryParameterValidationEnabled: false
-                    strictQueryParameterValidation: false
-                    hideHydraOperation: false
                     read: true
                     deserialize: false
                     validate: false
@@ -144,8 +142,8 @@ resources:
                         date:
                             key: date
             formats:
-                json: null
-                jsonld: null
+                json: ''
+                jsonld: ''
                 xls: application/vnd.ms-excel
             inputFormats:
                 json: application/merge-patch+json
@@ -290,11 +288,11 @@ resources:
                     serialize: true
                     priority: 200
                     extraProperties:
+                        route_prefix: /v1
                         custom_property: 'Lorem ipsum dolor sit amet'
                         another_custom_property:
                             'Lorem ipsum': 'Dolor sit amet'
                         foo: bar
-                        route_prefix: /v1
                     stateOptions:
                         elasticsearchOptions:
                             index: foo_index
@@ -340,8 +338,8 @@ resources:
             policy: null
             middleware: null
             parameters: null
-            strictQueryParameterValidation: false
-            hideHydraOperation: false
+            strictQueryParameterValidation: null
+            hideHydraOperation: null
             jsonStream: true
             throwOnNotFound: true
             extraProperties:

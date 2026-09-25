@@ -47,7 +47,7 @@ class IterableTypeTest extends TestCase
 
         $iterableType->serialize('foo');
 
-        $this->assertEquals(['foo'], $iterableType->serialize(['foo']));
+        $this->assertSame(['foo'], $iterableType->serialize(['foo']));
     }
 
     public function testParseValue(): void
@@ -59,7 +59,7 @@ class IterableTypeTest extends TestCase
 
         $iterableType->parseValue('foo');
 
-        $this->assertEquals(['foo'], $iterableType->parseValue(['foo']));
+        $this->assertSame(['foo'], $iterableType->parseValue(['foo']));
     }
 
     public function testParseLiteral(): void
@@ -70,10 +70,10 @@ class IterableTypeTest extends TestCase
         $iterableType->parseLiteral(new IntValueNode(['value' => '1']));
 
         $listValueNode = new ListValueNode(['values' => []]);
-        $this->assertEquals([], $iterableType->parseLiteral($listValueNode));
+        $this->assertSame([], $iterableType->parseLiteral($listValueNode));
 
         $objectValueNode = new ObjectValueNode(['fields' => []]);
-        $this->assertEquals([], $iterableType->parseLiteral($objectValueNode));
+        $this->assertSame([], $iterableType->parseLiteral($objectValueNode));
 
         $listValueNode = new ListValueNode([
             'values' => [
@@ -94,6 +94,6 @@ class IterableTypeTest extends TestCase
                 ]),
             ],
         ]);
-        $this->assertEquals(['foo', false, 123, 9.4, null, ['bar' => 'baz'], [true]], $iterableType->parseLiteral($listValueNode));
+        $this->assertSame(['foo', false, 123, 9.4, null, ['bar' => 'baz'], [true]], $iterableType->parseLiteral($listValueNode));
     }
 }

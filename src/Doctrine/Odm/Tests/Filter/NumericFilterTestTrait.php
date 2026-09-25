@@ -27,7 +27,7 @@ trait NumericFilterTestTrait
             'dummyBoolean' => null,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',
@@ -47,7 +47,7 @@ trait NumericFilterTestTrait
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',

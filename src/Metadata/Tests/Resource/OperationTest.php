@@ -66,6 +66,6 @@ final class OperationTest extends TestCase
     {
         $a = [];
         $operation = (new GetCollection())->withPaginationViaCursor($a);
-        $this->assertEquals($a, $operation->getPaginationViaCursor());
+        $this->assertSame($a, $operation->getPaginationViaCursor());
     }
 }

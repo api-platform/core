@@ -35,9 +35,9 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     {
         $configPath = __DIR__.'/../../Fixtures/FileConfigurations/properties.xml';
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new XmlPropertyExtractor([$configPath])))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['foo', 'name'])
+        $this->assertSame(
+            iterator_to_array((new ExtractorPropertyNameCollectionFactory(new XmlPropertyExtractor([$configPath])))->create(FileConfigDummy::class)),
+            iterator_to_array(new PropertyNameCollection(['foo', 'name']))
         );
     }
 
@@ -51,9 +51,9 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
             ->willReturn(new PropertyNameCollection(['id']))
             ->shouldBeCalled();
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new XmlPropertyExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['id', 'foo', 'name'])
+        $this->assertSame(
+            iterator_to_array((new ExtractorPropertyNameCollectionFactory(new XmlPropertyExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class)),
+            iterator_to_array(new PropertyNameCollection(['id', 'foo', 'name']))
         );
     }
 
@@ -81,9 +81,9 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     {
         $configPath = __DIR__.'/../../Fixtures/FileConfigurations/properties.yml';
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new YamlPropertyExtractor([$configPath])))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['foo', 'name'])
+        $this->assertSame(
+            iterator_to_array((new ExtractorPropertyNameCollectionFactory(new YamlPropertyExtractor([$configPath])))->create(FileConfigDummy::class)),
+            iterator_to_array(new PropertyNameCollection(['foo', 'name']))
         );
     }
 
@@ -97,9 +97,9 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
             ->willReturn(new PropertyNameCollection(['id']))
             ->shouldBeCalled();
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new YamlPropertyExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['id', 'foo', 'name'])
+        $this->assertSame(
+            iterator_to_array((new ExtractorPropertyNameCollectionFactory(new YamlPropertyExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class)),
+            iterator_to_array(new PropertyNameCollection(['id', 'foo', 'name']))
         );
     }
 

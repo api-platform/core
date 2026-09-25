@@ -41,6 +41,7 @@ use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +54,12 @@ use Symfony\Component\WebLink\Link;
  */
 final class ResourceMetadataCompatibilityTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use OperationDefaultsTrait;
+
+    private ResourceAdapterInterface $adapter;
+
     private const RESOURCE_CLASS = Comment::class;
     private const SHORT_NAME = 'Comment';
     private const DEFAULTS = [
@@ -97,12 +103,10 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'securityPostValidation' => 'is_granted(\'ROLE_OWNER\')',
             'securityPostValidationMessage' => 'Sorry, you must the owner of this resource to access it.',
             'queryParameterValidationEnabled' => true,
-            'strictQueryParameterValidation' => false,
-            'hideHydraOperation' => false,
             'types' => ['someirischema', 'anotheririschema'],
             'formats' => [
-                'json' => null,
-                'jsonld' => null,
+                'json' => '',
+                'jsonld' => '',
                 'xls' => 'application/vnd.ms-excel',
             ],
             'inputFormats' => [
@@ -237,12 +241,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'serialize' => true,
                     'priority' => 200,
                     'extraProperties' => [
+                        'route_prefix' => '/v1', // from defaults
                         'custom_property' => 'Lorem ipsum dolor sit amet',
                         'another_custom_property' => [
                             'Lorem ipsum' => 'Dolor sit amet',
                         ],
                         'foo' => 'bar',
-                        'route_prefix' => '/v1', // from defaults
                     ],
                     'stateOptions' => [
                         'elasticsearchOptions' => [
@@ -308,8 +312,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'description' => 'A list of Comments',
                     'types' => ['Comment'],
                     'formats' => [
-                        'json' => null,
-                        'jsonld' => null,
+                        'json' => '',
+                        'jsonld' => '',
                         'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     ],
                     'inputFormats' => [
@@ -403,8 +407,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'Symfony\Component\Serializer\Exception\ExceptionInterface' => 404,
                     ],
                     'queryParameterValidationEnabled' => false,
-                    'strictQueryParameterValidation' => false,
-                    'hideHydraOperation' => false,
                     'read' => true,
                     'deserialize' => false,
                     'validate' => false,
@@ -525,6 +527,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         $reflClass = new \ReflectionClass(ApiResource::class);
         $parameters = $reflClass->getConstructor()->getParameters();
+        $this->adapter = $adapter;
         $this->defaults = self::DEFAULTS;
         $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
 
@@ -537,7 +540,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         $resources = $this->buildApiResources();
-        $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $resources), $collection);
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(self::RESOURCE_CLASS, $resources)), self::toComparableArray($collection));
     }
 
     public static function getExtractors(): array
@@ -570,7 +573,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
                 // Build default GraphQL operations
                 $graphQlOperations = [];
-                foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
+                foreach ([new Query(), new QueryCollection(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $graphQlOperation) {
                     $description = $graphQlOperation instanceof Mutation ? ucfirst("{$graphQlOperation->getName()}s a {$resource->getShortName()}.") : null;
                     [$name, $operation] = $this->getOperationWithDefaults($resource, $graphQlOperation);
                     $graphQlOperations[$name] = $operation->withDescription($description);
@@ -635,11 +638,17 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 continue;
             }
 
-            if (isset($value['fromClass']) || isset($value[0])) {
+            // TODO: XmlResourceExtractor emits `from_property` before `from_class` while YamlResourceExtractor does the
+            // opposite, so the expected order has to follow the adapter under test.
+            $fromClassFirst = $this->adapter instanceof YamlResourceAdapter;
+            if ($fromClassFirst && (isset($value['fromClass']) || isset($value[0]))) {
                 $uriVariables[$parameterName]['from_class'] = $value['fromClass'] ?? $value[0];
             }
             if (isset($value['fromProperty']) || isset($value[1])) {
                 $uriVariables[$parameterName]['from_property'] = $value['fromProperty'] ?? $value[1];
+            }
+            if (!$fromClassFirst && (isset($value['fromClass']) || isset($value[0]))) {
+                $uriVariables[$parameterName]['from_class'] = $value['fromClass'] ?? $value[0];
             }
             if (isset($value['toClass'])) {
                 $uriVariables[$parameterName]['to_class'] = $value['toClass'];

@@ -68,7 +68,7 @@ class NestedPatchTest extends ApiTestCase
             ],
         ]);
         static::assertResponseIsSuccessful();
-        static::assertEquals([
+        static::assertSame([
             'id' => $createdFooId,
             'bar' => [
                 'id' => $createdBarId,

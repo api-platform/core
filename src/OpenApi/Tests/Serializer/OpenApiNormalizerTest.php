@@ -308,8 +308,8 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertArrayNotHasKey('security', $openApiAsArray['paths']['/dummies/{id}']['get']);
 
         // Security can be disabled per-operation using an empty array
-        $this->assertEquals([], $openApiAsArray['paths']['/dummies']['post']['security']);
-        $this->assertEquals(['url' => '/test'], $openApiAsArray['paths']['/dummies']['post']['servers']);
+        $this->assertSame([], $openApiAsArray['paths']['/dummies']['post']['security']);
+        $this->assertSame(['url' => '/test'], $openApiAsArray['paths']['/dummies']['post']['servers']);
 
         // Make sure things are sorted
         $this->assertSame(array_keys($openApiAsArray['paths']), ['/dummies', '/dummies/{id}', '/zorros', '/zorros/{id}']);

@@ -171,7 +171,7 @@ class McpTest extends ApiTestCase
         self::assertResponseIsSuccessful();
         self::assertArrayHasKey('result', $result);
         $content = $result['result']['content'][0]['text'] ?? null;
-        self::assertEquals('Custom result: Test content', $content);
+        self::assertSame('Custom result: Test content', $content);
         self::assertNull($result['result']['_meta'] ?? null);
     }
 
@@ -204,7 +204,7 @@ class McpTest extends ApiTestCase
         $result = $res->toArray();
         self::assertArrayHasKey('result', $result);
         $content = $result['result']['content'][0]['text'] ?? null;
-        self::assertEquals('Custom result: Test with metadata', $content);
+        self::assertSame('Custom result: Test with metadata', $content);
         $hasMeta = isset($result['result']['_meta']) || isset($result['result']['meta']) || isset($result['result']['structuredContent']);
         self::assertTrue($hasMeta, 'No metadata found in: '.json_encode(array_keys($result['result'])));
     }
@@ -425,7 +425,7 @@ class McpTest extends ApiTestCase
         foreach ($tools as $tool) {
             self::assertArrayHasKey('name', $tool);
             self::assertArrayHasKey('inputSchema', $tool);
-            self::assertEquals('object', $tool['inputSchema']['type']);
+            self::assertSame('object', $tool['inputSchema']['type']);
         }
 
         $listBooks = array_filter($tools, static function (array $input) {
@@ -554,10 +554,10 @@ class McpTest extends ApiTestCase
         }
 
         self::assertNotNull($processMessageTool);
-        self::assertEquals('process_message', $processMessageTool['name']);
-        self::assertEquals('Process a message with priority', $processMessageTool['description'] ?? null);
+        self::assertSame('process_message', $processMessageTool['name']);
+        self::assertSame('Process a message with priority', $processMessageTool['description'] ?? null);
         self::assertArrayHasKey('inputSchema', $processMessageTool);
-        self::assertEquals('object', $processMessageTool['inputSchema']['type']);
+        self::assertSame('object', $processMessageTool['inputSchema']['type']);
 
         $res = $client->request('POST', '/mcp', [
             'headers' => [
@@ -626,10 +626,10 @@ class McpTest extends ApiTestCase
         }
 
         self::assertNotNull($docResource, 'Could not find documentation resource in: '.json_encode(array_column($resources, 'name')));
-        self::assertEquals('resource://api-platform/documentation', $docResource['uri']);
+        self::assertSame('resource://api-platform/documentation', $docResource['uri']);
         self::assertStringContainsString('Documentation', $docResource['name'] ?? '');
         self::assertNotEmpty($docResource['description'] ?? '');
-        self::assertEquals('text/markdown', $docResource['mimeType'] ?? null);
+        self::assertSame('text/markdown', $docResource['mimeType'] ?? null);
 
         $res = $client->request('POST', '/mcp', [
             'headers' => [

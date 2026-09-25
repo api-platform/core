@@ -94,7 +94,7 @@ class CustomExceptionHandlerTest extends TestCase
 
         $this->assertTrue(self::$customHandlerCalled, 'Custom exception handler should be called for non-API routes');
         $response->assertStatus(418);
-        $this->assertEquals('Custom handler response', $response->getContent());
+        $this->assertSame('Custom handler response', $response->getContent());
     }
 
     public function testCustomExceptionHandlerIsNotCalledForApiRoutes(): void
@@ -137,7 +137,7 @@ class CustomExceptionHandlerTest extends TestCase
 
         $this->assertTrue(CustomHandler::$customRenderCalled, 'Custom handler class render() should be called');
         $response->assertStatus(419);
-        $this->assertEquals('Custom Handler Class Response', $response->getContent());
+        $this->assertSame('Custom Handler Class Response', $response->getContent());
 
         self::$useCustomHandlerClass = false;
     }

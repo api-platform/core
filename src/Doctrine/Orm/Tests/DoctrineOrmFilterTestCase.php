@@ -111,7 +111,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
             $queryParameter = $queryBuilder->getQuery()->getParameter($parameterName);
 
             $this->assertNotNull($queryParameter, \sprintf('Expected query parameter "%s" to be set', $parameterName));
-            $this->assertEquals($expectedParameterValue, $queryParameter->getValue(), \sprintf('Expected query parameter "%s" to be "%s"', $parameterName, var_export($expectedParameterValue, true)));
+            $this->assertSame($expectedParameterValue, $queryParameter->getValue(), \sprintf('Expected query parameter "%s" to be "%s"', $parameterName, var_export($expectedParameterValue, true)));
         }
     }
 

@@ -54,7 +54,7 @@ class PartialPaginationMongoDbTest extends ApiTestCase
                 'Accept' => 'application/ld+json',
             ],
         ]);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertArrayNotHasKey('hydra:totalItems', $response->toArray());
     }
 
@@ -78,7 +78,7 @@ class PartialPaginationMongoDbTest extends ApiTestCase
                 'Accept' => 'application/ld+json',
             ],
         ]);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertArrayHasKey('hydra:totalItems', $response->toArray());
     }
 }

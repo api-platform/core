@@ -60,7 +60,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
         $operation->getUriVariables()->willReturn([]);
 
-        $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
+        $this->assertSame([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
     }
 
     public function testGetIdentifiersFromItemWithOperation(): void
@@ -88,7 +88,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass($item)->shouldNotBeCalled();
 
-        $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
+        $this->assertSame([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
     }
 
     public function testGetIdentifiersFromItemWithId(): void
@@ -115,7 +115,7 @@ class IdentifiersExtractorTest extends TestCase
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
 
-        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
+        $this->assertSame(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
     }
 
     public function testGetIdentifiersFromItemWithToProperty(): void
@@ -165,7 +165,7 @@ class IdentifiersExtractorTest extends TestCase
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'firstId' => 1,
                 'secondId' => 2,

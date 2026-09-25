@@ -46,7 +46,7 @@ class SortFilterTest extends TestCase
         $filter->apply($aggregationBuilder, Dummy::class, null, $context);
         $pipeline = $aggregationBuilder->getPipeline();
 
-        $this->assertEquals([
+        $this->assertSame([
             ['$sort' => ['name' => 1]],
         ], $pipeline);
     }
@@ -66,7 +66,7 @@ class SortFilterTest extends TestCase
         $filter->apply($aggregationBuilder, Dummy::class, null, $context);
         $pipeline = $aggregationBuilder->getPipeline();
 
-        $this->assertEquals([
+        $this->assertSame([
             ['$sort' => ['name' => -1]],
         ], $pipeline);
     }
@@ -170,7 +170,7 @@ class SortFilterTest extends TestCase
         $filter->apply($aggregationBuilder, Dummy::class, null, $context);
         $pipeline = $aggregationBuilder->getPipeline();
 
-        $this->assertEquals([
+        $this->assertSame([
             [
                 '$lookup' => [
                     'from' => 'RelatedDummy',
@@ -210,7 +210,7 @@ class SortFilterTest extends TestCase
         $this->assertCount(2, $pipeline);
         $this->assertArrayHasKey('$addFields', $pipeline[0]);
         $this->assertArrayHasKey('_null_rank_dummyDate', $pipeline[0]['$addFields']);
-        $this->assertEquals(['$sort' => ['_null_rank_dummyDate' => 1, 'dummyDate' => 1]], $pipeline[1]);
+        $this->assertSame(['$sort' => ['_null_rank_dummyDate' => 1, 'dummyDate' => 1]], $pipeline[1]);
     }
 
     public function testGetSchema(): void
@@ -219,7 +219,7 @@ class SortFilterTest extends TestCase
 
         $parameter = new QueryParameter(property: 'name', key: 'order[name]');
 
-        $this->assertEquals(
+        $this->assertSame(
             ['type' => 'string', 'enum' => ['asc', 'desc', 'ASC', 'DESC']],
             $filter->getSchema($parameter)
         );
@@ -269,7 +269,7 @@ class SortFilterTest extends TestCase
         // 2 lookup+unwind pairs + 1 sort = 5 stages
         $this->assertCount(5, $pipeline);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$lookup' => [
                 'from' => 'RelatedDummy',
                 'localField' => 'relatedDummy',
@@ -280,7 +280,7 @@ class SortFilterTest extends TestCase
 
         $this->assertArrayHasKey('$unwind', $pipeline[1]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$lookup' => [
                 'from' => 'ThirdLevel',
                 'localField' => 'relatedDummy_lkup.thirdLevel',
@@ -291,7 +291,7 @@ class SortFilterTest extends TestCase
 
         $this->assertArrayHasKey('$unwind', $pipeline[3]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$sort' => ['relatedDummy_lkup.thirdLevel_lkup.level' => 1],
         ], $pipeline[4]);
     }
@@ -335,6 +335,6 @@ class SortFilterTest extends TestCase
 
         // Only $sort should be present — no $lookup/$unwind since they were deduplicated
         $this->assertCount(1, $pipeline);
-        $this->assertEquals(['$sort' => ['relatedDummy_lkup.name' => 1]], $pipeline[0]);
+        $this->assertSame(['$sort' => ['relatedDummy_lkup.name' => 1]], $pipeline[0]);
     }
 }

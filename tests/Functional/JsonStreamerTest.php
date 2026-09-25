@@ -118,9 +118,9 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertTrue(\is_int($res['rating']) || \is_float($res['rating']));
         $this->assertIsBool($res['isFeatured']);
         $this->assertIsString($res['price']);
-        $this->assertEquals('/json_stream_resources/1', $res['@id']);
-        $this->assertEquals('JsonStreamResource', $res['@type']);
-        $this->assertEquals('/contexts/JsonStreamResource', $res['@context']);
+        $this->assertSame('/json_stream_resources/1', $res['@id']);
+        $this->assertSame('JsonStreamResource', $res['@type']);
+        $this->assertSame('/contexts/JsonStreamResource', $res['@context']);
     }
 
     public function testJsonStreamerCollectionJsonLd(): void
@@ -150,10 +150,10 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertArrayHasKey('@context', $res);
         $this->assertArrayHasKey('@id', $res);
         $this->assertArrayHasKey('@type', $res);
-        $this->assertEquals('Collection', $res['@type']);
+        $this->assertSame('Collection', $res['@type']);
         $this->assertArrayHasKey('member', $res);
         $this->assertIsArray($res['member']);
-        $this->assertEquals('JsonStreamResource', $res['member'][0]['@type']);
+        $this->assertSame('JsonStreamResource', $res['member'][0]['@type']);
         $this->assertArrayHasKey('totalItems', $res);
         $this->assertIsInt($res['totalItems']);
         $this->assertArrayHasKey('search', $res);
@@ -231,7 +231,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame('asd', $res['title']);
         $this->assertSame(0, $res['views']);
-        $this->assertEquals(0, $res['rating']);
+        $this->assertSame(0, $res['rating']);
         $this->assertFalse($res['isFeatured']);
         $this->assertContains($res['price'], ['0', '0.00']); // Depends on DB
         $this->assertStringStartsWith('/json_stream_resources/', $res['@id']);
@@ -280,7 +280,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame('asd', $res['title']);
         $this->assertSame(0, $res['views']);
-        $this->assertEquals(0, $res['rating']);
+        $this->assertSame(0, $res['rating']);
         $this->assertFalse($res['isFeatured']);
         $this->assertContains($res['price'], ['0', '0.00']); // Depends on DB
         $this->assertArrayNotHasKey('@id', $res);
@@ -307,7 +307,7 @@ class JsonStreamerTest extends ApiTestCase
         $r = self::createClient()->request('GET', '/json-stream-products/test', ['headers' => ['accept' => 'application/ld+json']]);
         $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertArrayNotHasKey('@id', $res['aggregateRating']);
-        $this->assertEquals('https://schema.org/AggregateRating', $res['aggregateRating']['@type']);
-        $this->assertEquals('https://schema.org/Product', $res['@type']);
+        $this->assertSame('https://schema.org/AggregateRating', $res['aggregateRating']['@type']);
+        $this->assertSame('https://schema.org/Product', $res['@type']);
     }
 }

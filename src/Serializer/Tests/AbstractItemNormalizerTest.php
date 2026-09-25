@@ -2003,7 +2003,7 @@ class AbstractItemNormalizerTest extends TestCase
         $actual = $normalizer->denormalize($data, DtoWithNullValue::class, null, $context);
 
         $this->assertInstanceOf(DtoWithNullValue::class, $actual);
-        $this->assertEquals(new DtoWithNullValue(), $actual);
+        $this->assertSame((array) new DtoWithNullValue(), (array) $actual);
     }
 
     public function testCacheKey(): void
@@ -2070,8 +2070,8 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
 
         $operationCacheKey = (new \ReflectionClass($normalizer))->getProperty('localFactoryOptionsCache')->getValue($normalizer);
-        $this->assertEquals(array_keys($operationCacheKey), [\sprintf('%s%s%s%s', Dummy::class, 'operation_name', 'root_operation_name', 'n')]);
-        $this->assertEquals(current($operationCacheKey), ['serializer_groups' => ['group'], 'api_allow_update' => false]);
+        $this->assertSame(array_keys($operationCacheKey), [\sprintf('%s%s%s%s', Dummy::class, 'operation_name', 'root_operation_name', 'n')]);
+        $this->assertSame(current($operationCacheKey), ['api_allow_update' => false, 'serializer_groups' => ['group']]);
     }
 
     public function testSupportsDenormalizationWithApiPlatformInputContext(): void

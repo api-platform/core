@@ -37,7 +37,7 @@ class ReadProviderTest extends TestCase
         $provider = new ReadProvider($decorated, $serializerContextBuilder);
         $request = new Request();
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
-        $this->assertEquals(['a'], $request->attributes->get('_api_normalization_context'));
+        $this->assertSame(['a'], $request->attributes->get('_api_normalization_context'));
     }
 
     public function testShouldReadWithOutputFalse(): void
@@ -51,7 +51,7 @@ class ReadProviderTest extends TestCase
         $provider = new ReadProvider($decorated, $serializerContextBuilder);
         $request = new Request();
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
-        $this->assertEquals($data, $request->attributes->get('data'));
+        $this->assertSame($data, $request->attributes->get('data'));
     }
 
     public function testWithoutRequest(): void
@@ -62,7 +62,7 @@ class ReadProviderTest extends TestCase
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
 
         $readProvider = new ReadProvider($provider, $serializerContextBuilder);
-        $this->assertEquals($readProvider->provide($operation), ['ok']);
+        $this->assertSame($readProvider->provide($operation), ['ok']);
     }
 
     public function testThrowOnNotFoundExplicitTrueThrowsForPost(): void

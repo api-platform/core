@@ -25,7 +25,7 @@ class UuidDenormalizerTest extends TestCase
         $uuid = Uuid::uuid4();
         $normalizer = new UuidDenormalizer();
         self::assertTrue($normalizer->supportsDenormalization($uuid->toString(), Uuid::class));
-        self::assertEquals($uuid, $normalizer->denormalize($uuid->toString(), Uuid::class));
+        self::assertSame($uuid->toString(), $normalizer->denormalize($uuid->toString(), Uuid::class)->toString());
     }
 
     public function testNoSupportDenormalizeUuid(): void

@@ -300,7 +300,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('/cruds', $res['paths']);
         $this->assertArrayHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
-        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
+        $this->assertSame([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
 
         $response = self::createClient()->request('GET', '/docs?filter_tags[]=anotherone', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
@@ -314,7 +314,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
         $this->assertArrayHasKey('/crud_open_api_api_platform_tags/{id}', $res['paths']);
-        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
+        $this->assertSame([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
     }
 
     public function testHasSchemasForMultipleFormats(): void
@@ -368,7 +368,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertStringContainsString('This is a test API.', $json['info']['description']);
         $this->assertStringContainsString('Made with love', $json['info']['description']);
         // Security Schemes
-        $this->assertEquals([
+        $this->assertSame([
             'oauth' => [
                 'type' => 'oauth2',
                 'description' => 'OAuth 2.0 implicit Grant',
@@ -432,7 +432,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('id', $json['components']['schemas']['Dummy']['properties']);
         $this->assertSame(['name'], $json['components']['schemas']['Dummy']['required']);
         $this->assertArrayHasKey('genderType', $json['components']['schemas']['Person']['properties']);
-        $this->assertEquals([
+        $this->assertSame([
             'default' => 'male',
             'type' => ['string', 'null'],
             'enum' => [
@@ -442,10 +442,10 @@ class OpenApiTest extends ApiTestCase
             ],
         ], $json['components']['schemas']['Person']['properties']['genderType']);
         $this->assertArrayHasKey('playMode', $json['components']['schemas']['VideoGame']['properties']);
-        $this->assertEquals([
+        $this->assertSame([
             'default' => 'SinglePlayer',
-            'enum' => ['CoOp', 'MultiPlayer', 'SinglePlayer'],
             'type' => 'string',
+            'enum' => ['CoOp', 'MultiPlayer', 'SinglePlayer'],
         ], $json['components']['schemas']['VideoGame']['properties']['playMode']);
 
         // Filters
@@ -508,7 +508,7 @@ class OpenApiTest extends ApiTestCase
 
         // Formats
         $this->assertArrayHasKey('Dummy.jsonld', $json['components']['schemas']);
-        $this->assertEquals([
+        $this->assertSame([
             '204' => [
                 'description' => 'User activated',
             ],
@@ -574,7 +574,7 @@ class OpenApiTest extends ApiTestCase
 
         $this->assertArrayHasKey('Resource', $json['components']['schemas']);
         $this->assertArrayHasKey('ResourceRelated', $json['components']['schemas']);
-        $this->assertEquals([
+        $this->assertSame([
             'readOnly' => true,
             'anyOf' => [
                 [
@@ -603,7 +603,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertStringContainsString('This is a test API.', $json['info']['description']);
         $this->assertStringContainsString('Made with love', $json['info']['description']);
         // Security Schemes
-        $this->assertEquals([
+        $this->assertSame([
             'oauth' => [
                 'type' => 'oauth2',
                 'description' => 'OAuth 2.0 implicit Grant',
@@ -654,10 +654,10 @@ class OpenApiTest extends ApiTestCase
 
         $this->assertArrayHasKey('WrappedResponseEntity-read', $json['components']['schemas']);
         $this->assertArrayHasKey('id', $json['components']['schemas']['WrappedResponseEntity-read']['properties']);
-        $this->assertEquals(['type' => 'string'], $json['components']['schemas']['WrappedResponseEntity-read']['properties']['id']);
+        $this->assertSame(['type' => 'string'], $json['components']['schemas']['WrappedResponseEntity-read']['properties']['id']);
         $this->assertArrayHasKey('WrappedResponseEntity.CustomOutputEntityWrapperDto-read', $json['components']['schemas']);
         $this->assertArrayHasKey('data', $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto-read']['properties']);
-        $this->assertEquals(['$ref' => '#/components/schemas/WrappedResponseEntity-read'], $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto-read']['properties']['data']);
+        $this->assertSame(['$ref' => '#/components/schemas/WrappedResponseEntity-read'], $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto-read']['properties']['data']);
     }
 
     public function testRetrieveTheOpenApiDocumentationWith30Specification(): void

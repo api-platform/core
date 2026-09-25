@@ -70,7 +70,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(1, $data['hydra:member'], 'Should find author with profile1');
-        $this->assertEquals('John Doe', $data['hydra:member'][0]['name']);
+        $this->assertSame('John Doe', $data['hydra:member'][0]['name']);
     }
 
     public function testIriFilterWithOneToOneOwningMultiple(): void
@@ -85,7 +85,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find authors with profile1 or profile2');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe'], $names);
     }
 
     public function testIriFilterWithOneToOneInverse(): void
@@ -97,7 +97,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(1, $data['hydra:member'], 'Should find author with biography1');
-        $this->assertEquals('John Doe', $data['hydra:member'][0]['name']);
+        $this->assertSame('John Doe', $data['hydra:member'][0]['name']);
     }
 
     public function testIriFilterWithOneToOneInverseNonExistent(): void
@@ -152,7 +152,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find books by author1');
         $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
         sort($titles);
-        $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
+        $this->assertSame(['API Design', 'PHP Mastery'], $titles);
     }
 
     public function testIriFilterWithManyToManyMultiple(): void
@@ -167,7 +167,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find books by author1 or author2');
         $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
         sort($titles);
-        $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
+        $this->assertSame(['API Design', 'PHP Mastery'], $titles);
     }
 
     public function testIriFilterWithManyToManyInverse(): void
@@ -181,7 +181,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find authors of book1');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe'], $names);
     }
 
     public function testIriFilterWithManyToManyInverseMultiple(): void
@@ -196,7 +196,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(3, $data['hydra:member'], 'Should find authors of book1 or book3');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe', 'Mike Brown'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe', 'Mike Brown'], $names);
     }
 
     public function testIriFilterWithManyToManyNonExistent(): void
@@ -235,7 +235,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find books whose publisher is in country1');
         $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
         sort($titles);
-        $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
+        $this->assertSame(['API Design', 'PHP Mastery'], $titles);
     }
 
     public function testIriFilterWithManyToManyEmptyArray(): void
@@ -262,7 +262,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find authors whose publisher is in country1');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe'], $names);
     }
 
     public function testIriFilterWithThreeLevelNestingFromBook(): void
@@ -276,7 +276,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find books whose publisher is in country1');
         $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
         sort($titles);
-        $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
+        $this->assertSame(['API Design', 'PHP Mastery'], $titles);
     }
 
     public function testIriFilterWithThreeLevelNestingMultiple(): void
@@ -291,7 +291,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(3, $data['hydra:member'], 'Should find authors whose publisher is in country1 or country2');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe', 'Sarah Johnson'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe', 'Sarah Johnson'], $names);
     }
 
     public function testIriFilterWithThreeLevelNestingNonExistent(): void
@@ -315,7 +315,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(2, $data['hydra:member'], 'Should find authors who have books with publisher1');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe'], $names);
     }
 
     // Edge Cases
@@ -420,7 +420,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $this->assertCount(3, $data['hydra:member'], 'Should find authors whose publisher is in country1 or country2');
         $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
         sort($names);
-        $this->assertEquals(['Jane Smith', 'John Doe', 'Sarah Johnson'], $names);
+        $this->assertSame(['Jane Smith', 'John Doe', 'Sarah Johnson'], $names);
     }
 
     private function loadFixtures(): array

@@ -30,7 +30,7 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'id[between]' => [
                 'property' => 'id',
                 'type' => 'string',

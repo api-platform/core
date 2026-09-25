@@ -38,7 +38,7 @@ class DefaultPropertyMetadataFactoryTest extends TestCase
         $factory = new DefaultPropertyMetadataFactory();
         $metadata = $factory->create('\DoNotExist', 'foo');
 
-        $this->assertEquals(new ApiProperty(), $metadata);
+        $this->assertSame((array) new ApiProperty(), (array) $metadata);
     }
 
     public function testPropertyDoesNotExist(): void
@@ -49,6 +49,6 @@ class DefaultPropertyMetadataFactoryTest extends TestCase
         $factory = new DefaultPropertyMetadataFactory($decoratedProphecy->reveal());
         $metadata = $factory->create(DummyPropertyWithDefaultValue::class, 'doNotExist');
 
-        $this->assertEquals(new ApiProperty(), $metadata);
+        $this->assertSame((array) new ApiProperty(), (array) $metadata);
     }
 }

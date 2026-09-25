@@ -39,7 +39,7 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
         $router->setContext($context);
-        $this->assertEquals($context, $router->getContext());
+        $this->assertSame($context, $router->getContext());
     }
 
     public function testGetRouteCollection(): void
@@ -50,7 +50,7 @@ class RouterTest extends TestCase
         $mockedRouter->getRouteCollection()->willReturn($routeCollection)->shouldBeCalled();
 
         $router = new Router($mockedRouter->reveal());
-        $this->assertEquals($routeCollection, $router->getRouteCollection());
+        $this->assertSame($routeCollection, $router->getRouteCollection());
     }
 
     public function testGenerate(): void
@@ -92,7 +92,7 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
 
-        $this->assertEquals(['bar'], $router->match('/app_dev.php/foo'));
+        $this->assertSame(['bar'], $router->match('/app_dev.php/foo'));
     }
 
     public function testMatchDuplicatedBaseUrl(): void
@@ -106,7 +106,7 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
 
-        $this->assertEquals(['bar'], $router->match('/app/api/app_crm/resource'));
+        $this->assertSame(['bar'], $router->match('/app/api/app_crm/resource'));
     }
 
     public function testMatchEmptyBaseUrl(): void
@@ -120,6 +120,6 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
 
-        $this->assertEquals(['bar'], $router->match('/foo'));
+        $this->assertSame(['bar'], $router->match('/foo'));
     }
 }

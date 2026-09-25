@@ -20,12 +20,15 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class FormatsResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     #[DataProvider('createProvider')]
@@ -35,7 +38,7 @@ class FormatsResourceMetadataCollectionFactoryTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [$previous]));
 
         $actual = (new FormatsResourceMetadataCollectionFactory($resourceMetadataFactoryProphecy->reveal(), $formats, $patchFormats))->create('Foo')[0];
-        $this->assertEquals($expected, $actual);
+        $this->assertSame(self::toComparableArray($expected), self::toComparableArray($actual));
     }
 
     public static function createProvider(): iterable

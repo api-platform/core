@@ -37,7 +37,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'intEnumAsIdentifier')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'intEnumAsIdentifier');
-        $this->assertEquals(['type' => ['integer', 'null'], 'enum' => [1, 2, null]], $apiProperty->getSchema());
+        $this->assertSame(['type' => ['integer', 'null'], 'enum' => [1, 2, null]], $apiProperty->getSchema());
     }
 
     public function testWithCustomOpenApiContext(): void
@@ -51,7 +51,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'acme')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'acme');
-        $this->assertEquals([], $apiProperty->getSchema());
+        $this->assertSame([], $apiProperty->getSchema());
     }
 
     public function testWithCustomOpenApiContextWithoutTypeDefinition(): void
@@ -66,7 +66,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'foo')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'foo');
-        $this->assertEquals([
+        $this->assertSame([
             'type' => 'boolean',
         ], $apiProperty->getSchema());
 
@@ -79,7 +79,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'bar')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'bar');
-        $this->assertEquals([
+        $this->assertSame([
             'type' => 'string',
             'format' => 'date-time',
         ], $apiProperty->getSchema());
@@ -102,7 +102,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedSchema, $apiProperty->getSchema());
+        $this->assertSame($expectedSchema, $apiProperty->getSchema());
     }
 
     /**
@@ -203,7 +203,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithMixed::class, 'mixedProperty');
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => ['string', 'null'],
         ], $apiProperty->getSchema());
 
@@ -214,7 +214,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithMixed::class, 'mixedArrayProperty');
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => 'array',
             'items' => [
                 'type' => ['string', 'null'],

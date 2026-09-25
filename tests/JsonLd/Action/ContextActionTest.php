@@ -49,7 +49,7 @@ class ContextActionTest extends TestCase
         $contextBuilderProphecy->getEntrypointContext()->willReturn(['/entrypoints']);
         $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
 
-        $this->assertEquals(['@context' => ['/entrypoints']], $contextAction('Entrypoint'));
+        $this->assertSame(['@context' => ['/entrypoints']], $contextAction('Entrypoint'));
     }
 
     public function testContextActionWithResourceClass(): void
@@ -77,7 +77,7 @@ class ContextActionTest extends TestCase
                     ])),
             ])
         );
-        $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
+        $this->assertSame(['@context' => ['/dummies']], $contextAction('dummy'));
     }
 
     public function testContextActionWithThrown(): void

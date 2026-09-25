@@ -160,7 +160,7 @@ class McpTest extends TestCase
         $response->assertStatus(200);
         $this->assertArrayHasKey('result', $result);
         $content = $result['result']['content'][0]['text'] ?? null;
-        $this->assertEquals('Custom result: Test content', $content);
+        $this->assertSame('Custom result: Test content', $content);
         $this->assertNull($result['result']['_meta'] ?? null);
     }
 
@@ -187,7 +187,7 @@ class McpTest extends TestCase
         $result = $response->json();
         $this->assertArrayHasKey('result', $result);
         $content = $result['result']['content'][0]['text'] ?? null;
-        $this->assertEquals('Custom result: Test with metadata', $content);
+        $this->assertSame('Custom result: Test with metadata', $content);
         $hasMeta = isset($result['result']['_meta']) || isset($result['result']['meta']) || isset($result['result']['structuredContent']);
         $this->assertTrue($hasMeta, 'No metadata found in: '.json_encode(array_keys($result['result'])));
     }
@@ -344,7 +344,7 @@ class McpTest extends TestCase
         foreach ($tools as $tool) {
             $this->assertArrayHasKey('name', $tool);
             $this->assertArrayHasKey('inputSchema', $tool);
-            $this->assertEquals('object', $tool['inputSchema']['type']);
+            $this->assertSame('object', $tool['inputSchema']['type']);
         }
 
         $response->assertStatus(200);
@@ -382,10 +382,10 @@ class McpTest extends TestCase
         }
 
         $this->assertNotNull($processMessageTool);
-        $this->assertEquals('process_message', $processMessageTool['name']);
-        $this->assertEquals('Process a message with priority', $processMessageTool['description'] ?? null);
+        $this->assertSame('process_message', $processMessageTool['name']);
+        $this->assertSame('Process a message with priority', $processMessageTool['description'] ?? null);
         $this->assertArrayHasKey('inputSchema', $processMessageTool);
-        $this->assertEquals('object', $processMessageTool['inputSchema']['type']);
+        $this->assertSame('object', $processMessageTool['inputSchema']['type']);
 
         $response = $this->postJson('/mcp', [
             'jsonrpc' => '2.0',

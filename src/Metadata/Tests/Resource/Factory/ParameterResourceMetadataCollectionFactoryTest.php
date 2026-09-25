@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFac
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithLimitedPropertyParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -40,6 +41,8 @@ use Symfony\Component\TypeInfo\Type;
 
 class ParameterResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     public function testParameterFactory(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -83,8 +86,8 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $operation = $parameter->create(WithParameter::class)->getOperation('collection');
         $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
         $hydraParameter = $parameters->get('hydra', QueryParameter::class);
-        $this->assertEquals(['type' => 'foo'], $hydraParameter->getSchema());
-        $this->assertEquals(new Parameter('test', 'query'), $hydraParameter->getOpenApi());
+        $this->assertSame(['type' => 'foo'], $hydraParameter->getSchema());
+        $this->assertSame(self::toComparableArray(new Parameter('test', 'query')), self::toComparableArray($hydraParameter->getOpenApi()));
         $everywhere = $parameters->get('everywhere', QueryParameter::class);
         $this->assertNull($everywhere->getOpenApi());
     }

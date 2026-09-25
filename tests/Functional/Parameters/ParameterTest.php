@@ -98,7 +98,7 @@ final class ParameterTest extends ApiTestCase
     public function testHeaderAndQuery(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q=blabla', ['headers' => ['q' => '(complex stuff)']]);
-        $this->assertEquals($response->toArray(), [
+        $this->assertSame($response->toArray(), [
             '(complex stuff)',
             'blabla',
         ]);
@@ -107,7 +107,7 @@ final class ParameterTest extends ApiTestCase
     public function testHeaderAndQueryWithArray(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q[]=blabla', ['headers' => ['q' => '(complex stuff)']]);
-        $this->assertEquals($response->toArray(), [
+        $this->assertSame($response->toArray(), [
             '(complex stuff)',
             ['blabla'],
         ]);

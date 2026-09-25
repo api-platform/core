@@ -35,6 +35,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\Test\ComparableObjectTrait;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
@@ -56,6 +57,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  */
 class FieldsBuilderTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private ObjectProphecy $propertyNameCollectionFactoryProphecy;
@@ -553,7 +556,7 @@ class FieldsBuilderTest extends TestCase
 
             // If expected field is just a type (not an array), compare directly
             if (!\is_array($expectedField)) {
-                $this->assertEquals($expectedField, $resourceObjectTypeFields[$fieldName], "Field '$fieldName' should match");
+                $this->assertSame($expectedField, $resourceObjectTypeFields[$fieldName], "Field '$fieldName' should match");
                 continue;
             }
 
@@ -561,7 +564,7 @@ class FieldsBuilderTest extends TestCase
                 if ('resolve' === $key && $value instanceof \Closure) {
                     $this->assertInstanceOf(\Closure::class, $resourceObjectTypeFields[$fieldName][$key], "Field '$fieldName' resolve should be a closure");
                 } else {
-                    $this->assertEquals($value, $resourceObjectTypeFields[$fieldName][$key] ?? null, "Field '$fieldName' key '$key' should match");
+                    $this->assertSame(self::toComparableArray($value), self::toComparableArray($resourceObjectTypeFields[$fieldName][$key] ?? null), "Field '$fieldName' key '$key' should match");
                 }
             }
         }
@@ -951,6 +954,6 @@ class FieldsBuilderTest extends TestCase
             unset($expectedQueryFields[$fieldName]['resolve'], $queryFields[$fieldName]['resolve']);
         }
 
-        $this->assertEquals($expectedQueryFields, $queryFields);
+        $this->assertSame(self::toComparableArray($expectedQueryFields), self::toComparableArray($queryFields));
     }
 }

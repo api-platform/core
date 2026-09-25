@@ -17,6 +17,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Test\ComparableObjectTrait;
 use ApiPlatform\Test\Constraint\MatchesJsonSchema;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AggregateRating;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ChildAttribute;
@@ -38,6 +39,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class JsonSchemaTest extends ApiTestCase
 {
+    use ComparableObjectTrait;
+
     use SetupClassResourcesTrait;
 
     protected SchemaFactoryInterface $schemaFactory;
@@ -145,26 +148,26 @@ class JsonSchemaTest extends ApiTestCase
 
         $schema = $this->schemaFactory->buildSchema(BagOfTests::class, 'jsonld', Schema::TYPE_INPUT);
 
-        $this->assertEquals($schema['definitions']['BagOfTests-write']['properties']['tests'], new \ArrayObject([
+        $this->assertSame(self::toComparableArray($schema['definitions']['BagOfTests-write']['properties']['tests']), self::toComparableArray(new \ArrayObject([
             'type' => 'string',
             'foo' => 'bar',
-        ]));
+        ])));
 
-        $this->assertEquals($schema['definitions']['BagOfTests-write']['properties']['nonResourceTests'], new \ArrayObject([
+        $this->assertSame(self::toComparableArray($schema['definitions']['BagOfTests-write']['properties']['nonResourceTests']), self::toComparableArray(new \ArrayObject([
             'type' => 'array',
             'items' => [
                 '$ref' => '#/definitions/NonResourceTestEntity-write',
             ],
-        ]));
+        ])));
 
-        $this->assertEquals($schema['definitions']['BagOfTests-write']['properties']['description'], new \ArrayObject([
+        $this->assertSame(self::toComparableArray($schema['definitions']['BagOfTests-write']['properties']['description']), self::toComparableArray(new \ArrayObject([
             'type' => 'string',
             'maxLength' => 255,
-        ]));
+        ])));
 
-        $this->assertEquals($schema['definitions']['BagOfTests-write']['properties']['type'], new \ArrayObject([
+        $this->assertSame(self::toComparableArray($schema['definitions']['BagOfTests-write']['properties']['type']), self::toComparableArray(new \ArrayObject([
             '$ref' => '#/definitions/TestEntity-write',
-        ]));
+        ])));
     }
 
     public function testResourceWithEnumPropertiesSchema(): void
@@ -172,40 +175,28 @@ class JsonSchemaTest extends ApiTestCase
         $json = $this->schemaFactory->buildSchema(ResourceWithEnumProperty::class, 'jsonld', Schema::TYPE_OUTPUT);
         $properties = $json['definitions']['ResourceWithEnumProperty.jsonld']['allOf'][1]['properties'];
 
-        $this->assertEquals(
-            new \ArrayObject([
-                'type' => ['integer', 'null'],
-                'enum' => [1, 2, 3, null],
-            ]),
-            $properties['intEnum']
-        );
-        $this->assertEquals(
-            new \ArrayObject([
-                'type' => 'array',
-                'items' => [
-                    'enum' => ['yes', 'no', 'maybe'],
-                    'type' => 'string',
-                ],
-            ]),
-            $properties['stringEnum']
-        );
-        $this->assertEquals(
-            new \ArrayObject([
-                'type' => ['string', 'null'],
-                'enum' => ['male', 'female', null],
-            ]),
-            $properties['gender']
-        );
-        $this->assertEquals(
-            new \ArrayObject([
-                'type' => 'array',
-                'items' => [
-                    'enum' => ['male', 'female'],
-                    'type' => 'string',
-                ],
-            ]),
-            $properties['genders']
-        );
+        $this->assertSame(self::toComparableArray(new \ArrayObject([
+            'type' => ['integer', 'null'],
+            'enum' => [1, 2, 3, null],
+        ])), self::toComparableArray($properties['intEnum']));
+        $this->assertSame(self::toComparableArray(new \ArrayObject([
+            'type' => 'array',
+            'items' => [
+                'type' => 'string',
+                'enum' => ['yes', 'no', 'maybe'],
+            ],
+        ])), self::toComparableArray($properties['stringEnum']));
+        $this->assertSame(self::toComparableArray(new \ArrayObject([
+            'type' => ['string', 'null'],
+            'enum' => ['male', 'female', null],
+        ])), self::toComparableArray($properties['gender']));
+        $this->assertSame(self::toComparableArray(new \ArrayObject([
+            'type' => 'array',
+            'items' => [
+                'type' => 'string',
+                'enum' => ['male', 'female'],
+            ],
+        ])), self::toComparableArray($properties['genders']));
     }
 
     public function testSchemaWithUnknownType(): void

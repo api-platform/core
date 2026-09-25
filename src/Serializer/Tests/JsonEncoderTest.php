@@ -49,20 +49,20 @@ class JsonEncoderTest extends TestCase
 
     public function testDecode(): void
     {
-        $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', 'json'));
+        $this->assertSame(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', 'json'));
     }
 
     public function testUTF8EncodedString(): void
     {
         $data = ['foo' => 'Über'];
 
-        $this->assertEquals('{"foo":"Über"}', $this->encoder->encode($data, 'json'));
+        $this->assertSame('{"foo":"Über"}', $this->encoder->encode($data, 'json'));
     }
 
     public function testUTF8MalformedHandlingEncoding(): void
     {
         $data = ['foo' => pack('H*', 'B11111')];
 
-        $this->assertEquals('{"foo":"\u0011\u0011"}', $this->encoder->encode($data, 'json'));
+        $this->assertSame('{"foo":"\u0011\u0011"}', $this->encoder->encode($data, 'json'));
     }
 }

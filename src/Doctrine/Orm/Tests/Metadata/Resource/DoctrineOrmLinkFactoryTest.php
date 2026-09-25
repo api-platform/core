@@ -69,7 +69,7 @@ final class DoctrineOrmLinkFactoryTest extends TestCase
 
         $doctrineOrmLinkFactory = new DoctrineOrmLinkFactory($managerRegistryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), new LinkFactoryStub());
 
-        self::assertEquals([
+        self::assertSame([
             new Link(
                 fromProperty: 'relatedDummies',
                 toProperty: 'dummies',

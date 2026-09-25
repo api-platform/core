@@ -24,13 +24,13 @@ final class OperationsTest extends TestCase
         $operations = new Operations([new Get(name: 'a'), new Get(name: 'b')]);
 
         foreach ($operations as $name => $operation) {
-            $this->assertEquals($name, $operation->getName());
+            $this->assertSame($name, $operation->getName());
         }
     }
 
     public function testOperationAreSorted(): void
     {
         $operations = new Operations(['a' => new Get(priority: 0), 'b' => new Get(priority: -1)]);
-        $this->assertEquals(['b', 'a'], array_keys(iterator_to_array($operations)));
+        $this->assertSame(['b', 'a'], array_keys(iterator_to_array($operations)));
     }
 }

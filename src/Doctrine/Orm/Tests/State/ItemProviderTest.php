@@ -84,7 +84,7 @@ class ItemProviderTest extends TestCase
             [$extensionMock]
         );
 
-        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
     }
 
     public function testGetItemDoubleIdentifier(): void
@@ -136,7 +136,7 @@ class ItemProviderTest extends TestCase
             [$extensionMock]
         );
 
-        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
     }
 
     public function testGetItemWithFetchDataFalseOnSubresourceFiltersParentLink(): void
@@ -401,7 +401,7 @@ class ItemProviderTest extends TestCase
             [$extensionMock]
         );
 
-        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['identifier' => 1], $context));
     }
 
     public function testCannotCreateQueryBuilder(): void
@@ -541,7 +541,7 @@ class ItemProviderTest extends TestCase
             [$extensionMock]
         );
 
-        $this->assertEquals($returnObject, $dataProvider->provide($operation, ['employeeId' => 1]));
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['employeeId' => 1]));
     }
 
     public function testHandleLinksCallable(): void

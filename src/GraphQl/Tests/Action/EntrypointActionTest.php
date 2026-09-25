@@ -20,6 +20,7 @@ use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\Test\ComparableObjectTrait;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
@@ -41,6 +42,8 @@ use Twig\Environment as TwigEnvironment;
  */
 class EntrypointActionTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     /**
@@ -50,7 +53,7 @@ class EntrypointActionTest extends TestCase
     {
         $expected->headers->remove('Date');
         $actual->headers->remove('Date');
-        $this->assertEquals($expected, $actual);
+        $this->assertSame(self::toComparableArray($expected), self::toComparableArray($actual));
     }
 
     public function testGetHtmlAction(): void

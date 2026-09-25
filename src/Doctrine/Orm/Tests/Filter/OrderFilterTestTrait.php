@@ -23,7 +23,7 @@ trait OrderFilterTestTrait
     {
         $filter = $this->buildFilter(['id' => null, 'name' => null, 'foo' => null]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'order[id]' => [
                 'property' => 'id',
                 'type' => 'string',

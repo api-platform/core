@@ -34,7 +34,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'order[id]' => [
                 'property' => 'id',
                 'type' => 'string',

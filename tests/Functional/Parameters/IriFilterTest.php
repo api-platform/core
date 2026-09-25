@@ -63,7 +63,7 @@ final class IriFilterTest extends ApiTestCase
 
         $res = $client->request('GET', '/chickens?chickenCoop='.$iris['coopIris'][1])->toArray();
         $this->assertCount(1, $res['member']);
-        $this->assertEquals($iris['coopIris'][1], $res['member'][0]['chickenCoop']);
+        $this->assertSame($iris['coopIris'][1], $res['member'][0]['chickenCoop']);
 
         $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/595')->toArray();
         $this->assertCount(0, $res['member']);

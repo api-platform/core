@@ -40,6 +40,6 @@ class TypesFactoryTest extends TestCase
         $types = $typesFactory->getTypes();
         $this->assertArrayHasKey('Foo', $types);
         $this->assertInstanceOf(TypeInterface::class, $types['Foo']);
-        $this->assertEquals(['Foo' => $type], $types);
+        $this->assertSame(['Foo' => $type], $types);
     }
 }

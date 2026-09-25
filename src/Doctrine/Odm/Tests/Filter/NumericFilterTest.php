@@ -31,7 +31,7 @@ class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',

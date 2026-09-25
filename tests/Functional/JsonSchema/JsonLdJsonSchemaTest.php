@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\JsonSchema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Test\ComparableObjectTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7426\Boat;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest;
@@ -26,6 +27,8 @@ use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class JsonLdJsonSchemaTest extends ApiTestCase
 {
+    use ComparableObjectTrait;
+
     use SetupClassResourcesTrait;
 
     protected SchemaFactoryInterface $schemaFactory;
@@ -61,8 +64,8 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                     'type' => 'object',
                     'properties' => [
                         'id' => new \ArrayObject([
-                            'type' => 'integer',
                             'readOnly' => true,
+                            'type' => 'integer',
                         ]),
                         'description' => new \ArrayObject([
                             'type' => 'string',
@@ -90,8 +93,8 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
             'type' => 'object',
             'properties' => [
                 'id' => new \ArrayObject([
-                    'type' => 'integer',
                     'readOnly' => true,
+                    'type' => 'integer',
                 ]),
                 'nullableString' => new \ArrayObject([
                     'type' => [
@@ -117,8 +120,8 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                     'type' => 'object',
                     'properties' => [
                         'id' => new \ArrayObject([
-                            'type' => 'integer',
                             'readOnly' => true,
+                            'type' => 'integer',
                         ]),
                         'nullableString' => new \ArrayObject([
                             'type' => [
@@ -142,11 +145,11 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
         $this->assertArrayHasKey('NonResourceTestEntity.jsonld-read', $schema['definitions']);
         $this->assertArrayHasKey('TestEntity.jsonld-read', $schema['definitions']);
 
-        $this->assertEquals($expectedBagOfTestsSchema, $schema['definitions']['BagOfTests.jsonld-read']);
-        $this->assertEquals($expectedNonResourceTestEntitySchema, $schema['definitions']['NonResourceTestEntity.jsonld-read']);
-        $this->assertEquals($expectedTestEntitySchema, $schema['definitions']['TestEntity.jsonld-read']);
+        $this->assertSame(self::toComparableArray($expectedBagOfTestsSchema), self::toComparableArray($schema['definitions']['BagOfTests.jsonld-read']));
+        $this->assertSame(self::toComparableArray($expectedNonResourceTestEntitySchema), self::toComparableArray($schema['definitions']['NonResourceTestEntity.jsonld-read']));
+        $this->assertSame(self::toComparableArray($expectedTestEntitySchema), self::toComparableArray($schema['definitions']['TestEntity.jsonld-read']));
 
-        $this->assertEquals('#/definitions/BagOfTests.jsonld-read', $schema['$ref']);
+        $this->assertSame('#/definitions/BagOfTests.jsonld-read', $schema['$ref']);
     }
 
     public function testSchemaJsonLdCollection(): void
@@ -160,8 +163,8 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
         $this->assertArrayHasKey('HydraItemBaseSchema', $schema['definitions']);
         $this->assertArrayHasKey('HydraCollectionBaseSchema', $schema['definitions']);
 
-        $this->assertEquals(['$ref' => '#/definitions/HydraCollectionBaseSchema'], $schema['allOf'][0]);
-        $this->assertEquals(['$ref' => '#/definitions/BagOfTests.jsonld-read'], $schema['allOf'][1]['properties']['hydra:member']['items']);
+        $this->assertSame(['$ref' => '#/definitions/HydraCollectionBaseSchema'], $schema['allOf'][0]);
+        $this->assertSame(['$ref' => '#/definitions/BagOfTests.jsonld-read'], $schema['allOf'][1]['properties']['hydra:member']['items']);
     }
 
     public function testHydraCollectionBaseSchemaExample(): void
@@ -199,6 +202,6 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
     {
         $schema = $this->schemaFactory->buildSchema(Boat::class, 'jsonld', 'output', $this->operationMetadataFactory->create('_api_/boats{._format}_get_collection'));
 
-        $this->assertEquals(['$ref' => '#/definitions/HydraItemBaseSchema'], $schema->getDefinitions()['Boat.jsonld-boat.read']['allOf'][0]);
+        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchema'], $schema->getDefinitions()['Boat.jsonld-boat.read']['allOf'][0]);
     }
 }

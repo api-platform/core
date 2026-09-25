@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener;
+use ApiPlatform\Test\ComparableObjectTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class TransformFieldsetsParametersListenerTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private TransformFieldsetsParametersListener $listener;
@@ -54,7 +57,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequestWithInvalidFilter(): void
@@ -68,7 +71,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
 
         $expectedRequest = $expectedRequest->duplicate(['fields' => 'foo']);
 
@@ -76,7 +79,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequest(): void
@@ -98,13 +101,13 @@ class TransformFieldsetsParametersListenerTest extends TestCase
             [],
             [
                 '_api_resource_class' => Dummy::class,
-                '_api_filter_property' => ['id', 'name', 'dummyFloat', 'relatedDummy' => ['id', 'name']],
                 '_api_included' => ['relatedDummy'],
+                '_api_filter_property' => ['id', 'name', 'dummyFloat', 'relatedDummy' => ['id', 'name']],
             ]
         );
         $expectedRequest->setRequestFormat('jsonapi');
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequestWithIncludeWithoutFields(): void
@@ -131,7 +134,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         );
         $expectedRequest->setRequestFormat('jsonapi');
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 
     public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes(): void
@@ -155,6 +158,6 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         );
         $expectedRequest->setRequestFormat('jsonapi');
 
-        $this->assertEquals($expectedRequest, $request);
+        $this->assertSame(self::toComparableArray($expectedRequest), self::toComparableArray($request));
     }
 }

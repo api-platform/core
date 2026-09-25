@@ -23,7 +23,7 @@ trait DateFilterTestTrait
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'dummyDate[before]' => [
                 'property' => 'dummyDate',
                 'type' => \DateTimeInterface::class,

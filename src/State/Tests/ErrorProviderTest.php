@@ -43,7 +43,7 @@ class ErrorProviderTest extends TestCase
         $request->attributes->set('exception', new \Exception());
         /** @var Error */
         $error = $provider->provide(new Get(), [], ['request' => $request]);
-        $this->assertEquals('Internal Server Error', $error->getDetail());
+        $this->assertSame('Internal Server Error', $error->getDetail());
     }
 
     public function testAccessDeniedReasonIsExposedInDebugMode(): void

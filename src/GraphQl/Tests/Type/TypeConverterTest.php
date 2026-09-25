@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Test\ComparableObjectTrait;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
@@ -42,6 +43,8 @@ use Symfony\Component\TypeInfo\Type;
  */
 class TypeConverterTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     private ObjectProphecy $typeBuilderProphecy;
@@ -201,7 +204,7 @@ class TypeConverterTest extends TestCase
         $this->typesContainerProphecy->has(\DateTime::class)->willReturn(true);
         $this->typesContainerProphecy->get(\DateTime::class)->willReturn(new DateTimeType());
 
-        $this->assertEquals($expectedGraphqlType, $this->typeConverter->resolveType($type));
+        $this->assertSame(self::toComparableArray($expectedGraphqlType), self::toComparableArray($this->typeConverter->resolveType($type)));
     }
 
     public static function resolveTypeProvider(): array

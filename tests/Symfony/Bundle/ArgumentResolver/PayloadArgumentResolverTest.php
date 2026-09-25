@@ -110,7 +110,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
             'data' => new ResourceImplementation(),
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [$request->attributes->get('data')],
             iterator_to_array($resolver->resolve($request, $argument))
         );
@@ -127,7 +127,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
             'data' => new ResourceImplementation(),
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [$request->attributes->get('data')],
             iterator_to_array($resolver->resolve($request, $argument))
         );

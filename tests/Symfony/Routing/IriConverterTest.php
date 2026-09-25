@@ -285,7 +285,7 @@ class IriConverterTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, []));
 
         $iriConverter = $this->getIriConverter(null, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy, null, $skolemIriConverter);
-        $this->assertEquals($route, $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation));
+        $this->assertSame($route, $iriConverter->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation));
     }
 
     public function testGetIriFromResourceClassWithIdentifiers(): void

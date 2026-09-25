@@ -46,13 +46,13 @@ class YamlEncoderTest extends TestCase
 
     public function testDecode(): void
     {
-        $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{ foo: bar }', 'yamlopenapi'));
+        $this->assertSame(['foo' => 'bar'], $this->encoder->decode('{ foo: bar }', 'yamlopenapi'));
     }
 
     public function testUTF8EncodedString(): void
     {
         $data = ['foo' => 'Über'];
 
-        $this->assertEquals('{ foo: Über }', $this->encoder->encode($data, 'yamlopenapi'));
+        $this->assertSame('{ foo: Über }', $this->encoder->encode($data, 'yamlopenapi'));
     }
 }

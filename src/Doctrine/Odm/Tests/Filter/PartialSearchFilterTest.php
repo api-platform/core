@@ -90,7 +90,7 @@ class PartialSearchFilterTest extends TestCase
         // Nested property adds $lookup + $unwind stages
         $this->assertCount(2, $pipeline);
 
-        $this->assertEquals([
+        $this->assertSame([
             '$lookup' => [
                 'from' => 'RelatedDummy',
                 'localField' => 'relatedDummy',

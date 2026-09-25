@@ -30,7 +30,7 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',

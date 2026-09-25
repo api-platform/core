@@ -26,13 +26,13 @@ class CallableProcessorTest extends TestCase
     {
         $operation = new Get(name: 'hello');
         $data = new \stdClass();
-        $this->assertEquals($data, (new CallableProcessor())->process($data, $operation));
+        $this->assertSame($data, (new CallableProcessor())->process($data, $operation));
     }
 
     public function testCallable(): void
     {
         $operation = new Get(name: 'hello', processor: static fn () => ['ok']);
-        $this->assertEquals((new CallableProcessor())->process(new \stdClass(), $operation), ['ok']);
+        $this->assertSame((new CallableProcessor())->process(new \stdClass(), $operation), ['ok']);
     }
 
     public function testCallableServiceLocator(): void
@@ -43,7 +43,7 @@ class CallableProcessorTest extends TestCase
         $container = $this->createStub(ContainerInterface::class);
         $container->method('has')->willReturnMap([['processor', true]]);
         $container->method('get')->willReturnMap([['processor', $provider]]);
-        $this->assertEquals((new CallableProcessor($container))->process(new \stdClass(), $operation), ['ok']);
+        $this->assertSame((new CallableProcessor($container))->process(new \stdClass(), $operation), ['ok']);
     }
 
     public function testCallableServiceLocatorDoesNotExist(): void

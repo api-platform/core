@@ -56,11 +56,11 @@ class ObjectNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [],
-            '@id' => '_:1234',
             '@type' => 'Dummy',
+            '@id' => '_:1234',
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy));
+        $this->assertSame($expected, $normalizer->normalize($dummy));
     }
 
     public function testNormalizeEmptyArray(): void
@@ -83,7 +83,7 @@ class ObjectNormalizerTest extends TestCase
             $contextBuilderProphecy->reveal()
         );
 
-        $this->assertEquals([], $normalizer->normalize($dummy));
+        $this->assertSame([], $normalizer->normalize($dummy));
     }
 
     public function testNormalizeWithJsonLdContextSet(): void
@@ -111,6 +111,6 @@ class ObjectNormalizerTest extends TestCase
             '@type' => 'Dummy',
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['jsonld_has_context' => true]));
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, ['jsonld_has_context' => true]));
     }
 }

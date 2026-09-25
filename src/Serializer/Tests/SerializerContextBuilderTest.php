@@ -36,18 +36,24 @@ class SerializerContextBuilderTest extends TestCase
 
     private SerializerContextBuilder $builder;
     private HttpOperation $operation;
+    private HttpOperation $getCollectionOperation;
+    private HttpOperation $postOperation;
+    private HttpOperation $putOperation;
     private HttpOperation $patchOperation;
     private HttpOperation $patchCollectionOperation;
 
     protected function setUp(): void
     {
         $this->operation = new Get(normalizationContext: ['foo' => 'bar'], denormalizationContext: ['bar' => 'baz'], name: 'get');
+        $this->getCollectionOperation = $this->operation->withName('get_collection');
+        $this->postOperation = $this->operation->withName('post');
+        $this->putOperation = (new Put(name: 'put'))->withOperation($this->operation);
         $resourceMetadata = new ResourceMetadataCollection('Foo', [
             new ApiResource(operations: [
                 'get' => $this->operation,
-                'post' => $this->operation->withName('post'),
-                'put' => (new Put(name: 'put'))->withOperation($this->operation),
-                'get_collection' => $this->operation->withName('get_collection'),
+                'post' => $this->postOperation,
+                'put' => $this->putOperation,
+                'get_collection' => $this->getCollectionOperation,
             ]),
         ]);
 
@@ -73,57 +79,55 @@ class SerializerContextBuilderTest extends TestCase
     {
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
+        $expected = ['foo' => 'bar', 'operation_name' => 'get', 'operation' => $this->operation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foos/1', 'uri' => 'http://localhost/foos/1', 'input' => null, 'output' => null, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, true));
 
         $request = Request::create('/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get_collection', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'operation_name' => 'get_collection',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('get_collection'), 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata',  'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
+        $expected = ['foo' => 'bar', 'operation_name' => 'get_collection', 'operation' => $this->getCollectionOperation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foos', 'uri' => 'http://localhost/foos', 'input' => null, 'output' => null, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata',  'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, true));
 
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'operation' => $this->operation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foos/1', 'uri' => 'http://localhost/foos/1', 'input' => null, 'output' => null, 'api_allow_update' => false, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'POST');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('post'), 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['bar' => 'baz', 'operation_name' => 'post', 'operation' => $this->postOperation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foos', 'uri' => 'http://localhost/foos', 'input' => null, 'output' => null, 'api_allow_update' => false, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'PUT');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'put', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => (new Put(name: 'put'))->withOperation($this->operation), 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['bar' => 'baz', 'operation_name' => 'put', 'operation' => $this->putOperation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foos', 'uri' => 'http://localhost/foos', 'input' => null, 'output' => null, 'api_allow_update' => true, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/bars/1/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'operation' => $this->operation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/bars/1/foos', 'uri' => 'http://localhost/bars/1/foos', 'input' => null, 'output' => null, 'api_allow_update' => false, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foowithpatch/1', 'PATCH');
         $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_operation_name' => 'patch', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
-        $expected = ['operation_name' => 'patch', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false, 'operation' => $this->patchOperation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['operation_name' => 'patch', 'operation' => $this->patchOperation, 'resource_class' => 'FooWithPatch', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foowithpatch/1', 'uri' => 'http://localhost/foowithpatch/1', 'input' => null, 'output' => null, 'api_allow_update' => true, 'deep_object_to_populate' => true, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/bars/1/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml', 'id' => '1']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'operation' => $this->operation, 'skip_null_values' => true, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'operation' => $this->operation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/bars/1/foos', 'uri' => 'http://localhost/bars/1/foos', 'input' => null, 'output' => null, 'api_allow_update' => false, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foowithpatch/1', 'PATCH', server: ['CONTENT_TYPE' => 'text/csv']);
         $request->setFormat('csv', ['text/csv']);
         $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_operation_name' => 'patch', '_api_format' => 'csv', '_api_mime_type' => 'text/csv']);
-        $expected = ['operation_name' => 'patch', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false, 'operation' => $this->patchOperation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $expected[CsvEncoder::AS_COLLECTION_KEY] = false;
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = ['operation_name' => 'patch', 'operation' => $this->patchOperation, 'resource_class' => 'FooWithPatch', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foowithpatch/1', 'uri' => 'http://localhost/foowithpatch/1', 'input' => null, 'output' => null, 'api_allow_update' => true, 'deep_object_to_populate' => true, CsvEncoder::AS_COLLECTION_KEY => false, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foowithpatch/1', 'PATCH', server: ['CONTENT_TYPE' => 'text/csv']);
         $request->setFormat('csv', ['text/csv']);
         $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_operation_name' => 'patch_collection', '_api_format' => 'csv', '_api_mime_type' => 'text/csv']);
-        $expected = ['operation_name' => 'patch_collection', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false, 'operation' => $this->patchCollectionOperation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $expected[CsvEncoder::AS_COLLECTION_KEY] = true;
-        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+        $expected = [CsvEncoder::AS_COLLECTION_KEY => true, 'operation_name' => 'patch_collection', 'operation' => $this->patchCollectionOperation, 'resource_class' => 'FooWithPatch', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foowithpatch/1', 'uri' => 'http://localhost/foowithpatch/1', 'input' => null, 'output' => null, 'api_allow_update' => true, 'deep_object_to_populate' => true, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest($request, false));
     }
 
     public function testThrowExceptionOnInvalidRequest(): void
@@ -135,8 +139,8 @@ class SerializerContextBuilderTest extends TestCase
 
     public function testReuseExistingAttributes(): void
     {
-        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
-        $this->assertEquals($expected, $this->builder->createFromRequest(Request::create('/foos/1'), false, ['resource_class' => 'Foo', 'operation_name' => 'get']));
+        $expected = ['bar' => 'baz', 'operation_name' => 'get', 'operation' => $this->operation, 'resource_class' => 'Foo', 'skip_null_values' => true, 'skip_null_to_one_relations' => true, 'iri_only' => false, 'request_uri' => '/foos/1', 'uri' => 'http://localhost/foos/1', 'input' => null, 'output' => null, 'api_allow_update' => false, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id']];
+        $this->assertSame($expected, $this->builder->createFromRequest(Request::create('/foos/1'), false, ['resource_class' => 'Foo', 'operation_name' => 'get']));
     }
 
     public function testCreateFromRequestKeyCollectDenormalizationErrorsIsInContext(): void

@@ -41,7 +41,7 @@ class DoctrineExtractorTest extends TestCase
 {
     public function testGetProperties(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'id',
                 'foo',
@@ -74,7 +74,7 @@ class DoctrineExtractorTest extends TestCase
 
     public function testTestGetPropertiesWithEmbedded(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'id',
                 'embedOne',
@@ -88,7 +88,7 @@ class DoctrineExtractorTest extends TestCase
     #[DataProvider('typesProvider')]
     public function testExtract(string $property, ?Type $type): void
     {
-        $this->assertEquals($type, $this->createExtractor()->getType(DoctrineDummy::class, $property));
+        $this->assertSame($type, $this->createExtractor()->getType(DoctrineDummy::class, $property));
     }
 
     #[IgnoreDeprecations]
@@ -111,12 +111,12 @@ class DoctrineExtractorTest extends TestCase
             'embedOne'
         );
 
-        $this->assertEquals($expectedTypes, $actualTypes);
+        $this->assertSame($expectedTypes, $actualTypes);
     }
 
     public function testExtractWithEmbedOne(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Type::object(DoctrineEmbeddable::class),
             $this->createExtractor()->getType(DoctrineWithEmbedded::class, 'embedOne'),
         );
@@ -145,12 +145,12 @@ class DoctrineExtractorTest extends TestCase
             'embedMany'
         );
 
-        $this->assertEquals($expectedTypes, $actualTypes);
+        $this->assertSame($expectedTypes, $actualTypes);
     }
 
     public function testExtractWithEmbedMany(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Type::collection(Type::object(Collection::class), Type::object(DoctrineEmbeddable::class), Type::int()),
             $this->createExtractor()->getType(DoctrineWithEmbedded::class, 'embedMany'),
         );
@@ -163,15 +163,15 @@ class DoctrineExtractorTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
-        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
+        $this->assertSame([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
+        $this->assertSame([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom'));
     }
 
     public function testExtractEnum(): void
     {
-        $this->assertEquals(Type::enum(EnumString::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumString'));
-        $this->assertEquals(Type::enum(EnumInt::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumInt'));
+        $this->assertSame(Type::enum(EnumString::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumString'));
+        $this->assertSame(Type::enum(EnumInt::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumInt'));
         $this->assertNull($this->createExtractor()->getType(DoctrineEnum::class, 'enumCustom'));
     }
 
@@ -235,7 +235,7 @@ class DoctrineExtractorTest extends TestCase
         ];
 
         foreach ($legacyTypes as [$property, $t]) {
-            $this->assertEquals($t, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));
+            $this->assertSame($t, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));
         }
     }
 

@@ -145,7 +145,7 @@ YAML;
 
         $assertExample($json['components']['schemas']['Issue6317']['properties'], 'id');
         $assertExample($json['components']['schemas']['Issue6317.jsonld']['allOf'][1]['properties'], 'id');
-        $this->assertEquals($json['components']['schemas']['Issue6317.jsonhal']['allOf'][1]['$ref'], '#/components/schemas/Issue6317');
+        $this->assertSame($json['components']['schemas']['Issue6317.jsonhal']['allOf'][1]['$ref'], '#/components/schemas/Issue6317');
     }
 
     private function assertYaml(string $data): void
@@ -193,6 +193,6 @@ YAML;
         $this->assertArrayHasKey('/cruds', $res['paths']);
         $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
-        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
+        $this->assertSame([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
     }
 }

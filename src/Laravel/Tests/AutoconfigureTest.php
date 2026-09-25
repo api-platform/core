@@ -25,14 +25,14 @@ class AutoconfigureTest extends TestCase
     public function testServiceProvider(): void
     {
         $response = $this->get('/api/custom_service_provider', headers: ['accept' => ['application/ld+json']]);
-        $this->assertEquals($response->json()['test'], 'ok');
+        $this->assertSame($response->json()['test'], 'ok');
         $response->assertSuccessful();
     }
 
     public function testServiceProviderWithDependency(): void
     {
         $response = $this->get('/api/custom_service_provider_with_dependency', headers: ['accept' => ['application/ld+json']]);
-        $this->assertEquals($response->json()['test'], 'test');
+        $this->assertSame($response->json()['test'], 'test');
         $response->assertSuccessful();
     }
 }

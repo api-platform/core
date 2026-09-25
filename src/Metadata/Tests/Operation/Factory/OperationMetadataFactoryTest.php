@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -28,6 +29,8 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class OperationMetadataFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     public function testCreate(): void
@@ -41,8 +44,8 @@ class OperationMetadataFactoryTest extends TestCase
         ]));
 
         $operationMetadata = new OperationMetadataFactory($resourceNameCollectionFactory->reveal(), $resourceMetadataCollectionFactory->reveal());
-        $this->assertEquals($operation, $operationMetadata->create('one'));
-        $this->assertEquals($operation, $operationMetadata->create('/one'));
+        $this->assertSame(self::toComparableArray($operation->withPriority(0)), self::toComparableArray($operationMetadata->create('one')));
+        $this->assertSame(self::toComparableArray($operation->withPriority(0)), self::toComparableArray($operationMetadata->create('/one')));
         $this->assertNull($operationMetadata->create('none'));
     }
 

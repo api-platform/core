@@ -46,7 +46,7 @@ final class ErrorTest extends ApiTestCase
     public function testRetrieveErrorHtml(): void
     {
         $response = self::createClient()->request('GET', '/errors/403', ['headers' => ['accept' => 'text/html']]);
-        $this->assertEquals('<!DOCTYPE html>
+        $this->assertSame('<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
@@ -115,7 +115,7 @@ final class ErrorTest extends ApiTestCase
     public function testErrorResourceThrownFromProcessorRespectsGroups(): void
     {
         $response = self::createClient()->request('POST', '/error_resource_with_groups', ['json' => []]);
-        $this->assertEquals('This should be returned in the response.', $response->toArray(false)['detail'] ?? false);
+        $this->assertSame('This should be returned in the response.', $response->toArray(false)['detail'] ?? false);
     }
 
     public function testDataUriExceptionMessageIsNotWrapped(): void

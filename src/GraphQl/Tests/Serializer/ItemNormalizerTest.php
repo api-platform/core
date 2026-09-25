@@ -114,7 +114,7 @@ class ItemNormalizerTest extends TestCase
                 'id' => 1,
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
             'resources' => [],
             'resource_class' => Dummy::class,
         ]));
@@ -190,7 +190,7 @@ class ItemNormalizerTest extends TestCase
                 'id' => 1,
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($securedDummyWithOwnerOnlyPropertyAllowed, ItemNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($securedDummyWithOwnerOnlyPropertyAllowed, ItemNormalizer::FORMAT, [
             'resources' => [],
             'resource_class' => SecuredDummy::class,
         ]));
@@ -202,7 +202,7 @@ class ItemNormalizerTest extends TestCase
                 'id' => 2,
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($securedDummyWithoutOwnerOnlyPropertyAllowed, ItemNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($securedDummyWithoutOwnerOnlyPropertyAllowed, ItemNormalizer::FORMAT, [
             'resources' => [],
             'resource_class' => SecuredDummy::class,
         ]));
@@ -247,7 +247,7 @@ class ItemNormalizerTest extends TestCase
         $expected = [
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
             'resources' => [],
             'no_resolver_data' => true,
         ]));

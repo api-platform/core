@@ -74,99 +74,41 @@ class ConfigurationTest extends TestCase
 
         $this->assertInstanceOf(ConfigurationInterface::class, $this->configuration);
         $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
-        $this->assertEquals([
+        $this->assertSame([
             'title' => 'title',
             'description' => 'description',
-            'enable_json_streamer' => class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class),
             'version' => '1.0.0',
+            'doctrine' => [
+                'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true), ],
+            'doctrine_mongodb_odm' => [
+                'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true), ],
             'show_webby' => true,
-            'formats' => [
-                'jsonld' => ['mime_types' => ['application/ld+json']],
-            ],
-            'docs_formats' => [
-                'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
-                'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
-                'jsonld' => ['mime_types' => ['application/ld+json']],
-                'html' => ['mime_types' => ['text/html']],
-            ],
-            'patch_formats' => [
-                'json' => ['mime_types' => ['application/merge-patch+json']],
-            ],
-            'error_formats' => [
-                'jsonproblem' => ['mime_types' => ['application/problem+json']],
-                'jsonld' => ['mime_types' => ['application/ld+json']],
-                'json' => ['mime_types' => ['application/problem+json', 'application/json']],
-            ],
-            'jsonschema_formats' => [],
-            'exception_to_status' => [
-                ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
-                InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                OptimisticLockException::class => Response::HTTP_CONFLICT,
-                UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
-            ],
+            'use_symfony_listeners' => false,
+            'name_converter' => null,
+            'asset_package' => null,
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
             'inflector' => 'api_platform.metadata.inflector',
             'validator' => [
-                'serialize_payload_fields' => [],
-            ],
-            'name_converter' => null,
-            'enable_swagger' => true,
-            'enable_swagger_ui' => true,
-            'enable_entrypoint' => true,
-            'enable_re_doc' => true,
-            'enable_docs' => true,
-            'enable_profiler' => true,
-            'graphql' => [
-                'enabled' => true,
-                'default_ide' => 'graphiql',
-                'graphiql' => [
-                    'enabled' => true,
-                ],
-                'introspection' => [
-                    'enabled' => true,
-                ],
-                'max_query_depth' => 20,
-                'max_query_complexity' => 500,
-                'nesting_separator' => '_',
-                'collection' => [
-                    'pagination' => [
-                        'enabled' => true,
-                    ],
-                ],
-            ],
-            'elasticsearch' => [
-                'enabled' => false,
-                'hosts' => [],
-                'ssl_ca_bundle' => null,
-                'ssl_verification' => true,
-                'client' => 'elasticsearch',
-            ],
-            'oauth' => [
-                'enabled' => false,
-                'clientId' => '',
-                'clientSecret' => '',
-                'type' => 'oauth2',
-                'flow' => 'application',
-                'tokenUrl' => '',
-                'authorizationUrl' => '',
-                'refreshUrl' => '',
-                'scopes' => [],
-                'pkce' => false,
-            ],
-            'swagger' => [
-                'versions' => [3],
-                'api_keys' => [],
-                'http_auth' => [],
-                'swagger_ui_extra_configuration' => [],
-                'persist_authorization' => false,
-                'with_credentials' => false,
-            ],
+                'serialize_payload_fields' => [], ],
+            'jsonapi' => [
+                'use_iri_as_id' => false,
+                'allow_client_generated_id' => false, ],
             'eager_loading' => [
                 'enabled' => true,
-                'max_joins' => 30,
-                'force_eager' => true,
                 'fetch_partial' => false,
-            ],
+                'max_joins' => 30,
+                'force_eager' => true, ],
+            'handle_symfony_errors' => false,
+            'enable_swagger' => true,
+            'enable_json_streamer' => class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class),
+            'enable_swagger_ui' => true,
+            'enable_re_doc' => true,
+            'enable_scalar' => true,
+            'enable_entrypoint' => true,
+            'enable_docs' => true,
+            'enable_head_request_optimization' => true,
+            'enable_profiler' => true,
+            'enable_phpdoc_parser' => true,
             'collection' => [
                 'exists_parameter_name' => 'exists',
                 'order' => 'ASC',
@@ -177,78 +119,105 @@ class ConfigurationTest extends TestCase
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
-                    'partial_parameter_name' => 'partial',
-                ],
-            ],
+                    'partial_parameter_name' => 'partial', ], ],
             'mapping' => [
                 'imports' => [],
-                'paths' => [],
-            ],
+                'paths' => [], ],
+            'serializer' => [
+                'hydra_prefix' => false, ],
+            'oauth' => [
+                'enabled' => false,
+                'clientId' => '',
+                'clientSecret' => '',
+                'pkce' => false,
+                'type' => 'oauth2',
+                'flow' => 'application',
+                'tokenUrl' => '',
+                'authorizationUrl' => '',
+                'refreshUrl' => '',
+                'scopes' => [], ],
+            'graphql' => [
+                'enabled' => true,
+                'default_ide' => 'graphiql',
+                'graphiql' => [
+                    'enabled' => true, ],
+                'introspection' => [
+                    'enabled' => true, ],
+                'max_query_depth' => 20,
+                'max_query_complexity' => 500,
+                'nesting_separator' => '_',
+                'collection' => [
+                    'pagination' => [
+                        'enabled' => true, ], ], ],
+            'swagger' => [
+                'persist_authorization' => false,
+                'with_credentials' => false,
+                'versions' => [3],
+                'api_keys' => [],
+                'http_auth' => [],
+                'swagger_ui_extra_configuration' => [], ],
             'http_cache' => [
+                'public' => null,
                 'invalidation' => [
                     'enabled' => false,
-                    'request_options' => [],
-                    'max_header_length' => 7500,
-                    'purger' => 'api_platform.http_cache.purger.varnish',
                     'urls' => [],
                     'scoped_clients' => [],
-                ],
-                'public' => null,
-            ],
-            'doctrine' => [
-                'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),
-            ],
-            'doctrine_mongodb_odm' => [
-                'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true),
-            ],
-            'messenger' => [
-                'enabled' => true,
-            ],
+                    'max_header_length' => 7500,
+                    'request_options' => [],
+                    'purger' => 'api_platform.http_cache.purger.varnish', ], ],
             'mercure' => [
                 'enabled' => true,
                 'hub_url' => null,
-                'include_type' => false,
-            ],
-            'asset_package' => null,
+                'include_type' => false, ],
+            'messenger' => [
+                'enabled' => true, ],
+            'elasticsearch' => [
+                'enabled' => false,
+                'hosts' => [],
+                'ssl_ca_bundle' => null,
+                'ssl_verification' => true,
+                'client' => 'elasticsearch', ],
             'openapi' => [
                 'contact' => [
                     'name' => null,
                     'url' => null,
-                    'email' => null,
-                ],
+                    'email' => null, ],
                 'termsOfService' => null,
+                'tags' => [],
                 'license' => [
                     'name' => null,
                     'url' => null,
-                    'identifier' => null,
-                ],
+                    'identifier' => null, ],
                 'swagger_ui_extra_configuration' => [],
-                'overrideResponses' => true,
-                'tags' => [],
-                'error_resource_class' => null,
-                'validation_error_resource_class' => null,
                 'scalar_extra_configuration' => [],
-            ],
+                'overrideResponses' => true,
+                'error_resource_class' => null,
+                'validation_error_resource_class' => null, ],
             'maker' => [
                 'enabled' => true,
-                'namespace_prefix' => '',
-            ],
-            'use_symfony_listeners' => false,
-            'handle_symfony_errors' => false,
-            'serializer' => [
-                'hydra_prefix' => null,
-            ],
-            'enable_phpdoc_parser' => true,
+                'namespace_prefix' => '', ],
             'mcp' => [
                 'enabled' => true,
-                'format' => 'jsonld',
-            ],
-            'jsonapi' => [
-                'use_iri_as_id' => false,
-                'allow_client_generated_id' => false,
-            ],
-            'enable_scalar' => true,
-            'enable_head_request_optimization' => true,
+                'format' => 'jsonld', ],
+            'exception_to_status' => [
+                ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
+                InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                OptimisticLockException::class => Response::HTTP_CONFLICT,
+                UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY, ],
+            'formats' => [
+                'jsonld' => ['mime_types' => ['application/ld+json']], ],
+            'patch_formats' => [
+                'json' => ['mime_types' => ['application/merge-patch+json']], ],
+            'docs_formats' => [
+                'jsonld' => ['mime_types' => ['application/ld+json']],
+                'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
+                'html' => ['mime_types' => ['text/html']],
+                'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']], ],
+            'error_formats' => [
+                'jsonld' => ['mime_types' => ['application/ld+json']],
+                'jsonproblem' => ['mime_types' => ['application/problem+json']],
+                'json' => ['mime_types' => ['application/problem+json', 'application/json']], ],
+            'jsonschema_formats' => [],
         ], $config);
     }
 
@@ -378,7 +347,7 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('versions', $config['swagger']);
-        $this->assertEquals([3], $config['swagger']['versions']);
+        $this->assertSame([3], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/Only the versions .+ are supported. Got .+./');
@@ -452,7 +421,7 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(['name' => 'test3', 'description' => null], $config['openapi']['tags'][1]);
+        $this->assertSame(['name' => 'test3', 'description' => null], $config['openapi']['tags'][1]);
     }
 
     public function testElasticsearchSslCaBundleConfiguration(): void
@@ -538,6 +507,6 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(['resource:read-write' => 'Read and write resource data'], $config['oauth']['scopes']);
+        $this->assertSame(['resource:read-write' => 'Read and write resource data'], $config['oauth']['scopes']);
     }
 }

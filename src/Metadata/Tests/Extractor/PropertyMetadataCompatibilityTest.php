@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Tests\Extractor\Adapter\PropertyAdapterInterface;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\XmlPropertyAdapter;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\YamlPropertyAdapter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
+use ApiPlatform\Test\ComparableObjectTrait;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +35,8 @@ use Symfony\Component\TypeInfo\Type;
  */
 final class PropertyMetadataCompatibilityTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     private const RESOURCE_CLASS = Comment::class;
     private const PROPERTY = 'comment';
     private const FIXTURES = [
@@ -69,14 +72,13 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'types' => ['someirischema', 'anotheririschema'],
         'initializable' => true,
         'extraProperties' => [
-            'custom_property' => 'Lorem ipsum dolor sit amet',
             SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED => true,
+            'custom_property' => 'Lorem ipsum dolor sit amet',
         ],
         'iris' => ['https://schema.org/totalPrice'],
         'genId' => true,
         'uriTemplate' => '/sub-resource-get-collection',
         'property' => 'test',
-        'hydra' => false,
         'nativeType' => 'string',
     ];
 
@@ -94,7 +96,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiProperty::class, 0, $exception);
         }
 
-        $this->assertEquals($this->buildApiProperty(), $property);
+        $this->assertSame(self::toComparableArray($this->buildApiProperty()), self::toComparableArray($property));
     }
 
     public static function getExtractors(): array

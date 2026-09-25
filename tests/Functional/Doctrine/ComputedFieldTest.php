@@ -68,7 +68,7 @@ final class ComputedFieldTest extends ApiTestCase
         $this->assertArrayHasKey('next', $asc['view']);
 
         $this->assertArrayHasKey('search', $asc);
-        $this->assertEquals('/carts{?sort[totalQuantity]}', $asc['search']['template']);
+        $this->assertSame('/carts{?sort[totalQuantity]}', $asc['search']['template']);
 
         $this->assertGreaterThan(
             $asc['member'][0]['totalQuantity'],

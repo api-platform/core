@@ -46,7 +46,7 @@ class ResolverFactoryTest extends TestCase
         $resolveInfo->fieldName = 'test';
 
         $resolverFactory = new ResolverFactory($provider, $processor, $this->createMock(OperationMetadataFactoryInterface::class));
-        $this->assertEquals($resolverFactory->__invoke($resourceClass, $rootClass, $operation, $propertyMetadataFactory)(['test' => null], [], [], $resolveInfo), $returnValue);
+        $this->assertSame($resolverFactory->__invoke($resourceClass, $rootClass, $operation, $propertyMetadataFactory)(['test' => null], [], [], $resolveInfo), $returnValue);
     }
 
     public static function graphQlQueries(): array

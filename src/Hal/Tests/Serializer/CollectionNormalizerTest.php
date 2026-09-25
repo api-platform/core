@@ -54,7 +54,7 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizePaginator(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '_links' => [
                     'self' => ['href' => '/?page=3'],
@@ -66,6 +66,8 @@ class CollectionNormalizerTest extends TestCase
                         '/me',
                     ],
                 ],
+                'totalItems' => 1312.0,
+                'itemsPerPage' => 12,
                 '_embedded' => [
                     'item' => [
                         [
@@ -76,8 +78,6 @@ class CollectionNormalizerTest extends TestCase
                         ],
                     ],
                 ],
-                'totalItems' => 1312,
-                'itemsPerPage' => 12,
             ],
             $this->normalizePaginator()
         );
@@ -85,7 +85,7 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizePartialPaginator(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '_links' => [
                     'self' => ['href' => '/?page=3'],
@@ -95,6 +95,7 @@ class CollectionNormalizerTest extends TestCase
                         '/me',
                     ],
                 ],
+                'itemsPerPage' => 12,
                 '_embedded' => [
                     'item' => [
                         [
@@ -105,7 +106,6 @@ class CollectionNormalizerTest extends TestCase
                         ],
                     ],
                 ],
-                'itemsPerPage' => 12,
             ],
             $this->normalizePaginator(true)
         );

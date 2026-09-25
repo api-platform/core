@@ -45,8 +45,8 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
         $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
-        $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
-        $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
+        $this->assertSame(iterator_to_array($expectedResult), iterator_to_array($resultedPropertyNameCollection));
+        $this->assertSame(iterator_to_array($expectedResult), iterator_to_array($cachedPropertyNameCollectionFactory->create(Dummy::class)), 'Trigger the local cache');
     }
 
     public function testCreateWithItemNotHit(): void
@@ -68,8 +68,8 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
         $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
-        $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
-        $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
+        $this->assertSame(iterator_to_array($expectedResult), iterator_to_array($resultedPropertyNameCollection));
+        $this->assertSame(iterator_to_array($expectedResult), iterator_to_array($cachedPropertyNameCollectionFactory->create(Dummy::class)), 'Trigger the local cache');
     }
 
     public function testCreateWithGetCacheItemThrowsCacheException(): void
@@ -86,8 +86,8 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
         $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
-        $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
-        $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
+        $this->assertSame(iterator_to_array($expectedResult), iterator_to_array($resultedPropertyNameCollection));
+        $this->assertSame(iterator_to_array($expectedResult), iterator_to_array($cachedPropertyNameCollectionFactory->create(Dummy::class)), 'Trigger the local cache');
     }
 
     private function generateCacheKey(string $resourceClass = Dummy::class, array $options = []): string

@@ -74,7 +74,7 @@ class ObjectMapperValidationTest extends ApiTestCase
 
         // Verify first book exists in database
         $bookCount = $entityManager->getRepository(UniqueBook::class)->count(['isbn' => '978-0-13-468599-1']);
-        $this->assertEquals(1, $bookCount, 'First book should be in database');
+        $this->assertSame(1, $bookCount, 'First book should be in database');
 
         // Second book with same ISBN should return 422 validation error, NOT 500 database error
         $client->request('POST', '/unique_book_resources', [

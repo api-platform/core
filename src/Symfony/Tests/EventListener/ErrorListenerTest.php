@@ -50,7 +50,7 @@ class ErrorListenerTest extends TestCase
             $this->assertTrue($request->attributes->has('_api_original_route_params'));
             $this->assertTrue($request->attributes->has('_api_requested_operation'));
             $this->assertTrue($request->attributes->has('_api_previous_operation'));
-            $this->assertEquals('_api_errors_problem', $request->attributes->get('_api_operation_name'));
+            $this->assertSame('_api_errors_problem', $request->attributes->get('_api_operation_name'));
 
             return new Response();
         });
@@ -81,7 +81,7 @@ class ErrorListenerTest extends TestCase
             $this->assertTrue($request->attributes->has('_api_original_route_params'));
             $this->assertTrue($request->attributes->has('_api_requested_operation'));
             $this->assertTrue($request->attributes->has('_api_previous_operation'));
-            $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
+            $this->assertSame('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
 
             return new Response();
         });
@@ -112,10 +112,10 @@ class ErrorListenerTest extends TestCase
             $this->assertTrue($request->attributes->has('_api_original_route_params'));
             $this->assertTrue($request->attributes->has('_api_requested_operation'));
             $this->assertTrue($request->attributes->has('_api_previous_operation'));
-            $this->assertEquals('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
+            $this->assertSame('_api_errors_hydra', $request->attributes->get('_api_operation_name'));
 
             $operation = $request->attributes->get('_api_operation');
-            $this->assertEquals($operation->getNormalizationContext(), [
+            $this->assertSame($operation->getNormalizationContext(), [
                 // this flag is for bc layer on error normalizers
                 'api_error_resource' => true,
                 'ignored_attributes' => [
@@ -158,7 +158,7 @@ class ErrorListenerTest extends TestCase
         $refl = new \ReflectionClass($errorListener);
         $controllerProp = $refl->getProperty('controller');
 
-        $this->assertEquals($initialController, $controllerProp->getValue($errorListener), 'The controller property must never be modified.');
+        $this->assertSame($initialController, $controllerProp->getValue($errorListener), 'The controller property must never be modified.');
     }
 
     /**

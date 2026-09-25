@@ -31,7 +31,7 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'id[between]' => [
                 'property' => 'id',
                 'type' => 'string',

@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Symfony\Routing\ApiLoader;
+use ApiPlatform\Test\ComparableObjectTrait;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\Fixtures\RelatedDummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -47,6 +48,8 @@ use Symfony\Component\Routing\Route;
  */
 class ApiLoaderTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     public function testApiLoader(): void
@@ -72,132 +75,108 @@ class ApiLoaderTest extends TestCase
 
         $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
 
-        $this->assertEquals(
-            $this->getRoute(
-                $path,
-                'api_platform.action.get_item',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_get_item',
-                ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
-                ['GET'],
-                ['id' => '\d+']
-            ),
-            $routeCollection->get('api_dummies_get_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            $path,
+            'api_platform.action.get_item',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_get_item',
+            ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
+            ['GET'],
+            ['id' => '\d+']
+        )), self::toComparableArray($routeCollection->get('api_dummies_get_item')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $path,
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_delete_item',
-                [],
-                ['DELETE'],
-                []
-            ),
-            $routeCollection->get('api_dummies_delete_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            $path,
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_delete_item',
+            [],
+            ['DELETE'],
+            []
+        )), self::toComparableArray($routeCollection->get('api_dummies_delete_item')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $path,
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_put_item',
-                [],
-                ['PUT'],
-                []
-            ),
-            $routeCollection->get('api_dummies_put_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            $path,
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_put_item',
+            [],
+            ['PUT'],
+            []
+        )), self::toComparableArray($routeCollection->get('api_dummies_put_item')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/dummies.{_format}',
-                'some.service.name',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_my_op_collection',
-                ['my_default' => 'default_value', '_format' => 'a valid format'],
-                ['GET'],
-                ['_format' => 'a valid format'],
-                [],
-                '',
-                [],
-                "request.headers.get('User-Agent') matches '/firefox/i'"
-            ),
-            $routeCollection->get('api_dummies_my_op_collection')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            '/dummies.{_format}',
+            'some.service.name',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_my_op_collection',
+            ['my_default' => 'default_value', '_format' => 'a valid format'],
+            ['GET'],
+            ['_format' => 'a valid format'],
+            [],
+            '',
+            [],
+            "request.headers.get('User-Agent') matches '/firefox/i'"
+        )), self::toComparableArray($routeCollection->get('api_dummies_my_op_collection')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/dummies.{_format}',
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_my_second_op_collection',
-                [],
-                ['POST'],
-                [],
-                ['option' => 'option_value'],
-                '{subdomain}.api-platform.com',
-                ['https']
-            ),
-            $routeCollection->get('api_dummies_my_second_op_collection')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            '/dummies.{_format}',
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_my_second_op_collection',
+            [],
+            ['POST'],
+            [],
+            ['option' => 'option_value'],
+            '{subdomain}.api-platform.com',
+            ['https']
+        )), self::toComparableArray($routeCollection->get('api_dummies_my_second_op_collection')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                'some/custom/path',
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_my_path_op_collection',
-                [],
-                ['GET'],
-                []
-            ),
-            $routeCollection->get('api_dummies_my_path_op_collection')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            'some/custom/path',
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_my_path_op_collection',
+            [],
+            ['GET'],
+            []
+        )), self::toComparableArray($routeCollection->get('api_dummies_my_path_op_collection')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/dummies.{_format}',
-                'api_platform.action.placeholder',
-                true,
-                DummyEntity::class,
-                [],
-                'api_dummies_my_stateless_op_collection',
-                [],
-                ['GET'],
-                []
-            ),
-            $routeCollection->get('api_dummies_my_stateless_op_collection')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            '/dummies.{_format}',
+            'api_platform.action.placeholder',
+            true,
+            DummyEntity::class,
+            [],
+            'api_dummies_my_stateless_op_collection',
+            [],
+            ['GET'],
+            []
+        )), self::toComparableArray($routeCollection->get('api_dummies_my_stateless_op_collection')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/foo',
-                'Foo\\Bar\\MyController::method',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_my_controller_method_item',
-                [],
-                ['GET'],
-                []
-            ),
-            $routeCollection->get('api_dummies_my_controller_method_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            '/foo',
+            'Foo\\Bar\\MyController::method',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_my_controller_method_item',
+            [],
+            ['GET'],
+            []
+        )), self::toComparableArray($routeCollection->get('api_dummies_my_controller_method_item')));
     }
 
     public function testApiLoaderWithPrefix(): void
@@ -215,48 +194,39 @@ class ApiLoaderTest extends TestCase
 
         $prefixedPath = $prefix.$path;
 
-        $this->assertEquals(
-            $this->getRoute(
-                $prefixedPath,
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_get_item',
-                ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
-                ['GET'],
-                ['id' => '\d+']
-            ),
-            $routeCollection->get('api_dummies_get_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            $prefixedPath,
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_get_item',
+            ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
+            ['GET'],
+            ['id' => '\d+']
+        )), self::toComparableArray($routeCollection->get('api_dummies_get_item')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $prefixedPath,
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_delete_item',
-                [],
-                ['DELETE']
-            ),
-            $routeCollection->get('api_dummies_delete_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            $prefixedPath,
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_delete_item',
+            [],
+            ['DELETE']
+        )), self::toComparableArray($routeCollection->get('api_dummies_delete_item')));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $prefixedPath,
-                'api_platform.action.placeholder',
-                null,
-                DummyEntity::class,
-                [],
-                'api_dummies_put_item',
-                [],
-                ['PUT']
-            ),
-            $routeCollection->get('api_dummies_put_item')
-        );
+        $this->assertSame(self::toComparableArray($this->getRoute(
+            $prefixedPath,
+            'api_platform.action.placeholder',
+            null,
+            DummyEntity::class,
+            [],
+            'api_dummies_put_item',
+            [],
+            ['PUT']
+        )), self::toComparableArray($routeCollection->get('api_dummies_put_item')));
     }
 
     public function testApiLoaderIrisTypeRegistersItemRoutesWithNotExposedController(): void
@@ -421,11 +391,10 @@ class ApiLoaderTest extends TestCase
             $path,
             [
                 '_controller' => $controller,
-                '_format' => $extraDefaults['_format'] ?? null,
                 '_stateless' => $stateless,
                 '_api_resource_class' => $resourceClass,
                 '_api_operation_name' => $operationName,
-            ] + $extraDefaults,
+            ] + $extraDefaults + ['_format' => $extraDefaults['_format'] ?? null],
             $requirements,
             $options,
             $host,

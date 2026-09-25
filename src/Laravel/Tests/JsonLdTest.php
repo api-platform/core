@@ -253,7 +253,7 @@ class JsonLdTest extends TestCase
 
         $violations = $response->json('violations');
         $this->assertCount(1, $violations);
-        $this->assertEquals($violations[0], ['propertyPath' => 'isbn', 'message' => 'The isbn field must only contain letters and numbers.']);
+        $this->assertSame($violations[0], ['propertyPath' => 'isbn', 'message' => 'The isbn field must only contain letters and numbers.']);
     }
 
     public function testCreateNotValidPost(): void
@@ -278,7 +278,7 @@ class JsonLdTest extends TestCase
 
         $violations = $response->json('violations');
         $this->assertCount(1, $violations);
-        $this->assertEquals($violations[0], ['propertyPath' => 'title', 'message' => 'The title field is required.']);
+        $this->assertSame($violations[0], ['propertyPath' => 'title', 'message' => 'The title field is required.']);
     }
 
     public function testSluggable(): void
@@ -360,7 +360,7 @@ class JsonLdTest extends TestCase
         $response->assertStatus(404);
         $content = $response->json();
         $this->assertArrayHasKey('status', $content);
-        $this->assertEquals(404, $content['status']);
+        $this->assertSame(404, $content['status']);
     }
 
     public function testRelationWithGroups(): void

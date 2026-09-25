@@ -39,6 +39,7 @@
         "api-platform/json-schema": "^5.0",
         "api-platform/openapi": "^5.0",
         "api-platform/state": "^5.0",
+        "api-platform/test": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
         "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",

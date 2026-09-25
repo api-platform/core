@@ -64,6 +64,6 @@ class InputDtoIriDenormalizationTest extends ApiTestCase
         ]);
 
         $res = $response->toArray();
-        $this->assertEquals('Bar two', $res['title']);
+        $this->assertSame('Bar two', $res['title']);
     }
 }

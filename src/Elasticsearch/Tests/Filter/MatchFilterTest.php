@@ -81,7 +81,7 @@ class MatchFilterTest extends TestCase
             $nameConverterProphecy->reveal()
         );
 
-        self::assertEquals(
+        self::assertSame(
             ['bool' => ['must' => [['match' => ['id' => 1]], ['bool' => ['should' => [['match' => ['name' => 'Caroline']], ['match' => ['name' => 'Xavier']]]]]]]],
             $matchFilter->apply([], Foo::class, null, ['filters' => ['id' => '/foos/1', 'name' => ['Caroline', 'Xavier']]])
         );
@@ -113,7 +113,7 @@ class MatchFilterTest extends TestCase
             ['foo.bar' => null]
         );
 
-        self::assertEquals(
+        self::assertSame(
             ['bool' => ['must' => [['nested' => ['path' => 'foo', 'query' => ['match' => ['foo.bar' => 'Krupicka']]]]]]],
             $matchFilter->apply([], Foo::class, null, ['filters' => ['foo.bar' => 'Krupicka']])
         );
@@ -171,7 +171,7 @@ class MatchFilterTest extends TestCase
             $this->prophesize(NameConverterInterface::class)->reveal()
         );
 
-        self::assertEquals(
+        self::assertSame(
             [],
             $matchFilter->apply([], Foo::class, null, ['filters' => ['id' => '/invalid_iri_foos/1', 'bar' => 'Chaverot']])
         );
@@ -201,7 +201,7 @@ class MatchFilterTest extends TestCase
             $this->prophesize(NameConverterInterface::class)->reveal()
         );
 
-        self::assertEquals(
+        self::assertSame(
             [
                 'id' => [
                     'property' => 'id',

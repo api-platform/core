@@ -104,7 +104,7 @@ class ItemNormalizerTest extends TestCase
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $this->assertEquals(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => []]));
+        $this->assertSame(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
     public function testNormalizeWithDefinedIri(): void
@@ -143,7 +143,7 @@ class ItemNormalizerTest extends TestCase
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $this->assertEquals(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => [], 'iri' => '/custom']));
+        $this->assertSame(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => [], 'iri' => '/custom']));
     }
 
     #[Group('legacy')]

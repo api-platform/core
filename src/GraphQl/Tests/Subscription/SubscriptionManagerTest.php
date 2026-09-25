@@ -185,7 +185,7 @@ class SubscriptionManagerTest extends TestCase
         $cacheItemProphecy->isHit()->willReturn(false);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertEquals([], $this->subscriptionManager->getPushPayloads($object));
+        $this->assertSame([], $this->subscriptionManager->getPushPayloads($object));
     }
 
     public function testGetPushPayloadsHit(): void
@@ -224,6 +224,6 @@ class SubscriptionManagerTest extends TestCase
             ['resultBar', 'clientSubscriptionId' => 'client-subscription-id']
         );
 
-        $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
+        $this->assertSame([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
     }
 }

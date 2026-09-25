@@ -346,9 +346,9 @@ final class ApiGatewayNormalizerTest extends TestCase
 
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
-        $this->assertEquals($modifiedSwaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT, [
+        $this->assertSame(json_encode($modifiedSwaggerDocument), json_encode($normalizer->normalize($documentation, OpenApiNormalizer::FORMAT, [
             ApiGatewayNormalizer::API_GATEWAY => true,
-        ]));
+        ])));
     }
 
     public function testNormalizeNotInApiGatewayContext(): void
@@ -519,7 +519,7 @@ final class ApiGatewayNormalizerTest extends TestCase
 
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
-        $this->assertEquals($swaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT));
+        $this->assertSame(json_encode($swaggerDocument), json_encode($normalizer->normalize($documentation, OpenApiNormalizer::FORMAT)));
     }
 
     private function getOpenApi(): OpenApi

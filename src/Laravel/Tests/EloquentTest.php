@@ -421,7 +421,7 @@ class EloquentTest extends TestCase
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $res = $this->get('/api/authors?order[name]=something', ['Accept' => ['application/ld+json']]);
-        $this->assertEquals($res->getStatusCode(), 422);
+        $this->assertSame($res->getStatusCode(), 422);
     }
 
     public function testWithAccessor(): void
@@ -435,7 +435,7 @@ class EloquentTest extends TestCase
     {
         $books = BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $res = $this->get('/api/books?published=notabool', ['Accept' => ['application/ld+json']]);
-        $this->assertEquals($res->getStatusCode(), 422);
+        $this->assertSame($res->getStatusCode(), 422);
 
         $res = $this->get('/api/books?published=true', ['Accept' => ['application/ld+json']]);
         $res->assertOk();
@@ -446,8 +446,8 @@ class EloquentTest extends TestCase
         $this->assertSame(0, $res->json()['totalItems']);
 
         $res = $this->get('/api/books?published=0', ['Accept' => ['application/ld+json']]);
-        $this->assertEquals($res->getStatusCode(), 200);
-        $this->assertEquals($res->json()['totalItems'], 0);
+        $this->assertSame($res->getStatusCode(), 200);
+        $this->assertSame($res->json()['totalItems'], 0);
     }
 
     public function testBelongsTo(): void
@@ -456,8 +456,8 @@ class EloquentTest extends TestCase
 
         $res = $this->get('/api/grand_sons/1/grand_father', ['Accept' => ['application/ld+json']]);
         $json = $res->json();
-        $this->assertEquals($json['@id'], '/api/grand_sons/1/grand_father');
-        $this->assertEquals($json['sons'][0], '/api/grand_sons/1');
+        $this->assertSame($json['@id'], '/api/grand_sons/1/grand_father');
+        $this->assertSame($json['sons'][0], '/api/grand_sons/1');
     }
 
     public function testHasMany(): void
@@ -466,9 +466,9 @@ class EloquentTest extends TestCase
 
         $res = $this->get('/api/grand_fathers/1/grand_sons', ['Accept' => ['application/ld+json']]);
         $json = $res->json();
-        $this->assertEquals($json['@id'], '/api/grand_fathers/1/grand_sons');
-        $this->assertEquals($json['totalItems'], 1);
-        $this->assertEquals($json['member'][0]['@id'], '/api/grand_sons/1');
+        $this->assertSame($json['@id'], '/api/grand_fathers/1/grand_sons');
+        $this->assertSame($json['totalItems'], 1);
+        $this->assertSame($json['member'][0]['@id'], '/api/grand_sons/1');
     }
 
     public function testRelationIsHandledOnCreateWithNestedData(): void

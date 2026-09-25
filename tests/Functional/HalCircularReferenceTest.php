@@ -28,7 +28,7 @@ class HalCircularReferenceTest extends ApiTestCase
     {
         $r1 = self::createClient()->request('GET', '/resource_a', ['headers' => ['Accept' => 'application/hal+json']]);
         self::assertResponseIsSuccessful();
-        self::assertEquals('{"_links":{"self":{"href":"\/resource_a"},"b":{"href":"\/resource_b"}},"_embedded":{"b":{"_links":{"self":{"href":"\/resource_b"},"a":{"href":"\/resource_a"}},"_embedded":{"a":{"_links":{"self":{"href":"\/resource_a"}}}}}}}', $r1->getContent());
+        self::assertSame('{"_links":{"self":{"href":"\/resource_a"},"b":{"href":"\/resource_b"}},"_embedded":{"b":{"_links":{"self":{"href":"\/resource_b"},"a":{"href":"\/resource_a"}},"_embedded":{"a":{"_links":{"self":{"href":"\/resource_a"}}}}}}}', $r1->getContent());
     }
 
     public static function getResources(): array

@@ -27,7 +27,7 @@ trait BooleanFilterTestTrait
             'dummyBoolean' => null,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
                 'type' => 'bool',
@@ -40,7 +40,7 @@ trait BooleanFilterTestTrait
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
                 'type' => 'bool',

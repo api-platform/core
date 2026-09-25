@@ -68,11 +68,11 @@ final class LinkProviderParameterTest extends ApiTestCase
         $manager->flush();
 
         $response = self::createClient()->request('GET', '/with_parameters_links?dummy='.$dummy->getId());
-        $this->assertEquals('hi', $response->toArray()['name']);
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame('hi', $response->toArray()['name']);
+        self::assertSame(200, $response->getStatusCode());
         $response = self::createClient()->request('GET', '/with_parameters_links?dummy[id]='.$dummy->getId());
-        $this->assertEquals('hi', $response->toArray()['name']);
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame('hi', $response->toArray()['name']);
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testReadDummyIrisFromQueryParameter(): void
@@ -93,9 +93,9 @@ final class LinkProviderParameterTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', \sprintf('/with_parameters_links?dummy[]=%s&dummy[]=%s', $dummy2->getId(), $dummy->getId()));
         $res = $response->toArray();
-        $this->assertEquals('ho', $res['hydra:member'][0]['name']);
-        $this->assertEquals('hi', $res['hydra:member'][1]['name']);
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame('ho', $res['hydra:member'][0]['name']);
+        $this->assertSame('hi', $res['hydra:member'][1]['name']);
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testReadDummyProviderFromQueryParameterNotFound(): void
@@ -105,7 +105,7 @@ final class LinkProviderParameterTest extends ApiTestCase
             $this->markTestSkipped();
         }
         $response = self::createClient()->request('GET', '/with_parameters_links?dummy=1');
-        self::assertEquals(404, $response->getStatusCode());
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testReadDummyProviderFromQueryParameterNoNotFound(): void
@@ -115,7 +115,7 @@ final class LinkProviderParameterTest extends ApiTestCase
             $this->markTestSkipped();
         }
         $response = self::createClient()->request('GET', '/with_parameters_links_no_not_found?dummy=1');
-        self::assertEquals(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
     /**
@@ -168,7 +168,7 @@ final class LinkProviderParameterTest extends ApiTestCase
         $manager->flush();
 
         $response = self::createClient()->request('GET', '/companies-by-name/NotTest/employees');
-        self::assertEquals(422, $response->getStatusCode());
+        self::assertSame(422, $response->getStatusCode());
     }
 
     public function testUriVariableHasDummy(): void

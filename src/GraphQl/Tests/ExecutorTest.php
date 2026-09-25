@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Tests;
 
 use ApiPlatform\GraphQl\Executor;
+use ApiPlatform\Test\ComparableObjectTrait;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -25,12 +26,14 @@ use PHPUnit\Framework\TestCase;
  */
 class ExecutorTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     public function testEnableIntrospectionQuery(): void
     {
         $executor = new Executor(true);
 
         $expected = new DisableIntrospection(DisableIntrospection::DISABLED);
-        $this->assertEquals($expected, DocumentValidator::getRule(DisableIntrospection::class));
+        $this->assertSame(self::toComparableArray($expected), self::toComparableArray(DocumentValidator::getRule(DisableIntrospection::class)));
     }
 
     public function testDisableIntrospectionQuery(): void
@@ -38,7 +41,7 @@ class ExecutorTest extends TestCase
         $executor = new Executor(false);
 
         $expected = new DisableIntrospection(DisableIntrospection::ENABLED);
-        $this->assertEquals($expected, DocumentValidator::getRule(DisableIntrospection::class));
+        $this->assertSame(self::toComparableArray($expected), self::toComparableArray(DocumentValidator::getRule(DisableIntrospection::class)));
     }
 
     public function testChangeValueOfMaxQueryDepth(): void
@@ -46,7 +49,7 @@ class ExecutorTest extends TestCase
         $executor = new Executor(true, 20);
 
         $expected = new QueryComplexity(20);
-        $this->assertEquals($expected, DocumentValidator::getRule(QueryComplexity::class));
+        $this->assertSame(self::toComparableArray($expected), self::toComparableArray(DocumentValidator::getRule(QueryComplexity::class)));
     }
 
     public function testChangeValueOfMaxQueryComplexity(): void
@@ -54,6 +57,6 @@ class ExecutorTest extends TestCase
         $executor = new Executor(true, maxQueryDepth: 20);
 
         $expected = new QueryDepth(20);
-        $this->assertEquals($expected, DocumentValidator::getRule(QueryDepth::class));
+        $this->assertSame(self::toComparableArray($expected), self::toComparableArray(DocumentValidator::getRule(QueryDepth::class)));
     }
 }

@@ -87,7 +87,7 @@ class GraphQlAuthTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json();
         $this->assertArrayHasKey('errors', $data);
-        $this->assertEquals('Access Denied.', $data['errors'][0]['message']);
+        $this->assertSame('Access Denied.', $data['errors'][0]['message']);
     }
 
     /**

@@ -49,7 +49,7 @@ class EndSearchFilterTest extends TestCase
 
         // The filter populates $context['match'] with the match expression (no pipeline stage added)
         $this->assertArrayHasKey('match', $context);
-        $this->assertEquals(
+        $this->assertSame(
             ['$and' => [['name' => new Regex('foo$', '')]]],
             $context['match']->getQuery()
         );
@@ -71,7 +71,7 @@ class EndSearchFilterTest extends TestCase
 
         $filter->apply($aggregationBuilder, Dummy::class, null, $context);
 
-        $this->assertEquals(
+        $this->assertSame(
             ['$and' => [['name' => new Regex('foo$', 'i')]]],
             $context['match']->getQuery()
         );

@@ -88,7 +88,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['allOf'][0]['properties']));
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['allOf'][0]['properties'];
         $this->assertArrayHasKey('_links', $properties);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'type' => 'object',
                 'properties' => [
@@ -118,15 +118,15 @@ class SchemaFactoryTest extends TestCase
 
         foreach ($resultSchema['allOf'] as $schema) {
             if (isset($schema['$ref'])) {
-                $this->assertEquals($schema['$ref'], '#/definitions/HalCollectionBaseSchema');
+                $this->assertSame($schema['$ref'], '#/definitions/HalCollectionBaseSchema');
                 continue;
             }
 
             $this->assertArrayHasKey('_embedded', $schema['properties']);
-            $this->assertEquals('#/definitions/Dummy.jsonhal', $schema['properties']['_embedded']['additionalProperties']['items']['$ref']);
+            $this->assertSame('#/definitions/Dummy.jsonhal', $schema['properties']['_embedded']['additionalProperties']['items']['$ref']);
         }
 
         $forceCollectionSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, null, null, null, true);
-        $this->assertEquals($forceCollectionSchema, $resultSchema);
+        $this->assertSame(json_encode($forceCollectionSchema), json_encode($resultSchema));
     }
 }

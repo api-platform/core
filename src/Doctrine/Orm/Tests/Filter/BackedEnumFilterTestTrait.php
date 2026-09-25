@@ -27,7 +27,7 @@ trait BackedEnumFilterTestTrait
             'dummyBackedEnum' => null,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'dummyBackedEnum' => [
                 'property' => 'dummyBackedEnum',
                 'type' => 'string',
@@ -58,7 +58,7 @@ trait BackedEnumFilterTestTrait
     {
         $filter = $this->buildFilter();
 
-        $this->assertEquals([
+        $this->assertSame([
             'dummyBackedEnum' => [
                 'property' => 'dummyBackedEnum',
                 'type' => 'string',

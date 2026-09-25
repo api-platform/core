@@ -53,7 +53,7 @@ class UuidIriRelationTest extends ApiTestCase
             ],
         ]);
 
-        self::assertEquals(201, $response->getStatusCode());
+        self::assertSame(201, $response->getStatusCode());
     }
 
     public function testInvalidPostRequestWithIriWhenIdentifierIsUuid(): void
@@ -69,7 +69,7 @@ class UuidIriRelationTest extends ApiTestCase
             ],
         ]);
 
-        self::assertEquals(400, $response->getStatusCode());
+        self::assertSame(400, $response->getStatusCode());
         self::assertJsonContains(['detail' => 'Invalid IRI "uuid_iri_relation/bar/invalid-uuid".']);
     }
 
@@ -82,7 +82,7 @@ class UuidIriRelationTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/uuid_iri_relation/bar/invalid-uuid');
 
-        self::assertEquals(404, $response->getStatusCode());
+        self::assertSame(404, $response->getStatusCode());
     }
 
     protected function loadBarFixture(): Bar

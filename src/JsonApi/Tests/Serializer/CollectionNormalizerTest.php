@@ -107,6 +107,11 @@ class CollectionNormalizerTest extends TestCase
                 'prev' => '/foos?page=2',
                 'next' => '/foos?page=4',
             ],
+            'meta' => [
+                'totalItems' => 1312.0,
+                'itemsPerPage' => 12,
+                'currentPage' => 3,
+            ],
             'data' => [
                 [
                     'type' => 'Foo',
@@ -117,14 +122,9 @@ class CollectionNormalizerTest extends TestCase
                     ],
                 ],
             ],
-            'meta' => [
-                'totalItems' => 1312,
-                'itemsPerPage' => 12,
-                'currentPage' => 3,
-            ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
             'operation_name' => 'get',
             'uri' => 'http://example.com/foos?page=3',
@@ -182,6 +182,10 @@ class CollectionNormalizerTest extends TestCase
                 'prev' => '/foos?page=2',
                 'next' => '/foos?page=4',
             ],
+            'meta' => [
+                'itemsPerPage' => 12,
+                'currentPage' => 3,
+            ],
             'data' => [
                 [
                     'type' => 'Foo',
@@ -192,13 +196,9 @@ class CollectionNormalizerTest extends TestCase
                     ],
                 ],
             ],
-            'meta' => [
-                'itemsPerPage' => 12,
-                'currentPage' => 3,
-            ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
             'operation_name' => 'get',
             'uri' => 'http://example.com/foos?page=3',
@@ -241,6 +241,7 @@ class CollectionNormalizerTest extends TestCase
 
         $expected = [
             'links' => ['self' => '/foos'],
+            'meta' => ['totalItems' => 1],
             'data' => [
                 [
                     'type' => 'Foo',
@@ -251,10 +252,9 @@ class CollectionNormalizerTest extends TestCase
                     ],
                 ],
             ],
-            'meta' => ['totalItems' => 1],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
             'operation_name' => 'get',
             'uri' => 'http://example.com/foos',
@@ -309,6 +309,7 @@ class CollectionNormalizerTest extends TestCase
 
         $expected = [
             'links' => ['self' => '/foos'],
+            'meta' => ['totalItems' => 1],
             'data' => [
                 [
                     'type' => 'Foo',
@@ -319,7 +320,6 @@ class CollectionNormalizerTest extends TestCase
                     ],
                 ],
             ],
-            'meta' => ['totalItems' => 1],
             'included' => [
                 [
                     'type' => 'Bar',
@@ -332,7 +332,7 @@ class CollectionNormalizerTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+        $this->assertSame($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
             'operation_name' => 'get',
             'uri' => 'http://example.com/foos',

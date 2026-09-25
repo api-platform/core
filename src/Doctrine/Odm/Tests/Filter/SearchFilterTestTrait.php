@@ -35,7 +35,7 @@ trait SearchFilterTestTrait
             'relatedDummy' => null,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => [
                 'property' => 'id',
                 'type' => 'int',

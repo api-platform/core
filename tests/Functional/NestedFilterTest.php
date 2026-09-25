@@ -125,14 +125,14 @@ final class NestedFilterTest extends ApiTestCase
 
         $this->assertCount(3, $data['hydra:member']);
         // Engineering employees first (Alice, Charlie), then Sales (Bob)
-        $this->assertEquals('Bob', $data['hydra:member'][2]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][2]['name']);
 
         // Order by department.name DESC — Sales > Engineering
         $response = self::createClient()->request('GET', '/filter_employees?orderDepartmentName=desc');
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Bob', $data['hydra:member'][0]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][0]['name']);
     }
 
     public function testOrderFilterWithDirectProperty(): void
@@ -149,18 +149,18 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Alice', $data['hydra:member'][0]['name']);
-        $this->assertEquals('Bob', $data['hydra:member'][1]['name']);
-        $this->assertEquals('Charlie', $data['hydra:member'][2]['name']);
+        $this->assertSame('Alice', $data['hydra:member'][0]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][1]['name']);
+        $this->assertSame('Charlie', $data['hydra:member'][2]['name']);
 
         // Order by name DESC — Charlie > Bob > Alice
         $response = self::createClient()->request('GET', '/filter_employees?orderName=desc');
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Charlie', $data['hydra:member'][0]['name']);
-        $this->assertEquals('Bob', $data['hydra:member'][1]['name']);
-        $this->assertEquals('Alice', $data['hydra:member'][2]['name']);
+        $this->assertSame('Charlie', $data['hydra:member'][0]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][1]['name']);
+        $this->assertSame('Alice', $data['hydra:member'][2]['name']);
     }
 
     public function testSortFilterNullsAlwaysFirst(): void
@@ -177,18 +177,18 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Charlie', $data['hydra:member'][0]['name']);
-        $this->assertEquals('Alice', $data['hydra:member'][1]['name']);
-        $this->assertEquals('Bob', $data['hydra:member'][2]['name']);
+        $this->assertSame('Charlie', $data['hydra:member'][0]['name']);
+        $this->assertSame('Alice', $data['hydra:member'][1]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][2]['name']);
 
         // DESC with nulls_always_first — Charlie (null) first, then Bob (2024-06), then Alice (2024-01)
         $response = self::createClient()->request('GET', '/filter_employees?orderHireDate=desc');
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Charlie', $data['hydra:member'][0]['name']);
-        $this->assertEquals('Bob', $data['hydra:member'][1]['name']);
-        $this->assertEquals('Alice', $data['hydra:member'][2]['name']);
+        $this->assertSame('Charlie', $data['hydra:member'][0]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][1]['name']);
+        $this->assertSame('Alice', $data['hydra:member'][2]['name']);
     }
 
     public function testSortFilterNullsAlwaysLast(): void
@@ -205,18 +205,18 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Alice', $data['hydra:member'][0]['name']);
-        $this->assertEquals('Bob', $data['hydra:member'][1]['name']);
-        $this->assertEquals('Charlie', $data['hydra:member'][2]['name']);
+        $this->assertSame('Alice', $data['hydra:member'][0]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][1]['name']);
+        $this->assertSame('Charlie', $data['hydra:member'][2]['name']);
 
         // DESC with nulls_always_last — Bob (2024-06), Alice (2024-01), then Charlie (null)
         $response = self::createClient()->request('GET', '/filter_employees?orderHireDateNullsLast=desc');
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member']);
-        $this->assertEquals('Bob', $data['hydra:member'][0]['name']);
-        $this->assertEquals('Alice', $data['hydra:member'][1]['name']);
-        $this->assertEquals('Charlie', $data['hydra:member'][2]['name']);
+        $this->assertSame('Bob', $data['hydra:member'][0]['name']);
+        $this->assertSame('Alice', $data['hydra:member'][1]['name']);
+        $this->assertSame('Charlie', $data['hydra:member'][2]['name']);
     }
 
     private function loadFixtures(): array

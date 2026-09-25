@@ -36,7 +36,7 @@ class ContextOutputTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', '/json_ld_context_output');
         $res = $response->toArray();
-        $this->assertEquals($res['@context'], [
+        $this->assertSame($res['@context'], [
             '@vocab' => 'http://localhost/docs.jsonld#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'foo' => 'Output/foo',

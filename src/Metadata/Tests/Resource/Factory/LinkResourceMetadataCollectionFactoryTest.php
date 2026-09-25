@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
+use ApiPlatform\Test\ComparableObjectTrait;
 use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -36,6 +37,8 @@ use Symfony\Component\TypeInfo\Type;
 
 class LinkResourceMetadataCollectionFactoryTest extends TestCase
 {
+    use ComparableObjectTrait;
+
     use ProphecyTrait;
 
     public function testCreate(): void
@@ -77,23 +80,20 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
 
         $linkResourceMetadataCollectionFactory = new LinkResourceMetadataCollectionFactory($linkFactory, $resourceCollectionMetadataFactoryProphecy->reveal(), true);
 
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    class: AttributeResource::class,
-                    graphQlOperations: [
-                        'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
-                            (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['id'])->withParameterName('id'),
-                            (new Link())->withFromProperty('foo')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
-                            (new Link())->withFromProperty('foo2')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
-                            (new Link())->withFromProperty('bar')->withFromClass(AttributeResource::class)->withToClass(RelatedDummy::class)->withIdentifiers(['id']),
-                        ]),
-                    ]
-                ),
-            ]),
-            $linkResourceMetadataCollectionFactory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                class: AttributeResource::class,
+                graphQlOperations: [
+                    'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
+                        (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['id'])->withParameterName('id'),
+                        (new Link())->withFromProperty('foo')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
+                        (new Link())->withFromProperty('foo2')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
+                        (new Link())->withFromProperty('bar')->withFromClass(AttributeResource::class)->withToClass(RelatedDummy::class)->withIdentifiers(['id']),
+                    ]),
+                ]
+            ),
+        ])), self::toComparableArray($linkResourceMetadataCollectionFactory->create(AttributeResource::class)));
     }
 
     public function testCreateWithLinkAttribute(): void
@@ -126,20 +126,17 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
 
         $linkResourceMetadataCollectionFactory = new LinkResourceMetadataCollectionFactory($linkFactory, $resourceCollectionMetadataFactoryProphecy->reveal(), true);
 
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    class: AttributeResource::class,
-                    graphQlOperations: [
-                        'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
-                            (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['identifier'])->withParameterName('identifier'),
-                            (new Link())->withParameterName('dummyId')->withFromProperty('dummy')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['identifier']),
-                        ]),
-                    ]
-                ),
-            ]),
-            $linkResourceMetadataCollectionFactory->create(AttributeResource::class)
-        );
+        $this->assertSame(self::toComparableArray(new ResourceMetadataCollection(AttributeResource::class, [
+            new ApiResource(
+                shortName: 'AttributeResource',
+                class: AttributeResource::class,
+                graphQlOperations: [
+                    'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
+                        (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['identifier'])->withParameterName('identifier'),
+                        (new Link())->withParameterName('dummyId')->withFromProperty('dummy')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['identifier']),
+                    ]),
+                ]
+            ),
+        ])), self::toComparableArray($linkResourceMetadataCollectionFactory->create(AttributeResource::class)));
     }
 }
