@@ -77,7 +77,7 @@ final class NotExposed extends HttpOperation
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
         ?array $order = null,
-        ?string $description = null,
+        string|\Stringable|null $description = null,
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
         ?bool $collectDenormalizationErrors = null,
