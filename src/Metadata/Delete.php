@@ -106,6 +106,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: 'DELETE',
@@ -192,7 +193,8 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             hideHydraOperation: $hideHydraOperation,
             throwOnNotFound: $throwOnNotFound,
             stateOptions: $stateOptions,
-            map: $map
+            map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate
         );
     }
 }

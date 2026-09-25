@@ -106,6 +106,7 @@ final class Patch extends HttpOperation
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: 'PATCH',
@@ -192,7 +193,8 @@ final class Patch extends HttpOperation
             jsonStream: $jsonStream,
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate
         );
     }
 }

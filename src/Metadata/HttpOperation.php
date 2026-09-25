@@ -227,6 +227,7 @@ class HttpOperation extends Operation
         ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
+        protected ?string $canonicalUriTemplate = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -315,6 +316,23 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
+
+        return $self;
+    }
+
+    /**
+     * The URI template of the operation whose IRI identifies this resource, used as the `@id` of an item returned
+     * through an operation with a custom URI template.
+     */
+    public function getCanonicalUriTemplate(): ?string
+    {
+        return $this->canonicalUriTemplate;
+    }
+
+    public function withCanonicalUriTemplate(?string $canonicalUriTemplate = null): static
+    {
+        $self = clone $this;
+        $self->canonicalUriTemplate = $canonicalUriTemplate;
 
         return $self;
     }

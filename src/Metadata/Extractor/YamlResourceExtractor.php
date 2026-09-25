@@ -103,6 +103,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
     {
         return array_merge($this->buildBase($resource), [
             'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
+            'canonicalUriTemplate' => $this->phpize($resource, 'canonicalUriTemplate', 'string'),
             'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             'stateless' => $this->phpize($resource, 'stateless', 'bool'),
             'sunset' => $this->phpize($resource, 'sunset', 'string'),
