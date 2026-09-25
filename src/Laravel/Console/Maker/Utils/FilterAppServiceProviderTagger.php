@@ -46,7 +46,15 @@ final readonly class FilterAppServiceProviderTagger
 
     private function addUseStatements(string &$content, string $filterName): void
     {
-        $useStatements = [self::FILTER_INTERFACE_USE_STATEMENT, \sprintf('use App\\Filter\\%s;', $filterName)];
+        $useStatements = array_filter(
+            [self::FILTER_INTERFACE_USE_STATEMENT, \sprintf('use App\\Filter\\%s;', $filterName)],
+            static fn (string $useStatement): bool => !str_contains($content, $useStatement)
+        );
+
+        if (!$useStatements) {
+            return;
+        }
+
         $statementsString = implode("\n", $useStatements)."\n";
 
         $content = preg_replace(
