@@ -95,13 +95,19 @@ trait ParameterParserTrait
         }
 
         $isCollectionType = static fn ($t) => $t instanceof CollectionType;
-        $isCollection = $parameter->getNativeType()?->isSatisfiedBy($isCollectionType) ?? false;
+        $nativeType = $parameter->getNativeType();
+        $isCollection = $nativeType?->isSatisfiedBy($isCollectionType) ?? false;
 
-        // type-info 7.2
-        if (!$isCollection && $parameter->getNativeType() instanceof UnionType) {
-            foreach ($parameter->getNativeType()->getTypes() as $t) {
-                if ($isCollection = $t->isSatisfiedBy($isCollectionType)) {
-                    break;
+        // type-info 7.2: the default native type of a header/query parameter is the
+        // "string|list<string>" union. Such a union is a collection only because one of
+        // its members is a list; a single scalar value still satisfies it.
+        $allowsScalar = false;
+        if ($nativeType instanceof UnionType) {
+            foreach ($nativeType->getTypes() as $t) {
+                if ($t->isSatisfiedBy($isCollectionType)) {
+                    $isCollection = true;
+                } else {
+                    $allowsScalar = true;
                 }
             }
         }
@@ -110,7 +116,11 @@ trait ParameterParserTrait
             $value = [$value];
         }
 
-        if (!$isCollection && $parameter instanceof HeaderParameter && \is_array($value) && array_is_list($value) && 1 === \count($value)) {
+        // The HeaderBag always exposes header values as a list. When the parameter can
+        // carry a scalar (no explicit array/list native type), a single value must be
+        // unwrapped so scalar constraints validate the value itself and not the wrapping
+        // array (#8499).
+        if ($parameter instanceof HeaderParameter && \is_array($value) && array_is_list($value) && 1 === \count($value) && (!$isCollection || $allowsScalar)) {
             $value = $value[0];
         }
 

@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Tests;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
@@ -27,6 +28,7 @@ use ApiPlatform\State\Provider\ParameterProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\TypeInfo\Type;
 
 final class ParameterProviderTest extends TestCase
 {
@@ -149,6 +151,80 @@ final class ParameterProviderTest extends TestCase
 
         $this->expectException(ParameterNotSupportedException::class);
         $parameterProvider->provide($operation, [], $context);
+    }
+
+    /**
+     * A HeaderParameter without an explicit schema type gets the default
+     * "string|list<string>" native type (ParameterResourceMetadataCollectionFactory).
+     * The HeaderBag always exposes header values as a list, so a single value must still
+     * be extracted as a scalar; otherwise scalar constraints (e.g. NotBlank) validate the
+     * wrapping array instead of the value itself and silently pass (#8499).
+     */
+    public function testSingleHeaderValueWithScalarNativeTypeIsExtractedAsScalar(): void
+    {
+        $operation = new Get(parameters: new Parameters([
+            'foo' => (new HeaderParameter(key: 'foo'))
+                ->withNativeType(Type::union(Type::string(), Type::list(Type::string()))),
+        ]));
+        $parameterProvider = new ParameterProvider();
+        $request = new Request();
+        $request->headers->set('foo', 'bar');
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $parameterProvider->provide($operation, [], $context);
+        $operation = $request->attributes->get('_api_operation');
+
+        $this->assertSame('bar', $operation->getParameters()->get('foo', HeaderParameter::class)->getValue());
+    }
+
+    public function testEmptySingleHeaderValueWithScalarNativeTypeIsExtractedAsScalar(): void
+    {
+        $operation = new Get(parameters: new Parameters([
+            'foo' => (new HeaderParameter(key: 'foo'))
+                ->withNativeType(Type::union(Type::string(), Type::list(Type::string()))),
+        ]));
+        $parameterProvider = new ParameterProvider();
+        $request = new Request();
+        $request->headers->set('foo', '');
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $parameterProvider->provide($operation, [], $context);
+        $operation = $request->attributes->get('_api_operation');
+
+        $this->assertSame('', $operation->getParameters()->get('foo', HeaderParameter::class)->getValue());
+    }
+
+    public function testHeaderValueWithListNativeTypeStaysArray(): void
+    {
+        $operation = new Get(parameters: new Parameters([
+            'foo' => (new HeaderParameter(key: 'foo'))->withNativeType(Type::list(Type::string())),
+        ]));
+        $parameterProvider = new ParameterProvider();
+        $request = new Request();
+        $request->headers->set('foo', 'bar');
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $parameterProvider->provide($operation, [], $context);
+        $operation = $request->attributes->get('_api_operation');
+
+        $this->assertSame(['bar'], $operation->getParameters()->get('foo', HeaderParameter::class)->getValue());
+    }
+
+    public function testMultipleHeaderValuesStayArray(): void
+    {
+        $operation = new Get(parameters: new Parameters([
+            'foo' => (new HeaderParameter(key: 'foo'))
+                ->withNativeType(Type::union(Type::string(), Type::list(Type::string()))),
+        ]));
+        $parameterProvider = new ParameterProvider();
+        $request = new Request();
+        $request->headers->set('foo', ['bar', 'baz']);
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $parameterProvider->provide($operation, [], $context);
+        $operation = $request->attributes->get('_api_operation');
+
+        $this->assertSame(['bar', 'baz'], $operation->getParameters()->get('foo', HeaderParameter::class)->getValue());
     }
 
     public static function provide(): void
