@@ -48,5 +48,5 @@ class CanonicalIriEntity
     public string $name = '';
 
     #[ManyToOne]
-    public ?self $parent = null;
+    public ?CanonicalIriEntity $parent = null;
 }
