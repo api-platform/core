@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\HttpCache;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Purges Varnish.
@@ -22,6 +23,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class VarnishPurger implements PurgerInterface
 {
+    use PurgeResponsesTrait;
+
+    private const BAN_HEADER = 'ApiPlatform-Ban-Regex';
     private const DEFAULT_VARNISH_MAX_HEADER_LENGTH = 8000;
     private const REGEXP_PATTERN = '(%s)($|\,)';
     private readonly int $maxHeaderLength;
@@ -72,10 +76,12 @@ final class VarnishPurger implements PurgerInterface
 
         $chunkSize = $this->determineTagsPerHeader($iris, '|');
 
-        $irisChunks = array_chunk($iris, $chunkSize);
-        foreach ($irisChunks as $irisChunk) {
-            $this->purgeRequest($irisChunk);
+        $responses = [];
+        foreach (array_chunk($iris, $chunkSize) as $irisChunk) {
+            array_push($responses, ...$this->purgeRequest($irisChunk));
         }
+
+        $this->assertPurgeSucceeded($responses);
     }
 
     /**
@@ -86,23 +92,35 @@ final class VarnishPurger implements PurgerInterface
         return ['Cache-Tags' => implode(',', $iris)];
     }
 
-    private function purgeRequest(array $iris): void
+    /**
+     * @return list<ResponseInterface>
+     */
+    private function purgeRequest(array $iris): array
     {
         // Create the regex to purge all tags in just one request
         $parts = array_map(static fn ($iri): string => // here we should remove the prefix as it's not discriminent and cost a lot to compute
 preg_quote($iri), $iris);
 
+        $responses = [];
         foreach ($this->chunkRegexParts($parts) as $regex) {
             $regex = \sprintf(self::REGEXP_PATTERN, $regex);
-            $this->banRegex($regex);
+            array_push($responses, ...$this->banRegex($regex));
         }
+
+        return $responses;
     }
 
-    private function banRegex(string $regex): void
+    /**
+     * @return list<ResponseInterface>
+     */
+    private function banRegex(string $regex): array
     {
+        $responses = [];
         foreach ($this->clients as $client) {
-            $client->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => $regex]]);
+            $responses[] = $client->request('BAN', '', ['headers' => [self::BAN_HEADER => $regex], 'user_data' => [self::BAN_HEADER, $regex]]);
         }
+
+        return $responses;
     }
 
     private function chunkRegexParts(array $parts): iterable
