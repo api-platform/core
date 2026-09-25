@@ -65,6 +65,12 @@
 * `api-platform/doctrine-orm` requires `doctrine/orm` `^2.17 || ^3.3`. The `PARTIAL` DQL grammar is absent from 3.0.0 through 3.2.3, so the `fetch_partial` option was silently a no-op on those versions.
 * `doctrine/doctrine-bundle` moves to `^2.11.1 || ^3.1`. 2.11.0 passes `$reportFieldsWhereDeclared` to `AttributeDriver`, which doctrine/orm 3 rejects.
 
+## v4.3.20
+
+### Bug fixes
+
+* [17035672e](https://github.com/api-platform/core/commit/17035672e1079647f2dedffa808f62cd5db6bf96) fix(symfony): hide graphiql link when graphql is disabled (#8576)
+
 ## v4.3.19
 
 ### Bug fixes
