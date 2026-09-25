@@ -221,6 +221,20 @@ final class PersistProcessor implements ProcessorInterface
                 continue;
             }
 
+            // A brand-new entity carrying an application-assigned identifier (e.g. a UUID built in
+            // its constructor) also exposes non-null identifiers, yet it is not a reference to an
+            // existing row. Swapping it for a getReference() proxy would drop the object and let a
+            // cascade persist write a foreign key to a row that does not exist. Leave entities
+            // Doctrine (ORM) still schedules as new to the cascade. ORM is referenced through a
+            // guarded FQCN so this ORM/ODM-agnostic package keeps working when only the ODM is
+            // installed. (#8438)
+            if (
+                $relManager instanceof \Doctrine\ORM\EntityManagerInterface
+                && \Doctrine\ORM\UnitOfWork::STATE_NEW === $relManager->getUnitOfWork()->getEntityState($value)
+            ) {
+                continue;
+            }
+
             \assert(method_exists($relManager, 'getReference'));
 
             $reflectionProperty->setValue($data, $relManager->getReference($relClass, $identifiers));

@@ -24,10 +24,12 @@ use ApiPlatform\State\ProcessorInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prediction\CallPrediction;
 use Prophecy\Prediction\NoCallsPrediction;
@@ -190,6 +192,97 @@ class PersistProcessorTest extends TestCase
         $this->assertSame($device, $result);
         $this->assertSame($userReference, $device->user);
         $this->assertSame('device-uuid', $device->id);
+    }
+
+    public function testHandleLazyObjectRelationsKeepsNewRelationWithAssignedIdentifier(): void
+    {
+        $device = new PersistProcessorTestDeviceStub();
+        $device->id = 'device-uuid';
+
+        // A brand-new relation whose identifier is assigned by the application (e.g. a UUID built
+        // in its constructor) must be left untouched so cascade persist can insert it (#8438).
+        $relation = new PersistProcessorTestUserStub();
+        $relation->id = 'assigned-uuid';
+        $device->user = $relation;
+
+        $deviceClassMetadata = new ORMClassMetadata(PersistProcessorTestDeviceStub::class);
+        $deviceClassMetadata->identifier = ['id'];
+
+        $deviceManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $deviceManagerProphecy->getClassMetadata(PersistProcessorTestDeviceStub::class)->willReturn($deviceClassMetadata);
+        $deviceManagerProphecy->contains($device)->willReturn(false);
+        $deviceManagerProphecy->persist($device)->shouldBeCalled();
+        $deviceManagerProphecy->flush()->shouldBeCalled();
+        $deviceManagerProphecy->refresh($device)->shouldBeCalled();
+
+        $relationMetadataProphecy = $this->prophesize(ORMClassMetadata::class);
+        $relationMetadataProphecy->getIdentifierValues($relation)->willReturn(['id' => 'assigned-uuid']);
+
+        $unitOfWorkProphecy = $this->prophesize(UnitOfWork::class);
+        $unitOfWorkProphecy->getEntityState($relation)->willReturn(UnitOfWork::STATE_NEW);
+
+        $relationManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $relationManagerProphecy->contains($relation)->willReturn(false);
+        $relationManagerProphecy->getClassMetadata(PersistProcessorTestUserStub::class)->willReturn($relationMetadataProphecy->reveal());
+        $relationManagerProphecy->getUnitOfWork()->willReturn($unitOfWorkProphecy->reveal());
+        $relationManagerProphecy->getReference(Argument::cetera())->willReturn($relation)->shouldNotBeCalled();
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestDeviceStub::class)->willReturn($deviceManagerProphecy->reveal());
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestUserStub::class)->willReturn($relationManagerProphecy->reveal());
+
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($device, new Post(map: true));
+
+        $this->assertSame($device, $result);
+        $this->assertSame($relation, $device->user);
+    }
+
+    public function testHandleLazyObjectRelationsStillReplacesReferenceToExistingRow(): void
+    {
+        $device = new PersistProcessorTestDeviceStub();
+        $device->id = 'device-uuid';
+
+        // A detached object standing for an already persisted row keeps being swapped for a managed
+        // reference, preserving the #7689 behaviour.
+        $relation = new PersistProcessorTestUserStub();
+        $relation->id = 'existing-uuid';
+        $device->user = $relation;
+
+        $managedReference = new PersistProcessorTestUserStub();
+        $managedReference->id = 'existing-uuid';
+
+        $deviceClassMetadata = new ORMClassMetadata(PersistProcessorTestDeviceStub::class);
+        $deviceClassMetadata->identifier = ['id'];
+
+        $deviceManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $deviceManagerProphecy->getClassMetadata(PersistProcessorTestDeviceStub::class)->willReturn($deviceClassMetadata);
+        $deviceManagerProphecy->contains($device)->willReturn(false);
+        $deviceManagerProphecy->persist($device)->shouldBeCalled();
+        $deviceManagerProphecy->flush()->shouldBeCalled();
+        $deviceManagerProphecy->refresh($device)->shouldBeCalled();
+
+        $relationMetadataProphecy = $this->prophesize(ORMClassMetadata::class);
+        $relationMetadataProphecy->getIdentifierValues($relation)->willReturn(['id' => 'existing-uuid']);
+
+        $unitOfWorkProphecy = $this->prophesize(UnitOfWork::class);
+        $unitOfWorkProphecy->getEntityState($relation)->willReturn(UnitOfWork::STATE_DETACHED);
+
+        $relationManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $relationManagerProphecy->contains($relation)->willReturn(false);
+        $relationManagerProphecy->getClassMetadata(PersistProcessorTestUserStub::class)->willReturn($relationMetadataProphecy->reveal());
+        $relationManagerProphecy->getUnitOfWork()->willReturn($unitOfWorkProphecy->reveal());
+        $relationManagerProphecy->getReference(PersistProcessorTestUserStub::class, ['id' => 'existing-uuid'])
+            ->willReturn($managedReference)
+            ->shouldBeCalledTimes(1);
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestDeviceStub::class)->willReturn($deviceManagerProphecy->reveal());
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestUserStub::class)->willReturn($relationManagerProphecy->reveal());
+
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($device, new Post(map: true));
+
+        $this->assertSame($device, $result);
+        $this->assertSame($managedReference, $device->user);
     }
 }
 
