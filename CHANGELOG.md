@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.20
+
+### Bug fixes
+
+* [17035672e](https://github.com/api-platform/core/commit/17035672e1079647f2dedffa808f62cd5db6bf96) fix(symfony): hide graphiql link when graphql is disabled (#8576)
+
 ## v4.3.19
 
 ### Bug fixes
