@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Filter;
 
+use ApiPlatform\JsonApi\Util\ResourceLinkageResolver;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -29,6 +30,7 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
         private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         private PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private ResourceLinkageResolver $resourceLinkageResolver,
     ) {
     }
 
@@ -48,14 +50,21 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
 
         $properties = [];
         $shortName = strtolower($operation->getShortName());
+        $relationPropertiesByKey = null;
+
         foreach ($value as $resource => $fields) {
             if (strtolower($resource) === $shortName) {
                 $p = &$properties;
                 $resourceAllowedProperties = $allowedProperties;
             } else {
-                $properties[$resource] = [];
-                $p = &$properties[$resource];
                 $resourceAllowedProperties = $this->getAllowedProperties((string) $resource);
+
+                // fields[TYPE] sends the JSON:API resource type; resolve it to the host property name the serializer whitelists.
+                $relationPropertiesByKey ??= $this->resolveRelationPropertiesByKey((string) $operation->getClass());
+                $propertyName = $relationPropertiesByKey[strtolower((string) $resource)] ?? $resource;
+
+                $properties[$propertyName] = [];
+                $p = &$properties[$propertyName];
             }
 
             foreach (explode(',', $fields) as $f) {
@@ -104,5 +113,34 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
         }
 
         return null;
+    }
+
+    /**
+     * Maps both the relation property name and its target resource's short name (lowercased) to the property name.
+     *
+     * @return array<string, string>
+     */
+    private function resolveRelationPropertiesByKey(string $resourceClass): array
+    {
+        $map = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            foreach ($this->resourceLinkageResolver->getRelationships($propertyMetadata) as [$relatedClass]) {
+                $map[strtolower($property)] = $property;
+                $map[strtolower($this->getShortName($relatedClass))] = $property;
+                break;
+            }
+        }
+
+        return $map;
+    }
+
+    private function getShortName(string $resourceClass): string
+    {
+        try {
+            return $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation()->getShortName();
+        } catch (\Throwable) {
+            return (new \ReflectionClass($resourceClass))->getShortName();
+        }
     }
 }

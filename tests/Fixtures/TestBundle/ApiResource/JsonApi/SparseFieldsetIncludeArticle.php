@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi;
 
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\JsonApi\Filter\SparseFieldset;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Metadata\QueryParameter;
 
 #[ApiResource(
     shortName: 'SparseFieldsetIncludeArticle',
@@ -29,8 +29,8 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
             provider: [self::class, 'provide'],
         ),
     ],
+    parameters: ['fields' => new QueryParameter(filter: SparseFieldset::class)],
 )]
-#[ApiFilter(PropertyFilter::class)]
 final class SparseFieldsetIncludeArticle
 {
     public function __construct(
