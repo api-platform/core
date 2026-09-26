@@ -331,4 +331,16 @@ class JsonApiTest extends TestCase
         $this->assertArrayNotHasKey('createdAt', $included);
         $this->assertArrayHasKey('name', $included);
     }
+
+    public function testSparseFieldsetOnIncludedResourceUsesItsOwnAllowedProperties(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->create();
+
+        $r = $this->get('/api/books?include=author&fields[book]=name&fields[author]=created_at', headers: ['accept' => 'application/vnd.api+json']);
+        $res = $r->json();
+
+        $this->assertArrayHasKey('included', $res);
+        $attributes = $res['included'][0]['attributes'] ?? [];
+        $this->assertSame(['createdAt'], array_keys($attributes));
+    }
 }
