@@ -69,9 +69,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $operationWasProvided = null !== $operation;
 
         if (!$this->isResourceClass($className)) {
+            $serializerContext ??= $operation ? $this->getSerializerContext($operation, $type) : [];
             $operation = null;
             $inputOrOutputClass = $className;
-            $serializerContext ??= [];
         } else {
             $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
             $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
