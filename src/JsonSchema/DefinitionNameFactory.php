@@ -76,6 +76,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
                 $parts[] = $this->getAttributesAsString($attributes);
             }
 
+            if ($validationGroups = $this->getValidationGroupsPart($operation)) {
+                $parts[] = implode('_', $validationGroups);
+            }
+
             $name = $parts ? \sprintf('%s-%s', $prefix, implode('_', $parts)) : $prefix;
         }
 
@@ -97,6 +101,53 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private function encodeDefinitionName(string $name): string
     {
         return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
+    }
+
+    /**
+     * Kept in sync with SchemaFactory::getValidationGroups() so a name and the constraints it labels agree.
+     *
+     * @return string[]
+     */
+    private function getValidationGroupsPart(?Operation $operation): array
+    {
+        if (!$operation) {
+            return [];
+        }
+
+        $groups = $operation->getValidationContext()['groups'] ?? [];
+        $groups = \is_array($groups) ? $groups : [$groups];
+
+        if (\is_callable($groups)) {
+            // A group-provider callable resolves to something only the validator can compute;
+            // hash it so the name still differs from operations without a validationContext.
+            return [substr(hash('xxh128', serialize($groups)), 0, 8)];
+        }
+
+        return $this->flattenValidationGroups($groups);
+    }
+
+    /**
+     * @param array<mixed> $groups
+     *
+     * @return string[]
+     */
+    private function flattenValidationGroups(array $groups): array
+    {
+        $flattened = [];
+
+        foreach ($groups as $group) {
+            if (\is_array($group)) {
+                $flattened[] = $this->flattenValidationGroups($group);
+            } elseif (\is_object($group) && property_exists($group, 'groups') && \is_array($group->groups)) {
+                $flattened[] = $this->flattenValidationGroups($group->groups);
+            } elseif (\is_scalar($group)) {
+                $flattened[] = [(string) $group];
+            } else {
+                $flattened[] = [substr(hash('xxh128', serialize($group)), 0, 8)];
+            }
+        }
+
+        return array_merge([], ...$flattened);
     }
 
     private function createPrefixFromOperation(Operation $operation): ?string
