@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -46,6 +48,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $queryFields = ['node' => $this->fieldsBuilder->getNodeQueryFields()];
         $mutationFields = [];
         $subscriptionFields = [];
+        $deferredQueryOperations = [];
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
@@ -54,13 +57,21 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     $configuration = null !== $operation->getArgs() ? ['args' => $operation->getArgs()] : [];
 
                     if ($operation instanceof Query && $operation instanceof CollectionOperationInterface) {
-                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
+                        try {
+                            $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
+                        } catch (InvalidArgumentException) {
+                            $deferredQueryOperations[] = [$resourceClass, $operation, $configuration, true];
+                        }
 
                         continue;
                     }
 
                     if ($operation instanceof Query) {
-                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+                        try {
+                            $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+                        } catch (InvalidArgumentException) {
+                            $deferredQueryOperations[] = [$resourceClass, $operation, $configuration, false];
+                        }
 
                         continue;
                     }
@@ -72,6 +83,20 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     }
 
                     $mutationFields += $this->fieldsBuilder->getMutationFields($resourceClass, $operation);
+                }
+            }
+        }
+
+        if ($deferredQueryOperations) {
+            $this->materializeRegisteredTypes();
+
+            foreach ($deferredQueryOperations as [$resourceClass, $operation, $configuration, $isCollectionQuery]) {
+                try {
+                    $queryFields += $isCollectionQuery
+                        ? $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration)
+                        : $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+                } catch (InvalidArgumentException $e) {
+                    throw new InvalidArgumentException(\sprintf('Custom argument(s) "%s" of GraphQL operation "%s" for resource "%s" could not be resolved, even after building every resource type: %s', implode('", "', array_keys($configuration['args'] ?? [])), $operation->getName(), $operation->getShortName(), $e->getMessage()), 0, $e);
                 }
             }
         }
@@ -116,5 +141,26 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         return new Schema($schema);
+    }
+
+    private function materializeRegisteredTypes(): void
+    {
+        $visited = [];
+
+        do {
+            $before = \count($this->typesContainer->all());
+
+            foreach ($this->typesContainer->all() as $id => $type) {
+                if (isset($visited[$id])) {
+                    continue;
+                }
+
+                $visited[$id] = true;
+
+                if ($type instanceof ObjectType || $type instanceof InputObjectType) {
+                    $type->getFields();
+                }
+            }
+        } while (\count($this->typesContainer->all()) > $before);
     }
 }
