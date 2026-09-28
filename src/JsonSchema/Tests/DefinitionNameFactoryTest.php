@@ -116,6 +116,38 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Bar.DtoOutput.jsonapi-title_author.name_name', Dummy::class, 'jsonapi', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
         yield ['Bar.DtoOutput.jsonhal-title_author.name_name', Dummy::class, 'jsonhal', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
         yield ['Bar.DtoOutput.jsonld-title_author.name_name', Dummy::class, 'jsonld', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+
+        yield ['Dummy-validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a']])];
+        yield ['Dummy.jsonapi-validation.a', Dummy::class, 'jsonapi', null, new Post(validationContext: ['groups' => ['a']])];
+
+        yield ['Dummy-validation.a_b', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a', 'b']])];
+
+        yield ['Dummy-validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a', 'a']])];
+
+        yield ['Dummy-read_validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a']]), [AbstractNormalizer::GROUPS => ['read']]];
+        yield ['Dummy-read_a', Dummy::class, 'json', null, new Post(), [AbstractNormalizer::GROUPS => ['read', 'a']]];
+
+        yield ['Dummy-validation.app.group_generator', Dummy::class, 'json', null, new Post(validationContext: ['groups' => 'app.group_generator'])];
+
+        yield ['Dummy-validation.seq1_seq2', Dummy::class, 'json', null, new Post(validationContext: ['groups' => self::groupSequence(['seq1', 'seq2'])])];
+
+        yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => [self::class, 'callableGroups']])];
+
+        yield ['Dummy-validation.none', Dummy::class, 'json', null, new Post(validationContext: ['groups' => static fn (): array => ['x']])];
+    }
+
+    public static function callableGroups(): array
+    {
+        return ['x'];
+    }
+
+    private static function groupSequence(array $groups): object
+    {
+        return new class($groups) {
+            public function __construct(public array $groups)
+            {
+            }
+        };
     }
 
     #[DataProvider('providerDefinitions')]
