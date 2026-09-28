@@ -28,7 +28,9 @@ use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -1535,6 +1537,27 @@ class OpenApiFactoryTest extends TestCase
         $this->assertSame(['type' => 'string'], $parameter->getSchema());
     }
 
+    public function testStringFilterNotImplementingFilterInterfaceIsSkipped(): void
+    {
+        $filter = new class implements OpenApiParameterFilterInterface {
+            public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+            {
+                return null;
+            }
+        };
+
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->method('has')->with('f3notfilterinterface')->willReturn(true);
+        $filterLocator->method('get')->with('f3notfilterinterface')->willReturn($filter);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f3notfilterinterface', openApi: new Parameter(name: 'name', in: 'query', description: 'From user openApi'))],
+            $filterLocator,
+        );
+
+        $this->assertSame('From user openApi', $this->getParameterByName($parameters, 'name')->getDescription());
+    }
+
     public function testFilterInstanceWithUserMetadataStillHonoured(): void
     {
         $parameters = $this->getGeneratedQueryParameters([
@@ -1621,7 +1644,7 @@ class OpenApiFactoryTest extends TestCase
     }
 
     /**
-     * @param array<string, \ApiPlatform\Metadata\Parameter> $parameters
+     * @param array<string, MetadataParameter> $parameters
      *
      * @return Parameter[]
      */
