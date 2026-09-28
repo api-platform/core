@@ -1685,6 +1685,128 @@ class OpenApiFactoryTest extends TestCase
         $this->assertCount(0, $plainInputSchema->getDefinitions());
     }
 
+    public function testFilterlessArrayQueryParameterHonoursCastToArray(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory([]);
+
+        $arraySchema = ['type' => 'array', 'items' => ['type' => 'string']];
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            'castTrue' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('cast_true')
+                ->withUriTemplate('/cast-true')
+                ->withParameters(['ids' => new QueryParameter(key: 'ids', schema: $arraySchema, castToArray: true)]),
+            'castFalse' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('cast_false')
+                ->withUriTemplate('/cast-false')
+                ->withParameters(['ids' => new QueryParameter(key: 'ids', schema: $arraySchema, castToArray: false)]),
+            'castNull' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('cast_null')
+                ->withUriTemplate('/cast-null')
+                ->withParameters(['ids' => new QueryParameter(key: 'ids', schema: $arraySchema)]),
+            'scalarQuery' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('scalar_query')
+                ->withUriTemplate('/scalar-query')
+                ->withParameters(['name' => new QueryParameter(key: 'name', schema: ['type' => 'string'])]),
+            'arrayHeader' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('array_header')
+                ->withUriTemplate('/array-header')
+                ->withParameters(['ids' => new HeaderParameter(key: 'ids', schema: $arraySchema)]),
+            'linkParameterGuard' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('link_parameter_guard')
+                ->withUriTemplate('/link-parameter-guard')
+                ->withParameters(['foobar' => new QueryParameter(key: 'foobar', schema: $arraySchema, openApi: [
+                    new Parameter(name: 'foobar', in: 'query', schema: $arraySchema),
+                    new Parameter(name: 'foobar[]', in: 'query', style: 'deepObject', explode: true, schema: $arraySchema),
+                ])]),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        $castTrueParameters = $openApi->getPaths()->getPath('/cast-true')->getGet()->getParameters();
+        $this->assertCount(1, $castTrueParameters);
+        $this->assertSame('ids[]', $castTrueParameters[0]->getName());
+        $this->assertTrue($castTrueParameters[0]->canExplode());
+        $this->assertSame('deepObject', $castTrueParameters[0]->getStyle());
+        $this->assertSame($arraySchema, $castTrueParameters[0]->getSchema());
+
+        $castFalseParameters = $openApi->getPaths()->getPath('/cast-false')->getGet()->getParameters();
+        $this->assertCount(1, $castFalseParameters);
+        $this->assertSame('ids', $castFalseParameters[0]->getName());
+        $this->assertSame($arraySchema, $castFalseParameters[0]->getSchema());
+
+        $castNullParameters = $openApi->getPaths()->getPath('/cast-null')->getGet()->getParameters();
+        $this->assertCount(2, $castNullParameters);
+        $this->assertSame('ids', $this->getParameterByName($castNullParameters, 'ids')->getName());
+        $this->assertSame('ids[]', $this->getParameterByName($castNullParameters, 'ids[]')->getName());
+        $this->assertTrue($this->getParameterByName($castNullParameters, 'ids[]')->canExplode());
+        $this->assertSame('deepObject', $this->getParameterByName($castNullParameters, 'ids[]')->getStyle());
+
+        $scalarQueryParameters = $openApi->getPaths()->getPath('/scalar-query')->getGet()->getParameters();
+        $this->assertCount(1, $scalarQueryParameters);
+        $this->assertSame('name', $scalarQueryParameters[0]->getName());
+        $this->assertSame(['type' => 'string'], $scalarQueryParameters[0]->getSchema());
+
+        $arrayHeaderParameters = $openApi->getPaths()->getPath('/array-header')->getGet()->getParameters();
+        $this->assertCount(1, $arrayHeaderParameters);
+        $this->assertSame('ids', $arrayHeaderParameters[0]->getName());
+        $this->assertSame('header', $arrayHeaderParameters[0]->getIn());
+        $this->assertSame($arraySchema, $arrayHeaderParameters[0]->getSchema());
+
+        $linkParameterGuardParameters = $openApi->getPaths()->getPath('/link-parameter-guard')->getGet()->getParameters();
+        $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar' === $parameter->getName()));
+        $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar[]' === $parameter->getName()));
+    }
+
     /**
      * @param Parameter[] $parameters
      */
