@@ -18,6 +18,7 @@ use ApiPlatform\JsonLd\Serializer\ErrorNormalizer;
 use ApiPlatform\JsonLd\Serializer\ItemDenormalizer;
 use ApiPlatform\JsonLd\Serializer\ItemNormalizer;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
+use ApiPlatform\JsonLd\Serializer\PotentialActionNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer;
 
@@ -57,6 +58,19 @@ return static function (ContainerConfigurator $container) {
         ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -890])
         ->tag('kernel.reset', ['method' => '?reset']);
+
+    $services->set('api_platform.jsonld.normalizer.item.potential_action', PotentialActionNormalizer::class)
+        ->decorate('api_platform.jsonld.normalizer.item', null, 0)
+        ->args([
+            service('api_platform.jsonld.normalizer.item.potential_action.inner'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.api.identifiers_extractor'),
+            service('api_platform.router'),
+            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+            service('api_platform.name_converter')->ignoreOnInvalid(),
+        ]);
 
     $services->set('api_platform.jsonld.denormalizer.item', ItemDenormalizer::class)
         ->args([
