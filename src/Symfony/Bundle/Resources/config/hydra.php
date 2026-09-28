@@ -22,6 +22,7 @@ use ApiPlatform\Hydra\Serializer\DocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer;
 use ApiPlatform\Hydra\Serializer\HydraPrefixNameConverter;
 use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer;
+use ApiPlatform\JsonLd\Serializer\PotentialActionNormalizer;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -103,6 +104,19 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.resource_class_resolver'),
             service('api_platform.filter_locator'),
             '%api_platform.serializer.default_context%',
+        ]);
+
+    $services->set('api_platform.hydra.normalizer.collection.potential_action', PotentialActionNormalizer::class)
+        ->decorate('api_platform.hydra.normalizer.collection', null, 0)
+        ->args([
+            service('api_platform.hydra.normalizer.collection.potential_action.inner'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.api.identifiers_extractor'),
+            service('api_platform.router'),
+            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+            service('api_platform.name_converter')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.hydra.name_converter.hydra_prefix', HydraPrefixNameConverter::class)

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
+use ApiPlatform\JsonLd\Serializer\PotentialActionNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
@@ -92,7 +93,18 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
         // Every operation resolves to this same /contexts/{shortName} URI, so union their groups.
         $sharedGroups = $this->getOperationsGroups($resourceMetadataCollection, $operation->getShortName());
 
-        return $this->buildOperationContext($operation, $resourceClass, $referenceType, $sharedGroups);
+        $context = $this->buildOperationContext($operation, $resourceClass, $referenceType, $sharedGroups);
+        foreach ($resourceMetadataCollection as $resource) {
+            foreach ($resource->getOperations() ?? [] as $resourceOperation) {
+                if (true === ($resourceOperation->getExtraProperties()[PotentialActionNormalizer::EXTRA_PROPERTY] ?? false)) {
+                    $context['potentialAction'] = PotentialActionNormalizer::JSONLD_CONTEXT;
+
+                    return $context;
+                }
+            }
+        }
+
+        return $context;
     }
 
     /**

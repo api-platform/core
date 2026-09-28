@@ -76,6 +76,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ItemDenormalizer as JsonLdItemDenormalizer;
 use ApiPlatform\JsonLd\Serializer\ItemNormalizer as JsonLdItemNormalizer;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer as JsonLdObjectNormalizer;
+use ApiPlatform\JsonLd\Serializer\PotentialActionNormalizer as JsonLdPotentialActionNormalizer;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\DefinitionNameFactoryInterface;
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
@@ -1167,15 +1168,26 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton('api_platform_normalizer_list', static function (Application $app) {
+            $withPotentialActions = static fn (NormalizerInterface $normalizer): JsonLdPotentialActionNormalizer => new JsonLdPotentialActionNormalizer(
+                $normalizer,
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IdentifiersExtractorInterface::class),
+                $app->make(UrlGeneratorInterface::class),
+                new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
+                $app->make(NameConverterInterface::class),
+            );
+
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
-            $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
+            $list->insert($withPotentialActions($app->make(HydraPartialCollectionViewNormalizer::class)), -800);
             $list->insert($app->make(HydraCollectionObjectNormalizer::class), -984);
             $list->insert($app->make(HalCollectionNormalizer::class), -800);
             $list->insert($app->make(HalEntrypointNormalizer::class), -985);
             $list->insert($app->make(HalObjectNormalizer::class), -995);
             $list->insert($app->make(HalItemNormalizer::class), -890);
-            $list->insert($app->make(JsonLdItemNormalizer::class), -890);
+            $list->insert($withPotentialActions($app->make(JsonLdItemNormalizer::class)), -890);
             $list->insert($app->make(JsonLdItemDenormalizer::class), -889);
             $list->insert($app->make(JsonLdObjectNormalizer::class), -995);
             $list->insert($app->make(ArrayDenormalizer::class), -990);
