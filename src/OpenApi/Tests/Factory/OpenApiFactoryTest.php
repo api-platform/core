@@ -1606,6 +1606,85 @@ class OpenApiFactoryTest extends TestCase
         $this->assertSame('', $this->getParameterByName($parameters, 'description')->getDescription());
     }
 
+    public function testDeleteOperationWithDeserializeDocumentsRequestBody(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory([]);
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            'deleteWithBody' => (new Delete())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('delete_with_body')
+                ->withUriTemplate('/dummies/{id}')
+                ->withInputFormats(self::OPERATION_FORMATS['input_formats'])
+                ->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
+                ->withInput(['class' => OutputDto::class])
+                ->withDeserialize(true),
+            'deletePlain' => (new Delete())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('delete_plain')
+                ->withUriTemplate('/dummies/{id}/plain')
+                ->withInputFormats(self::OPERATION_FORMATS['input_formats'])
+                ->withOutputFormats(self::OPERATION_FORMATS['output_formats']),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        $deleteWithBody = $openApi->getPaths()->getPath('/dummies/{id}')->getDelete();
+        $this->assertNotNull($deleteWithBody->getRequestBody());
+        $content = $deleteWithBody->getRequestBody()->getContent();
+        $schema = $content['application/ld+json']->getSchema();
+        $this->assertNotEmpty($schema);
+        $this->assertArrayHasKey('$ref', (array) $schema);
+        $this->assertStringContainsString('OutputDto', $schema['$ref']);
+
+        $deletePlain = $openApi->getPaths()->getPath('/dummies/{id}/plain')->getDelete();
+        $this->assertNull($deletePlain->getRequestBody());
+
+        $plainOperation = $resourceCollectionMetadata->getOperation('delete_plain');
+        $plainInputSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_INPUT, $plainOperation);
+        $this->assertArrayNotHasKey('$ref', $plainInputSchema->getArrayCopy(false));
+        $this->assertCount(0, $plainInputSchema->getDefinitions());
+    }
+
     /**
      * @param Parameter[] $parameters
      */
