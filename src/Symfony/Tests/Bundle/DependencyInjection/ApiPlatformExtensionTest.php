@@ -530,6 +530,21 @@ class ApiPlatformExtensionTest extends TestCase
     }
 
     /**
+     * @see https://github.com/api-platform/core/issues/8332
+     */
+    public function testCachePoolClearerClearsPropertyInfoAndOperationMetadataCaches(): void
+    {
+        $this->container->setParameter('kernel.debug', true);
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.cache_warmer.cache_pool_clearer');
+        $pools = $this->container->getDefinition('api_platform.cache_warmer.cache_pool_clearer')->getArgument(1);
+        $this->assertContains('cache.property_info', $pools);
+        $this->assertContains('api_platform.cache.metadata.operation', $pools);
+    }
+
+    /**
      * @see https://github.com/api-platform/core/issues/8095
      */
     public function testHttpCachePurgersRegisteredWhenInvalidationDisabled(): void
