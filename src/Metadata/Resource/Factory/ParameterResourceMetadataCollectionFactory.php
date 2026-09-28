@@ -69,12 +69,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     {
         $resourceMetadataCollection = $this->decorated?->create($resourceClass) ?? new ResourceMetadataCollection($resourceClass);
 
+        $declaredOperationClasses = $this->getDeclaredOperationClasses($resourceMetadataCollection);
+
         foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = $resource->getOperations();
 
             $internalPriority = -1;
             foreach ($operations as $operationName => $operation) {
-                $parameters = $this->getDefaultParameters($operation, $resourceClass, $internalPriority);
+                $parameters = $this->getDefaultParameters($operation, $resourceClass, $internalPriority, $declaredOperationClasses);
                 if (\count($parameters) > 0) {
                     $operations->add($operationName, $operation->withParameters($parameters));
                 }
@@ -88,7 +90,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $internalPriority = -1;
             foreach ($graphQlOperations as $operationName => $operation) {
-                $parameters = $this->getDefaultParameters($operation, $resourceClass, $internalPriority);
+                $parameters = $this->getDefaultParameters($operation, $resourceClass, $internalPriority, $declaredOperationClasses);
                 if (\count($parameters) > 0) {
                     $graphQlOperations[$operationName] = $operation->withParameters($parameters);
                 }
@@ -229,12 +231,15 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         return $this->localPropertyCache[$k];
     }
 
-    private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
+    /**
+     * @param list<class-string<Operation>> $declaredOperationClasses
+     */
+    private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority, array $declaredOperationClasses): Parameters
     {
         $propertyNames = $properties = [];
         $parameters = $operation->getParameters() ?? new Parameters();
 
-        foreach ($this->createParametersFromAttributes($operation) as $key => $parameter) {
+        foreach ($this->createParametersFromAttributes($operation, $declaredOperationClasses) as $key => $parameter) {
             $parameters->add($key, $parameter);
         }
 
@@ -510,7 +515,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         return $this->filterLocator->get($filter);
     }
 
-    private function createParametersFromAttributes(Operation $operation): Parameters
+    /**
+     * @param list<class-string<Operation>> $declaredOperationClasses
+     */
+    private function createParametersFromAttributes(Operation $operation, array $declaredOperationClasses): Parameters
     {
         $parameters = new Parameters();
 
@@ -521,19 +529,22 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         foreach ((new \ReflectionClass($resourceClass))->getProperties() as $reflectionProperty) {
             foreach ($reflectionProperty->getAttributes(Parameter::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 $parameter = $attribute->newInstance();
+                $propertyName = $reflectionProperty->getName();
 
-                if (
-                    null !== ($parameterOperations = $parameter->getOperations())
-                    && !\in_array(
-                        $operation::class,
-                        array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations),
-                        true
-                    )
-                ) {
-                    continue;
+                if (null !== ($parameterOperations = $parameter->getOperations())) {
+                    $parameterOperationClasses = array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations);
+
+                    foreach ($parameterOperationClasses as $parameterOperationClass) {
+                        if (!\in_array($parameterOperationClass, $declaredOperationClasses, true)) {
+                            throw new RuntimeException(\sprintf('Parameter attribute on property "%s" is restricted to the operation "%s" which is not declared on the resource "%s".', $propertyName, $parameterOperationClass, $resourceClass));
+                        }
+                    }
+
+                    if (!\in_array($operation::class, $parameterOperationClasses, true)) {
+                        continue;
+                    }
                 }
 
-                $propertyName = $reflectionProperty->getName();
                 $key = $parameter->getKey() ?? $propertyName;
 
                 if (null === $parameterPropertyName = $parameter->getProperty()) {
@@ -553,5 +564,20 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         return $parameters;
+    }
+
+    /**
+     * @return list<class-string<Operation>>
+     */
+    private function getDeclaredOperationClasses(ResourceMetadataCollection $resourceMetadataCollection): array
+    {
+        $operationClasses = [];
+        foreach ($resourceMetadataCollection as $resource) {
+            foreach ($resource->getOperations() ?? [] as $operation) {
+                $operationClasses[] = $operation::class;
+            }
+        }
+
+        return $operationClasses;
     }
 }
