@@ -277,6 +277,18 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertTrue($this->container->getParameter('api_platform.enable_head_request_optimization'));
     }
 
+    public function testUpgradeFilterCommandIsRegisteredWhenPhpParserAndDoctrineCommonAreAvailable(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $this->assertContainerHas([
+            'api_platform.upgrade.filter_mapper',
+            'api_platform.upgrade.filter_resolver',
+            'api_platform.upgrade.filter_command',
+        ]);
+        $this->assertServiceHasTags('api_platform.upgrade.filter_command', ['console.command']);
+    }
+
     public function testSwaggerUiDisabledConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;

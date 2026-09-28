@@ -325,7 +325,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.php');
         $loader->load('filter.php');
 
-        if (class_exists(\PhpParser\ParserFactory::class)) {
+        if (class_exists(\PhpParser\ParserFactory::class) && interface_exists(\ApiPlatform\Doctrine\Common\Filter\DateFilterInterface::class)) {
             $loader->load('upgrade.php');
         }
 
