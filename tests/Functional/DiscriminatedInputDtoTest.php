@@ -49,6 +49,19 @@ final class DiscriminatedInputDtoTest extends ApiTestCase
         ]);
     }
 
+    public function testNonStringTypePropertyIsRejected(): void
+    {
+        self::createClient()->request('POST', '/discriminated_notification_channels', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'type' => ['webhook'],
+                'config' => ['url' => 'https://example.com/hook'],
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+    }
+
     public function testObjectTypedSubclassOnlyPropertyIsDenormalizedOnPatch(): void
     {
         self::createClient()->request('PATCH', '/discriminated_notification_channels/1', [
