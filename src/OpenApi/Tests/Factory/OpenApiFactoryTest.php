@@ -1672,6 +1672,12 @@ class OpenApiFactoryTest extends TestCase
         $this->assertNotNull($deleteWithBody->getRequestBody());
         $content = $deleteWithBody->getRequestBody()->getContent();
         $schema = $content['application/ld+json']->getSchema();
+
+        $schemaFactoryFile = (new \ReflectionClass(SchemaFactory::class))->getFileName();
+        if (false !== $schemaFactoryFile && str_contains($schemaFactoryFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
+            self::markTestSkipped('Running against an installed api-platform/json-schema release that predates the Operation::canDeserialize() gate (added in #8598).');
+        }
+
         $this->assertNotEmpty($schema);
         $this->assertArrayHasKey('$ref', (array) $schema);
         $this->assertStringContainsString('OutputDto', $schema['$ref']);
