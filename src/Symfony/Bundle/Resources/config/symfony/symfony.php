@@ -30,7 +30,7 @@ return static function (ContainerConfigurator $container) {
     $services->set('api_platform.cache_warmer.cache_pool_clearer', CachePoolClearerCacheWarmer::class)
         ->args([
             service('cache.system_clearer'),
-            ['api_platform.cache.metadata.property', 'api_platform.cache.metadata.resource', 'api_platform.cache.metadata.resource_collection', 'api_platform.cache.route_name_resolver', 'api_platform.cache.identifiers_extractor', 'api_platform.elasticsearch.cache.metadata.document'],
+            ['api_platform.cache.metadata.property', 'api_platform.cache.metadata.resource', 'api_platform.cache.metadata.resource_collection', 'api_platform.cache.metadata.operation', 'api_platform.cache.route_name_resolver', 'api_platform.cache.identifiers_extractor', 'api_platform.elasticsearch.cache.metadata.document', 'cache.property_info'],
         ])
         ->tag('kernel.cache_warmer', ['priority' => 64]);
 };
