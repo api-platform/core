@@ -45,6 +45,7 @@ class PolicyAllowTest extends TestCase
         tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
+            $config->set('api-platform.defaults.pagination_client_enabled', true);
             $config->set('app.debug', true);
         });
     }
@@ -54,6 +55,14 @@ class PolicyAllowTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
+    }
+
+    public function testGetCollectionWithPaginationDisabled(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $response = $this->get('/api/books?pagination=false', ['accept' => ['application/vnd.api+json']]);
+        $response->assertStatus(200);
+        $response->assertJsonCount(10, 'data');
     }
 
     public function testGetEmptyCollection(): void
