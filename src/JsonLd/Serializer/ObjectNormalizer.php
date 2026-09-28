@@ -70,6 +70,10 @@ final class ObjectNormalizer implements NormalizerInterface
         }
 
         $metadata = $this->createJsonLdContext($this->anonymousContextBuilder, $data, $context);
+        // an explicit @type, such as a discriminator map value, beats the short name
+        if (isset($normalizedData['@type'])) {
+            $metadata['@type'] = $normalizedData['@type'];
+        }
 
         return $metadata + $normalizedData;
     }
