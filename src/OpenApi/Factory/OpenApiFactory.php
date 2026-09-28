@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter as MetadataParameter;
@@ -341,9 +342,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                if (($f = $p->getFilter()) && \is_string($f) && $this->filterLocator && $this->filterLocator->has($f)) {
-                    $filter = $this->filterLocator->get($f);
-
+                if (($f = $p->getFilter()) && \is_string($f) && $this->filterLocator && $this->filterLocator->has($f) && ($filter = $this->filterLocator->get($f)) instanceof FilterInterface) {
                     if ($d = $filter->getDescription($entityClass)) {
                         foreach ($d as $name => $description) {
                             if ($prop = $p->getProperty()) {
@@ -761,6 +760,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $filter = $this->filterLocator->get($filterId);
+            if (!$filter instanceof FilterInterface) {
+                continue;
+            }
+
             foreach ($filter->getDescription($entityClass) as $name => $description) {
                 $parameters[] = $this->getFilterParameter($name, $description, $operation->getShortName(), $filterId);
             }
