@@ -67,7 +67,10 @@ abstract class ApiTestCase extends KernelTestCase
     #[Before]
     protected function keepBrowserKitAssertionsVerbose(): void
     {
-        self::setBrowserKitAssertionsAsVerbose(true);
+        // @phpstan-ignore function.alreadyNarrowedType (the setter only exists since Symfony 7.3)
+        if (method_exists(self::class, 'setBrowserKitAssertionsAsVerbose')) {
+            self::setBrowserKitAssertionsAsVerbose(true);
+        }
     }
 
     #[After]
