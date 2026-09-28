@@ -217,6 +217,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -970,6 +971,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {

@@ -23,6 +23,8 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
@@ -51,7 +53,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
     public const PARTIAL_UPDATE = 'partial_update';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -129,6 +131,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
+        if (Schema::VERSION_SWAGGER !== $version && ($mapping = $this->classDiscriminatorResolver?->getMappingForClass($inputOrOutputClass)) && null === $mapping->getMappedObjectType($inputOrOutputClass)) {
+            $this->buildDiscriminatorDefinition($schema, $definitionName, $mapping, $format, $type, $serializerContext);
+
+            return $schema;
+        }
+
         /** @var \ArrayObject<string, mixed> $definition */
         $definition = new \ArrayObject(['type' => 'object']);
         $definitions[$definitionName] = $definition;
@@ -172,7 +180,42 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
 
+        if (($mapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($inputOrOutputClass)) && null !== $typeValue = $mapping->getMappedObjectType($inputOrOutputClass)) {
+            $typeProperty = $mapping->getTypeProperty();
+            $definition['properties'][$typeProperty] = new \ArrayObject(['type' => 'string', 'enum' => [$typeValue]]);
+            if (!$isPartialUpdate && !\in_array($typeProperty, $definition['required'] ?? [], true)) {
+                $definition['required'][] = $typeProperty;
+            }
+        }
+
         return $schema;
+    }
+
+    private function buildDiscriminatorDefinition(Schema $schema, string $definitionName, ClassDiscriminatorMapping $mapping, string $format, string $type, array $serializerContext): void
+    {
+        $version = $schema->getVersion();
+        $definitions = $schema->getDefinitions();
+        /** @var \ArrayObject<string, mixed> $definition */
+        $definition = new \ArrayObject(['oneOf' => []]);
+        // registered before recursing so that a subclass referencing its parent does not loop
+        $definitions[$definitionName] = $definition;
+
+        $oneOf = $refs = [];
+        foreach ($mapping->getTypesMapping() as $typeValue => $mappedClass) {
+            $subSchema = new Schema($version);
+            $subSchema->setDefinitions($definitions);
+            $result = ($this->schemaFactory ?: $this)->buildSchema($mappedClass, $format, $type, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true]);
+
+            if (isset($result['$ref'])) {
+                $oneOf[] = ['$ref' => $result['$ref']];
+                $refs[$typeValue] = $result['$ref'];
+            }
+        }
+
+        $definition['oneOf'] = $oneOf;
+        if (Schema::VERSION_OPENAPI === $version) {
+            $definition['discriminator'] = ['propertyName' => $mapping->getTypeProperty(), 'mapping' => $refs];
+        }
     }
 
     private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void
