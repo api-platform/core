@@ -16,10 +16,11 @@ namespace ApiPlatform\Laravel\Metadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use Illuminate\Support\Facades\Cache;
 
 final class CachePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
+    use MetadataCacheTrait;
+
     /**
      * @var array<string, ApiProperty>
      */
@@ -34,27 +35,9 @@ final class CachePropertyMetadataFactory implements PropertyMetadataFactoryInter
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
-        $key = hash('xxh3', serialize(['resource_class' => $resourceClass, 'property' => $property] + $options));
-
-        if (isset($this->localCache[$key])) {
-            return $this->localCache[$key];
-        }
-
-        $store = Cache::store($this->cacheStore);
-        if (null !== $propertyMetadata = $store->get($key)) {
-            return $this->localCache[$key] = $propertyMetadata;
-        }
-
-        $missingTableReads = $this->modelMetadata?->getMissingTableReads();
-        $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-
-        // built from a missing table: the next call, maybe in another process, has to read it again
-        if ($missingTableReads !== $this->modelMetadata?->getMissingTableReads()) {
-            return $propertyMetadata;
-        }
-
-        $store->forever($key, $propertyMetadata);
-
-        return $this->localCache[$key] = $propertyMetadata;
+        return $this->cached(
+            hash('xxh3', serialize(['resource_class' => $resourceClass, 'property' => $property] + $options)),
+            fn (): ApiProperty => $this->decorated->create($resourceClass, $property, $options),
+        );
     }
 }

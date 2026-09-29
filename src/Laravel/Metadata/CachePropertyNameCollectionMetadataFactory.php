@@ -16,10 +16,11 @@ namespace ApiPlatform\Laravel\Metadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
-use Illuminate\Support\Facades\Cache;
 
 final class CachePropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
 {
+    use MetadataCacheTrait;
+
     /**
      * @var array<string, PropertyNameCollection>
      */
@@ -34,27 +35,9 @@ final class CachePropertyNameCollectionMetadataFactory implements PropertyNameCo
 
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $key = hash('xxh3', serialize(['resource_class' => $resourceClass] + $options));
-
-        if (isset($this->localCache[$key])) {
-            return $this->localCache[$key];
-        }
-
-        $store = Cache::store($this->cacheStore);
-        if (null !== $propertyNameCollection = $store->get($key)) {
-            return $this->localCache[$key] = $propertyNameCollection;
-        }
-
-        $missingTableReads = $this->modelMetadata?->getMissingTableReads();
-        $propertyNameCollection = $this->decorated->create($resourceClass, $options);
-
-        // built from a missing table: the next call, maybe in another process, has to read it again
-        if ($missingTableReads !== $this->modelMetadata?->getMissingTableReads()) {
-            return $propertyNameCollection;
-        }
-
-        $store->forever($key, $propertyNameCollection);
-
-        return $this->localCache[$key] = $propertyNameCollection;
+        return $this->cached(
+            hash('xxh3', serialize(['resource_class' => $resourceClass] + $options)),
+            fn (): PropertyNameCollection => $this->decorated->create($resourceClass, $options),
+        );
     }
 }

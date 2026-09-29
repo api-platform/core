@@ -16,10 +16,11 @@ namespace ApiPlatform\Laravel\Metadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use Illuminate\Support\Facades\Cache;
 
 final class CacheResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use MetadataCacheTrait;
+
     /**
      * @var array<string, ResourceMetadataCollection>
      */
@@ -34,25 +35,6 @@ final class CacheResourceCollectionMetadataFactory implements ResourceMetadataCo
 
     public function create(string $resourceClass): ResourceMetadataCollection
     {
-        if (isset($this->localCache[$resourceClass])) {
-            return $this->localCache[$resourceClass];
-        }
-
-        $store = Cache::store($this->cacheStore);
-        if (null !== $resourceMetadataCollection = $store->get($resourceClass)) {
-            return $this->localCache[$resourceClass] = $resourceMetadataCollection;
-        }
-
-        $missingTableReads = $this->modelMetadata?->getMissingTableReads();
-        $resourceMetadataCollection = $this->decorated->create($resourceClass);
-
-        // built from a missing table: the next call, maybe in another process, has to read it again
-        if ($missingTableReads !== $this->modelMetadata?->getMissingTableReads()) {
-            return $resourceMetadataCollection;
-        }
-
-        $store->forever($resourceClass, $resourceMetadataCollection);
-
-        return $this->localCache[$resourceClass] = $resourceMetadataCollection;
+        return $this->cached($resourceClass, fn (): ResourceMetadataCollection => $this->decorated->create($resourceClass));
     }
 }
