@@ -35,6 +35,7 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.url_generation_strategy%',
             service('api_platform.metadata.resource.metadata_collection_factory'),
             '%api_platform.enable_head_request_optimization%',
+            tagged_locator('api_platform.parameter_provider', 'key'),
         ]);
 
     $services->set('api_platform.jsonld.state_provider.json_streamer', HydraJsonStreamerProvider::class)
@@ -52,6 +53,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.operation.metadata_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
             '%api_platform.enable_head_request_optimization%',
+            tagged_locator('api_platform.parameter_provider', 'key'),
         ]);
 
     $services->set('api_platform.state_provider.json_streamer', JsonStreamerProvider::class)

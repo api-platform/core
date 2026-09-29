@@ -169,6 +169,7 @@ use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\ObjectMapperInputProcessor;
 use ApiPlatform\State\Processor\ObjectMapperOutputProcessor;
@@ -534,11 +535,17 @@ class ApiPlatformProvider extends ServiceProvider
         }
 
         $this->app->singleton(RespondProcessor::class, static function (Application $app) {
+            $parameterProviders = [];
+            foreach ($app->tagged(ParameterProviderInterface::class) as $provider) {
+                $parameterProviders[$provider::class] = $provider;
+            }
+
             $decorated = new RespondProcessor(
                 $app->make(IriConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(OperationMetadataFactoryInterface::class),
-                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                new ServiceLocator($parameterProviders),
             );
 
             /** @var ConfigRepository */
