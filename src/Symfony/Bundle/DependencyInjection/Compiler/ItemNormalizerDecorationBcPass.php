@@ -18,10 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Item normalizers were split into a normalizer and a denormalizer registered one priority higher.
- * A user decorator of the normalizer that also implements {@see DenormalizerInterface} would never
- * be reached for denormalization, so the denormalizer is detached from the serializer chain and
- * denormalization goes through the decorated normalizer again.
+ * Detaches an item denormalizer from the serializer chain when a user decorator of the matching normalizer implements {@see DenormalizerInterface}.
  *
  * @internal
  *

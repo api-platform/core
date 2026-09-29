@@ -79,6 +79,22 @@ final class ItemNormalizerDecorationBcPassTest extends TestCase
         $this->assertTrue($container->getDefinition('api_platform.serializer.denormalizer.item')->hasTag('serializer.normalizer'));
     }
 
+    #[IgnoreDeprecations]
+    public function testApiPlatformDecoratorOfTheDenormalizerDoesNotCountAsMigrated(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 4.4: Service "user.item_normalizer" decorates "api_platform.serializer.normalizer.item" and implements "Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface": denormalization is routed through the decorated normalizer for backward compatibility. Decorate "api_platform.serializer.denormalizer.item" instead.');
+
+        $container = $this->createContainer();
+        $container->setDefinition('user.item_normalizer', (new Definition(DenormalizingJsonLdItemNormalizerDecorator::class))
+            ->setDecoratedService('api_platform.serializer.normalizer.item'));
+        $container->setDefinition('api_platform.elasticsearch.denormalizer.item', (new Definition(ElasticsearchItemNormalizer::class))
+            ->setDecoratedService('api_platform.serializer.denormalizer.item'));
+
+        (new ItemNormalizerDecorationBcPass())->process($container);
+
+        $this->assertFalse($container->getDefinition('api_platform.serializer.denormalizer.item')->hasTag('serializer.normalizer'));
+    }
+
     private function createContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
