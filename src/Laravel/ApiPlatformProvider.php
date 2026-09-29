@@ -50,7 +50,9 @@ use ApiPlatform\Hal\Serializer\CollectionNormalizer as HalCollectionNormalizer;
 use ApiPlatform\Hal\Serializer\EntrypointNormalizer as HalEntrypointNormalizer;
 use ApiPlatform\Hal\Serializer\ItemNormalizer as HalItemNormalizer;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer as HalObjectNormalizer;
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\HttpCache\State\AddHeadersProcessor;
+use ApiPlatform\HttpCache\State\AddTagsProcessor;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraCollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
@@ -375,7 +377,8 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ResourceClassResolverInterface::class)
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file'),
+                $app->make(ModelMetadata::class)
             );
         });
 
@@ -398,7 +401,8 @@ class ApiPlatformProvider extends ServiceProvider
                     ),
                     $nameConverter
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file'),
+                $app->make(ModelMetadata::class)
             );
         });
 
@@ -536,10 +540,10 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class)
             );
 
-            if (class_exists(AddHeadersProcessor::class)) {
-                /** @var ConfigRepository */
-                $config = $app['config']->get('api-platform.http_cache') ?? [];
+            /** @var ConfigRepository */
+            $config = $app['config']->get('api-platform.http_cache') ?? [];
 
+            if (class_exists(AddHeadersProcessor::class)) {
                 $decorated = new AddHeadersProcessor(
                     $decorated,
                     etag: $config['etag'] ?? false,
@@ -552,7 +556,17 @@ class ApiPlatformProvider extends ServiceProvider
                 );
             }
 
-            return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
+            $decorated = new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
+
+            if (class_exists(AddTagsProcessor::class) && !empty($config['invalidation'])) {
+                $decorated = new AddTagsProcessor(
+                    $decorated,
+                    $app->make(IriConverterInterface::class),
+                    $app->make(PurgerInterface::class)
+                );
+            }
+
+            return $decorated;
         });
 
         $this->app->singleton(SerializeProcessor::class, static function (Application $app) {

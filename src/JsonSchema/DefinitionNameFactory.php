@@ -66,6 +66,11 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
                 $parts[] = $this->getAttributesAsString($attributes);
             }
 
+            $validationGroups = $this->getValidationGroupsPart($operation);
+            if ('' !== $validationGroups) {
+                $parts[] = 'validation'.self::GLUE.$validationGroups;
+            }
+
             $name = $parts ? \sprintf('%s-%s', $prefix, implode('_', $parts)) : $prefix;
         }
 
@@ -87,6 +92,48 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private function encodeDefinitionName(string $name): string
     {
         return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
+    }
+
+    /**
+     * Mirrors ApiPlatform\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory::getValidationGroups()
+     * and ::flattenValidationGroups(), so a definition name and the constraints it labels always agree.
+     * api-platform/json-schema does not require symfony/validator, hence the duck-typed GroupSequence check.
+     */
+    private function getValidationGroupsPart(?Operation $operation): string
+    {
+        $groups = $operation?->getValidationContext()['groups'] ?? null;
+
+        if (null === $groups) {
+            return '';
+        }
+
+        $groups = \is_array($groups) ? $groups : [$groups];
+
+        if (\is_callable($groups)) {
+            return '';
+        }
+
+        $flattened = [];
+        $this->flattenValidationGroups($groups, $flattened);
+
+        return $flattened ? implode('_', array_keys($flattened)) : 'none';
+    }
+
+    /**
+     * @param array<mixed>        $groups
+     * @param array<string, true> $flattened
+     */
+    private function flattenValidationGroups(array $groups, array &$flattened): void
+    {
+        foreach ($groups as $group) {
+            if (\is_array($group)) {
+                $this->flattenValidationGroups($group, $flattened);
+            } elseif (\is_object($group) && property_exists($group, 'groups') && \is_array($group->groups)) {
+                $this->flattenValidationGroups($group->groups, $flattened);
+            } elseif (\is_string($group)) {
+                $flattened[$group] = true;
+            }
+        }
     }
 
     private function createPrefixFromOperation(Operation $operation): ?string

@@ -14,10 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Tests\Doctrine\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener;
@@ -317,6 +322,110 @@ class PurgeHttpCacheListenerTest extends TestCase
             $objectMapperProphecy->reveal()
         );
         $listener->onFlush($eventArgs);
+        $listener->postFlush();
+    }
+
+    public function testPreUpdatePurgesAllGetCollectionOperations(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(1);
+
+        $getCollection = (new GetCollection())->withName('get_dummies_collection')->withClass(Dummy::class)->withUriTemplate('/dummies');
+        $getExportsCollection = (new GetCollection())->withName('get_dummies_exports_collection')->withClass(Dummy::class)->withUriTemplate('/dummies/exports');
+
+        $apiResource = (new ApiResource())->withClass(Dummy::class)->withOperations(new Operations([
+            'get_dummies_collection' => $getCollection,
+            'get_dummies_exports_collection' => $getExportsCollection,
+        ]));
+
+        $resourceMetadataCollection = new ResourceMetadataCollection(Dummy::class, [$apiResource]);
+
+        $purger = $this->createMock(PurgerInterface::class);
+        $purger->expects($this->once())->method('purge')->with($this->callback(static function (array $tags): bool {
+            sort($tags);
+
+            return ['/dummies', '/dummies/1', '/dummies/exports'] === $tags;
+        }));
+
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->expects($this->exactly(3))->method('getIriFromResource')->willReturnCallback(
+            static function (object $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null) use ($getCollection, $getExportsCollection): string {
+                if ($operation === $getCollection) {
+                    return '/dummies';
+                }
+
+                if ($operation === $getExportsCollection) {
+                    return '/dummies/exports';
+                }
+
+                return '/dummies/1';
+            }
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+
+        $changeSet = [];
+        $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
+
+        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, null, null, null, $resourceMetadataCollectionFactory);
+        $listener->preUpdate($eventArgs);
+        $listener->postFlush();
+    }
+
+    public function testPreUpdateSkipsCollectionOperationsWithUriVariables(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(1);
+
+        $getCollection = (new GetCollection())->withName('get_dummies_collection')->withClass(Dummy::class)->withUriTemplate('/dummies');
+        $getSubresourceCollection = (new GetCollection())->withName('get_dummies_subresource_collection')->withClass(Dummy::class)->withUriTemplate('/related_dummies/{id}/dummies')->withUriVariables(['id' => 'id']);
+
+        $apiResource = (new ApiResource())->withClass(Dummy::class)->withOperations(new Operations([
+            'get_dummies_collection' => $getCollection,
+            'get_dummies_subresource_collection' => $getSubresourceCollection,
+        ]));
+
+        $resourceMetadataCollection = new ResourceMetadataCollection(Dummy::class, [$apiResource]);
+
+        $purger = $this->createMock(PurgerInterface::class);
+        $purger->expects($this->once())->method('purge')->with($this->callback(static function (array $tags): bool {
+            sort($tags);
+
+            return ['/dummies', '/dummies/1'] === $tags;
+        }));
+
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->expects($this->exactly(2))->method('getIriFromResource')->willReturnCallback(
+            static function (object $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null) use ($getCollection): string {
+                if ($operation === $getCollection) {
+                    return '/dummies';
+                }
+
+                return '/dummies/1';
+            }
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+
+        $changeSet = [];
+        $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
+
+        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, null, null, null, $resourceMetadataCollectionFactory);
+        $listener->preUpdate($eventArgs);
         $listener->postFlush();
     }
 }
