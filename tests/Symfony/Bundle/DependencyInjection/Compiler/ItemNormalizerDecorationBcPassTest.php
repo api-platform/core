@@ -21,23 +21,34 @@ use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ItemNormalizerDecorationBcPass;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Decorator\DenormalizingJsonLdItemNormalizerDecorator;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Decorator\NormalizeOnlyItemNormalizerDecorator;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 final class ItemNormalizerDecorationBcPassTest extends TestCase
 {
-    #[IgnoreDeprecations]
     public function testDenormalizingDecoratorDetachesDenormalizerFromSerializerChain(): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/core 4.4: Service "user.item_normalizer" decorates "api_platform.jsonld.normalizer.item" and implements "Symfony\Component\Serializer\Normalizer\DenormalizerInterface": denormalization is routed through the decorated normalizer for backward compatibility. Decorate "api_platform.jsonld.denormalizer.item" instead.');
+        $expected = 'Since api-platform/core 4.4: Service "user.item_normalizer" decorates "api_platform.jsonld.normalizer.item" and implements "Symfony\Component\Serializer\Normalizer\DenormalizerInterface": denormalization is routed through the decorated normalizer for backward compatibility. Decorate "api_platform.jsonld.denormalizer.item" instead.';
 
         $container = $this->createContainer();
         $container->setDefinition('user.item_normalizer', (new Definition(DenormalizingJsonLdItemNormalizerDecorator::class))
             ->setDecoratedService('api_platform.jsonld.normalizer.item'));
 
-        (new ItemNormalizerDecorationBcPass())->process($container);
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            (new ItemNormalizerDecorationBcPass())->process($container);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([$expected], $deprecations);
 
         $this->assertFalse($container->getDefinition('api_platform.jsonld.denormalizer.item')->hasTag('serializer.normalizer'));
         $this->assertTrue($container->getDefinition('api_platform.jsonld.normalizer.item')->hasTag('serializer.normalizer'));
@@ -79,10 +90,9 @@ final class ItemNormalizerDecorationBcPassTest extends TestCase
         $this->assertTrue($container->getDefinition('api_platform.serializer.denormalizer.item')->hasTag('serializer.normalizer'));
     }
 
-    #[IgnoreDeprecations]
     public function testApiPlatformDecoratorOfTheDenormalizerDoesNotCountAsMigrated(): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/core 4.4: Service "user.item_normalizer" decorates "api_platform.serializer.normalizer.item" and implements "Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface": denormalization is routed through the decorated normalizer for backward compatibility. Decorate "api_platform.serializer.denormalizer.item" instead.');
+        $expected = 'Since api-platform/core 4.4: Service "user.item_normalizer" decorates "api_platform.serializer.normalizer.item" and implements "Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface": denormalization is routed through the decorated normalizer for backward compatibility. Decorate "api_platform.serializer.denormalizer.item" instead.';
 
         $container = $this->createContainer();
         $container->setDefinition('user.item_normalizer', (new Definition(DenormalizingJsonLdItemNormalizerDecorator::class))
@@ -90,7 +100,20 @@ final class ItemNormalizerDecorationBcPassTest extends TestCase
         $container->setDefinition('api_platform.elasticsearch.denormalizer.item', (new Definition(ElasticsearchItemNormalizer::class))
             ->setDecoratedService('api_platform.serializer.denormalizer.item'));
 
-        (new ItemNormalizerDecorationBcPass())->process($container);
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            (new ItemNormalizerDecorationBcPass())->process($container);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([$expected], $deprecations);
 
         $this->assertFalse($container->getDefinition('api_platform.serializer.denormalizer.item')->hasTag('serializer.normalizer'));
     }
