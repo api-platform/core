@@ -427,6 +427,7 @@ JSON
 
     public function testBrowserKitAssertionsStayVerboseByDefault(): void
     {
+        // @phpstan-ignore function.alreadyNarrowedType (the setter only exists since Symfony 7.3)
         if (!method_exists(self::class, 'setBrowserKitAssertionsAsVerbose')) {
             $this->markTestSkipped('BrowserKit assertions verbosity requires Symfony 7.3+.');
         }
