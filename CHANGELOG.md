@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.21
+
+### Bug fixes
+
+* [9b65bc59a](https://github.com/api-platform/core/commit/9b65bc59afa6303d8339c636d658ec403ecd296e) fix(symfony): guard browserkit verbose setter on symfony 6.4 (#8580)
+
 ## v4.3.20
 
 ### Bug fixes
