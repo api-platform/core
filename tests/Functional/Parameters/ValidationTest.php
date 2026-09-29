@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ValidateParameterBeforePro
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
 final class ValidationTest extends ApiTestCase
 {
@@ -190,6 +191,10 @@ final class ValidationTest extends ApiTestCase
 
     public function testTranslationValidation(): void
     {
+        if (class_exists(AnnotationLoader::class)) {
+            $this->markTestSkipped('Parameter validation messages are not translated on Symfony 6.4.');
+        }
+
         $res = self::createClient()->request('GET', 'translate_validation_error', ['headers' => ['accept-language' => 'es']]);
         $this->assertSame([
             ['propertyPath' => 'name', 'message' => 'Este valor no debería estar vacío.', 'code' => 'c1051bb4-d103-4f74-8988-acbcafc7fdc3'],

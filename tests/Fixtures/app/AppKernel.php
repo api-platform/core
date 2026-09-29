@@ -114,6 +114,10 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
+        if (class_exists(McpBundle::class)) {
+            $loader->load(__DIR__.'/config/config_mcp.yml');
+        }
+
         $messengerConfig = [
             'default_bus' => 'messenger.bus.default',
             'buses' => [
