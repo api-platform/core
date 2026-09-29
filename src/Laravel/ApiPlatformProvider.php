@@ -373,7 +373,8 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ResourceClassResolverInterface::class)
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file'),
+                $app->make(ModelMetadata::class)
             );
         });
 
@@ -396,7 +397,8 @@ class ApiPlatformProvider extends ServiceProvider
                     ),
                     $nameConverter
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file'),
+                $app->make(ModelMetadata::class)
             );
         });
 

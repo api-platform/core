@@ -46,6 +46,8 @@ final class ModelMetadata
         'morphedByMany',
     ];
 
+    private int $missingTableReads = 0;
+
     /**
      * @param array<class-string, array<string, mixed>> $attributes seeds the attribute cache, e.g. from a dump produced by api-platform:metadata:dump, so the app can boot without a database
      * @param array<class-string, array<string, mixed>> $relations  seeds the relation cache for the same reason
@@ -106,10 +108,21 @@ final class ModelMetadata
         // Don't cache an empty result for a missing table: the table may be created later
         // (e.g. by RefreshDatabase between MCP boot-time discovery and the actual request).
         if ([] === $result && !$schema->hasTable($table)) {
+            ++$this->missingTableReads;
+
             return $result;
         }
 
         return $this->attributes[$model::class] = $result;
+    }
+
+    /**
+     * Counts the attribute reads that found no table. Metadata computed while this number
+     * changes was built from a missing table, and must not be cached beyond the current call.
+     */
+    public function getMissingTableReads(): int
+    {
+        return $this->missingTableReads;
     }
 
     /**
