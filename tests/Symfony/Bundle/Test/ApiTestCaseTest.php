@@ -427,6 +427,10 @@ JSON
 
     public function testBrowserKitAssertionsStayVerboseByDefault(): void
     {
+        if (!method_exists(self::class, 'setBrowserKitAssertionsAsVerbose')) {
+            $this->markTestSkipped('BrowserKit assertions verbosity requires Symfony 7.3+.');
+        }
+
         // The trait's static property is flattened into ApiTestCase (which directly uses the assertions trait)
         // and shared with subclasses, so read it there rather than on the trait or this subclass.
         $verboseMode = new \ReflectionProperty(ApiTestCase::class, 'defaultVerboseMode');
