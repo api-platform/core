@@ -933,6 +933,57 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
 
+  phpunit-symfony-64:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony 6.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer:2.9.8
+          extensions: intl, bcmath, curl, openssl, mbstring
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      # Every package below only exists from Symfony 7.x (or requires it), no other job ever resolves 6.4 without dropping them
+      - name: Remove dependencies that require Symfony 7+
+        run: composer remove --dev --no-update --no-interaction symfony/mcp-bundle mcp/sdk laravel/framework illuminate/config illuminate/contracts illuminate/database illuminate/http illuminate/pagination illuminate/routing illuminate/support orchestra/testbench symfony/json-streamer symfony/object-mapper symfony/var-exporter
+      # symfony/type-info has no 6.x release, 7.4 is the highest line compatible with the 6.4 components
+      - name: Force Symfony 6.4
+        run: |
+          jq '(.["require"], .["require-dev"]) |= with_entries(if (.key | startswith("symfony/")) and (.value | contains("^6.4")) then .value = "6.4.*" elif .key == "symfony/type-info" then .value = "7.4.*" else . end)' composer.json > composer.json.tmp
+          mv composer.json.tmp composer.json
+      - name: Cache dependencies
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-symfony-64-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-symfony-64-
+      - name: Remove cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Update project dependencies
+        run: |
+          composer global require "soyuka/pmu:$PMU_VERSION"
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+          composer update
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
+
   phpunit-symfony-lowest:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony lowest)
     runs-on: ubuntu-latest
