@@ -489,7 +489,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if (
-                (\in_array($method, ['PATCH', 'PUT', 'POST'], true) || true === $operation->canDeserialize())
+                \in_array($method, ['PATCH', 'PUT', 'POST'], true)
                 && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
             ) {
                 $content = $openapiOperation->getRequestBody()?->getContent();
