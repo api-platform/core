@@ -277,6 +277,18 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertTrue($this->container->getParameter('api_platform.enable_head_request_optimization'));
     }
 
+    public function testUpgradeFilterCommandIsRegisteredWhenPhpParserAndDoctrineCommonAreAvailable(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $this->assertContainerHas([
+            'api_platform.upgrade.filter_mapper',
+            'api_platform.upgrade.filter_resolver',
+            'api_platform.upgrade.filter_command',
+        ]);
+        $this->assertServiceHasTags('api_platform.upgrade.filter_command', ['console.command']);
+    }
+
     public function testSwaggerUiDisabledConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
@@ -527,6 +539,21 @@ class ApiPlatformExtensionTest extends TestCase
                 $this->assertStringStartsWith('api_platform.property_info.', $arg->getTag(), \sprintf('api_platform.property_info must consume only "api_platform.property_info.*" private tags; found "%s".', $arg->getTag()));
             }
         }
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8332
+     */
+    public function testCachePoolClearerClearsPropertyInfoAndOperationMetadataCaches(): void
+    {
+        $this->container->setParameter('kernel.debug', true);
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.cache_warmer.cache_pool_clearer');
+        $pools = $this->container->getDefinition('api_platform.cache_warmer.cache_pool_clearer')->getArgument(1);
+        $this->assertContains('cache.property_info', $pools);
+        $this->assertContains('api_platform.cache.metadata.operation', $pools);
     }
 
     /**

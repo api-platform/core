@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.2
+
+### Behavior changes
+
+* [0c0b608f4](https://github.com/api-platform/core/commit/0c0b608f469e2fd76683c9160d4306f3102d07ef) fix(openapi): document request body on operations that deserialize (#8598). An operation with `deserialize: true` on a method other than `POST`, `PUT` or `PATCH` (for example `GET` or `DELETE`) now gets a `requestBody` and an input JSON Schema in the OpenAPI document. **This can change your generated schema**, so clients generated from it or snapshot tests of it can differ. It is acceptable in 5.0, but it was reverted from 4.4 because a schema change must not ship in a patch release.
+
 ## v5.0.1
 
 API Platform 5.0.1 contains every change shipped in [v4.4.1](#v441) and [v4.4.2](#v442), plus the fixes below.

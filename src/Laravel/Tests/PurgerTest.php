@@ -87,6 +87,29 @@ class PurgerTest extends TestCase
         ]);
     }
 
+    public function testPurgeAllCollectionOperationsOnCreate(): void
+    {
+        $this->postJson('/api/public_magazines', [
+            'name' => 'The Test Magazine',
+        ], ['Accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+
+        $this->assertContainsTags([
+            '/api/public_magazines',
+            '/api/archived_magazines',
+        ]);
+    }
+
+    /**
+     * @param string[] $expectedTags
+     */
+    private function assertContainsTags(array $expectedTags): void
+    {
+        $purged = MockPurger::getPurgedTags();
+        foreach ($expectedTags as $expectedTag) {
+            $this->assertContains($expectedTag, $purged);
+        }
+    }
+
     /**
      * @param string[] $expectedTags
      */

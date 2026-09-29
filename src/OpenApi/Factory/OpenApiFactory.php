@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter as MetadataParameter;
@@ -339,9 +340,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                if (($f = $p->getFilter()) && \is_string($f) && $this->filterLocator && $this->filterLocator->has($f)) {
-                    $filter = $this->filterLocator->get($f);
-
+                if (($f = $p->getFilter()) && \is_string($f) && $this->filterLocator && $this->filterLocator->has($f) && ($filter = $this->filterLocator->get($f)) instanceof FilterInterface) {
                     if ($d = $filter->getDescription($entityClass)) {
                         foreach ($d as $name => $description) {
                             if ($prop = $p->getProperty()) {
@@ -367,46 +366,52 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $defaultSchema['default'] = $p->getDefault();
                 }
 
-                $defaultParameter = new Parameter(
-                    $key,
-                    $in,
-                    $p->getDescription() ?? "$resourceShortName $key",
-                    $p->getRequired() ?? false,
-                    false,
-                    null,
-                    $p->getSchema() ?? $defaultSchema,
-                );
-
+                $parameterSchema = $p->getSchema() ?? $defaultSchema;
+                $castToArray = $p->getCastToArray();
+                $parameterDescription = $p->getDescription() ?? "$resourceShortName $key";
+                $parameterRequired = $p->getRequired() ?? false;
                 $linkParameter = $p->getOpenApi();
-                if (null === $linkParameter) {
-                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
-                        $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
-                    } else {
-                        $openapiParameters[] = $defaultParameter;
-                    }
+                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null);
 
-                    continue;
+                $defaultParameters = [];
+                if (!$canSplitToArray || true !== $castToArray) {
+                    $defaultParameters[] = new Parameter($key, $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema);
+                }
+                if ($canSplitToArray && false !== $castToArray) {
+                    $defaultParameters[] = new Parameter($key.'[]', $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema, 'deepObject', true);
                 }
 
-                if (\is_array($linkParameter)) {
-                    foreach ($linkParameter as $lp) {
-                        $parameter = $this->mergeParameter($defaultParameter, $lp);
-                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
-                            $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
-                            continue;
+                foreach ($defaultParameters as $defaultParameter) {
+                    if (null === $linkParameter) {
+                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
+                            $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
+                        } else {
+                            $openapiParameters[] = $defaultParameter;
                         }
 
-                        $openapiParameters[] = $parameter;
+                        continue;
                     }
-                    continue;
-                }
 
-                $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
-                if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
-                    $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
-                    continue;
+                    if (\is_array($linkParameter)) {
+                        foreach ($linkParameter as $lp) {
+                            $parameter = $this->mergeParameter($defaultParameter, $lp);
+                            if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                                $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                                continue;
+                            }
+
+                            $openapiParameters[] = $parameter;
+                        }
+                        continue;
+                    }
+
+                    $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
+                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                        $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                        continue;
+                    }
+                    $openapiParameters[] = $parameter;
                 }
-                $openapiParameters[] = $parameter;
             }
 
             $openapiOperation = $openapiOperation->withParameters($openapiParameters);
@@ -484,7 +489,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if (
-                \in_array($method, ['PATCH', 'PUT', 'POST'], true)
+                (\in_array($method, ['PATCH', 'PUT', 'POST'], true) || true === $operation->canDeserialize())
                 && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
             ) {
                 $content = $openapiOperation->getRequestBody()?->getContent();
@@ -775,6 +780,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $filter = $this->filterLocator->get($filterId);
+            if (!$filter instanceof FilterInterface) {
+                continue;
+            }
+
             foreach ($filter->getDescription($entityClass) as $name => $description) {
                 $parameters[] = $this->getFilterParameter($name, $description, $operation->getShortName(), $filterId);
             }

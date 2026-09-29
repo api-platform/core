@@ -23,6 +23,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ChildAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8115\Module;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8115\ReadModuleResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
@@ -72,6 +74,7 @@ class JsonSchemaTest extends ApiTestCase
             ResourceWithIterableUnionProperty::class,
             ParentAttribute::class,
             ChildAttribute::class,
+            ReadModuleResource::class,
         ];
     }
 
@@ -294,5 +297,17 @@ class JsonSchemaTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hiddenData', $childProperties);
         $this->assertArrayNotHasKey('id', $childProperties);
+    }
+
+    public function testSchemaGroupsForNonResourceOperationClass(): void
+    {
+        $operation = $this->operationMetadataFactory->create('issue8115_modules_get_collection');
+        $schema = $this->schemaFactory->buildSchema(Module::class, 'json', Schema::TYPE_OUTPUT, $operation);
+
+        $definitionName = array_key_first($schema['definitions']->getArrayCopy());
+        $properties = $schema['definitions'][$definitionName]['properties'];
+
+        $this->assertArrayHasKey('name', $properties);
+        $this->assertArrayNotHasKey('secret', $properties);
     }
 }
