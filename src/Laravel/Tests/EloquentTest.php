@@ -299,6 +299,16 @@ class EloquentTest extends TestCase
         $this->assertSame($res['totalItems'], 2);
     }
 
+    public function testOrFilterWithSingleValue(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $book = $this->get('/api/books', ['Accept' => ['application/ld+json']])->json()['member'][0];
+
+        $response = $this->get(\sprintf('/api/books?name2[]=%s', $book['name']), ['Accept' => ['application/ld+json']]);
+        $response->assertOk();
+        $this->assertSame(1, $response->json()['totalItems']);
+    }
+
     public function testRangeLowerThanFilter(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
