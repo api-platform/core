@@ -97,7 +97,7 @@ final class PropertyInfoToTypeInfoHelper
 
         if ($collectionValueTypes) {
             if (!$collectionKeyTypes) {
-                $variableTypes[] = \is_array($collectionKeyTypes) ? Type::mixed() : Type::union(Type::int(), Type::string()); // @phpstan-ignore-line
+                $variableTypes[] = Type::union(Type::int(), Type::string());
             }
 
             $collectionValueTypes = array_unique(array_map(self::convertLegacyTypeToType(...), $collectionValueTypes));

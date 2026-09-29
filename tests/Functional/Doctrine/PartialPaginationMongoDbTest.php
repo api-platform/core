@@ -17,8 +17,6 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\PartialPaginationMongo\PartialPaginationMongoDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Orchestra\Testbench\Concerns\WithWorkbench;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -28,9 +26,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class PartialPaginationMongoDbTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
-    use RefreshDatabase;
     use SetupClassResourcesTrait;
-    use WithWorkbench;
 
     /**
      * @return class-string[]

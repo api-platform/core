@@ -62,6 +62,20 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
         }
     }
 
+    public function testConvertLegacyCollectionWithoutKeyTypeToType(): void
+    {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
+        $legacyTypes = [new LegacyType('array', false, null, true, null, new LegacyType('int'))];
+
+        $this->assertEquals(
+            Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::union(Type::int(), Type::string())), // @phpstan-ignore-line
+            PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($legacyTypes)
+        );
+    }
+
     public function testConvertTypeToLegacyTypes(): void
     {
         if (!class_exists(LegacyType::class)) {
