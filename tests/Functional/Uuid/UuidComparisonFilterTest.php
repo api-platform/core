@@ -43,6 +43,23 @@ final class UuidComparisonFilterTest extends ApiTestCase
         }
     }
 
+    public function testOpenApiOperatorParametersUseScalarUuidSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $parameters = $response->toArray()['paths']['/symfony_uuid_devices']['get']['parameters'];
+        $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'idComparison['));
+        $this->assertCount(5, $comparisonParams);
+
+        foreach ($comparisonParams as $param) {
+            $this->assertSame(['type' => 'string', 'format' => 'uuid'], $param['schema'], $param['name']);
+            $this->assertFalse($param['explode'], $param['name']);
+        }
+    }
+
     public function testGtWithUuid(): void
     {
         $this->recreateSchema(static::getResources());
