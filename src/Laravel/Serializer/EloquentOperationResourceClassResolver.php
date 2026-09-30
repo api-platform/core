@@ -44,7 +44,7 @@ final class EloquentOperationResourceClassResolver extends OperationResourceClas
 
             // Validate object matches the backing model class
             if ($modelClass && is_a($objectClass, $modelClass, true)) {
-                return $operation->getClass();
+                return $operation->getApiClass();
             }
         }
 

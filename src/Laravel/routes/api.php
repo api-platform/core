@@ -65,7 +65,7 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
                         '_format' => '^\.[a-zA-Z]+',
                     ] + ($operation->getRequirements() ?? []))
                     ->name($operation->getName())
-                    ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
+                    ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getApiClass()]);
 
                 $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
 

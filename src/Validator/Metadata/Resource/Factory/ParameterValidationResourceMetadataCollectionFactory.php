@@ -115,7 +115,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             }
 
             $filter = $this->filterLocator->get($filter);
-            foreach ($filter->getDescription($operation->getClass()) as $parameterName => $definition) {
+            foreach ($filter->getDescription($operation->getDataClass()) as $parameterName => $definition) {
                 $key = $parameterName;
                 $required = $definition['required'] ?? false;
                 $schema = $definition['schema'] ?? null;

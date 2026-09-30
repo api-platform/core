@@ -37,8 +37,8 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
         foreach ($resourceMetadataCollection as $key => $resourceMetadata) {
-            $resourceMetadata = $resourceMetadata->withInput($this->transformInputOutput($resourceMetadata->getInput()));
-            $resourceMetadata = $resourceMetadata->withOutput($this->transformInputOutput($resourceMetadata->getOutput()));
+            $resourceMetadata = $resourceMetadata->withInputClass($this->transformInputOutput($resourceMetadata->getInput())['class'] ?? null);
+            $resourceMetadata = $resourceMetadata->withOutputClass($this->transformInputOutput($resourceMetadata->getOutput())['class'] ?? null);
 
             if ($resourceMetadata->getOperations()) {
                 $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations($resourceMetadata->getOperations(), $resourceMetadata));
@@ -61,23 +61,20 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
     private function getTransformedOperations(Operations|array $operations, ApiResource $resourceMetadata): Operations|array
     {
         foreach ($operations as $key => $operation) {
-            $operation = $operation->withInput(null !== $operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());
-            $operation = $operation->withOutput(null !== $operation->getOutput() ? $this->transformInputOutput($operation->getOutput()) : $resourceMetadata->getOutput());
+            $resolvedInputClass = null !== $operation->getInput() ? ($this->transformInputOutput($operation->getInput())['class'] ?? null) : $resourceMetadata->getInputClass();
+            $operation = $operation->withInputClass($resolvedInputClass);
 
-            if (
-                $operation->getInput()
-                && \array_key_exists('class', $operation->getInput())
-                && null === $operation->getInput()['class']
-            ) {
+            $resolvedOutputClass = null !== $operation->getOutput() ? ($this->transformInputOutput($operation->getOutput())['class'] ?? null) : $resourceMetadata->getOutputClass();
+            $operation = $operation->withOutputClass($resolvedOutputClass);
+
+            if (null === $resolvedInputClass) {
                 $operation = $operation->withDeserialize(null === $operation->canDeserialize() ? false : $operation->canDeserialize());
                 $operation = $operation->withValidate(null === $operation->canValidate() ? false : $operation->canValidate());
             }
 
             if (
                 $operation instanceof HttpOperation
-                && $operation->getOutput()
-                && \array_key_exists('class', $operation->getOutput())
-                && null === $operation->getOutput()['class']
+                && null === $resolvedOutputClass
                 && null === $operation->getStatus()
             ) {
                 $operation = $operation->withStatus(204);

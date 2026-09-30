@@ -44,7 +44,7 @@ final class DoctrineOdmOperationResourceClassResolver extends OperationResourceC
 
             // Validate object matches the backing document class
             if ($documentClass && is_a($objectClass, $documentClass, true)) {
-                return $operation->getClass();
+                return $operation->getApiClass();
             }
         }
 

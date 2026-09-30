@@ -79,7 +79,7 @@ final class ItemNormalizer extends BaseItemNormalizer
 
         if ($this->getOutputClass($context)) {
             $context['graphql_identifiers'] = [
-                self::ITEM_RESOURCE_CLASS_KEY => $context['operation']->getClass(),
+                self::ITEM_RESOURCE_CLASS_KEY => $context['operation']->getApiClass(),
                 self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null),
             ];
 

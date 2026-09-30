@@ -41,13 +41,13 @@ final class DenormalizeProvider implements ProviderInterface
             return $data;
         }
 
-        $denormalizationContext = $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, normalization: false);
+        $denormalizationContext = $this->serializerContextBuilder->create($operation->getApiClass(), $operation, $context, normalization: false);
 
         if (null !== $data) {
             $denormalizationContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
-        $item = $this->denormalizer->denormalize($context['args']['input'], $operation->getClass(), ItemNormalizer::FORMAT, $denormalizationContext);
+        $item = $this->denormalizer->denormalize($context['args']['input'], $operation->getInputClass(), ItemNormalizer::FORMAT, $denormalizationContext);
 
         if (!\is_object($item)) {
             throw new \UnexpectedValueException('Expected item to be an object.');

@@ -50,7 +50,7 @@ final class CollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {
-        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $entityClass = $operation->getDataClass();
 
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($entityClass);

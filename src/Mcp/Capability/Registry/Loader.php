@@ -49,13 +49,13 @@ final class Loader implements LoaderInterface
             foreach ($metadata as $resource) {
                 foreach ($resource->getMcp() ?? [] as $mcp) {
                     if ($mcp instanceof McpTool) {
-                        $inputClass = $mcp->getInput()['class'] ?? $mcp->getClass();
+                        $inputClass = $mcp->getInputClass();
                         $inputFormat = array_key_first($mcp->getInputFormats() ?? ['json' => ['application/json']]);
                         $inputSchema = $this->schemaFactory->buildSchema($inputClass, $inputFormat, Schema::TYPE_INPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
 
                         $outputSchema = null;
                         if (false !== $mcp->getStructuredContent()) {
-                            $outputClass = $mcp->getOutput()['class'] ?? $mcp->getClass();
+                            $outputClass = $mcp->getOutputClass();
                             $outputFormat = array_key_first($mcp->getOutputFormats() ?? ['json' => ['application/json']]);
                             $outputSchema = $this->schemaFactory->buildSchema($outputClass, $outputFormat, Schema::TYPE_OUTPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true])->getArrayCopy();
                         }

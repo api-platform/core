@@ -42,7 +42,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         }
 
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->create($operation->getClass())->willReturn(new ResourceMetadataCollection($operation->getClass(), [
+        $resourceMetadataCollectionFactory->create($operation->getApiClass())->willReturn(new ResourceMetadataCollection($operation->getApiClass(), [
             (new ApiResource())
                 ->withOperations(
                     new Operations([$operation->getName() => $operation])
@@ -80,9 +80,9 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
 
         $objectManager = $this->prophesize(DocumentManager::class);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass($operation->getClass())->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass($operation->getApiClass())->willReturn($objectManager->reveal());
         $resourceMetadataCollectionFactory = new DoctrineMongoDbOdmResourceCollectionMetadataFactory($managerRegistry->reveal(), $this->getResourceMetadataCollectionFactory($operation));
-        $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getClass());
+        $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getApiClass());
         $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
         $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
         $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());

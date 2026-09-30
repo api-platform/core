@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Metadata\Resource;
 
-use ApiPlatform\Doctrine\Odm\State\Options;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -79,7 +78,7 @@ final class DoctrineMongoDbOdmParameterResourceMetadataCollectionFactory impleme
             return $operation;
         }
 
-        $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $documentClass = $operation->getDataClass();
         if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
             return $operation;
         }

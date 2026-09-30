@@ -42,11 +42,11 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
         }
 
         /** @var EntityManager */
-        $manager = $this->registry->getManagerForClass($operation->getClass());
-        $entity = new ($operation->getClass())();
+        $manager = $this->registry->getManagerForClass($operation->getApiClass());
+        $entity = new ($operation->getApiClass())();
 
         if (isset($context['previous_data'])) {
-            $entity = $manager->getReference($operation->getClass(), $context['previous_data']->id);
+            $entity = $manager->getReference($operation->getApiClass(), $context['previous_data']->id);
         }
 
         $entity->str = $data->foo;
@@ -58,7 +58,7 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
         $manager->persist($entity);
         $manager->flush();
 
-        $outputDto = DummyDtoInputOutputDocument::class === $operation->getClass() ? new OutputDtoDocument() : new OutputDto();
+        $outputDto = DummyDtoInputOutputDocument::class === $operation->getApiClass() ? new OutputDtoDocument() : new OutputDto();
         $outputDto->id = $entity->id;
         $outputDto->baz = $entity->num;
         $outputDto->bat = $entity->str;

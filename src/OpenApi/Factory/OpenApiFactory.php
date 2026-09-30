@@ -206,7 +206,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            $resourceClass = $operation->getClass() ?? $resource->getClass();
+            $resourceClass = $operation->getApiClass() ?? $resource->getApiClass();
             $routeName = $operation->getRouteName() ?? $operation->getName();
 
             if (!$this->routeCollection && $this->router) {
@@ -333,7 +333,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
+            $entityClass = $operation->getDataClass();
             $openapiParameters = $openapiOperation->getParameters();
             foreach ($operation->getParameters() ?? [] as $key => $p) {
                 if (false === $p->getOpenApi()) {
@@ -473,7 +473,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if (
                 \in_array($method, ['PATCH', 'PUT', 'POST'], true)
-                && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
+                && $operation->getInputClass()
             ) {
                 $content = $openapiOperation->getRequestBody()?->getContent();
                 if (null === $content) {
@@ -521,7 +521,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Operation $openapiOperation, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null, bool $isErrorResponse = false): Operation
     {
-        $noOutput = !$isErrorResponse && \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
+        $noOutput = !$isErrorResponse && null === $operation?->getOutputClass();
 
         $response = $existingResponses[$status] ?? new Response($description);
         if (null === $response->getDescription()) {
@@ -676,7 +676,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if ($uriVariableDefinition->getFromClass() === $currentOperation->getClass()) {
+                    if ($uriVariableDefinition->getFromClass() === $currentOperation->getApiClass()) {
                         $parameters[$parameterName] = '$response.body#/'.($uriVariableDefinition->getIdentifiers()[0] ?? 'id');
                     }
                 }
@@ -700,7 +700,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         $parameters = [];
         $resourceFilters = $operation->getFilters();
-        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
+        $entityClass = $operation->getDataClass();
 
         foreach ($resourceFilters ?? [] as $filterId) {
             if (!$this->filterLocator->has($filterId)) {
@@ -1028,13 +1028,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $operationErrorSchemas = [];
             foreach ($responseMimeTypes as $operationFormat) {
                 $operationErrorSchema = null;
-                $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($errorResource->getClass(), $operationFormat, Schema::TYPE_OUTPUT, null, $schema, $serializerContext);
+                $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($errorResource->getApiClass(), $operationFormat, Schema::TYPE_OUTPUT, null, $schema, $serializerContext);
                 $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
                 $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
             }
 
             if (!$status = $errorResource->getStatus()) {
-                throw new RuntimeException(\sprintf('The error class "%s" has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $errorResource->getClass()));
+                throw new RuntimeException(\sprintf('The error class "%s" has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $errorResource->getApiClass()));
             }
 
             $operation = $this->buildOpenApiResponse($operation->getResponses() ?: [], $status, $errorResource->getDescription() ?? '', $operation, $originalOperation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection, true);
@@ -1084,7 +1084,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $errorResource = new ErrorResource(status: $status, description: $description, class: $defaultErrorResourceClass);
         }
 
-        if (!$errorResource->getClass()) {
+        if (!$errorResource->getApiClass()) {
             $errorResource = $errorResource->withClass($error);
         }
 

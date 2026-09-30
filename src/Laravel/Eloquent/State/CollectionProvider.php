@@ -48,7 +48,7 @@ final class CollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $resourceClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $resourceClass = $operation->getDataClass();
         $model = new $resourceClass();
 
         if (!$model instanceof Model) {
@@ -56,9 +56,9 @@ final class CollectionProvider implements ProviderInterface
         }
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
-            $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
+            $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getApiClass()] + $context);
         } else {
-            $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
+            $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getApiClass()] + $context);
         }
 
         foreach ($this->queryExtensions as $extension) {

@@ -43,7 +43,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
     private function getResourceMetadataCollectionFactory(HttpOperation $operation)
     {
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->create($operation->getClass())->willReturn(new ResourceMetadataCollection($operation->getClass(), [
+        $resourceMetadataCollectionFactory->create($operation->getDataClass())->willReturn(new ResourceMetadataCollection($operation->getApiClass(), [
             (new ApiResource())
                 ->withOperations(
                     new Operations([$operation->getName() => $operation])
@@ -72,11 +72,11 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
     public function testWithProvider(HttpOperation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         $objectManager = $this->prophesize(EntityManagerInterface::class);
-        $objectManager->getClassMetadata($operation->getClass())->willReturn(new ClassMetadata(Dummy::class));
+        $objectManager->getClassMetadata($operation->getDataClass())->willReturn(new ClassMetadata(Dummy::class));
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass($operation->getClass())->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass($operation->getDataClass())->willReturn($objectManager->reveal());
         $resourceMetadataCollectionFactory = new DoctrineOrmResourceCollectionMetadataFactory($managerRegistry->reveal(), $this->getResourceMetadataCollectionFactory($operation));
-        $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getClass());
+        $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($operation->getDataClass());
         $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation($operation->getName())->getProvider());
         $this->assertSame($expectedProvider, $resourceMetadataCollection->getOperation('graphql_'.$operation->getName())->getProvider());
         $this->assertSame($expectedProcessor, $resourceMetadataCollection->getOperation($operation->getName())->getProcessor());

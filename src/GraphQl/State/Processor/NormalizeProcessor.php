@@ -79,7 +79,7 @@ final class NormalizeProcessor implements ProcessorInterface
             return null;
         }
 
-        $normalizationContext = $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, normalization: true);
+        $normalizationContext = $this->serializerContextBuilder->create($operation->getApiClass(), $operation, $context, normalization: true);
 
         $data = null;
         if (!$operation instanceof CollectionOperationInterface) {

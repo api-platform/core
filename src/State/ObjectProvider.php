@@ -26,9 +26,9 @@ final class ObjectProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         try {
-            return new ($operation->getClass());
+            return new ($operation->getApiClass());
         } catch (\Throwable $e) {
-            throw new RuntimeException(\sprintf('An error occurred while trying to create an instance of the "%s" resource. Consider writing your own "%s" implementation and setting it as `provider` on your operation instead.', $operation->getClass(), ProviderInterface::class), 0, $e);
+            throw new RuntimeException(\sprintf('An error occurred while trying to create an instance of the "%s" resource. Consider writing your own "%s" implementation and setting it as `provider` on your operation instead.', $operation->getApiClass(), ProviderInterface::class), 0, $e);
         }
     }
 }

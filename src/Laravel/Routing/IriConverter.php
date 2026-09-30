@@ -130,7 +130,7 @@ class IriConverter implements IriConverterInterface
 
         if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
             /** @var class-string $operationClass */
-            $operationClass = $operation->getClass() ?? $resourceClass;
+            $operationClass = $operation->getApiClass() ?? $resourceClass;
             $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operationClass);
             unset($context['uri_variables']);
         }
@@ -177,7 +177,7 @@ class IriConverter implements IriConverterInterface
             } catch (RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
-                    throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                    throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getApiClass()), $e->getCode(), $e);
                 }
             }
         }
@@ -187,7 +187,7 @@ class IriConverter implements IriConverterInterface
 
             return $this->router->generate($routeName, $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+            throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getApiClass()), $e->getCode(), $e);
         }
     }
 
