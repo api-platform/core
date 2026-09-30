@@ -137,7 +137,11 @@ trait MetadataCollectionFactoryTrait
                 continue;
             }
 
-            if (-1 === $index || $this->hasSameOperation($resources[$index], $metadata::class, $metadata)) {
+            if (
+                -1 === $index
+                || $this->hasSameOperation($resources[$index], $metadata::class, $metadata)
+                || (!$hasApiResource && null !== $metadata->getShortName() && $metadata->getShortName() !== $resources[$index]->getShortName())
+            ) {
                 $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
             }
 
