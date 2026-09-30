@@ -32,6 +32,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeDefaultOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyGraphQlOperationWithShortName;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyMcpToolWithShortName;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperation;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationsWithDifferentShortNames;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithShortName;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
@@ -271,6 +272,30 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         foreach ($metadataCollection[0]->getOperations() as $operation) {
             $this->assertSame('CustomShortName', $operation->getShortName());
         }
+    }
+
+    public function testAttributeOnlyOperationsWithDifferentShortNamesAreSplit(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperationsWithDifferentShortNames::class);
+
+        $this->assertCount(2, $metadataCollection);
+
+        $this->assertSame('ItemShortName', $metadataCollection[0]->getShortName());
+        $itemOperations = iterator_to_array($metadataCollection[0]->getOperations());
+        $this->assertCount(2, $itemOperations);
+        foreach ($itemOperations as $operation) {
+            $this->assertSame('ItemShortName', $operation->getShortName());
+        }
+        $this->assertInstanceOf(Get::class, array_values($itemOperations)[0]);
+        $this->assertInstanceOf(Post::class, array_values($itemOperations)[1]);
+
+        $this->assertSame('ListShortName', $metadataCollection[1]->getShortName());
+        $listOperations = iterator_to_array($metadataCollection[1]->getOperations());
+        $this->assertCount(1, $listOperations);
+        $this->assertInstanceOf(GetCollection::class, array_values($listOperations)[0]);
+        $this->assertSame('ListShortName', array_values($listOperations)[0]->getShortName());
     }
 
     public function testAttributeOnlyGraphQlOperationUsesOperationShortName(): void
