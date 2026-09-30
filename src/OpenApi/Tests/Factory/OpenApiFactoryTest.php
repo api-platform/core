@@ -1547,8 +1547,8 @@ class OpenApiFactoryTest extends TestCase
         };
 
         $filterLocator = $this->createMock(ContainerInterface::class);
-        $filterLocator->method('has')->with('f3notfilterinterface')->willReturn(true);
-        $filterLocator->method('get')->with('f3notfilterinterface')->willReturn($filter);
+        $filterLocator->expects($this->atLeastOnce())->method('has')->with('f3notfilterinterface')->willReturn(true);
+        $filterLocator->expects($this->atLeastOnce())->method('get')->with('f3notfilterinterface')->willReturn($filter);
 
         $parameters = $this->getGeneratedQueryParameters(
             ['name' => new QueryParameter(filter: 'f3notfilterinterface', openApi: new Parameter(name: 'name', in: 'query', description: 'From user openApi'))],
@@ -1635,7 +1635,7 @@ class OpenApiFactoryTest extends TestCase
         $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $arraySchema = ['type' => 'array', 'items' => ['type' => 'string']];
 
@@ -1757,7 +1757,7 @@ class OpenApiFactoryTest extends TestCase
         $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
             'deleteWithBody' => (new Delete())
