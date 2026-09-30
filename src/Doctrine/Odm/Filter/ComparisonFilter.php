@@ -96,14 +96,17 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();
+        $leafSchema = $this->filter instanceof JsonSchemaFilterInterface
+            ? $this->filter->getSchema($parameter->withCastToArray(false))
+            : ['type' => 'string'];
 
         return [
-            new OpenApiParameter(name: "{$key}[gt]", in: $in),
-            new OpenApiParameter(name: "{$key}[gte]", in: $in),
-            new OpenApiParameter(name: "{$key}[lt]", in: $in),
-            new OpenApiParameter(name: "{$key}[lte]", in: $in),
-            new OpenApiParameter(name: "{$key}[ne]", in: $in),
-            new OpenApiParameter(name: "{$key}[between]", in: $in),
+            new OpenApiParameter(name: "{$key}[gt]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[gte]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[lt]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[lte]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[ne]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[between]", in: $in, explode: false, schema: ['type' => 'string']),
         ];
     }
 

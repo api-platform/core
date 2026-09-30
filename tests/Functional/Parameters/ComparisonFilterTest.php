@@ -153,6 +153,23 @@ final class ComparisonFilterTest extends ApiTestCase
         }
     }
 
+    public function testOpenApiOperatorParametersAreScalar(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $parameters = $response->toArray()['paths']['/chickens']['get']['parameters'];
+        $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'nameComparison['));
+        $this->assertCount(6, $comparisonParams);
+
+        foreach ($comparisonParams as $param) {
+            $this->assertSame(['type' => 'string'], $param['schema'], $param['name']);
+            $this->assertFalse($param['explode'], \sprintf('"%s" must not explode', $param['name']));
+        }
+    }
+
     private function loadFixtures(): void
     {
         $manager = $this->getManager();
