@@ -113,7 +113,7 @@ trait MetadataCollectionFactoryTrait
 
             if ($metadata instanceof GraphQlOperation) {
                 if (-1 === $index) {
-                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
                 }
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
                 $graphQlOperations = $resources[$index]->getGraphQlOperations();
@@ -124,7 +124,7 @@ trait MetadataCollectionFactoryTrait
 
             if ($metadata instanceof McpTool || $metadata instanceof McpResource) {
                 if (-1 === $index) {
-                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
                 }
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
                 $mcp = $resources[$index]->getMcp() ?? [];
@@ -137,8 +137,12 @@ trait MetadataCollectionFactoryTrait
                 continue;
             }
 
-            if (-1 === $index || $this->hasSameOperation($resources[$index], $metadata::class, $metadata)) {
-                $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+            if (
+                -1 === $index
+                || $this->hasSameOperation($resources[$index], $metadata::class, $metadata)
+                || (!$hasApiResource && null !== $metadata->getShortName() && $metadata->getShortName() !== $resources[$index]->getShortName())
+            ) {
+                $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
             }
 
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
