@@ -80,6 +80,7 @@ class SchemaFactoryTest extends TestCase
         );
 
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->getResourceClass(null, Argument::type('string'))->willReturnArgument(1);
         $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolver->isResourceClass(Error::class)->willReturn(true);
 
@@ -368,6 +369,7 @@ class SchemaFactoryTest extends TestCase
         );
 
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->getResourceClass(null, Argument::type('string'))->willReturnArgument(1);
         $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolver->isResourceClass(RelatedDummy::class)->willReturn(true);
         $resourceClassResolver->isResourceClass(OtherRelatedDummy::class)->willReturn(true);
@@ -430,6 +432,7 @@ class SchemaFactoryTest extends TestCase
         );
 
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->getResourceClass(null, Argument::type('string'))->willReturnArgument(1);
         $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolver->isResourceClass(RelatedDummy::class)->willReturn(true);
 
