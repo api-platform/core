@@ -677,4 +677,28 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertSame('api_platform.doctrine_mongodb.odm.state.remove_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
         $this->assertNotContainerHasService('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor');
     }
+
+    public function testDoctrineDiscriminatorMappingLoadersAreNotRegisteredByDefault(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.doctrine.orm.state.item_provider');
+        $this->assertNotContainerHasService('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        $this->assertContainerHasService('api_platform.doctrine_mongodb.odm.state.item_provider');
+        $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
+    }
+
+    public function testDoctrineDiscriminatorMappingLoadersCanBeEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine'] = ['enabled' => true, 'discriminator_map' => true];
+        $config['api_platform']['doctrine_mongodb_odm'] = ['enabled' => true, 'discriminator_map' => true];
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        $this->assertContainerHasService('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
+    }
 }
