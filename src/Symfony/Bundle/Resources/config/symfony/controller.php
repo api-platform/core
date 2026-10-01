@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Symfony\Action\DocumentationAction;
 use ApiPlatform\Symfony\Action\EntrypointAction;
 use ApiPlatform\Symfony\Controller\MainController;
+use ApiPlatform\Symfony\EventListener\ControllerApiOperationPipelineListener;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -29,6 +30,16 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.uri_variables.converter')->ignoreOnInvalid(),
             service('logger')->ignoreOnInvalid(),
         ]);
+
+    $services->set('api_platform.listener.controller_api_operation.pipeline', ControllerApiOperationPipelineListener::class)
+        ->args([
+            service('api_platform.state_provider.main'),
+            service('api_platform.state_processor.main'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.uri_variables.converter')->ignoreOnInvalid(),
+        ])
+        ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 27])
+        ->tag('kernel.event_listener', ['event' => 'kernel.view', 'method' => 'onKernelView']);
 
     $services->set('api_platform.action.entrypoint', EntrypointAction::class)
         ->public()
