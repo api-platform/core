@@ -43,6 +43,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
             service('api_platform.jsonapi.resource_linkage_resolver'),
             false,
+            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.jsonapi.encoder', JsonEncoder::class)
