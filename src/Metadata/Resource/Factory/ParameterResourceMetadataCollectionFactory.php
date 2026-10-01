@@ -577,6 +577,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             foreach ($resource->getOperations() ?? [] as $operation) {
                 $operationClasses[] = $operation::class;
             }
+
+            foreach ($resource->getGraphQlOperations() ?? [] as $operation) {
+                $operationClasses[] = $operation::class;
+            }
         }
 
         return $operationClasses;
