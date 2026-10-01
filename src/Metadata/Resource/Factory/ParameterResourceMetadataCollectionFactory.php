@@ -241,6 +241,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $parameters = $existingParameters ? clone $existingParameters : new Parameters();
 
         foreach ($this->createParametersFromAttributes($operation, $declaredOperationClasses) as $key => $parameter) {
+            if (!str_contains($key, ':property') && $parameters->has($key, $parameter::class)) {
+                continue;
+            }
+
             $parameters->add($key, $parameter);
         }
 
