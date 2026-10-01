@@ -143,11 +143,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         $configuredTags = $this->openApiOptions->getTags();
-        if ($configuredTags) {
-            $configuredNames = array_map(static fn (Tag $tag): string => $tag->getName(), $configuredTags);
-            $globalTags = [...$configuredTags, ...array_values(array_filter($declaredTags, static fn (Tag $tag): bool => !\in_array($tag->getName(), $configuredNames, true)))];
-        } else {
-            $globalTags = array_values([...$tags, ...$declaredTags]);
+        $globalTags = [];
+        foreach ($configuredTags ?: $tags as $tag) {
+            $globalTags[$tag->getName()] = $tag;
+        }
+
+        foreach ($declaredTags as $name => $tag) {
+            if (!$configuredTags || !isset($globalTags[$name])) {
+                $globalTags[$name] = $tag;
+            }
         }
 
         return new OpenApi(
@@ -164,7 +168,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 new \ArrayObject($securitySchemes)
             ),
             $securityRequirements,
-            $globalTags,
+            array_values($globalTags),
             null,
             null,
             $webhooks
