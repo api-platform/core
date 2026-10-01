@@ -985,6 +985,67 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $parameterFactory->create(QueryParameterOnPropertiesWithUndeclaredGraphQlOperation::class);
     }
 
+    public function testParameterOnPropertiesWithOperationClassStrings(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['name', 'authToken']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(ParameterOnPropertiesWithOperationClassStrings::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        [$collectionOperation, $getOperation] = $operations;
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('search', QueryParameter::class));
+        $this->assertTrue($collectionOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertFalse($getOperation->getParameters()->has('search', QueryParameter::class));
+        $this->assertTrue($getOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+    }
+
+    public function testParameterOnPropertiesThrowsExceptionWhenOperationClassStringIsNotDeclared(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Parameter attribute on property "name" is restricted to the operation "%s" which is not declared on the resource "%s".', Patch::class, ParameterOnPropertiesWithUndeclaredOperationClassString::class));
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(ParameterOnPropertiesWithUndeclaredOperationClassString::class);
+    }
+
     public function testNestedPropertyWithNameConverter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -1542,5 +1603,31 @@ class QueryParameterOnPropertiesWithGraphQlOperations
 class QueryParameterOnPropertiesWithUndeclaredGraphQlOperation
 {
     #[QueryParameter(key: 'search', description: 'Search by name', operations: [new Mutation(name: 'create')])]
+    public string $name = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ]
+)]
+class ParameterOnPropertiesWithOperationClassStrings
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [GetCollection::class])]
+    public string $name = '';
+
+    #[HeaderParameter(key: 'X-Authorization', description: 'Authorization header', operations: [Get::class, new GetCollection()])]
+    public string $authToken = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+    ]
+)]
+class ParameterOnPropertiesWithUndeclaredOperationClassString
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [Patch::class])]
     public string $name = '';
 }

@@ -42,7 +42,7 @@ abstract class Parameter
      * @param ?bool                                           $castToNativeType whether API Platform should cast your parameter to the nativeType declared
      * @param ?callable(mixed): mixed                         $castFn           the closure used to cast your parameter, this gets called only when $castToNativeType is set
      * @param ?string                                         $filterClass      the class to use when resolving filter properties (from stateOptions)
-     * @param list<Operation>|null                            $operations       a list of operations this parameter applies to (if null, applies to all operations)
+     * @param list<Operation|class-string<Operation>>|null    $operations       a list of operations (instances or class names) this parameter applies to (if null, applies to all operations)
      *
      * @phpstan-param array<string, mixed>|null $schema
      *
@@ -414,7 +414,7 @@ abstract class Parameter
     }
 
     /**
-     * @return list<Operation>|null
+     * @return list<Operation|class-string<Operation>>|null
      */
     public function getOperations(): ?array
     {
@@ -422,7 +422,7 @@ abstract class Parameter
     }
 
     /**
-     * @param list<Operation>|null $operations
+     * @param list<Operation|class-string<Operation>>|null $operations
      */
     public function withOperations(?array $operations): self
     {
