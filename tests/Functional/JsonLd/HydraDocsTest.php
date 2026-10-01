@@ -106,6 +106,18 @@ final class HydraDocsTest extends ApiTestCase
         $this->assertSame('The doc resource name.', $name['hydra:description']);
     }
 
+    public function testPropertyTitleFromJsonldContext(): void
+    {
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocs');
+        $titles = [];
+        foreach ($resource['hydra:supportedProperty'] as $prop) {
+            $titles[$prop['hydra:property']['label']] = $prop['hydra:title'];
+        }
+        $this->assertSame('The label', $titles['label']);
+        $this->assertSame('name', $titles['name']);
+    }
+
     public function testRelationPropertyRangeAndCardinality(): void
     {
         $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
