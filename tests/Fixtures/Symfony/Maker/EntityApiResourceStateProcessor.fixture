@@ -1,0 +1,18 @@
+namespace App\State;
+
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProcessorInterface;
+
+class BookProcessor implements ProcessorInterface
+{
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    {
+        if ($operation instanceof Post) {
+            // TODO: process state for Post operation
+        }
+
+
+        return null;
+    }
+}
