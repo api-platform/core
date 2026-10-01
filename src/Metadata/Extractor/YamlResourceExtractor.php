@@ -87,6 +87,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 }
 
                 try {
+                    $resourceYamlDatum = $this->normalizeConfigKeys($resourceYamlDatum, '_');
                     $base = $this->buildExtendedBase($resourceYamlDatum);
                     $this->resources[$resourceName][$resourcesCount + $key] = array_merge($base, [
                         'operations' => $this->buildOperations($resourceYamlDatum, $base),
@@ -327,6 +328,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 $operation = [];
             }
 
+            $operation = $this->normalizeConfigKeys($operation, '_');
+
             if (\array_key_exists('class', $operation)) {
                 if (!\array_key_exists('name', $operation) && \is_string($class)) {
                     $operation['name'] = $class;
@@ -385,6 +388,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             if (null === $operation) {
                 $operation = [];
             }
+
+            $operation = $this->normalizeConfigKeys($operation, '_');
 
             if (\array_key_exists('class', $operation)) {
                 if (!\array_key_exists('name', $operation) && \is_string($class)) {

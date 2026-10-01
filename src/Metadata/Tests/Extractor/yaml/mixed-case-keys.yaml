@@ -1,0 +1,4 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        shortName: Prg
+        short_name: Prg

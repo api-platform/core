@@ -27,6 +27,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             [],
             service('service_container'),
+            '%api_platform.resource_config_camel_case%',
         ]);
 
     $services->set('api_platform.metadata.property_extractor.yaml', YamlPropertyExtractor::class)

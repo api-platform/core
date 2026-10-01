@@ -22,6 +22,7 @@
         </xsd:sequence>
         <xsd:attributeGroup ref="extendedBase"/>
         <xsd:attribute type="xsd:string" name="uriTemplate"/>
+        <xsd:attribute type="xsd:string" name="uri-template"/>
         <xsd:attribute type="xsd:string" name="class" use="required"/>
     </xsd:complexType>
 
@@ -38,6 +39,7 @@
         <xsd:attributeGroup ref="extendedBase"/>
         <xsd:attribute type="xsd:string" name="class" use="required"/>
         <xsd:attribute type="xsd:string" name="uriTemplate"/>
+        <xsd:attribute type="xsd:string" name="uri-template"/>
         <xsd:attribute type="xsd:string" name="method"/>
         <xsd:attribute type="xsd:boolean" name="read"/>
         <xsd:attribute type="xsd:boolean" name="deserialize"/>
@@ -47,9 +49,12 @@
         <xsd:attribute type="xsd:boolean" name="openapi"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:integer" name="routePriority"/>
+        <xsd:attribute type="xsd:integer" name="route-priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
+        <xsd:attribute type="xsd:string" name="item-uri-template"/>
         <xsd:attribute type="xsd:string" name="routeName"/>
+        <xsd:attribute type="xsd:string" name="route-name"/>
     </xsd:complexType>
 
     <xsd:complexType name="graphQlOperations">
@@ -68,6 +73,7 @@
         <xsd:attribute type="xsd:string" name="resolver"/>
         <xsd:attribute type="xsd:string" name="class" use="required"/>
         <xsd:attribute type="xsd:boolean" name="queryParameterValidationEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="query-parameter-validation-enabled"/>
         <xsd:attribute type="xsd:boolean" name="read"/>
         <xsd:attribute type="xsd:boolean" name="deserialize"/>
         <xsd:attribute type="xsd:boolean" name="validate"/>
@@ -75,6 +81,7 @@
         <xsd:attribute type="xsd:boolean" name="serialize"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:integer" name="routePriority"/>
+        <xsd:attribute type="xsd:integer" name="route-priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>
 
@@ -499,47 +506,75 @@
 
     <xsd:attributeGroup name="base">
         <xsd:attribute type="xsd:string" name="shortName"/>
+        <xsd:attribute type="xsd:string" name="short-name"/>
         <xsd:attribute type="xsd:token" name="description"/>
         <xsd:attribute type="xsd:integer" name="urlGenerationStrategy"/>
+        <xsd:attribute type="xsd:integer" name="url-generation-strategy"/>
         <xsd:attribute type="xsd:string" name="deprecationReason"/>
+        <xsd:attribute type="xsd:string" name="deprecation-reason"/>
         <xsd:attribute type="xsd:string" name="messenger"/>
         <xsd:attribute type="xsd:string" name="input"/>
         <xsd:attribute type="xsd:string" name="output"/>
         <xsd:attribute type="xsd:boolean" name="fetchPartial"/>
+        <xsd:attribute type="xsd:boolean" name="fetch-partial"/>
         <xsd:attribute type="xsd:boolean" name="forceEager"/>
+        <xsd:attribute type="xsd:boolean" name="force-eager"/>
         <xsd:attribute type="xsd:boolean" name="paginationClientEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-client-enabled"/>
         <xsd:attribute type="xsd:boolean" name="paginationClientItemsPerPage"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-client-items-per-page"/>
         <xsd:attribute type="xsd:boolean" name="paginationClientPartial"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-client-partial"/>
         <xsd:attribute type="xsd:boolean" name="paginationEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-enabled"/>
         <xsd:attribute type="xsd:boolean" name="paginationFetchJoinCollection"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-fetch-join-collection"/>
         <xsd:attribute type="xsd:boolean" name="paginationUseOutputWalkers"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-use-output-walkers"/>
         <xsd:attribute type="xsd:positiveInteger" name="paginationItemsPerPage"/>
+        <xsd:attribute type="xsd:positiveInteger" name="pagination-items-per-page"/>
         <xsd:attribute type="xsd:positiveInteger" name="paginationMaximumItemsPerPage"/>
+        <xsd:attribute type="xsd:positiveInteger" name="pagination-maximum-items-per-page"/>
         <xsd:attribute type="xsd:boolean" name="paginationPartial"/>
+        <xsd:attribute type="xsd:boolean" name="pagination-partial"/>
         <xsd:attribute type="xsd:string" name="paginationType"/>
+        <xsd:attribute type="xsd:string" name="pagination-type"/>
         <xsd:attribute type="xsd:string" name="processor"/>
         <xsd:attribute type="xsd:string" name="provider"/>
         <xsd:attribute type="xsd:string" name="security"/>
         <xsd:attribute type="xsd:string" name="securityMessage"/>
+        <xsd:attribute type="xsd:string" name="security-message"/>
         <xsd:attribute type="xsd:string" name="securityPostDenormalize"/>
+        <xsd:attribute type="xsd:string" name="security-post-denormalize"/>
         <xsd:attribute type="xsd:string" name="securityPostDenormalizeMessage"/>
+        <xsd:attribute type="xsd:string" name="security-post-denormalize-message"/>
         <xsd:attribute type="xsd:string" name="securityPostValidation"/>
+        <xsd:attribute type="xsd:string" name="security-post-validation"/>
         <xsd:attribute type="xsd:string" name="securityPostValidationMessage"/>
+        <xsd:attribute type="xsd:string" name="security-post-validation-message"/>
         <xsd:attribute type="xsd:boolean" name="collectDenormalizationErrors"/>
+        <xsd:attribute type="xsd:boolean" name="collect-denormalization-errors"/>
         <xsd:attribute type="xsd:boolean" name="jsonStream"/>
+        <xsd:attribute type="xsd:boolean" name="json-stream"/>
         <xsd:attribute type="xsd:boolean" name="map"/>
         <xsd:attribute type="xsd:boolean" name="throwOnNotFound"/>
+        <xsd:attribute type="xsd:boolean" name="throw-on-not-found"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="extendedBase">
         <xsd:attributeGroup ref="base"/>
         <xsd:attribute type="xsd:boolean" name="strictQueryParameterValidation"/>
+        <xsd:attribute type="xsd:boolean" name="strict-query-parameter-validation"/>
         <xsd:attribute type="xsd:boolean" name="hideHydraOperation"/>
+        <xsd:attribute type="xsd:boolean" name="hide-hydra-operation"/>
         <xsd:attribute type="xsd:boolean" name="queryParameterValidationEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="query-parameter-validation-enabled"/>
         <xsd:attribute type="xsd:string" name="routePrefix"/>
+        <xsd:attribute type="xsd:string" name="route-prefix"/>
         <xsd:attribute type="xsd:boolean" name="stateless"/>
         <xsd:attribute type="xsd:string" name="sunset"/>
         <xsd:attribute type="xsd:string" name="acceptPatch"/>
+        <xsd:attribute type="xsd:string" name="accept-patch"/>
         <xsd:attribute type="xsd:positiveInteger" name="status"/>
         <xsd:attribute type="xsd:string" name="host"/>
         <xsd:attribute type="xsd:string" name="condition"/>

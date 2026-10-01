@@ -45,6 +45,7 @@ api_platform:
         This is a test API.
         Made with love
     enable_swagger: true
+    resource_config_camel_case: true
     enable_swagger_ui: true
     formats:
         jsonld:                        ['application/ld+json']

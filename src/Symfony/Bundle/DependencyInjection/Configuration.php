@@ -131,6 +131,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_head_request_optimization')->defaultTrue()->info('Skip response body construction on HEAD requests so collections are not iterated. Disable to process HEAD identically to GET.')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
                 ->booleanNode('enable_phpdoc_parser')->defaultTrue()->info('Enable resource metadata collector using PHPStan PhpDocParser.')->end()
+                ->booleanNode('resource_config_camel_case')->defaultNull()->info('Whether YAML/XML resource configuration accepts camelCase keys (shortName). snake_case (short_name) in YAML and kebab-case (short-name) in XML are always accepted. When unset, camelCase keys are accepted but deprecated. Set to false to reject them, this will be the only behavior in 6.0.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()

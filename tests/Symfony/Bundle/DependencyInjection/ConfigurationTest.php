@@ -241,6 +241,7 @@ class ConfigurationTest extends TestCase
                 'hydra_prefix' => null,
             ],
             'enable_phpdoc_parser' => true,
+            'resource_config_camel_case' => null,
             'mcp' => [
                 'enabled' => true,
                 'format' => 'jsonld',

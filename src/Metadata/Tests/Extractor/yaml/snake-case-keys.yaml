@@ -1,0 +1,11 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        short_name: Prg
+        pagination_client_enabled: true
+        pagination_items_per_page: 5
+        normalization_context:
+            groups: [read]
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                uri_template: /programs
+                pagination_enabled: false

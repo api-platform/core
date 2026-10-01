@@ -489,6 +489,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/operation.php');
         $loader->load('metadata/mutator.php');
 
+        $container->setParameter('api_platform.resource_config_camel_case', $config['resource_config_camel_case']);
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 

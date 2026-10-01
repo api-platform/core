@@ -47,8 +47,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
     protected function extractPath(string $path): void
     {
         try {
-            /** @var \SimpleXMLElement $xml */
-            $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::SCHEMA));
+            $dom = XmlUtils::loadFile($path, self::SCHEMA);
         } catch (\InvalidArgumentException $e) {
             // Ensure it's not a resource
             try {
@@ -61,12 +60,42 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             return;
         }
 
+        $this->normalizeAttributes($dom);
+        /** @var \SimpleXMLElement $xml */
+        $xml = simplexml_import_dom($dom);
+
         foreach ($xml->resource as $resource) {
             $base = $this->buildExtendedBase($resource);
             $this->resources[$this->resolve((string) $resource['class'])][] = array_merge($base, [
                 'operations' => $this->buildOperations($resource, $base),
                 'graphQlOperations' => $this->buildGraphQlOperations($resource, $base),
             ]);
+        }
+    }
+
+    private function normalizeAttributes(\DOMDocument $dom): void
+    {
+        foreach (['resource', 'operation', 'graphQlOperation'] as $elementName) {
+            foreach ($dom->getElementsByTagNameNS('*', $elementName) as $element) {
+                $attributes = [];
+                foreach ($element->attributes as $attribute) {
+                    $attributes[$attribute->nodeName] = $attribute->nodeValue;
+                }
+
+                foreach ($attributes as $name => $value) {
+                    $camelName = $this->normalizeConfigKey($name, '-');
+                    if ($camelName === $name) {
+                        continue;
+                    }
+
+                    if ($element->hasAttribute($camelName)) {
+                        throw new InvalidArgumentException(\sprintf('"%s" and "%s" are the same configuration key, use only one of them.', $camelName, $name));
+                    }
+
+                    $element->removeAttribute($name);
+                    $element->setAttribute($camelName, (string) $value);
+                }
+            }
         }
     }
 

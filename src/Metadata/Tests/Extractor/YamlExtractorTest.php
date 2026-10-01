@@ -33,7 +33,7 @@ class YamlExtractorTest extends TestCase
 {
     public function testValidYaml(): void
     {
-        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/valid.yaml']);
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/valid.yaml'], null, true);
         $this->assertEquals([
             FlexConfig::class => [
                 [
@@ -523,7 +523,7 @@ class YamlExtractorTest extends TestCase
 
     public function testOpenApiParameters(): void
     {
-        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/openapi.yaml']);
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/openapi.yaml'], null, true);
         $resources = $extractor->getResources();
 
         $this->assertArrayHasKey(Program::class, $resources);
@@ -544,12 +544,12 @@ class YamlExtractorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('OpenAPI parameter is missing the required "name" key');
 
-        (new YamlResourceExtractor([__DIR__.'/yaml/openapi-parameter-without-name.yaml']))->getResources();
+        (new YamlResourceExtractor([__DIR__.'/yaml/openapi-parameter-without-name.yaml'], null, true))->getResources();
     }
 
     public function testInputAndOutputAreBooleans(): void
     {
-        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-booleans.yaml']);
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-booleans.yaml'], null, true);
         $resources = $extractor->getResources();
 
         $this->assertArrayHasKey(Program::class, $resources);
@@ -566,7 +566,7 @@ class YamlExtractorTest extends TestCase
 
     public function testInputAndOutputAreStrings(): void
     {
-        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-strings.yaml']);
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-strings.yaml'], null, true);
         $resources = $extractor->getResources();
 
         $this->assertArrayHasKey(Program::class, $resources);
@@ -586,7 +586,7 @@ class YamlExtractorTest extends TestCase
         $extractor = new YamlResourceExtractor([
             __DIR__.'/yaml/extending-base.yaml',
             __DIR__.'/yaml/extending-additional.yaml',
-        ]);
+        ], null, true);
         $resources = $extractor->getResources();
 
         $this->assertArrayHasKey(User::class, $resources);
@@ -614,7 +614,7 @@ class YamlExtractorTest extends TestCase
         $container = $this->createStub(ContainerInterface::class);
         $container->method('get')->willReturnCallback(static fn (string $id): string => $parameters[$id]);
 
-        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/parameters.yaml'], $container);
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/parameters.yaml'], $container, true);
         $resources = $extractor->getResources();
 
         $this->assertArrayHasKey(User::class, $resources);
@@ -628,6 +628,65 @@ class YamlExtractorTest extends TestCase
 
         // expression field with a real expression (no whole-string param): left untouched
         $this->assertSame('is_granted("ROLE_USER")', $resources[User::class][0]['operations'][0]['security']);
+    }
+
+    public function testSnakeCaseKeys(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/snake-case-keys.yaml'], null, true))->getResources();
+
+        $resource = $resources[Program::class][0];
+        $this->assertSame('Prg', $resource['shortName']);
+        $this->assertTrue($resource['paginationClientEnabled']);
+        $this->assertSame(5, $resource['paginationItemsPerPage']);
+        $this->assertSame(['groups' => ['read']], $resource['normalizationContext']);
+        $this->assertSame('/programs', $resource['operations'][0]['uriTemplate']);
+        $this->assertFalse($resource['operations'][0]['paginationEnabled']);
+    }
+
+    public function testSnakeCaseKeysDoNotDeprecate(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/snake-case-keys.yaml']))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testCamelCaseKeysAreDeprecatedWhenFlagIsUnset(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: The camelCase resource configuration key "shortName" is deprecated, use "short_name" instead. camelCase keys will no longer be supported in 6.0, set "api_platform.resource_config_camel_case" to false to opt in now.');
+
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/camel-case-keys.yaml']))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testCamelCaseKeysAreAcceptedSilentlyWhenFlagIsTrue(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/camel-case-keys.yaml'], null, true))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testCamelCaseKeysAreRejectedWhenFlagIsFalse(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The camelCase resource configuration key "shortName" is not supported when "api_platform.resource_config_camel_case" is false, use "short_name" instead.');
+
+        (new YamlResourceExtractor([__DIR__.'/yaml/camel-case-keys.yaml'], null, false))->getResources();
+    }
+
+    public function testSnakeCaseKeysAreAcceptedWhenFlagIsFalse(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/snake-case-keys.yaml'], null, false))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testSameKeyInBothCasesThrows(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"shortName" and "short_name" are the same configuration key');
+
+        (new YamlResourceExtractor([__DIR__.'/yaml/mixed-case-keys.yaml'], null, true))->getResources();
     }
 
     #[DataProvider('getInvalidPaths')]

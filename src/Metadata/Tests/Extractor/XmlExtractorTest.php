@@ -35,7 +35,7 @@ class XmlExtractorTest extends TestCase
 {
     public function testValidXML(): void
     {
-        $extractor = new XmlResourceExtractor([__DIR__.'/xml/valid.xml']);
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/valid.xml'], null, true);
         $this->assertEquals([
             Comment::class => [
                 [
@@ -443,7 +443,7 @@ class XmlExtractorTest extends TestCase
         $container = $this->createStub(ContainerInterface::class);
         $container->method('get')->willReturnCallback(static fn (string $id): string => $parameters[$id]);
 
-        $extractor = new XmlResourceExtractor([__DIR__.'/xml/parameters.xml'], $container);
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/parameters.xml'], $container, true);
         $resources = $extractor->getResources();
 
         $this->assertArrayHasKey(User::class, $resources);
@@ -484,7 +484,7 @@ class XmlExtractorTest extends TestCase
      */
     public function testDuplicateOperationNameFromXmlThrows(): void
     {
-        $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_operation_name.xml']);
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_operation_name.xml'], null, true);
         $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
 
         $this->expectException(RuntimeException::class);
@@ -493,9 +493,52 @@ class XmlExtractorTest extends TestCase
         $factory->create(Comment::class);
     }
 
+    public function testKebabCaseAttributes(): void
+    {
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/kebab-case-attributes.xml'], null, true))->getResources();
+
+        $resource = $resources[Program::class][0];
+        $this->assertSame('Prg', $resource['shortName']);
+        $this->assertTrue($resource['paginationClientEnabled']);
+        $this->assertSame(5, $resource['paginationItemsPerPage']);
+        $this->assertSame('/programs', $resource['operations'][0]['uriTemplate']);
+        $this->assertFalse($resource['operations'][0]['paginationEnabled']);
+    }
+
+    public function testKebabCaseAttributesDoNotDeprecate(): void
+    {
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/kebab-case-attributes.xml']))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testCamelCaseAttributesAreDeprecatedWhenFlagIsUnset(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: The camelCase resource configuration key "shortName" is deprecated, use "short-name" instead. camelCase keys will no longer be supported in 6.0, set "api_platform.resource_config_camel_case" to false to opt in now.');
+
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/camel-case-attributes.xml']))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testCamelCaseAttributesAreAcceptedSilentlyWhenFlagIsTrue(): void
+    {
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/camel-case-attributes.xml'], null, true))->getResources();
+
+        $this->assertSame('Prg', $resources[Program::class][0]['shortName']);
+    }
+
+    public function testCamelCaseAttributesAreRejectedWhenFlagIsFalse(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The camelCase resource configuration key "shortName" is not supported when "api_platform.resource_config_camel_case" is false, use "short-name" instead.');
+
+        (new XmlResourceExtractor([__DIR__.'/xml/camel-case-attributes.xml'], null, false))->getResources();
+    }
+
     public function testOpenApiParametersAreAList(): void
     {
-        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_parameters.xml']);
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_parameters.xml'], null, true);
         $resources = $extractor->getResources();
 
         $operation = $resources[Program::class][0]['operations'][0]['openapi'];
