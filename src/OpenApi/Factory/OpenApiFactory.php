@@ -126,11 +126,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $schemas = new \ArrayObject();
         $webhooks = new \ArrayObject();
         $tags = [];
+        $declaredTags = [];
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks, $tags, $context);
+                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks, $tags, $declaredTags, $context);
             }
         }
 
@@ -141,7 +142,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $securityRequirements[] = [$key => []];
         }
 
-        $globalTags = $this->openApiOptions->getTags() ?: array_values($tags) ?: [];
+        $configuredTags = $this->openApiOptions->getTags();
+        if ($configuredTags) {
+            $configuredNames = array_map(static fn (Tag $tag): string => $tag->getName(), $configuredTags);
+            $globalTags = [...$configuredTags, ...array_values(array_filter($declaredTags, static fn (Tag $tag): bool => !\in_array($tag->getName(), $configuredNames, true)))];
+        } else {
+            $globalTags = array_values([...$tags, ...$declaredTags]);
+        }
 
         return new OpenApi(
             $info,
@@ -164,7 +171,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         );
     }
 
-    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks, array &$tags, array $context = []): void
+    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks, array &$tags, array &$declaredTags, array $context = []): void
     {
         if (0 === $resource->getOperations()->count()) {
             return;
@@ -240,10 +247,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $summary = null !== $openapiOperation->getSummary() ? $openapiOperation->getSummary() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface);
 
+            $operationTags = null;
+            if (null !== $openapiOperation->getTags()) {
+                $operationTags = [];
+                foreach ($openapiOperation->getTags() as $tag) {
+                    if ($tag instanceof Tag) {
+                        $declaredTags[$tag->getName()] ??= $tag;
+                        $operationTags[] = $tag->getName();
+                    } else {
+                        $operationTags[] = $tag;
+                    }
+                }
+            }
+
             // Complete with defaults
             $openapiOperation = new Operation(
                 operationId: null !== $openapiOperation->getOperationId() ? $openapiOperation->getOperationId() : $this->normalizeOperationName($operationName),
-                tags: null !== $openapiOperation->getTags() ? $openapiOperation->getTags() : [$operation->getShortName() ?: $resourceShortName],
+                tags: $operationTags ?? [$operation->getShortName() ?: $resourceShortName],
                 responses: null !== $openapiOperation->getResponses() ? $openapiOperation->getResponses() : [],
                 summary: $summary,
                 description: null !== $openapiOperation->getDescription() ? $openapiOperation->getDescription() : $summary,

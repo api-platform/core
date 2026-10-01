@@ -58,6 +58,7 @@ use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use ApiPlatform\OpenApi\Model\SecurityScheme;
 use ApiPlatform\OpenApi\Model\Server;
+use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
@@ -1391,6 +1392,60 @@ class OpenApiFactoryTest extends TestCase
 
         $this->assertNotNull($diamondPutOperation);
         $this->assertArrayNotHasKey('403', $diamondPutResponses);
+    }
+
+    public function testOperationTagsAcceptTagObjects(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+
+        $candidateTag = new Tag(name: 'Candidate', description: 'Some description');
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            (new Get())->withUriTemplate('/dummies/{id}')->withOpenapi(new OpenApiOperation(tags: [$candidateTag]))->withShortName('Dummy')->withName('api_dummies_get')->withRouteName('api_dummies_get'),
+            (new GetCollection())->withUriTemplate('/dummies')->withOpenapi(new OpenApiOperation(tags: ['Plain', $candidateTag]))->withShortName('Dummy')->withName('api_dummies_get_collection')->withRouteName('api_dummies_get_collection'),
+        ]))->withClass(Dummy::class)->withDescription('Dummy description')]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => Dummy::class === $resourceClass ? $resourceCollectionMetadata : new ResourceMetadataCollection($resourceClass, []));
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+        $paths = $openApi->getPaths();
+
+        $this->assertSame(['Candidate'], $paths->getPath('/dummies/{id}')->getGet()->getTags());
+        $this->assertSame(['Plain', 'Candidate'], $paths->getPath('/dummies')->getGet()->getTags());
+
+        $tags = [];
+        foreach ($openApi->getTags() as $tag) {
+            $tags[$tag->getName()] = $tag->getDescription();
+        }
+        $this->assertSame(['Candidate' => 'Some description', 'Plain' => 'Dummy description'], $tags);
     }
 
     public function testGetExtensionPropertiesWithFalseValue(): void
