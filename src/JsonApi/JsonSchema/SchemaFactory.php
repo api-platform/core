@@ -27,7 +27,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\State\ApiResource\Error;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * Decorator factory which adds JSON:API properties to the JSON Schema document.
@@ -81,7 +83,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private readonly ResourceLinkageResolver $resourceLinkageResolver;
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, ?ResourceLinkageResolver $resourceLinkageResolver = null, private readonly bool $strictMemberNames = false)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, ?ResourceLinkageResolver $resourceLinkageResolver = null, private readonly bool $strictMemberNames = false, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -383,16 +385,90 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Only relax the requirement on the input schema; responses still always carry an `id`.
         $required = Schema::TYPE_INPUT === $type && $resourceOperation instanceof HttpOperation && 'POST' === $resourceOperation->getMethod() ? ['type'] : ['type', 'id'];
 
-        $resourceDefinitionName = $documentDefinitionName.'.resource';
-        $definitions[$resourceDefinitionName] = [
+        $data = [
             'type' => 'object',
             'properties' => $replacement,
             'required' => $required,
         ];
 
+        // Subtypes declared in a serializer discriminator map: the type property lives in "attributes" so an OpenAPI discriminator cannot be used
+        $typeProperty = null;
+        foreach ($this->getDiscriminatedSubtypes($key, $propertyClass, $definitions, $schema->getVersion()) as [$subKey, $subClass, $typeProperty]) {
+            $subDocumentDefinitionName = $documentDefinitionName.'.'.(new \ReflectionClass($subClass))->getShortName();
+            $subSchema = $this->buildDefinitionPropertiesSchema($subKey, $subDocumentDefinitionName, $subClass, $format, $type, $resourceOperation, $schema, $serializerContext);
+            if (\in_array($typeProperty, $definitions[$subKey]['required'] ?? [], true)) {
+                $definitions[$subDocumentDefinitionName.'.resource']['properties']['attributes']['required'] = [ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$typeProperty] ?? $typeProperty];
+            }
+            $data['oneOf'][] = $subSchema['data'];
+
+            foreach ($subSchema['included']['items']['anyOf'] ?? [] as $relatedDefinition) {
+                $relatedDefinitions[$relatedDefinition['$ref']] = $relatedDefinition;
+            }
+        }
+
+        // The inline "oneOf" branch of a class declared in its own discriminator map describes the instances of the class itself
+        foreach (null !== $typeProperty ? $definitions[$key]['oneOf'] : [] as $branch) {
+            if (isset($branch['$ref']) || !isset($branch['properties'][$typeProperty])) {
+                continue;
+            }
+
+            $attributeName = ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$typeProperty] ?? $typeProperty;
+            $ownData = $data;
+            unset($ownData['oneOf']);
+            $ownData['properties']['attributes']['properties'][$attributeName] = $branch['properties'][$typeProperty];
+            if (\in_array($typeProperty, $branch['required'] ?? [], true)) {
+                $ownData['properties']['attributes']['required'] = [$attributeName];
+            }
+            array_unshift($data['oneOf'], $ownData);
+        }
+
+        if ($relatedDefinitions && !$included) {
+            $included = [
+                'included' => [
+                    'description' => 'Related resources requested via the "include" query parameter.',
+                    'type' => 'array',
+                    'items' => [],
+                    'readOnly' => true,
+                    'externalDocs' => [
+                        'url' => 'https://jsonapi.org/format/#fetching-includes',
+                    ],
+                ],
+            ];
+        }
+
+        if ($included) {
+            $included['included']['items'] = ['anyOf' => array_values($relatedDefinitions)];
+        }
+
+        $resourceDefinitionName = $documentDefinitionName.'.resource';
+        $definitions[$resourceDefinitionName] = $data;
+
         return [
             'data' => ['$ref' => $this->getSchemaUriPrefix($schema->getVersion()).$resourceDefinitionName],
         ] + $included;
+    }
+
+    /**
+     * @return iterable<array{string, class-string, string}>
+     */
+    private function getDiscriminatedSubtypes(string $key, string $className, \ArrayObject $definitions, string $version): iterable
+    {
+        $discriminator = $definitions[$key]['discriminator'] ?? null;
+        if (null === $this->classDiscriminatorResolver || !isset($definitions[$key]['oneOf'], $discriminator['mapping']) || null === $mapping = $this->classDiscriminatorResolver->getMappingForClass($className)) {
+            return;
+        }
+
+        $prefix = $this->getSchemaUriPrefix($version);
+        foreach (ClassDiscriminatorHelper::getDirectSubtypes($mapping, $className) as $typeValue => $subClass) {
+            if (null === $ref = $discriminator['mapping'][$typeValue] ?? null) {
+                continue;
+            }
+
+            $subKey = substr($ref, \strlen($prefix));
+            if (isset($definitions[$subKey])) {
+                yield [$subKey, $subClass, $mapping->getTypeProperty()];
+            }
+        }
     }
 
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
@@ -409,6 +485,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $relatedClasses = [];
         foreach ($relationships as [$className, $isCollection]) {
             $isOne = $isOne || !$isCollection;
+            // A relation narrowed to a subtype of a resource (e.g. declared in a discriminator map) targets the resource itself
+            $className = $this->resourceClassResolver->getResourceClass(null, $className);
             $relatedClasses[$className] = $className;
         }
 
