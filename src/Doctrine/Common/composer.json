@@ -35,6 +35,7 @@
         "doctrine/orm": "^2.17 || ^3.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
+        "symfony/serializer": "^7.4 || ^8.0",
         "symfony/type-info": "^7.4 || ^8.0"
     },
     "conflict": {
@@ -46,7 +47,8 @@
         "symfony/config": "For XML resource configuration.",
         "api-platform/http-cache": "For HTTP cache invalidation.",
         "api-platform/graphql": "For GraphQl mercure subscriptions.",
-        "symfony/mercure-bundle": "For mercure updates publisher."
+        "symfony/mercure-bundle": "For mercure updates publisher.",
+        "symfony/serializer": "To expose Doctrine discriminator maps as polymorphic resources."
     },
     "autoload": {
         "psr-4": {

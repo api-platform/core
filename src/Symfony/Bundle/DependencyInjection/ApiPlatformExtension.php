@@ -864,6 +864,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('graphql/doctrine_orm.php');
         }
 
+        if (!$config['doctrine']['discriminator_map']) {
+            $container->removeDefinition('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        }
+
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
         }
@@ -897,6 +901,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql/doctrine_mongodb_odm.php');
+        }
+
+        if (!$config['doctrine_mongodb_odm']['discriminator_map']) {
+            $container->removeDefinition('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
         }
     }
 
