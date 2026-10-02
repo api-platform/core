@@ -237,7 +237,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority, array $declaredOperationClasses): Parameters
     {
         $propertyNames = $properties = [];
-        $parameters = $operation->getParameters() ?? new Parameters();
+        $existingParameters = $operation->getParameters();
+        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
 
         foreach ($this->createParametersFromAttributes($operation, $declaredOperationClasses) as $key => $parameter) {
             $parameters->add($key, $parameter);
