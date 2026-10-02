@@ -48,7 +48,7 @@ final class ObjectMapperOutputProcessor implements ProcessorInterface
 
         $request = $context['request'] ?? null;
         $request?->attributes->set('persisted_data', $data);
-        $dto = $this->objectMapper->map($data, $operation->getClass());
+        $dto = $this->objectMapper->map($data, $operation->getOutput()['class'] ?? $operation->getClass());
 
         return $this->decorated ? $this->decorated->process($dto, $operation, $uriVariables, $context) : $dto;
     }
