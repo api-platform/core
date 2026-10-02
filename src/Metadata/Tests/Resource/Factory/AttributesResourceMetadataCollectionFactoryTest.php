@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\HydraOperation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -38,7 +37,6 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithSh
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
-use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\HydraOperationResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
@@ -410,23 +408,5 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(SameNameDifferentMethodOperations::class);
-    }
-
-    public function testHydraOperationsFromAttributes(): void
-    {
-        $factory = new AttributesResourceMetadataCollectionFactory();
-
-        $collection = $factory->create(HydraOperationResource::class);
-
-        $this->assertCount(1, $collection);
-        $hydraOperations = $collection[0]->getHydraOperations();
-        $this->assertNotNull($hydraOperations);
-        $this->assertCount(2, $hydraOperations);
-        $this->assertContainsOnlyInstancesOf(HydraOperation::class, $hydraOperations);
-        $this->assertSame('DELETE', $hydraOperations[0]->getMethod());
-        $this->assertSame("is_granted('ROLE_ADMIN')", $hydraOperations[0]->getSecurity());
-        $this->assertFalse($hydraOperations[0]->getCollection());
-        $this->assertSame('PUT', $hydraOperations[1]->getMethod());
-        $this->assertTrue($hydraOperations[1]->getCollection());
     }
 }

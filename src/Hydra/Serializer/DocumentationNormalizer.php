@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
@@ -50,9 +49,6 @@ final class DocumentationNormalizer implements NormalizerInterface
     use HydraPrefixTrait;
     public const FORMAT = 'jsonld';
 
-    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
-    private ?ResourceAccessCheckerInterface $resourceAccessChecker;
-
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
         private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
@@ -62,10 +58,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?array $defaultContext = [],
         private readonly ?bool $entrypointEnabled = true,
-        ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
     ) {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**

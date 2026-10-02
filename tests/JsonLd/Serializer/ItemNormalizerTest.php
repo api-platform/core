@@ -18,15 +18,14 @@ use ApiPlatform\JsonLd\Serializer\ItemNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\HydraOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -101,83 +100,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeWithHydraOperationsMultipleApiResourceWithOperationInDuplicate(): void
-    {
-        $dummy = new Dummy();
-        $dummy->setName('hello');
-
-        $hydraOperations = new HydraOperation(method: 'DELETE');
-
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
-            (new ApiResource())
-                ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')]))
-                ->withHydraOperations([$hydraOperations]),
-            (new ApiResource())
-                ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')]))
-                ->withHydraOperations([$hydraOperations]),
-        ]));
-        $propertyNameCollection = new PropertyNameCollection(['name']);
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn($propertyNameCollection);
-
-        $propertyMetadata = (new ApiProperty())->withReadable(true);
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn($propertyMetadata);
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_PATH, null, Argument::any())->willReturn('/dummies/1990');
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-        $contextBuilderProphecy->getResourceContextUri(Dummy::class)->willReturn('/contexts/Dummy');
-
-        $normalizer = new ItemNormalizer(
-            $resourceMetadataCollectionFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $contextBuilderProphecy->reveal(),
-            null,
-            null,
-            null,
-            ['hydra_prefix' => false]
-        );
-        $normalizer->setSerializer($serializerProphecy->reveal());
-
-        $expected = [
-            '@context' => '/contexts/Dummy',
-            '@id' => '/dummies/1990',
-            '@type' => 'Dummy',
-            'operation' => [
-                [
-                    '@type' => [
-                        'Operation',
-                        'schema:DeleteAction',
-                    ],
-                    'method' => 'DELETE',
-                    'returns' => 'owl:Nothing',
-                    'title' => 'deleteDummy',
-                ],
-            ],
-            'name' => 'hello',
-        ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy));
-    }
-
-    public function testNormalizeWithHydraOperationsWithoutSecurity(): void
+    public function testNormalizeWithHydraOperations(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -186,10 +109,7 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
             (new ApiResource())
                 ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')]))
-                ->withHydraOperations([
-                    new HydraOperation(method: 'DELETE'),
-                ]),
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
         ]));
         $propertyNameCollection = new PropertyNameCollection(['name']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -225,7 +145,7 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            ['hydra_prefix' => false]
+            ['hydra_prefix' => false, 'hydra_operations' => true]
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -237,11 +157,12 @@ class ItemNormalizerTest extends TestCase
                 [
                     '@type' => [
                         'Operation',
-                        'schema:DeleteAction',
+                        'schema:FindAction',
                     ],
-                    'method' => 'DELETE',
-                    'returns' => 'owl:Nothing',
-                    'title' => 'deleteDummy',
+                    'description' => 'Retrieves a Dummy resource.',
+                    'method' => 'GET',
+                    'returns' => 'Dummy',
+                    'title' => 'getDummy',
                 ],
             ],
             'name' => 'hello',
@@ -249,7 +170,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeWithHydraOperationGrantedBySecurity(): void
+    public function testNormalizeWithHydraOperationsMultipleApiResource(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -258,10 +179,10 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
             (new ApiResource())
                 ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')]))
-                ->withHydraOperations([
-                    new HydraOperation(method: 'DELETE', security: "is_granted('ROLE_ADMIN')"),
-                ]),
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['patch' => (new Patch())->withShortName('Dummy')])),
         ]));
         $propertyNameCollection = new PropertyNameCollection(['name']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -281,9 +202,6 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $accessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $accessCheckerProphecy->isGranted(Dummy::class, "is_granted('ROLE_ADMIN')", Argument::any())->willReturn(true);
-
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
@@ -300,8 +218,7 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            ['hydra_prefix' => false],
-            $accessCheckerProphecy->reveal()
+            ['hydra_prefix' => false, 'hydra_operations' => true]
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -313,11 +230,26 @@ class ItemNormalizerTest extends TestCase
                 [
                     '@type' => [
                         'Operation',
-                        'schema:DeleteAction',
+                        'schema:FindAction',
                     ],
-                    'method' => 'DELETE',
-                    'returns' => 'owl:Nothing',
-                    'title' => 'deleteDummy',
+                    'description' => 'Retrieves a Dummy resource.',
+                    'method' => 'GET',
+                    'returns' => 'Dummy',
+                    'title' => 'getDummy',
+                ],
+                [
+                    '@type' => 'Operation',
+                    'description' => 'Updates the Dummy resource.',
+                    'method' => 'PATCH',
+                    'returns' => 'Dummy',
+                    'title' => 'patchDummy',
+                    'expects' => 'Dummy',
+                    'expectsHeader' => [
+                        [
+                            'headerName' => 'Content-Type',
+                            'possibleValue' => [],
+                        ],
+                    ],
                 ],
             ],
             'name' => 'hello',
@@ -325,7 +257,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeWithHydraOperationDeniedBySecurity(): void
+    public function testNormalizeWithHydraOperationsMultipleApiResourceWithOperationInDuplicate(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -334,10 +266,10 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
             (new ApiResource())
                 ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')]))
-                ->withHydraOperations([
-                    new HydraOperation(method: 'DELETE', security: "is_granted('ROLE_ADMIN')"),
-                ]),
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
         ]));
         $propertyNameCollection = new PropertyNameCollection(['name']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -357,9 +289,6 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $accessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $accessCheckerProphecy->isGranted(Dummy::class, "is_granted('ROLE_ADMIN')", Argument::any())->willReturn(false);
-
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
@@ -376,8 +305,7 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            ['hydra_prefix' => false],
-            $accessCheckerProphecy->reveal()
+            ['hydra_prefix' => false, 'hydra_operations' => true]
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -385,6 +313,18 @@ class ItemNormalizerTest extends TestCase
             '@context' => '/contexts/Dummy',
             '@id' => '/dummies/1990',
             '@type' => 'Dummy',
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:FindAction',
+                    ],
+                    'description' => 'Retrieves a Dummy resource.',
+                    'method' => 'GET',
+                    'returns' => 'Dummy',
+                    'title' => 'getDummy',
+                ],
+            ],
             'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\HydraOperation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -40,14 +39,8 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         $metadataCollection = [];
-        $hydraOperations = [];
         foreach ($reflectionClass->getAttributes() as $attribute) {
             $name = $attribute->getName();
-            if (HydraOperation::class === $name) {
-                $hydraOperations[] = $attribute->newInstance();
-                continue;
-            }
-
             if ($this->isResourceMetadata($name)) {
                 $metadataCollection[] = $attribute->newInstance();
             }
@@ -55,10 +48,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         $resultCollection = new ResourceMetadataCollection($resourceClass);
         foreach ($this->buildResourceOperations($metadataCollection, $resourceClass, iterator_to_array($resourceMetadataCollection)) as $resource) {
-            if ($hydraOperations) {
-                $resource = $resource->withHydraOperations($hydraOperations);
-            }
-
             $resultCollection[] = $resource;
         }
 
