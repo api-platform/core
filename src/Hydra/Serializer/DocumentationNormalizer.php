@@ -534,7 +534,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $property = [
             '@type' => $hydraPrefix.'SupportedProperty',
             $hydraPrefix.'property' => $propertyData,
-            $hydraPrefix.'title' => $propertyName,
+            $hydraPrefix.'title' => $propertyMetadata->getJsonldContext()[$hydraPrefix.'title'] ?? $propertyName,
             $hydraPrefix.'required' => $propertyMetadata->isRequired() ?? false,
             $hydraPrefix.'readable' => $propertyMetadata->isReadable(),
             $hydraPrefix.'writeable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),

@@ -2,9 +2,19 @@
 
 ## v5.0.2
 
+API Platform 5.0.2 contains every change shipped in [v4.4.3](#v443), plus the changes below.
+
 ### Behavior changes
 
 * [0c0b608f4](https://github.com/api-platform/core/commit/0c0b608f469e2fd76683c9160d4306f3102d07ef) fix(openapi): document request body on operations that deserialize (#8598). An operation with `deserialize: true` on a method other than `POST`, `PUT` or `PATCH` (for example `GET` or `DELETE`) now gets a `requestBody` and an input JSON Schema in the OpenAPI document. **This can change your generated schema**, so clients generated from it or snapshot tests of it can differ. It is acceptable in 5.0, but it was reverted from 4.4 because a schema change must not ship in a patch release.
+
+### Bug fixes
+
+* [773c6cca0](https://github.com/api-platform/core/commit/773c6cca04b05ac98da588c794bec14ca4d43f45) fix(doctrine): avoid deprecation with SortFilter (#8617)
+* [54add936f](https://github.com/api-platform/core/commit/54add936f92b9bf5bf9fa865d00abdcbaad9f7e2) fix(jsonapi): sparse fieldsets on included resources (#8584)
+* [f590d9438](https://github.com/api-platform/core/commit/f590d9438bed057826eab02553514ef6a2179db7) fix(laravel): don't duplicate the filter interface use statement (#8593)
+* [c092cd0df](https://github.com/api-platform/core/commit/c092cd0dfefd2827f978649c2848110bbff0e737) fix(metadata): use operation shortName for resources without ApiResource (#8609)
+* [d25771aa7](https://github.com/api-platform/core/commit/d25771aa76deeaee517d2e612640fa510bfc49ab) fix: throw exception when an operation is not declared in ApiResource for parameter attributes on properties (#8552)
 
 ## v5.0.1
 
@@ -63,6 +73,25 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
+
+## v4.4.3
+
+### Bug fixes
+
+* [1e1719de6](https://github.com/api-platform/core/commit/1e1719de65d13da449f1434e57fc5d1097038ce8) fix(doctrine): scalar schema for comparison params (#8605)
+* [5e91aa7b8](https://github.com/api-platform/core/commit/5e91aa7b80286a43baa3bb4e6c827b0f0e03aa5b) fix(graphql): resolve custom query args after the resource loop (#8596)
+* [c8d80a0d4](https://github.com/api-platform/core/commit/c8d80a0d4ce1cff0be5dc0de6c74c373824d630b) fix(httpcache): purge every collection operation of a resource (#8602)
+* [b8c856ba1](https://github.com/api-platform/core/commit/b8c856ba1cbeb2491e9e111aad1c8003b478ae4a) fix(jsonschema): groups on non-resource class (#8594)
+* [52f012d61](https://github.com/api-platform/core/commit/52f012d611486d510ba0179ee8e84c5e25b5c633) fix(jsonschema): validation groups in schema name (#8595)
+* [b96b92c31](https://github.com/api-platform/core/commit/b96b92c313b875292ef7f37d290e7f7aeb7f5dc3) fix(laravel): accept a single value in or filter (#8604)
+* [f8231d118](https://github.com/api-platform/core/commit/f8231d11837c319094438107eb8eb2ec13d0256b) fix(laravel): authorize non-paginated collections against the resource class (#8579)
+* [e46e6a1d4](https://github.com/api-platform/core/commit/e46e6a1d4b19d2a9a1037602bd8ee6a7acabbb02) fix(laravel): don't cache metadata read from a missing table (#8586)
+* [8879f40cb](https://github.com/api-platform/core/commit/8879f40cb6a796ffd1f838d6c16968940cf539f9) fix(laravel): wire the http cache tags processor (#8601)
+* [eca4fb1f0](https://github.com/api-platform/core/commit/eca4fb1f0074d1d4e480e6c0fba7d501f5ca9587) fix(openapi): document array query parameters with bracket notation (#8600)
+* [e8094fc99](https://github.com/api-platform/core/commit/e8094fc99e93125ee2d6256965145b0042b4d979) fix(symfony): clear property info and operation caches on warmup (#8599)
+* [7b6b7af4d](https://github.com/api-platform/core/commit/7b6b7af4da49e1f98cfc7382be84cb58afd41865) fix(symfony): guard browserkit verbose setter on symfony 6.4 (#8580)
+* [e7271494c](https://github.com/api-platform/core/commit/e7271494c5db73413678d4ddd4f3bd2f7902132b) fix(symfony): keep denormalize on decorated normalizers (#8606)
+* [ee575fcc0](https://github.com/api-platform/core/commit/ee575fcc0ff7f6aa1170c4c0be23912d279b95d6) fix(symfony): register upgrade filter command only when doctrine-common is installed (#8597)
 
 ## v4.4.2
 
