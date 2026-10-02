@@ -57,7 +57,12 @@ final class ControllerApiOperationPipelineListener
             return;
         }
 
-        $uriVariables = $this->resolveUriVariables($operation, $request);
+        try {
+            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
+            throw new NotFoundHttpException('Invalid uri variables.', $e);
+        }
+
         $request->attributes->set('_api_uri_variables', $uriVariables);
 
         $this->provider->provide(
@@ -105,17 +110,5 @@ final class ControllerApiOperationPipelineListener
         $operation = $this->initializeOperation($request);
 
         return $operation instanceof HttpOperation ? $operation : null;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function resolveUriVariables(HttpOperation $operation, Request $request): array
-    {
-        try {
-            return $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
-        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
-            throw new NotFoundHttpException('Invalid uri variables.', $e);
-        }
     }
 }

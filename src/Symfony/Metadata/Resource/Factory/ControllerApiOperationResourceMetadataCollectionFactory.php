@@ -16,6 +16,8 @@ namespace ApiPlatform\Symfony\Metadata\Resource\Factory;
 use ApiPlatform\Metadata\ApiOperation;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
@@ -67,6 +69,10 @@ final class ControllerApiOperationResourceMetadataCollectionFactory implements R
                 $operation = $operation
                     ->withRouteName($this->getRouteName($controllerClass, $method, $operation, $controller))
                     ->withController($controller);
+
+                if (($operation instanceof Get || $operation instanceof GetCollection) && null === $operation->canRead()) {
+                    $operation = $operation->withRead(false);
+                }
 
                 $resource = $this->getResourceWithDefaults($resourceClass, $this->getDefaultShortname($resourceClass), new ApiResource());
                 [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);

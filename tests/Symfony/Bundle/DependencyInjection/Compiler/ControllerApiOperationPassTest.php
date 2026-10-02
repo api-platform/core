@@ -14,7 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ControllerApiOperationPass;
+use ApiPlatform\Tests\Fixtures\ControllerApiOperation\ControllerApiOperationClassAndOutput;
 use ApiPlatform\Tests\Fixtures\ControllerApiOperation\ControllerApiOperationDefinitions;
+use ApiPlatform\Tests\Fixtures\ControllerApiOperation\ControllerApiOperationInputOnly;
+use ApiPlatform\Tests\Fixtures\ControllerApiOperation\ControllerApiOperationOutputOnly;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ControllerApiOperation\Checkout;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ControllerApiOperation\CheckoutInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ControllerApiOperation\CheckoutOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Common\ControllerApiOperationController;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Common\CustomController;
@@ -32,10 +37,19 @@ final class ControllerApiOperationPassTest extends TestCase
         (new ControllerApiOperationPass())->process($container);
 
         $this->assertSame(
-            [CheckoutOutput::class => [ControllerApiOperationController::class.'::__invoke']],
+            [
+                CheckoutOutput::class => [ControllerApiOperationController::class.'::__invoke'],
+                Checkout::class => [
+                    ControllerApiOperationController::class.'::get',
+                    ControllerApiOperationController::class.'::getCollection',
+                    ControllerApiOperationController::class.'::patch',
+                    ControllerApiOperationController::class.'::delete',
+                ],
+            ],
             $container->getParameter('api_platform.controller_operations'),
         );
-        $this->assertSame(['Existing', CheckoutOutput::class], $container->getParameter('api_platform.class_name_resources'));
+        $this->assertSame([CheckoutOutput::class => true, Checkout::class => true], $container->getParameter('api_platform.controller_operation_resources'));
+        $this->assertSame(['Existing'], $container->getParameter('api_platform.class_name_resources'));
     }
 
     public function testIgnoresUntaggedControllers(): void
@@ -46,6 +60,7 @@ final class ControllerApiOperationPassTest extends TestCase
         (new ControllerApiOperationPass())->process($container);
 
         $this->assertSame([], $container->getParameter('api_platform.controller_operations'));
+        $this->assertSame([], $container->getParameter('api_platform.controller_operation_resources'));
         $this->assertSame(['Existing'], $container->getParameter('api_platform.class_name_resources'));
     }
 
@@ -55,6 +70,32 @@ final class ControllerApiOperationPassTest extends TestCase
         $this->expectExceptionMessage(ControllerApiOperationDefinitions::class.'::withoutResourceClass');
 
         (new ControllerApiOperationPass())->process($this->createContainer(ControllerApiOperationDefinitions::class));
+    }
+
+    public function testInputOnlyThrows(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('an "input" alone does not define a resource');
+
+        (new ControllerApiOperationPass())->process($this->createContainer(ControllerApiOperationInputOnly::class));
+    }
+
+    public function testClassTakesPrecedenceOverOutput(): void
+    {
+        $container = $this->createContainer(ControllerApiOperationClassAndOutput::class);
+
+        (new ControllerApiOperationPass())->process($container);
+
+        $this->assertSame([CheckoutInput::class => true], $container->getParameter('api_platform.controller_operation_resources'));
+    }
+
+    public function testOutputIsResourceWithoutClass(): void
+    {
+        $container = $this->createContainer(ControllerApiOperationOutputOnly::class);
+
+        (new ControllerApiOperationPass())->process($container);
+
+        $this->assertSame([CheckoutOutput::class => true], $container->getParameter('api_platform.controller_operation_resources'));
     }
 
     private function createContainer(string ...$controllers): ContainerBuilder

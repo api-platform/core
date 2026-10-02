@@ -29,6 +29,7 @@ final class ControllerApiOperationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $controllerOperations = [];
+        $resources = [];
 
         foreach (array_keys($container->findTaggedServiceIds('controller.service_arguments')) as $id) {
             $definition = $container->getDefinition($id);
@@ -47,27 +48,22 @@ final class ControllerApiOperationPass implements CompilerPassInterface
                     $resourceClass = $this->getResourceClass($attribute->newInstance()->operation);
 
                     if (null === $resourceClass) {
-                        throw new InvalidArgumentException(\sprintf('The "#[%s]" on "%s" must define a "class", an "output" or an "input" to resolve its resource class.', ApiOperation::class, $controller));
+                        throw new InvalidArgumentException(\sprintf('The "#[%s]" on "%s" must define a "class" or an "output": an "input" alone does not define a resource.', ApiOperation::class, $controller));
                     }
 
                     $controllerOperations[$resourceClass][] = $controller;
+                    $resources[$resourceClass] = true;
                 }
             }
         }
 
         $container->setParameter('api_platform.controller_operations', $controllerOperations);
-
-        if ($controllerOperations) {
-            $container->setParameter('api_platform.class_name_resources', array_values(array_unique([
-                ...$container->getParameter('api_platform.class_name_resources'),
-                ...array_keys($controllerOperations),
-            ])));
-        }
+        $container->setParameter('api_platform.controller_operation_resources', $resources);
     }
 
     private function getResourceClass(HttpOperation $operation): ?string
     {
-        foreach ([$operation->getClass(), $operation->getOutput(), $operation->getInput()] as $candidate) {
+        foreach ([$operation->getClass(), $operation->getOutput()] as $candidate) {
             if (\is_array($candidate)) {
                 $candidate = $candidate['class'] ?? null;
             }

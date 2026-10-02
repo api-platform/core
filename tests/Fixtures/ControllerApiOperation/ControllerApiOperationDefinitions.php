@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\ControllerApiOperation;
 
 use ApiPlatform\Metadata\ApiOperation;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ControllerApiOperation\CheckoutOutput;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,6 +46,34 @@ class ControllerApiOperationDefinitions
     #[Route('/without_resource_class', name: 'without_resource_class', methods: ['POST'])]
     #[ApiOperation(new Post())]
     public function withoutResourceClass(): CheckoutOutput
+    {
+        return new CheckoutOutput();
+    }
+
+    #[Route('/get', name: 'get_route', methods: ['GET'])]
+    #[ApiOperation(new Get(class: CheckoutOutput::class))]
+    public function withGet(): CheckoutOutput
+    {
+        return new CheckoutOutput();
+    }
+
+    #[Route('/get_collection', name: 'get_collection_route', methods: ['GET'])]
+    #[ApiOperation(new GetCollection(class: CheckoutOutput::class))]
+    public function withGetCollection(): array
+    {
+        return [];
+    }
+
+    #[Route('/get_explicit_read', name: 'get_explicit_read_route', methods: ['GET'])]
+    #[ApiOperation(new Get(class: CheckoutOutput::class, read: true))]
+    public function withExplicitRead(): CheckoutOutput
+    {
+        return new CheckoutOutput();
+    }
+
+    #[Route('/patch', name: 'patch_route', methods: ['PATCH'])]
+    #[ApiOperation(new Patch(class: CheckoutOutput::class))]
+    public function withPatch(): CheckoutOutput
     {
         return new CheckoutOutput();
     }
