@@ -2,9 +2,19 @@
 
 ## v5.0.2
 
+API Platform 5.0.2 contains every change shipped in [v4.4.3](#v443), plus the changes below.
+
 ### Behavior changes
 
 * [0c0b608f4](https://github.com/api-platform/core/commit/0c0b608f469e2fd76683c9160d4306f3102d07ef) fix(openapi): document request body on operations that deserialize (#8598). An operation with `deserialize: true` on a method other than `POST`, `PUT` or `PATCH` (for example `GET` or `DELETE`) now gets a `requestBody` and an input JSON Schema in the OpenAPI document. **This can change your generated schema**, so clients generated from it or snapshot tests of it can differ. It is acceptable in 5.0, but it was reverted from 4.4 because a schema change must not ship in a patch release.
+
+### Bug fixes
+
+* [773c6cca0](https://github.com/api-platform/core/commit/773c6cca04b05ac98da588c794bec14ca4d43f45) fix(doctrine): avoid deprecation with SortFilter (#8617)
+* [54add936f](https://github.com/api-platform/core/commit/54add936f92b9bf5bf9fa865d00abdcbaad9f7e2) fix(jsonapi): sparse fieldsets on included resources (#8584)
+* [f590d9438](https://github.com/api-platform/core/commit/f590d9438bed057826eab02553514ef6a2179db7) fix(laravel): don't duplicate the filter interface use statement (#8593)
+* [c092cd0df](https://github.com/api-platform/core/commit/c092cd0dfefd2827f978649c2848110bbff0e737) fix(metadata): use operation shortName for resources without ApiResource (#8609)
+* [d25771aa7](https://github.com/api-platform/core/commit/d25771aa76deeaee517d2e612640fa510bfc49ab) fix: throw exception when an operation is not declared in ApiResource for parameter attributes on properties (#8552)
 
 ## v5.0.1
 
