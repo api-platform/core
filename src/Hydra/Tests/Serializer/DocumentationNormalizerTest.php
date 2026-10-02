@@ -1162,4 +1162,54 @@ class DocumentationNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
     }
+
+    public function testNormalizeWithStringGroups(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->expects($this->once())->method('create')->with('dummy', $this->isArray())->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->expects($this->once())->method('create')->with('dummy', 'name', $this->isArray())->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+        );
+
+        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->expects($this->once())->method('create')->with('dummy')->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())
+                ->withShortName('dummy')
+                ->withOperations(new Operations([
+                    'get' => (new Get())->withShortName('dummy'),
+                ]))
+                ->withNormalizationContext(['groups' => 'read'])
+                ->withDenormalizationContext(['groups' => 'write']),
+        ]));
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->with($this->isString())->willReturn(false);
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturnMap([
+            ['api_entrypoint', '/'],
+            ['api_doc', ['_format' => 'jsonld'], '/doc'],
+            ['api_doc', ['_format' => 'jsonld'], 0, '/doc'],
+        ]);
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $resourceClassResolver,
+            $urlGenerator
+        );
+
+        $doc = $documentationNormalizer->normalize($documentation);
+
+        $this->assertSame('#dummy', $doc['hydra:supportedClass'][0]['@id']);
+        $this->assertNotEmpty($doc['hydra:supportedClass'][0]['hydra:supportedProperty']);
+    }
 }
