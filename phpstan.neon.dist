@@ -104,9 +104,6 @@ parameters:
 		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Exception\\\\PartialDenormalizationException and 'getNotNormalizableV…' will always evaluate to true\\.#"
 
 
-		-
-			message: '#Access to an undefined property .*DocumentationNormalizer::\$resourceMetadataCollectionFactory#'
-			path: src/Hydra/Serializer/DocumentationNormalizer.php
 
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
 		- '#^Call to (static )?method PHPUnit\\Framework\\Assert::.* will always evaluate to true\.$#'
