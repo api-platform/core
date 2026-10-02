@@ -532,7 +532,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $propertyName = $reflectionProperty->getName();
 
                 if (null !== ($parameterOperations = $parameter->getOperations())) {
-                    $parameterOperationClasses = array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations);
+                    $parameterOperationClasses = array_map(static fn (Operation|string $parameterOperation): string => \is_string($parameterOperation) ? $parameterOperation : $parameterOperation::class, $parameterOperations);
 
                     foreach ($parameterOperationClasses as $parameterOperationClass) {
                         if (!\in_array($parameterOperationClass, $declaredOperationClasses, true)) {
