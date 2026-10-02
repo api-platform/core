@@ -366,10 +366,10 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
         $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
+        $resourceMetadataCollectionFactory->expects($this->atLeastOnce())->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+        $em->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
 
         $changeSet = [];
         $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
@@ -416,10 +416,10 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
         $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
+        $resourceMetadataCollectionFactory->expects($this->atLeastOnce())->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+        $em->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
 
         $changeSet = [];
         $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
