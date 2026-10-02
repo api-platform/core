@@ -10,7 +10,7 @@
         <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
     {% endblock %}
 
-    {% set active_ui = app.request.query.get('ui', 'swagger_ui') %}
+    {% set active_ui = app.request.query.get('ui', reDocEnabled and not swaggerUiEnabled ? 're_doc' : 'swagger_ui') %}
     {% set is_scalar = (scalarEnabled and not swaggerUiEnabled and not reDocEnabled) or (scalarEnabled and 'scalar' == active_ui) %}
 
     {%- set csp_nonce_attr = cspNonce is defined and cspNonce is not null ? ' nonce="' ~ (cspNonce|e('html_attr')) ~ '"' : '' -%}
@@ -90,12 +90,19 @@
             {% for format in formats|keys %}
                 <a href="{{ path(originalRoute, originalRouteParams|merge({'_format': format})) }}">{{ format }}</a>
             {% endfor %}
-            <br>
-            Other API docs:
-            {% if swaggerUiEnabled and active_ui != 'swagger_ui' %}<a href="{{ path(originalRoute, originalRouteParams) }}">Swagger UI</a>{% endif %}
-            {% if reDocEnabled and active_ui != 're_doc' %}<a href="{{ path(originalRoute, originalRouteParams|merge({'ui': 're_doc'})) }}">ReDoc</a>{% endif %}
-            {% if scalarEnabled and active_ui != 'scalar' %}<a href="{{ path(originalRoute, originalRouteParams|merge({'ui': 'scalar'})) }}">Scalar</a>{% endif %}
-            {% if graphiQlEnabled %}<a href="{{ path('api_graphql_graphiql') }}" class="graphiql-link">GraphiQL</a>{% endif %}
+
+            {% set swaggerUiOption = swaggerUiEnabled and active_ui != 'swagger_ui' %}
+            {% set reDocOption = reDocEnabled and active_ui != 're_doc' %}
+            {% set scalarOption = scalarEnabled and active_ui != 'scalar' %}
+
+            {% if swaggerUiOption or reDocOption or scalarOption or graphiQlEnabled %}
+                <br>
+                Other API docs:
+                {% if swaggerUiOption %}<a href="{{ path(originalRoute, originalRouteParams) }}">Swagger UI</a>{% endif %}
+                {% if reDocOption %}<a href="{{ path(originalRoute, originalRouteParams|merge({'ui': 're_doc'})) }}">ReDoc</a>{% endif %}
+                {% if scalarOption %}<a href="{{ path(originalRoute, originalRouteParams|merge({'ui': 'scalar'})) }}">Scalar</a>{% endif %}
+                {% if graphiQlEnabled %}<a href="{{ path('api_graphql_graphiql') }}" class="graphiql-link">GraphiQL</a>{% endif %}
+            {% endif %}
         </div>
     </div>
 </div>
@@ -105,7 +112,7 @@
     {% if is_scalar %}
         <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"{{ csp_nonce_attr|raw }}></script>
         <script src="{{ asset('bundles/apiplatform/init-scalar-ui.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
-    {% elseif (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
+    {% elseif (reDocEnabled and 're_doc' == active_ui) %}
         <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
         <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js', assetPackage) }}"{{ csp_nonce_attr|raw }}></script>
     {% else %}
