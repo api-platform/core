@@ -77,9 +77,10 @@ class HttpOperation extends Operation
      *     field: string,
      *     direction: string,
      * }>|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
-     * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
-     * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
-     * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
+     * @param array|null                      $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
+     * @param array|null                      $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
+     * @param array|null                      $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
+     * @param list<HydraOperation>|false|null $hydraOperations        the operations exposed in the "hydra:operation" property of the JSON-LD responses, false to expose none
      * @param array{
      *     class?: string|null,
      *     name?: string,
@@ -174,6 +175,7 @@ class HttpOperation extends Operation
         protected ?array $errors = null,
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        protected array|false|null $hydraOperations = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -652,6 +654,25 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
+
+        return $self;
+    }
+
+    /**
+     * @return list<HydraOperation>|false|null
+     */
+    public function getHydraOperations(): array|false|null
+    {
+        return $this->hydraOperations;
+    }
+
+    /**
+     * @param list<HydraOperation>|false $hydraOperations
+     */
+    public function withHydraOperations(array|false $hydraOperations): static
+    {
+        $self = clone $this;
+        $self->hydraOperations = $hydraOperations;
 
         return $self;
     }

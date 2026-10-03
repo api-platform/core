@@ -63,6 +63,7 @@ use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFa
 use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\HydraOperationsResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory;
@@ -232,39 +233,41 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                         new ParameterResourceMetadataCollectionFactory(
                             $this->app->make(PropertyNameCollectionFactoryInterface::class),
                             $this->app->make(PropertyMetadataFactoryInterface::class),
-                            new AlternateUriResourceMetadataCollectionFactory(
-                                new FiltersResourceMetadataCollectionFactory(
-                                    new FormatsResourceMetadataCollectionFactory(
-                                        new InputOutputResourceMetadataCollectionFactory(
-                                            new PhpDocResourceMetadataCollectionFactory(
-                                                new OperationNameResourceMetadataCollectionFactory(
-                                                    new LinkResourceMetadataCollectionFactory(
-                                                        $app->make(LinkFactoryInterface::class),
-                                                        new UriTemplateResourceMetadataCollectionFactory(
+                            new HydraOperationsResourceMetadataCollectionFactory(
+                                new AlternateUriResourceMetadataCollectionFactory(
+                                    new FiltersResourceMetadataCollectionFactory(
+                                        new FormatsResourceMetadataCollectionFactory(
+                                            new InputOutputResourceMetadataCollectionFactory(
+                                                new PhpDocResourceMetadataCollectionFactory(
+                                                    new OperationNameResourceMetadataCollectionFactory(
+                                                        new LinkResourceMetadataCollectionFactory(
                                                             $app->make(LinkFactoryInterface::class),
-                                                            $app->make(PathSegmentNameGeneratorInterface::class),
-                                                            new NotExposedOperationResourceMetadataCollectionFactory(
+                                                            new UriTemplateResourceMetadataCollectionFactory(
                                                                 $app->make(LinkFactoryInterface::class),
-                                                                new AttributesResourceMetadataCollectionFactory(
-                                                                    new ConcernsResourceMetadataCollectionFactory(
-                                                                        null,
+                                                                $app->make(PathSegmentNameGeneratorInterface::class),
+                                                                new NotExposedOperationResourceMetadataCollectionFactory(
+                                                                    $app->make(LinkFactoryInterface::class),
+                                                                    new AttributesResourceMetadataCollectionFactory(
+                                                                        new ConcernsResourceMetadataCollectionFactory(
+                                                                            null,
+                                                                            $app->make(LoggerInterface::class),
+                                                                            $config->get('api-platform.defaults', []),
+                                                                            $config->get('api-platform.graphql.enabled'),
+                                                                        ),
                                                                         $app->make(LoggerInterface::class),
                                                                         $config->get('api-platform.defaults', []),
                                                                         $config->get('api-platform.graphql.enabled'),
                                                                     ),
-                                                                    $app->make(LoggerInterface::class),
-                                                                    $config->get('api-platform.defaults', []),
-                                                                    $config->get('api-platform.graphql.enabled'),
-                                                                ),
-                                                            )
-                                                        ),
-                                                        $config->get('api-platform.graphql.enabled')
+                                                                )
+                                                            ),
+                                                            $config->get('api-platform.graphql.enabled')
+                                                        )
                                                     )
                                                 )
-                                            )
-                                        ),
-                                        $formats,
-                                        $config->get('api-platform.patch_formats'),
+                                            ),
+                                            $formats,
+                                            $config->get('api-platform.patch_formats'),
+                                        )
                                     )
                                 )
                             ),

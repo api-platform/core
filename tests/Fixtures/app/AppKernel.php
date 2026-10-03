@@ -290,6 +290,7 @@ class AppKernel extends Kernel
             ],
             'serializer' => [
                 'hydra_prefix' => true,
+                'hydra_operations' => false,
             ],
         ]);
 

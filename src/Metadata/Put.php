@@ -106,6 +106,7 @@ final class Put extends HttpOperation
         array $extraProperties = [],
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
+        array|false|null $hydraOperations = null,
         private ?bool $allowCreate = null,
         ?bool $map = null,
     ) {
@@ -192,6 +193,7 @@ final class Put extends HttpOperation
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            hydraOperations: $hydraOperations,
             jsonStream: $jsonStream,
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
