@@ -21,9 +21,9 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\State\Util\OperationStageDefaults;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,27 +69,7 @@ final class MainController
             'resource_class' => $operation->getClass(),
         ];
 
-        if (null === $operation->canValidate()) {
-            $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
-        }
-
-        if (null === $operation->canRead()) {
-            $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
-        }
-
-        if (null === $operation->canDeserialize()) {
-            $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
-        }
-
-        $denormalizationContext = $operation->getDenormalizationContext() ?? [];
-        if ($operation->canDeserialize() && !isset($denormalizationContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE])) {
-            $method = $operation->getMethod();
-            $assignObjectToPopulate = 'POST' === $method
-                || 'PATCH' === $method
-                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
-
-            $operation = $operation->withDenormalizationContext($denormalizationContext + [SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => $assignObjectToPopulate]);
-        }
+        $operation = OperationStageDefaults::forProvider($operation, $request);
 
         $body = $this->provider->provide($operation, $uriVariables, $context);
 
@@ -114,13 +94,7 @@ final class MainController
         $context['read_data'] = $request->attributes->get('read_data');
         $context['mapped_data'] = $request->attributes->get('mapped_data');
 
-        if (null === $operation->canWrite()) {
-            $operation = $operation->withWrite(!$request->isMethodSafe());
-        }
-
-        if (null === $operation->canSerialize()) {
-            $operation = $operation->withSerialize(true);
-        }
+        $operation = OperationStageDefaults::forProcessor($operation, $request);
 
         return $this->processor->process($body, $operation, $uriVariables, $context);
     }
