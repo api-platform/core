@@ -427,6 +427,19 @@ class EloquentTest extends TestCase
         $this->assertSame($json['totalItems'], 2);
     }
 
+    public function testRangeFilterWithInvalidValue(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
+        $res = $this->get('/api/books?isbn_range=5', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(10, $res->json()['totalItems']);
+
+        $res = $this->get('/api/books?isbn_range[unknown]=5', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(10, $res->json()['totalItems']);
+    }
+
     public function testWrongOrderFilter(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();

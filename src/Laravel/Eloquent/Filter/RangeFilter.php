@@ -38,6 +38,11 @@ final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, O
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
+        if (!\is_array($values)) {
+            return $builder;
+        }
+
+        $values = array_intersect_key($values, self::OPERATOR_VALUE);
         $queryProperty = $this->getQueryProperty($parameter);
 
         foreach ($values as $key => $value) {
