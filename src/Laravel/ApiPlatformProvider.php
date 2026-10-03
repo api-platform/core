@@ -215,6 +215,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -307,6 +309,10 @@ class ApiPlatformProvider extends ServiceProvider
                     new RelationMetadataLoader($app->make(ModelMetadata::class)),
                 ])
             );
+        });
+
+        $this->app->singleton(ClassDiscriminatorResolverInterface::class, static function (Application $app) {
+            return new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class));
         });
 
         $this->app->singleton(SerializerClassMetadataFactory::class, static function (Application $app) {
@@ -967,6 +973,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                $app->make(ClassDiscriminatorResolverInterface::class),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {
@@ -976,6 +983,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                null,
+                $app->make(ClassDiscriminatorResolverInterface::class),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
