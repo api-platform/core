@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\JsonLd\Serializer;
+namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiResource;
@@ -86,7 +86,7 @@ trait HydraOperationsTrait
             $security ??= $candidate->getSecurity() ?? $candidate->getPolicy();
             try {
                 $granted = null === $security || $resourceAccessChecker?->isGranted($candidate->getClass(), $security, ['object' => $object, 'previous_object' => $object, 'request' => $context['request'] ?? null] + ($context['uri_variables'] ?? []));
-            } catch (\Exception) {
+            } catch (\Throwable) {
                 $granted = false;
             }
 

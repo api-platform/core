@@ -16,7 +16,6 @@ namespace ApiPlatform\Hydra\Serializer;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
-use ApiPlatform\JsonLd\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;

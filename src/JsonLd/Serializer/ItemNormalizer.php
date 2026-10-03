@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Hydra\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;

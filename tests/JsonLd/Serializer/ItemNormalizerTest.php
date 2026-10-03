@@ -188,6 +188,22 @@ class ItemNormalizerTest extends TestCase
         ], $normalizer->normalize($dummy)['operation']);
     }
 
+    public function testNormalizeHidesTheHydraOperationsWhoseSecurityCannotBeEvaluated(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $accessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $accessCheckerProphecy->isGranted(Dummy::class, 'update', Argument::withEntry('object', $dummy))->willThrow(new \ArgumentCountError('Too few arguments to function DummyPolicy::update()'));
+
+        $normalizer = $this->createHydraOperationsNormalizer($dummy, [
+            new Get(uriTemplate: '/dummies/{id}{._format}', shortName: 'Dummy', class: Dummy::class, name: 'get'),
+            new Patch(uriTemplate: '/dummies/{id}{._format}', shortName: 'Dummy', class: Dummy::class, name: 'patch', policy: 'update'),
+        ], [], $accessCheckerProphecy->reveal());
+
+        $this->assertSame(['GET'], array_column($normalizer->normalize($dummy)['operation'], 'method'));
+    }
+
     #[DataProvider('disabledHydraOperationsProvider')]
     public function testNormalizeWithDisabledHydraOperations(?false $hydraOperations, array $defaultContext): void
     {

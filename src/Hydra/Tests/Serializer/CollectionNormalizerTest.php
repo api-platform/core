@@ -20,6 +20,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -455,6 +456,10 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizeExposesTheCollectionOperationsByDefault(): void
     {
+        if (!method_exists(HttpOperation::class, 'getHydraOperations')) {
+            $this->markTestSkipped('api-platform/metadata without hydraOperations');
+        }
+
         $data = [];
         $getCollection = new GetCollection(uriTemplate: '/foos{._format}', shortName: 'Foo', class: Foo::class, name: 'get_collection');
 

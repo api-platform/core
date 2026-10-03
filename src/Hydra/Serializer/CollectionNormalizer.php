@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\JsonLd\ContextBuilderInterface;
-use ApiPlatform\JsonLd\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
