@@ -13,6 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Tests\Bundle\DependencyInjection;
 
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
+use ApiPlatform\Doctrine\Odm\State\CollectionProvider as OdmCollectionProvider;
+use ApiPlatform\Doctrine\Odm\State\ItemProvider as OdmItemProvider;
+use ApiPlatform\Doctrine\Orm\State\CollectionProvider as OrmCollectionProvider;
+use ApiPlatform\Doctrine\Orm\State\ItemProvider as OrmItemProvider;
+use ApiPlatform\Elasticsearch\State\CollectionProvider as ElasticsearchCollectionProvider;
+use ApiPlatform\Elasticsearch\State\ItemProvider as ElasticsearchItemProvider;
 use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -23,6 +31,8 @@ use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Action\NotFoundAction;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
@@ -593,5 +603,51 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHasService('api_platform.doctrine.listener.http_cache.purge');
         $this->assertContainerHasService('api_platform.http_cache_purger.processor.add_tags');
         $this->assertContainerHasAlias('api_platform.http_cache.purger');
+    }
+
+    public function testStateServicesHaveNamedAutowiringAliases(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['elasticsearch']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $aliases = [
+            ProcessorInterface::class.' $ormPersist' => 'api_platform.doctrine.orm.state.persist_processor',
+            ProcessorInterface::class.' $ormRemove' => 'api_platform.doctrine.orm.state.remove_processor',
+            ProviderInterface::class.' $ormItem' => 'api_platform.doctrine.orm.state.item_provider',
+            ProviderInterface::class.' $ormCollection' => 'api_platform.doctrine.orm.state.collection_provider',
+            ProcessorInterface::class.' $odmPersist' => 'api_platform.doctrine_mongodb.odm.state.persist_processor',
+            ProcessorInterface::class.' $odmRemove' => 'api_platform.doctrine_mongodb.odm.state.remove_processor',
+            ProviderInterface::class.' $odmItem' => 'api_platform.doctrine_mongodb.odm.state.item_provider',
+            ProviderInterface::class.' $odmCollection' => 'api_platform.doctrine_mongodb.odm.state.collection_provider',
+            ProviderInterface::class.' $elasticsearchItem' => 'api_platform.elasticsearch.state.item_provider',
+            ProviderInterface::class.' $elasticsearchCollection' => 'api_platform.elasticsearch.state.collection_provider',
+        ];
+
+        foreach ($aliases as $alias => $serviceId) {
+            $this->assertContainerHasAlias($alias);
+            $this->assertSame($serviceId, (string) $this->container->getAlias($alias));
+        }
+    }
+
+    public function testFinalStateServiceFqcnAliasesAreDeprecated(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['elasticsearch']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        foreach ([
+            PersistProcessor::class,
+            RemoveProcessor::class,
+            OrmItemProvider::class,
+            OrmCollectionProvider::class,
+            OdmItemProvider::class,
+            OdmCollectionProvider::class,
+            ElasticsearchItemProvider::class,
+            ElasticsearchCollectionProvider::class,
+        ] as $fqcn) {
+            $this->assertContainerHasAlias($fqcn);
+            $this->assertTrue($this->container->getAlias($fqcn)->isDeprecated(), \sprintf('Alias "%s" is not deprecated.', $fqcn));
+        }
     }
 }
