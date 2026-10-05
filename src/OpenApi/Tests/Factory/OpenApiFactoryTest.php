@@ -1775,7 +1775,7 @@ class OpenApiFactoryTest extends TestCase
         $this->assertCount(1, $castTrueParameters);
         $this->assertSame('ids[]', $castTrueParameters[0]->getName());
         $this->assertTrue($castTrueParameters[0]->canExplode());
-        $this->assertSame('deepObject', $castTrueParameters[0]->getStyle());
+        $this->assertSame('form', $castTrueParameters[0]->getStyle());
         $this->assertSame($arraySchema, $castTrueParameters[0]->getSchema());
 
         $castFalseParameters = $openApi->getPaths()->getPath('/cast-false')->getGet()->getParameters();
@@ -1784,11 +1784,11 @@ class OpenApiFactoryTest extends TestCase
         $this->assertSame($arraySchema, $castFalseParameters[0]->getSchema());
 
         $castNullParameters = $openApi->getPaths()->getPath('/cast-null')->getGet()->getParameters();
-        $this->assertCount(2, $castNullParameters);
-        $this->assertSame('ids', $this->getParameterByName($castNullParameters, 'ids')->getName());
-        $this->assertSame('ids[]', $this->getParameterByName($castNullParameters, 'ids[]')->getName());
-        $this->assertTrue($this->getParameterByName($castNullParameters, 'ids[]')->canExplode());
-        $this->assertSame('deepObject', $this->getParameterByName($castNullParameters, 'ids[]')->getStyle());
+        $this->assertCount(1, $castNullParameters);
+        $this->assertSame('ids[]', $castNullParameters[0]->getName());
+        $this->assertTrue($castNullParameters[0]->canExplode());
+        $this->assertSame('form', $castNullParameters[0]->getStyle());
+        $this->assertSame($arraySchema, $castNullParameters[0]->getSchema());
 
         $scalarQueryParameters = $openApi->getPaths()->getPath('/scalar-query')->getGet()->getParameters();
         $this->assertCount(1, $scalarQueryParameters);
