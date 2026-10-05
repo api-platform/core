@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Filter;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Psr\Log\LoggerInterface;
 
 final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
@@ -32,17 +34,25 @@ final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, O
         'gte' => '>=',
     ];
 
+    public function __construct(private readonly ?LoggerInterface $logger = null)
+    {
+    }
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        if (!\is_array($values)) {
+        $values = \is_array($values) ? array_intersect_key($values, self::OPERATOR_VALUE) : [];
+        if (!$values) {
+            $this->logger?->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(\sprintf('At least one valid operator ("%s") is required for "%s" parameter', implode('", "', array_keys(self::OPERATOR_VALUE)), $parameter->getKey())),
+            ]);
+
             return $builder;
         }
 
-        $values = array_intersect_key($values, self::OPERATOR_VALUE);
         $queryProperty = $this->getQueryProperty($parameter);
 
         foreach ($values as $key => $value) {

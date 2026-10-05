@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\Tests;
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
@@ -430,6 +431,7 @@ class EloquentTest extends TestCase
     public function testRangeFilterWithInvalidValue(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        Log::spy();
 
         $res = $this->get('/api/books?isbn_range=5', ['Accept' => ['application/ld+json']]);
         $res->assertOk();
@@ -438,6 +440,7 @@ class EloquentTest extends TestCase
         $res = $this->get('/api/books?isbn_range[unknown]=5', ['Accept' => ['application/ld+json']]);
         $res->assertOk();
         $this->assertSame(10, $res->json()['totalItems']);
+        Log::shouldHaveReceived('notice')->twice();
     }
 
     public function testWrongOrderFilter(): void
