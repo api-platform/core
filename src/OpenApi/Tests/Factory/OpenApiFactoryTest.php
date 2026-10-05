@@ -1806,6 +1806,25 @@ class OpenApiFactoryTest extends TestCase
         $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar[]' === $parameter->getName()));
     }
 
+    public function testFilterlessArrayQueryParameterWithBracketKeyIsNotSuffixedTwice(): void
+    {
+        $arraySchema = ['type' => 'array', 'items' => ['type' => 'string']];
+
+        foreach ([null, true, false] as $castToArray) {
+            $parameters = $this->getGeneratedQueryParameters(
+                ['status[]' => new QueryParameter(key: 'status[]', schema: $arraySchema, castToArray: $castToArray)],
+                null,
+            );
+
+            $statusParameters = array_values(array_filter($parameters, static fn (Parameter $parameter): bool => str_starts_with($parameter->getName(), 'status')));
+
+            $this->assertCount(1, $statusParameters, \sprintf('castToArray: %s', var_export($castToArray, true)));
+            $this->assertSame('status[]', $statusParameters[0]->getName());
+            $this->assertSame($arraySchema, $statusParameters[0]->getSchema());
+            $this->assertCount(0, array_filter($parameters, static fn (Parameter $parameter): bool => 'status[][]' === $parameter->getName()));
+        }
+    }
+
     public function testDeleteOperationWithDeserializeDocumentsRequestBody(): void
     {
         $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);

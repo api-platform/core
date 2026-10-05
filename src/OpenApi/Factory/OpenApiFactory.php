@@ -396,7 +396,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $parameterDescription = $p->getDescription() ?? "$resourceShortName $key";
                 $parameterRequired = $p->getRequired() ?? false;
                 $linkParameter = $p->getOpenApi();
-                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null);
+                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null) && !str_ends_with($key, '[]');
 
                 $defaultParameters = [];
                 if (!$canSplitToArray || true !== $castToArray) {
