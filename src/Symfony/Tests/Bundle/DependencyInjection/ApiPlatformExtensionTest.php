@@ -29,8 +29,11 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\AI\McpBundle\McpBundle;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -38,6 +41,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Translation\Command\TranslationExtractCommand;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -182,6 +186,20 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($tags as $tag) {
             $this->assertArrayHasKey($tag, $serviceTags, \sprintf('Tag "%s" not found on the service "%s".', $tag, $service));
         }
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testObjectMapperDoesNotLoadDeprecatedTranslationCommand(): void
+    {
+        if (!class_exists(TranslationExtractCommand::class)) {
+            self::markTestSkipped('Requires the Symfony 8.2 translation command.');
+        }
+
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('api_platform.object_mapper.metadata_factory'));
+        self::assertFalse(class_exists(FrameworkTranslationExtractCommand::class, false));
     }
 
     public function testCommonConfiguration(): void
