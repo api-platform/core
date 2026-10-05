@@ -50,6 +50,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\Doctrine\Serializer\Normalizer\CollectionDenormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
@@ -59,6 +60,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -1233,6 +1236,68 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
         $serializerProphecy->denormalize(['email'], NotificationType::class.'[]', null, Argument::type('array'))->willReturn([NotificationType::Email]);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $actual = $normalizer->denormalize($data, Dummy::class);
+
+        $this->assertInstanceOf(Dummy::class, $actual);
+    }
+
+    public function testDenormalizeCollectionWithAClassContainer(): void
+    {
+        $data = ['relatedDummies' => [['name' => 'foo']]];
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummies']));
+
+        // The property declares a Doctrine collection class and a value type that is not an API
+        // resource, so the element type has to travel through the context instead of the type.
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::int()))
+                ->withWritable(true)
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnMap([
+            [Dummy::class, true],
+            [RelatedDummy::class, false],
+            [ArrayCollection::class, false],
+        ]);
+        $resourceClassResolver->method('getResourceClass')->willReturnMap([
+            [null, Dummy::class, Dummy::class],
+        ]);
+
+        $relatedDummy = new RelatedDummy();
+        $collection = new ArrayCollection([$relatedDummy]);
+
+        // Symfony 8.2 and later ship the Doctrine collection denormalizer, so the declared
+        // collection class is handed to the Serializer with the element and key types in the
+        // context. Earlier versions keep the "Foo[]" type and build a plain array.
+        $supportsCollectionClass = class_exists(CollectionDenormalizer::class);
+
+        $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor->expects($this->once())
+            ->method('setValue')
+            ->with($this->isInstanceOf(Dummy::class), 'relatedDummies', $supportsCollectionClass ? $collection : [$relatedDummy]);
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        if ($supportsCollectionClass) {
+            $serializerProphecy->denormalize($data['relatedDummies'], ArrayCollection::class, null, Argument::that(static function (array $context): bool {
+                return $context['value_type'] instanceof ObjectType
+                    && RelatedDummy::class === $context['value_type']->getClassName()
+                    && $context['key_type']->isIdentifiedBy(TypeIdentifier::INT);
+            }))->willReturn($collection);
+        } else {
+            $serializerProphecy->denormalize($data['relatedDummies'], RelatedDummy::class.'[]', null, Argument::type('array'))->willReturn([$relatedDummy]);
+        }
 
         $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
