@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
+/**
+ * Holds the pagination options, such as the page size and the names of the query parameters.
+ */
 final class PaginationOptions
 {
     public function __construct(private readonly bool $paginationEnabled = true, private readonly string $paginationPageParameterName = 'page', private readonly bool $clientItemsPerPage = false, private readonly string $itemsPerPageParameterName = 'itemsPerPage', private readonly bool $paginationClientEnabled = false, private readonly string $paginationClientEnabledParameterName = 'pagination', private readonly int $itemsPerPage = 30, private readonly ?int $maximumItemsPerPage = null, private readonly bool $partialPaginationEnabled = false, private readonly bool $clientPartialPaginationEnabled = false, private readonly string $partialPaginationParameterName = 'partial')
