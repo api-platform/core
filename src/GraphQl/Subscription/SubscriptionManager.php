@@ -132,15 +132,22 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     }
 
     /**
+     * @return string[]
+     */
+    private function getPrivateFields(?Operation $operation): array
+    {
+        $options = $operation?->getMercure() ?? false;
+
+        return ($options['private'] ?? false) ? ($options['private_fields'] ?? []) : [];
+    }
+
+    /**
      * @return array<string, string>
      */
     private function getPrivateFieldData(?Operation $operation, ?object $object): array
     {
-        $options = $operation?->getMercure() ?? false;
-        $private = $options['private'] ?? false;
-        $privateFields = $options['private_fields'] ?? [];
-
-        if (!$private || [] === $privateFields || null === $object) {
+        $privateFields = $this->getPrivateFields($operation);
+        if ([] === $privateFields || null === $object) {
             return [];
         }
 
@@ -249,7 +256,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     private function getDeletePushPayloads(object $object): array
     {
         $iri = $object->id;
-        $privatePartitionKey = $this->getPrivatePartitionKey($object->private);
         $payloads = [];
         $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
         foreach ($this->resourceMetadataCollectionFactory->create($object->resourceClass) as $apiResource) {
@@ -258,6 +264,13 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                     continue;
                 }
 
+                $privateFieldData = [];
+                foreach ($this->getPrivateFields($operation) as $privateField) {
+                    if (\array_key_exists($privateField, $object->private)) {
+                        $privateFieldData[$privateField] = $object->private[$privateField];
+                    }
+                }
+                $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
                 $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
                 foreach ($this->getSubscriptions($subscriptionKey, $privatePartitionKey) as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
                     $payloads[] = [$subscriptionId, $payload];

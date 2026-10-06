@@ -17,6 +17,7 @@ use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
@@ -1090,7 +1091,9 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([
             'get' => (new Get())->withMercure(['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false])->withShortName('PartitionedDummy')->withNormalizationContext(['groups' => ['foo', 'bar']]),
-        ]))]));
+        ]))->withGraphQlOperations([
+            new Subscription(name: 'watch', mercure: ['private' => true, 'private_fields' => ['tenant']]),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
@@ -1183,7 +1186,9 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([
             'get' => (new Get())->withMercure(['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false])->withShortName('PartitionedDummy')->withNormalizationContext(['groups' => ['foo', 'bar']]),
-        ]))]));
+        ]))->withGraphQlOperations([
+            new Subscription(name: 'watch', mercure: ['private' => true, 'private_fields' => ['tenant']]),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 

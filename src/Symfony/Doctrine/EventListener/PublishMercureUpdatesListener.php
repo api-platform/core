@@ -20,6 +20,7 @@ use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -223,15 +224,28 @@ final class PublishMercureUpdatesListener
                 $this->evaluateTopics($options, $object);
 
                 $privateData = [];
-                $mercureOptions = $operation ? ($operation->getMercure() ?? false) : false;
-                $private = $mercureOptions['private'] ?? false;
-                $privateFields = $mercureOptions['private_fields'] ?? [];
-                if ($this->graphQlSubscriptionManager && $private && $privateFields) {
-                    foreach ($privateFields as $privateField) {
-                        try {
-                            $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
-                        } catch (NoSuchPropertyException|AccessException) {
-                            continue;
+                if ($this->graphQlSubscriptionManager) {
+                    foreach ($resourceMetadataCollection as $graphQlResource) {
+                        foreach ($graphQlResource->getGraphQlOperations() ?? [] as $graphQlOperation) {
+                            if (!$graphQlOperation instanceof Subscription) {
+                                continue;
+                            }
+                            $mercureOptions = $graphQlOperation->getMercure() ?? false;
+                            if (!($mercureOptions['private'] ?? false)) {
+                                continue;
+                            }
+
+                            foreach ($mercureOptions['private_fields'] ?? [] as $privateField) {
+                                if (\array_key_exists($privateField, $privateData)) {
+                                    continue;
+                                }
+
+                                try {
+                                    $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
+                                } catch (NoSuchPropertyException|AccessException) {
+                                    continue;
+                                }
+                            }
                         }
                     }
                 }

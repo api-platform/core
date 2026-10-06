@@ -1052,7 +1052,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withGraphQlOperations([
-                'update' => $this->createItemSubscription(true),
+                'update' => $this->createItemSubscription(['private' => true, 'private_fields' => ['tenant']]),
                 'update_collection' => $this->createCollectionSubscription(['private' => true, 'private_fields' => ['tenant']]),
             ]),
         ]));
