@@ -228,7 +228,7 @@ final class PublishMercureUpdatesListener
                 if ($private && $privateFields) {
                     foreach ($privateFields as $privateField) {
                         try {
-                            $privateData[$privateField] = $this->getPrivateFieldValue($privateField, $object);
+                            $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField);
                         } catch (NoSuchPropertyException|AccessException) {
                             continue;
                         }
@@ -341,10 +341,5 @@ final class PublishMercureUpdatesListener
     private function buildUpdate(string|array $iri, string $data, array $options): Update
     {
         return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
-    }
-
-    private function getPrivateFieldValue(string $privateField, object $object): string
-    {
-        return PropertyAccessorValueExtractor::getValue($object, $privateField);
     }
 }

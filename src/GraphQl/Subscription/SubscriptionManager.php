@@ -116,11 +116,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         }
     }
 
-    private function getPrivateFieldValue(string $privateField, object $object): string
-    {
-        return PropertyAccessorValueExtractor::getValue($object, $privateField);
-    }
-
     private function getSubscriptionKey(string $iri, ?Operation $operation): string
     {
         $collection = $operation instanceof CollectionOperationInterface;
@@ -149,7 +144,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $privateFieldData = [];
         foreach ($privateFields as $privateField) {
             try {
-                $privateFieldData[$privateField] = $this->getPrivateFieldValue($privateField, $object);
+                $privateFieldData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField);
             } catch (NoSuchPropertyException|AccessException) {
                 continue;
             }
