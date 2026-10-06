@@ -11,11 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Util;
+namespace ApiPlatform\GraphQl\Util;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @internal
+ */
 final class PropertyAccessorValueExtractor
 {
     private static ?PropertyAccessorInterface $propertyAccessor = null;

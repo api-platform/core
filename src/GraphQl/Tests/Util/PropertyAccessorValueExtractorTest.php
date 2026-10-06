@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Tests\Util;
+namespace ApiPlatform\GraphQl\Tests\Util;
 
-use ApiPlatform\Metadata\Util\PropertyAccessorValueExtractor;
+use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use PHPUnit\Framework\TestCase;
 
 enum PropertyAccessorValueExtractorTestStatus

@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Doctrine\EventListener;
 use ApiPlatform\Doctrine\Common\Messenger\DispatchTrait;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
+use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -25,7 +26,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
@@ -225,7 +225,7 @@ final class PublishMercureUpdatesListener
                 $mercureOptions = $operation ? ($operation->getMercure() ?? false) : false;
                 $private = $mercureOptions['private'] ?? false;
                 $privateFields = $mercureOptions['private_fields'] ?? [];
-                if ($private && $privateFields) {
+                if ($this->graphQlSubscriptionManager && $private && $privateFields) {
                     foreach ($privateFields as $privateField) {
                         try {
                             $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField);

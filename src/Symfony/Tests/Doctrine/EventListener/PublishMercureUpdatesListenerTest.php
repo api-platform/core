@@ -1002,6 +1002,63 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals(['2', '["data"]'], $data);
     }
 
+    public function testPublishRestDeleteDoesNotReadGraphQlPrivateFields(): void
+    {
+        $toDelete = new class {
+            public function getTenant(): string
+            {
+                throw new \LogicException('GraphQL private fields must not be read without a subscription manager.');
+            }
+        };
+        $resourceClass = $toDelete::class;
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->getResourceClass($toDelete)->willReturn($resourceClass);
+        $resourceClassResolver->isResourceClass($resourceClass)->willReturn(true);
+
+        $iriConverter = $this->prophesize(IriConverterInterface::class);
+        $iriConverter->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/partitioned_dummies/2');
+        $iriConverter->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/partitioned_dummies/2');
+
+        $metadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $metadataFactory->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [
+            new ApiResource(operations: [
+                new Get(shortName: 'PartitionedDummy', mercure: ['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false]),
+            ]),
+        ]));
+
+        $updates = [];
+        $hub = $this->createMockHub(static function (Update $update) use (&$updates): string {
+            $updates[] = $update;
+
+            return 'id';
+        });
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolver->reveal(),
+            $iriConverter->reveal(),
+            $metadataFactory->reveal(),
+            $this->createStub(SerializerInterface::class),
+            ['jsonld' => ['application/ld+json']],
+            hubRegistry: new HubRegistry($hub),
+            includeType: true,
+        );
+
+        $uow = $this->prophesize(UnitOfWork::class);
+        $uow->getScheduledEntityInsertions()->willReturn([]);
+        $uow->getScheduledEntityUpdates()->willReturn([]);
+        $uow->getScheduledEntityDeletions()->willReturn([$toDelete]);
+        $em = $this->prophesize(EntityManagerInterface::class);
+        $em->getUnitOfWork()->willReturn($uow->reveal());
+
+        $listener->onFlush(new OnFlushEventArgs($em->reveal()));
+        $listener->postFlush();
+
+        $this->assertCount(1, $updates);
+        $this->assertSame(['http://example.com/partitioned_dummies/2'], $updates[0]->getTopics());
+        $this->assertTrue($updates[0]->isPrivate());
+        $this->assertSame(['@id' => '/partitioned_dummies/2', '@type' => 'PartitionedDummy'], json_decode($updates[0]->getData(), true, flags: \JSON_THROW_ON_ERROR));
+    }
+
     public function testPublishGraphQlDeleteUpdatesKeepsPrivatePartitionData(): void
     {
         $toDelete = new class {

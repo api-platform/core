@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Subscription;
 
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Util\SortTrait;
 use ApiPlatform\State\ProcessorInterface;
