@@ -41,6 +41,8 @@ use ApiPlatform\Doctrine\Orm\Serializer\DoctrineOrmOperationResourceClassResolve
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\State\LinksHandler;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
 return function (ContainerConfigurator $container) {
@@ -55,14 +57,20 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'api_platform.doctrine.orm.state.remove_processor'])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Common\State\RemoveProcessor']);
 
-    $services->alias(RemoveProcessor::class, 'api_platform.doctrine.orm.state.remove_processor');
+    $services->alias(RemoveProcessor::class, 'api_platform.doctrine.orm.state.remove_processor')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'ormRemove\')] ProcessorInterface $processor" instead.');
+
+    $services->alias(ProcessorInterface::class.' $ormRemove', 'api_platform.doctrine.orm.state.remove_processor');
 
     $services->set('api_platform.doctrine.orm.state.persist_processor', PersistProcessor::class)
         ->args([service('doctrine')])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'api_platform.doctrine.orm.state.persist_processor'])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Common\State\PersistProcessor']);
 
-    $services->alias(PersistProcessor::class, 'api_platform.doctrine.orm.state.persist_processor');
+    $services->alias(PersistProcessor::class, 'api_platform.doctrine.orm.state.persist_processor')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'ormPersist\')] ProcessorInterface $processor" instead.');
+
+    $services->alias(ProcessorInterface::class.' $ormPersist', 'api_platform.doctrine.orm.state.persist_processor');
 
     $services->set('api_platform.doctrine.orm.order_filter', OrderFilter::class)
         ->abstract()
@@ -233,7 +241,10 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Orm\State\CollectionProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.doctrine.orm.state.collection_provider']);
 
-    $services->alias(CollectionProvider::class, 'api_platform.doctrine.orm.state.collection_provider');
+    $services->alias(CollectionProvider::class, 'api_platform.doctrine.orm.state.collection_provider')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'ormCollection\')] ProviderInterface $provider" instead.');
+
+    $services->alias(ProviderInterface::class.' $ormCollection', 'api_platform.doctrine.orm.state.collection_provider');
 
     $services->set('api_platform.doctrine.orm.state.item_provider', ItemProvider::class)
         ->args([
@@ -245,9 +256,12 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Orm\State\ItemProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.doctrine.orm.state.item_provider']);
 
-    $services->alias(ItemProvider::class, 'api_platform.doctrine.orm.state.item_provider');
+    $services->alias(ItemProvider::class, 'api_platform.doctrine.orm.state.item_provider')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'ormItem\')] ProviderInterface $provider" instead.');
 
-    $services->alias('api_platform.state.item_provider', 'ApiPlatform\Doctrine\Orm\State\ItemProvider');
+    $services->alias(ProviderInterface::class.' $ormItem', 'api_platform.doctrine.orm.state.item_provider');
+
+    $services->alias('api_platform.state.item_provider', 'api_platform.doctrine.orm.state.item_provider');
 
     $services->set('api_platform.doctrine.orm.search_filter', SearchFilter::class)
         ->abstract()
