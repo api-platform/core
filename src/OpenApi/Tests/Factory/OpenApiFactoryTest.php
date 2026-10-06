@@ -1775,7 +1775,7 @@ class OpenApiFactoryTest extends TestCase
         $this->assertCount(1, $castTrueParameters);
         $this->assertSame('ids[]', $castTrueParameters[0]->getName());
         $this->assertTrue($castTrueParameters[0]->canExplode());
-        $this->assertSame('deepObject', $castTrueParameters[0]->getStyle());
+        $this->assertSame('form', $castTrueParameters[0]->getStyle());
         $this->assertSame($arraySchema, $castTrueParameters[0]->getSchema());
 
         $castFalseParameters = $openApi->getPaths()->getPath('/cast-false')->getGet()->getParameters();
@@ -1784,11 +1784,11 @@ class OpenApiFactoryTest extends TestCase
         $this->assertSame($arraySchema, $castFalseParameters[0]->getSchema());
 
         $castNullParameters = $openApi->getPaths()->getPath('/cast-null')->getGet()->getParameters();
-        $this->assertCount(2, $castNullParameters);
-        $this->assertSame('ids', $this->getParameterByName($castNullParameters, 'ids')->getName());
-        $this->assertSame('ids[]', $this->getParameterByName($castNullParameters, 'ids[]')->getName());
-        $this->assertTrue($this->getParameterByName($castNullParameters, 'ids[]')->canExplode());
-        $this->assertSame('deepObject', $this->getParameterByName($castNullParameters, 'ids[]')->getStyle());
+        $this->assertCount(1, $castNullParameters);
+        $this->assertSame('ids[]', $castNullParameters[0]->getName());
+        $this->assertTrue($castNullParameters[0]->canExplode());
+        $this->assertSame('form', $castNullParameters[0]->getStyle());
+        $this->assertSame($arraySchema, $castNullParameters[0]->getSchema());
 
         $scalarQueryParameters = $openApi->getPaths()->getPath('/scalar-query')->getGet()->getParameters();
         $this->assertCount(1, $scalarQueryParameters);
@@ -1804,6 +1804,25 @@ class OpenApiFactoryTest extends TestCase
         $linkParameterGuardParameters = $openApi->getPaths()->getPath('/link-parameter-guard')->getGet()->getParameters();
         $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar' === $parameter->getName()));
         $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar[]' === $parameter->getName()));
+    }
+
+    public function testFilterlessArrayQueryParameterWithBracketKeyIsNotSuffixedTwice(): void
+    {
+        $arraySchema = ['type' => 'array', 'items' => ['type' => 'string']];
+
+        foreach ([null, true, false] as $castToArray) {
+            $parameters = $this->getGeneratedQueryParameters(
+                ['status[]' => new QueryParameter(key: 'status[]', schema: $arraySchema, castToArray: $castToArray)],
+                null,
+            );
+
+            $statusParameters = array_values(array_filter($parameters, static fn (Parameter $parameter): bool => str_starts_with($parameter->getName(), 'status')));
+
+            $this->assertCount(1, $statusParameters, \sprintf('castToArray: %s', var_export($castToArray, true)));
+            $this->assertSame('status[]', $statusParameters[0]->getName());
+            $this->assertSame($arraySchema, $statusParameters[0]->getSchema());
+            $this->assertCount(0, array_filter($parameters, static fn (Parameter $parameter): bool => 'status[][]' === $parameter->getName()));
+        }
     }
 
     public function testDeleteOperationWithDeserializeDocumentsRequestBody(): void

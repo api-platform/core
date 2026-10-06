@@ -396,47 +396,41 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $parameterDescription = $p->getDescription() ?? "$resourceShortName $key";
                 $parameterRequired = $p->getRequired() ?? false;
                 $linkParameter = $p->getOpenApi();
-                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null);
+                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null) && !str_ends_with($key, '[]');
 
-                $defaultParameters = [];
-                if (!$canSplitToArray || true !== $castToArray) {
-                    $defaultParameters[] = new Parameter($key, $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema);
-                }
-                if ($canSplitToArray && false !== $castToArray) {
-                    $defaultParameters[] = new Parameter($key.'[]', $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema, 'deepObject', true);
+                $defaultParameter = $canSplitToArray && false !== $castToArray
+                    ? new Parameter($key.'[]', $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema, 'form', true)
+                    : new Parameter($key, $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema);
+
+                if (null === $linkParameter) {
+                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
+                        $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
+                    } else {
+                        $openapiParameters[] = $defaultParameter;
+                    }
+
+                    continue;
                 }
 
-                foreach ($defaultParameters as $defaultParameter) {
-                    if (null === $linkParameter) {
-                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
-                            $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
-                        } else {
-                            $openapiParameters[] = $defaultParameter;
+                if (\is_array($linkParameter)) {
+                    foreach ($linkParameter as $lp) {
+                        $parameter = $this->mergeParameter($defaultParameter, $lp);
+                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                            $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                            continue;
                         }
 
-                        continue;
+                        $openapiParameters[] = $parameter;
                     }
-
-                    if (\is_array($linkParameter)) {
-                        foreach ($linkParameter as $lp) {
-                            $parameter = $this->mergeParameter($defaultParameter, $lp);
-                            if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
-                                $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
-                                continue;
-                            }
-
-                            $openapiParameters[] = $parameter;
-                        }
-                        continue;
-                    }
-
-                    $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
-                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
-                        $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
-                        continue;
-                    }
-                    $openapiParameters[] = $parameter;
+                    continue;
                 }
+
+                $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
+                if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                    $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                    continue;
+                }
+                $openapiParameters[] = $parameter;
             }
 
             $openapiOperation = $openapiOperation->withParameters($openapiParameters);
