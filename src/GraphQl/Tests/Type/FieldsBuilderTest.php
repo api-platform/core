@@ -427,7 +427,7 @@ class FieldsBuilderTest extends TestCase
                 [
                     'actionShortNameSubscribe' => [
                         'type' => $graphqlType,
-                        'description' => 'Subscribes to the action event of a ShortName.',
+                        'description' => 'Subscribes to updates and deletion of an individual ShortName.',
                         'args' => [
                             'input' => [
                                 'type' => $inputGraphqlType,
@@ -467,7 +467,7 @@ class FieldsBuilderTest extends TestCase
                 [
                     'action_collectionShortNameSubscribe' => [
                         'type' => $graphqlType,
-                        'description' => 'Subscribes to the action event of a ShortName.',
+                        'description' => 'Subscribes to creation, updates and deletion of ShortName resources.',
                         'args' => [
                             'input' => [
                                 'type' => $inputGraphqlType,

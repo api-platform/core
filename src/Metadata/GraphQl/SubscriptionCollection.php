@@ -17,6 +17,9 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
 
+/**
+ * Subscribes to creation, updates and deletion of resources in a collection.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class SubscriptionCollection extends Subscription implements CollectionOperationInterface
 {
@@ -124,7 +127,7 @@ final class SubscriptionCollection extends Subscription implements CollectionOpe
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
-            name: $name ?: 'update_collection_subscription',
+            name: $name ?: 'collection',
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,

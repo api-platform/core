@@ -16,6 +16,12 @@ namespace ApiPlatform\Metadata\GraphQl;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
 
+/**
+ * Subscribes to updates and deletion of an existing resource.
+ *
+ * Set extraProperties: ['legacy_graphql_subscription_names' => false] to use the
+ * neutral "item" default name. An explicit name always takes precedence.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Subscription extends Operation
 {
@@ -123,7 +129,7 @@ class Subscription extends Operation
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
-            name: $name ?: 'update_subscription',
+            name: $name,
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
@@ -134,5 +140,18 @@ class Subscription extends Operation
             extraProperties: $extraProperties,
             map: $map,
         );
+    }
+
+    public function getName(): ?string
+    {
+        return parent::getName() ?: (($this->getExtraProperties()['legacy_graphql_subscription_names'] ?? true) ? 'update_subscription' : 'item');
+    }
+
+    /**
+     * @internal
+     */
+    public function hasExplicitName(): bool
+    {
+        return (bool) parent::getName();
     }
 }

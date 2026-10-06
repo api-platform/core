@@ -16,6 +16,7 @@ namespace ApiPlatform\GraphQl\Type;
 use ApiPlatform\GraphQl\Exception\InvalidTypeException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
@@ -145,7 +146,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
     {
         $subscriptionFields = [];
         $resourceType = Type::nullable(Type::object($resourceClass));
-        $description = $operation->getDescription() ?? \sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
+        $description = $operation->getDescription() ?? \sprintf($operation instanceof CollectionOperationInterface ? 'Subscribes to creation, updates and deletion of %s resources.' : 'Subscribes to updates and deletion of an individual %s.', $operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $operation->getDeprecationReason(), $resourceType, $resourceClass, true, $operation)];
@@ -156,7 +157,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         $subscriptionName = $operation->getName();
-        // TODO: 3.0 change this
+        // Keep the existing public field name for the default item subscription.
         if ('update_subscription' === $subscriptionName) {
             $subscriptionName = 'update';
         }

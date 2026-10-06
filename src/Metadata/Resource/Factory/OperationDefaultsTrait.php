@@ -142,7 +142,7 @@ trait OperationDefaultsTrait
         }
 
         if ($resource->getMercure()) {
-            [$key, $operation] = $this->getOperationWithDefaults($resource, (new Subscription())->withDescription("Subscribes to the update event of a {$operation->getShortName()}."));
+            [$key, $operation] = $this->getOperationWithDefaults($resource, (new Subscription())->withDescription("Subscribes to updates and deletion of an individual {$resource->getShortName()}."));
             $graphQlOperations[$key] = $operation;
         }
 
@@ -198,6 +198,10 @@ trait OperationDefaultsTrait
         $operation = $this->addGlobalDefaults($operation);
 
         if ($operation instanceof GraphQlOperation) {
+            if ($operation instanceof Subscription && !$operation->hasExplicitName() && ($operation->getExtraProperties()['legacy_graphql_subscription_names'] ?? true)) {
+                trigger_deprecation('api-platform/core', '4.4', 'Using the implicit "update_subscription" GraphQL subscription name is deprecated. Set "defaults.extra_properties.legacy_graphql_subscription_names" to false to use "item", or explicitly set the subscription name to "update" to preserve the existing GraphQL field.');
+            }
+
             if (!$operation->getName()) {
                 throw new RuntimeException('No GraphQL operation name.');
             }
