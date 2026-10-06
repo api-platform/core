@@ -19,6 +19,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
@@ -126,7 +127,7 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
             return null;
         }
 
-        $validationGroups = ($operation->getValidationContext() ?? [])['groups'] ?? null;
+        $validationGroups = $this->normalizeValidationGroups(($operation->getValidationContext() ?? [])['groups'] ?? null);
         $constraints = $this->collectConstraints($classMetadata, $path, $validationGroups);
         if (!$constraints) {
             return null;
@@ -149,6 +150,53 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
 
         // Property has constraints but none match by class → still 422 with a generic Type message.
         return $this->emitViolation($exception, new Type([]), (string) Type::INVALID_TYPE_ERROR);
+    }
+
+    /**
+     * Normalizes the operation's validation groups into a flat list of group names.
+     *
+     * The `groups` entry of the validation context may be a plain list, a {@see GroupSequence},
+     * or a list mixing nested arrays and GroupSequence instances. A callable (resolved at
+     * validation time against the object) cannot be evaluated here and is treated as absent.
+     *
+     * @return array<string>|null
+     */
+    private function normalizeValidationGroups(mixed $validationGroups): ?array
+    {
+        if (null === $validationGroups) {
+            return null;
+        }
+
+        if ($validationGroups instanceof GroupSequence) {
+            return $this->flattenValidationGroups($validationGroups->groups);
+        }
+
+        if (!\is_array($validationGroups) || \is_callable($validationGroups)) {
+            return null;
+        }
+
+        return $this->flattenValidationGroups($validationGroups);
+    }
+
+    /**
+     * @param array<string|array<mixed>|GroupSequence> $groups
+     *
+     * @return array<string>
+     */
+    private function flattenValidationGroups(array $groups): array
+    {
+        $flattenGroups = [];
+        foreach ($groups as $group) {
+            if (\is_array($group)) {
+                $flattenGroups[] = $this->flattenValidationGroups($group);
+            } elseif ($group instanceof GroupSequence) {
+                $flattenGroups[] = $this->flattenValidationGroups($group->groups);
+            } else {
+                $flattenGroups[] = [$group];
+            }
+        }
+
+        return array_merge([], ...$flattenGroups);
     }
 
     /**
