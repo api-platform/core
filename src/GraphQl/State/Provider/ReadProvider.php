@@ -55,7 +55,8 @@ final class ReadProvider implements ProviderInterface
             $context += $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, true);
         }
 
-        if (!$operation instanceof CollectionOperationInterface) {
+        // Collection subscriptions use the input item to establish their private scope and check access.
+        if (!$operation instanceof CollectionOperationInterface || $operation instanceof Subscription) {
             $identifier = $this->getIdentifierFromOperation($operation, $args);
 
             if (!$identifier) {

@@ -18,6 +18,7 @@ use ApiPlatform\GraphQl\State\Provider\ReadProvider;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -70,5 +71,40 @@ class ReadProviderTest extends TestCase
         $serializerContextBuilder->expects($this->once())->method('create')->willReturn(['a']);
         $provider = new ReadProvider($decorated, $iriConverter, $serializerContextBuilder, '.');
         $provider->provide($operation, [], $context);
+    }
+
+    public function testCollectionSubscriptionReadsAndClonesTheEnrollmentItem(): void
+    {
+        $item = (object) ['tenant' => 'tenant-a'];
+        $operation = new SubscriptionCollection(class: \stdClass::class);
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->never())->method('provide');
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->expects($this->once())->method('getResourceFromIri')->with('/dummy/1')->willReturn($item);
+        $provider = new ReadProvider($decorated, $iriConverter, null, '.');
+        /** @var array<string, mixed> $graphQlContext */
+        $graphQlContext = [];
+
+        $this->assertSame($item, $provider->provide($operation, [], [
+            'args' => ['input' => ['id' => '/dummy/1']],
+            'graphql_context' => &$graphQlContext,
+        ]));
+        $this->assertArrayHasKey('previous_object', $graphQlContext);
+        $this->assertEquals($item, $graphQlContext['previous_object']);
+        $this->assertNotSame($item, $graphQlContext['previous_object']);
+    }
+
+    public function testCollectionSubscriptionRejectsAnItemOfAnotherResourceClass(): void
+    {
+        $operation = new SubscriptionCollection(class: \stdClass::class, shortName: 'Dummy');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->never())->method('provide');
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->expects($this->once())->method('getResourceFromIri')->willReturn(new \ArrayObject());
+        $provider = new ReadProvider($decorated, $iriConverter, null, '.');
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('did not match expected type "Dummy"');
+        $provider->provide($operation, [], ['args' => ['input' => ['id' => '/other/1']]]);
     }
 }
