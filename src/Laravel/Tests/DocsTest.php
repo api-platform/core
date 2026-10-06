@@ -57,6 +57,9 @@ class DocsTest extends TestCase
         $content = (string) $res->getContent();
 
         $this->assertStringContainsString('init-swagger-ui.js', $content);
+        $this->assertStringContainsString('swagger-ui-login-plugin.js', $content);
+        $this->assertStringContainsString('"persistAuthorization":false', $content);
+        $this->assertStringContainsString('"extraConfiguration":[]', $content);
         $this->assertStringContainsString('id="formats"', $content);
         $this->assertStringContainsString('>ReDoc</a>', $content);
         $this->assertStringContainsString('>Scalar</a>', $content);

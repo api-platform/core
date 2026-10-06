@@ -36,6 +36,7 @@ use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\OpenApi\Model\Paths;
 use ApiPlatform\OpenApi\Model\Reference;
 use ApiPlatform\OpenApi\Model\Schema;
@@ -124,6 +125,29 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertArrayHasKey('$ref', $array['components']['responses']['401']);
         $this->assertSame('#/components/responses/401', $array['components']['responses']['401']['$ref']);
         $this->assertArrayNotHasKey('ref', $array['components']['responses']['401']);
+    }
+
+    public function testNormalizeKeepsOperationExtensionProperties(): void
+    {
+        $paths = new Paths();
+        $paths->addPath('/login', (new PathItem())->withPost(new OpenApiOperation(
+            operationId: 'api_login_post',
+            security: [],
+            extensionProperties: [
+                OpenApiFactory::API_PLATFORM_LOGIN => ['securityScheme' => 'JWT', 'tokenPath' => 'token'],
+            ],
+        )));
+        $openApi = new OpenApi(new Info('Test API', '1.0.0'), [], $paths);
+
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setSerializer(new Serializer([$normalizer], [new JsonEncoder()]));
+
+        $array = (new OpenApiNormalizer($normalizer))->normalize($openApi);
+        $operation = $array['paths']['/login']['post'];
+
+        $this->assertSame(['securityScheme' => 'JWT', 'tokenPath' => 'token'], $operation['x-apiplatform-login']);
+        $this->assertArrayNotHasKey('extensionProperties', $operation);
+        $this->assertSame([], $operation['security']);
     }
 
     public function testNormalize(): void
