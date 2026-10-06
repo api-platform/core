@@ -15,7 +15,6 @@ namespace ApiPlatform\GraphQl\Subscription;
 
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -61,7 +60,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $options = $operation ? ($operation->getMercure() ?? false) : false;
         $private = $options['private'] ?? false;
         $privateFields = $options['private_fields'] ?? [];
-        $this->validateMercureOptions($private, $privateFields);
         $previousObject = $context['graphql_context']['previous_object'] ?? null;
         $privateFieldData = $this->getPrivateFieldData($private, $privateFields, $previousObject);
         $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
@@ -166,13 +164,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         }
 
         return hash('sha256', serialize($privateFieldData));
-    }
-
-    private function validateMercureOptions(bool $private, array $privateFields): void
-    {
-        if ([] !== $privateFields && !$private) {
-            throw new InvalidArgumentException('"private_fields" requires "mercure.private" to be true.');
-        }
     }
 
     private function getCreatedOrUpdatedPayloads(object $object, string $type): array

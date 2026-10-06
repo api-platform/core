@@ -18,7 +18,6 @@ use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
@@ -450,26 +449,6 @@ class SubscriptionManagerTest extends TestCase
             $manager->retrieveSubscriptionId(['args' => ['input' => ['id' => '/dummies/1']], 'info' => $info->reveal()], [], $operation),
             $manager->retrieveSubscriptionId(['args' => ['input' => ['id' => '/dummies/2']], 'info' => $info->reveal()], [], $operation)
         );
-    }
-
-    public function testRetrieveSubscriptionIdRejectsPrivateFieldsWithoutPrivateMercure(): void
-    {
-        $infoProphecy = $this->prophesize(ResolveInfo::class);
-        $infoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn(['fields' => true]);
-
-        $context = [
-            'args' => ['input' => ['id' => '/foos/34']],
-            'info' => $infoProphecy->reveal(),
-            'is_collection' => false,
-            'is_mutation' => false,
-            'is_subscription' => true,
-        ];
-        $operation = new Subscription(mercure: ['private_fields' => ['tenant']]);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"private_fields" requires "mercure.private" to be true.');
-
-        $this->subscriptionManager->retrieveSubscriptionId($context, ['result'], $operation);
     }
 
     public function testRetrieveSubscriptionIdCollectionOperationUsesCollectionRegistrationPath(): void

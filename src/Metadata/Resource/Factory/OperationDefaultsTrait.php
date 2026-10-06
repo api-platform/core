@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -198,8 +199,15 @@ trait OperationDefaultsTrait
         $operation = $this->addGlobalDefaults($operation);
 
         if ($operation instanceof GraphQlOperation) {
-            if ($operation instanceof Subscription && !$operation->hasExplicitName() && ($operation->getExtraProperties()['legacy_graphql_subscription_names'] ?? true)) {
-                trigger_deprecation('api-platform/core', '4.4', 'Using the implicit "update_subscription" GraphQL subscription name is deprecated. Set "defaults.extra_properties.legacy_graphql_subscription_names" to false to use "item", or explicitly set the subscription name to "update" to preserve the existing GraphQL field.');
+            if ($operation instanceof Subscription) {
+                $mercure = $operation->getMercure() ?? false;
+                if ([] !== ($mercure['private_fields'] ?? []) && !($mercure['private'] ?? false)) {
+                    throw new InvalidArgumentException('"private_fields" requires "mercure.private" to be true.');
+                }
+
+                if (!$operation->hasExplicitName() && ($operation->getExtraProperties()['legacy_graphql_subscription_names'] ?? true)) {
+                    trigger_deprecation('api-platform/core', '4.4', 'Using the implicit "update_subscription" GraphQL subscription name is deprecated. Set "defaults.extra_properties.legacy_graphql_subscription_names" to false to use "item", or explicitly set the subscription name to "update" to preserve the existing GraphQL field.');
+                }
             }
 
             if (!$operation->getName()) {
