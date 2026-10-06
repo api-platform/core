@@ -20,6 +20,8 @@ use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\SecuredDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -31,6 +33,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -261,7 +264,14 @@ class ItemNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizeMercureSubscriptionNestedCollectionRelations(): void
+    public static function subscriptionOperations(): iterable
+    {
+        yield 'item subscription' => [new Subscription(name: 'renamed_event')];
+        yield 'collection subscription' => [new SubscriptionCollection(name: 'renamed_event')];
+    }
+
+    #[DataProvider('subscriptionOperations')]
+    public function testNormalizeMercureSubscriptionNestedCollectionRelations(Subscription $operation): void
     {
         $firstChild = new MercureSubscriptionChildDummy();
         $firstChild->setName('alpha');
@@ -350,7 +360,7 @@ class ItemNormalizerTest extends TestCase
             MercureSubscriptionChildDummy::class,
             ItemNormalizer::FORMAT,
             [
-                'graphql_operation_name' => 'mercure_subscription',
+                'root_operation' => $operation,
                 'attributes' => [
                     'collection' => ['name' => true],
                     'paginationInfo' => [

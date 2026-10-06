@@ -17,6 +17,7 @@ use ApiPlatform\GraphQl\State\Provider\NoopProvider;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -92,6 +93,11 @@ final class ItemNormalizer extends BaseItemNormalizer
             return parent::normalize($data, $format, $context);
         }
 
+        if (($context['operation'] ?? null) instanceof Subscription && ($context['no_resolver_data'] ?? false)) {
+            // Keep the subscription available when nested relations replace the current operation.
+            $context['root_operation'] ??= $context['operation'];
+        }
+
         if ($this->isCacheKeySafe($context)) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
         } else {
@@ -111,7 +117,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             $normalizedData[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null);
         }
 
-        if (isset($context['graphql_operation_name']) && 'mercure_subscription' === $context['graphql_operation_name'] && \is_object($data) && isset($normalizedData['id']) && !isset($normalizedData['_id'])) {
+        if (($context['root_operation'] ?? null) instanceof Subscription && ($context['no_resolver_data'] ?? false) && \is_object($data) && isset($normalizedData['id']) && !isset($normalizedData['_id'])) {
             $normalizedData['_id'] = $normalizedData['id'];
             $normalizedData['id'] = $this->iriConverter->getIriFromResource($data);
         }
@@ -130,8 +136,8 @@ final class ItemNormalizer extends BaseItemNormalizer
             return [...$attributeValue];
         }
 
-        // Handle relationships for mercure subscriptions
-        if ($operation instanceof QueryCollection && 'mercure_subscription' === $context['graphql_operation_name'] && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
+        // Serialize selected relationships in subscription event payloads.
+        if ($operation instanceof QueryCollection && ($context['root_operation'] ?? null) instanceof Subscription && ($context['no_resolver_data'] ?? false) && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
             $relationContext = $context;
             $relationContext['attributes'] = $context['attributes']['collection'];
             $data['collection'] = [];
