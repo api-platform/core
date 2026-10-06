@@ -65,16 +65,17 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $previousObject = $context['graphql_context']['previous_object'] ?? null;
         $privateFieldData = $this->getPrivateFieldData($private, $privateFields, $previousObject);
         $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
+        $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
 
         if ($operation instanceof CollectionOperationInterface) {
             $subscriptionId = $this->updateSubscriptionCollectionCacheData(
-                $this->getCollectionSubscriptionKey($iri, $operation),
+                $subscriptionKey,
                 $fields,
                 $privatePartitionKey
             );
         } else {
             $subscriptionId = $this->updateSubscriptionItemCacheData(
-                $iri,
+                $subscriptionKey,
                 $fields,
                 $result,
                 $privatePartitionKey
@@ -96,9 +97,9 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     /**
      * @return array<array>
      */
-    private function getSubscriptionsFromIri(string $iri, ?string $privatePartitionKey = null): array
+    private function getSubscriptions(string $subscriptionKey, ?string $privatePartitionKey = null): array
     {
-        $subscriptionsCacheItem = $this->getSubscriptionsCacheItem($iri, $privatePartitionKey);
+        $subscriptionsCacheItem = $this->getSubscriptionsCacheItem($subscriptionKey, $privatePartitionKey);
 
         if ($subscriptionsCacheItem->isHit()) {
             return $subscriptionsCacheItem->get();
@@ -107,22 +108,17 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return [];
     }
 
-    private function getSubscriptionsCacheItem(string $iri, ?string $privatePartitionKey = null): CacheItemInterface
+    private function getSubscriptionsCacheItem(string $subscriptionKey, ?string $privatePartitionKey = null): CacheItemInterface
     {
-        return $this->subscriptionsCache->getItem($this->generateCacheKey($iri, $privatePartitionKey));
+        return $this->subscriptionsCache->getItem($this->generateCacheKey($subscriptionKey, $privatePartitionKey));
     }
 
-    private function removeItemFromSubscriptionCache(string $iri, ?string $privatePartitionKey = null): void
+    private function removeItemFromSubscriptionCache(string $subscriptionKey, ?string $privatePartitionKey = null): void
     {
-        $cacheKey = $this->generateCacheKey($iri, $privatePartitionKey);
+        $cacheKey = $this->generateCacheKey($subscriptionKey, $privatePartitionKey);
         if ($this->subscriptionsCache->hasItem($cacheKey)) {
             $this->subscriptionsCache->deleteItem($cacheKey);
         }
-    }
-
-    private function encodeIriToCacheKey(string $iri): string
-    {
-        return str_replace('/', '_', $iri);
     }
 
     private function getPrivateFieldValue(string $privateField, object $object): string
@@ -130,25 +126,16 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return PropertyAccessorValueExtractor::getValue($object, $privateField);
     }
 
-    private function getCollectionSubscriptionKey(string $iri, Operation $operation): string
+    private function getSubscriptionKey(string $iri, ?Operation $operation): string
     {
-        if (null === $operation->getClass()) {
-            return $this->getCollectionIri($iri);
-        }
+        $collection = $operation instanceof CollectionOperationInterface;
 
-        return $this->getGraphQlCollectionSubscriptionKey($operation);
-    }
-
-    private function getCollectionIri(string $iri): string
-    {
-        return substr($iri, 0, strrpos($iri, '/'));
-    }
-
-    private function getGraphQlCollectionSubscriptionKey(Operation $operation): string
-    {
-        $resourceKey = $operation->getShortName() ?? str_replace('\\', '.', ltrim($operation->getClass() ?? 'resource', '\\'));
-
-        return '/graphql/collection-subscriptions/'.$resourceKey.'/'.$operation->getName();
+        return 'graphql_subscription_'.hash('sha256', serialize([
+            'resource' => $operation?->getClass(),
+            'operation' => $operation?->getName(),
+            'collection' => $collection,
+            'iri' => $collection ? null : $iri,
+        ]));
     }
 
     /**
@@ -178,12 +165,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
             return null;
         }
 
-        $privatePartitionData = [];
-        foreach ($privateFieldData as $field => $value) {
-            $privatePartitionData[] = \sprintf('%s=%s', $field, $value);
-        }
-
-        return hash('sha256', implode('|', $privatePartitionData));
+        return hash('sha256', serialize($privateFieldData));
     }
 
     private function validateMercureOptions(bool $private, array $privateFields): void
@@ -215,10 +197,11 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                 $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
 
                 $iri = $this->iriConverter->getIriFromResource($object);
+                $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
                 if ($operation instanceof CollectionOperationInterface) {
                     $this->appendNormalizedPayloads(
                         $payloadsBySubscriptionId,
-                        $this->getSubscriptionsFromIri($this->getCollectionSubscriptionKey($iri, $operation), $privatePartitionKey),
+                        $this->getSubscriptions($subscriptionKey, $privatePartitionKey),
                         $object,
                         $shortName
                     );
@@ -226,7 +209,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                     continue;
                 }
 
-                $itemSubscriptionsCacheItem = $this->getSubscriptionsCacheItem($iri, $privatePartitionKey);
+                $itemSubscriptionsCacheItem = $this->getSubscriptionsCacheItem($subscriptionKey, $privatePartitionKey);
                 $itemSubscriptions = $itemSubscriptionsCacheItem->isHit() ? $itemSubscriptionsCacheItem->get() : [];
                 $updatedItemSubscriptions = $this->appendNormalizedPayloads(
                     $payloadsBySubscriptionId,
@@ -288,32 +271,34 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $privatePartitionKey = $this->getPrivatePartitionKey($object->private);
         $payloads = [];
         $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
-        foreach ($this->getSubscriptionsFromIri($iri, $privatePartitionKey) as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-            $payloads[] = [$subscriptionId, $payload];
-        }
         foreach ($this->resourceMetadataCollectionFactory->create($object->resourceClass) as $apiResource) {
             foreach ($apiResource->getGraphQlOperations() ?? [] as $operation) {
-                if (!$operation instanceof Subscription || !$operation instanceof CollectionOperationInterface) {
+                if (!$operation instanceof Subscription) {
                     continue;
                 }
 
-                foreach ($this->getSubscriptionsFromIri($this->getCollectionSubscriptionKey($iri, $operation), $privatePartitionKey) as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
+                $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
+                foreach ($this->getSubscriptions($subscriptionKey, $privatePartitionKey) as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
                     $payloads[] = [$subscriptionId, $payload];
+                }
+
+                if (!$operation instanceof CollectionOperationInterface) {
+                    $this->removeItemFromSubscriptionCache($subscriptionKey, $privatePartitionKey);
                 }
             }
         }
-        $this->removeItemFromSubscriptionCache($iri, $privatePartitionKey);
 
         return $payloads;
     }
 
     private function updateSubscriptionItemCacheData(
-        string $iri,
+        string $subscriptionKey,
         array $fields,
         ?array $result,
         ?string $privatePartitionKey = null,
     ): string {
-        $subscriptionsCacheItem = $this->subscriptionsCache->getItem($this->generateCacheKey($iri, $privatePartitionKey));
+        $cacheKey = $this->generateCacheKey($subscriptionKey, $privatePartitionKey);
+        $subscriptionsCacheItem = $this->subscriptionsCache->getItem($cacheKey);
         $subscriptions = [];
         if ($subscriptionsCacheItem->isHit()) {
             /*
@@ -328,7 +313,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         }
 
         unset($result['clientSubscriptionId']);
-        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields);
+        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields + ['__subscription_scope' => $cacheKey]);
         $subscriptions[] = [$subscriptionId, $fields, $result];
         $subscriptionsCacheItem->set($subscriptions);
         $this->subscriptionsCache->save($subscriptionsCacheItem);
@@ -337,11 +322,12 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     }
 
     private function updateSubscriptionCollectionCacheData(
-        string $collectionIri,
+        string $subscriptionKey,
         array $fields,
         ?string $privatePartitionKey = null,
     ): string {
-        $subscriptionCollectionCacheItem = $this->subscriptionsCache->getItem($this->generateCacheKey($collectionIri, $privatePartitionKey));
+        $cacheKey = $this->generateCacheKey($subscriptionKey, $privatePartitionKey);
+        $subscriptionCollectionCacheItem = $this->subscriptionsCache->getItem($cacheKey);
         $collectionSubscriptions = [];
         if ($subscriptionCollectionCacheItem->isHit()) {
             $collectionSubscriptions = $subscriptionCollectionCacheItem->get();
@@ -351,7 +337,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                 }
             }
         }
-        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields + ['__collection' => true]);
+        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields + ['__collection' => true, '__subscription_scope' => $cacheKey]);
         $collectionSubscriptions[] = [$subscriptionId, $fields, []];
         $subscriptionCollectionCacheItem->set($collectionSubscriptions);
         $this->subscriptionsCache->save($subscriptionCollectionCacheItem);
@@ -359,13 +345,12 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return $subscriptionId;
     }
 
-    private function generateCacheKey(string $iri, ?string $privatePartitionKey = null): string
+    private function generateCacheKey(string $subscriptionKey, ?string $privatePartitionKey = null): string
     {
-        $cacheKey = $this->encodeIriToCacheKey($iri);
         if (null === $privatePartitionKey) {
-            return $cacheKey;
+            return $subscriptionKey;
         }
 
-        return $cacheKey.'_'.$privatePartitionKey;
+        return $subscriptionKey.'_'.$privatePartitionKey;
     }
 }
