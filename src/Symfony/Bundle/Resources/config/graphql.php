@@ -202,6 +202,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.graphql.state_processor.subscription.inner'),
             service('api_platform.graphql.subscription.subscription_manager'),
             service('api_platform.graphql.subscription.mercure_iri_generator')->ignoreOnInvalid(),
+            service('api_platform.mercure.options_resolver')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.graphql.state_processor.write', WriteProcessor::class)

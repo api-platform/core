@@ -16,23 +16,24 @@ namespace ApiPlatform\Symfony\Doctrine\EventListener;
 use ApiPlatform\Doctrine\Common\Messenger\DispatchTrait;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionPayloadProviderInterface;
 use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use ApiPlatform\State\Util\MercureOptionsResolver;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
-use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\HubRegistry;
@@ -49,19 +50,7 @@ final class PublishMercureUpdatesListener
 {
     use DispatchTrait;
     use ResourceClassInfoTrait;
-    private const ALLOWED_KEYS = [
-        'topics' => true,
-        'data' => true,
-        'private' => true,
-        'private_fields' => true,
-        'id' => true,
-        'type' => true,
-        'retry' => true,
-        'normalization_context' => true,
-        'hub' => true,
-        'enable_async_update' => true,
-    ];
-    private readonly ?ExpressionLanguage $expressionLanguage;
+    private readonly MercureOptionsResolver $optionsResolver;
     /** @var list<array{object: object, options: array, operation: ?Operation}> */
     private array $createdObjects;
     /** @var list<array{object: object, options: array, operation: ?Operation}> */
@@ -72,7 +61,7 @@ final class PublishMercureUpdatesListener
     /**
      * @param array<string, string[]|string> $formats
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, ?MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ?ExpressionLanguage $expressionLanguage = null, private bool $includeType = false, private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, ?MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ?ExpressionLanguage $expressionLanguage = null, private bool $includeType = false, private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null, ?MercureOptionsResolver $optionsResolver = null)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
@@ -82,20 +71,8 @@ final class PublishMercureUpdatesListener
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->messageBus = $messageBus;
-        $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
+        $this->optionsResolver = $optionsResolver ?? new MercureOptionsResolver($resourceClassResolver, $iriConverter, $resourceMetadataFactory, $expressionLanguage);
         $this->reset();
-
-        if ($this->expressionLanguage) {
-            $rawurlencode = ExpressionFunction::fromPhp('rawurlencode', 'escape');
-            $this->expressionLanguage->addFunction($rawurlencode);
-
-            $this->expressionLanguage->addFunction(
-                new ExpressionFunction('get_operation', static fn (string $apiResource, string $name): string => \sprintf('getOperation(%s, %s)', $apiResource, $name), static fn (array $arguments, $apiResource, string $name): Operation => $resourceMetadataFactory->create($resourceClassResolver->getResourceClass($apiResource))->getOperation($name))
-            );
-            $this->expressionLanguage->addFunction(
-                new ExpressionFunction('iri', static fn (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL, ?string $operation = null): string => \sprintf('iri(%s, %d, %s)', $apiResource, $referenceType, $operation), static fn (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL, $operation = null): string => $iriConverter->getIriFromResource($apiResource, $referenceType, $operation))
-            );
-        }
     }
 
     /**
@@ -167,7 +144,12 @@ final class PublishMercureUpdatesListener
         }
 
         $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+        $this->collectHttpPublications($object, $resourceClass, $resourceMetadataCollection, $property);
+        $this->collectGraphQlPublications($object, $resourceClass, $resourceMetadataCollection, $property);
+    }
 
+    private function collectHttpPublications(object $object, string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, string $property): void
+    {
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             /** @var ?HttpOperation $operation */
             $operation = null;
@@ -182,35 +164,9 @@ final class PublishMercureUpdatesListener
                 continue;
             }
 
-            $options = $operation->getMercure() ?? false;
-
-            if (\is_string($options)) {
-                if (null === $this->expressionLanguage) {
-                    throw new RuntimeException('The Expression Language component is not installed. Try running "composer require symfony/expression-language".');
-                }
-
-                $options = $this->expressionLanguage->evaluate($options, ['object' => $object]);
-            }
-
-            if (false === $options) {
+            if (null === $options = $this->optionsResolver->resolve($operation, $object, $resourceClass)) {
                 continue;
             }
-
-            if (true === $options) {
-                $options = [];
-            }
-
-            if (!\is_array($options)) {
-                throw new InvalidArgumentException(\sprintf('The value of the "mercure" attribute of the "%s" resource class must be a boolean, an array of options or an expression returning this array, "%s" given.', $resourceClass, \gettype($options)));
-            }
-
-            foreach ($options as $key => $value) {
-                if (!isset(self::ALLOWED_KEYS[$key])) {
-                    throw new InvalidArgumentException(\sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', array_keys(self::ALLOWED_KEYS))));
-                }
-            }
-
-            $options['enable_async_update'] ??= true;
 
             if ('deletedObjects' === $property) {
                 $types = $operation->getTypes();
@@ -219,10 +175,10 @@ final class PublishMercureUpdatesListener
                 }
 
                 // We need to evaluate it here, because in publishUpdate() the resource would be already deleted
-                $this->evaluateTopics($options, $object);
+                $this->optionsResolver->evaluateTopics($options, $object);
 
                 $privateData = [];
-                if ($this->graphQlSubscriptionManager) {
+                if ($this->graphQlSubscriptionManager && !$this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface) {
                     foreach ($resourceMetadataCollection as $graphQlResource) {
                         foreach ($graphQlResource->getGraphQlOperations() ?? [] as $graphQlOperation) {
                             if (!$graphQlOperation instanceof Subscription) {
@@ -263,8 +219,55 @@ final class PublishMercureUpdatesListener
         }
     }
 
+    private function collectGraphQlPublications(object $object, string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, string $property): void
+    {
+        if (!$this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface || !$this->graphQlMercureSubscriptionIriGenerator) {
+            return;
+        }
+        $privateValues = [];
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operation) {
+                if (!$operation instanceof Subscription || ('createdObjects' === $property && !$operation instanceof CollectionOperationInterface)) {
+                    continue;
+                }
+                if (null === $options = $this->optionsResolver->resolve($operation, $object, $resourceClass)) {
+                    continue;
+                }
+                $operation = $operation->withMercure($options);
+                $toPublish = $object;
+                if ('deletedObjects' === $property) {
+                    $private = [];
+                    foreach (($options['private'] ?? false) ? ($options['private_fields'] ?? []) : [] as $field) {
+                        $private[$field] = $privateValues[$field] ??= PropertyAccessorValueExtractor::getValue($object, $field, $this->identifiersExtractor, $this->resourceClassResolver);
+                    }
+                    $types = $resourceMetadata->getTypes() ?? [$resourceMetadata->getShortName()];
+                    $toPublish = (object) [
+                        'resourceClass' => $resourceClass,
+                        'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH),
+                        'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL),
+                        'type' => 1 === \count($types) ? $types[0] : $types,
+                        'private' => $private,
+                    ];
+                }
+                $this->{$property}[] = ['object' => $toPublish, 'options' => $options, 'operation' => $operation];
+            }
+        }
+    }
+
     private function publishUpdate(object $object, array $options, string $type, ?Operation $operation = null): void
     {
+        if ($operation instanceof Subscription && $this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface) {
+            foreach ($this->graphQlSubscriptionManager->getPushPayloadsForOperation($object, $operation, $type) as [$id, $data]) {
+                $this->publish($this->buildUpdate(
+                    $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($id),
+                    (string) (new JsonResponse($data))->getContent(),
+                    $options
+                ), $options);
+            }
+
+            return;
+        }
+
         if ($object instanceof \stdClass) {
             // By convention, if the object has been deleted, we send only its IRI and its type.
             // This may change in the feature, because it's not JSON Merge Patch compliant,
@@ -276,57 +279,37 @@ final class PublishMercureUpdatesListener
             $context = $options['normalization_context'] ?? $operation?->getNormalizationContext() ?? [];
 
             // We need to evaluate it here, because in storeObjectToPublish() the resource would not have been persisted yet
-            $this->evaluateTopics($options, $object);
+            $this->optionsResolver->evaluateTopics($options, $object);
 
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $operation);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
         }
 
-        $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
+        $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getLegacyGraphQlSubscriptionUpdates($object, $options, $type));
         foreach ($updates as $update) {
-            if ($options['enable_async_update'] && $this->messageBus) {
-                $this->dispatch($update);
-                continue;
-            }
-
-            $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update);
+            $this->publish($update, $options);
         }
     }
 
-    private function evaluateTopics(array &$options, object $object): void
+    private function publish(Update $update, array $options): void
     {
-        if (!($options['topics'] ?? false)) {
+        if ($options['enable_async_update'] && $this->messageBus) {
+            $this->dispatch($update);
+
             return;
         }
 
-        $topics = [];
-        foreach ((array) $options['topics'] as $topic) {
-            if (!\is_string($topic)) {
-                $topics[] = $topic;
-                continue;
-            }
-
-            if (!str_starts_with($topic, '@=')) {
-                $topics[] = $topic;
-                continue;
-            }
-
-            if (null === $this->expressionLanguage) {
-                throw new \LogicException('The "@=" expression syntax cannot be used without the Expression Language component. Try running "composer require symfony/expression-language".');
-            }
-
-            $topics[] = $this->expressionLanguage->evaluate(substr($topic, 2), ['object' => $object]);
-        }
-
-        $options['topics'] = $topics;
+        $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update);
     }
 
     /**
+     * Keeps custom managers using the original payload API on the existing HTTP publication path.
+     *
      * @return Update[]
      */
-    private function getGraphQlSubscriptionUpdates(object $object, array $options, string $type): array
+    private function getLegacyGraphQlSubscriptionUpdates(object $object, array $options, string $type): array
     {
-        if (!$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
+        if (!$this->graphQlSubscriptionManager || $this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface || !$this->graphQlMercureSubscriptionIriGenerator) {
             return [];
         }
 

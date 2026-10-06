@@ -13,10 +13,18 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\Util\MercureOptionsResolver;
 use ApiPlatform\Symfony\State\MercureLinkProcessor;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
+
+    $services->set('api_platform.mercure.options_resolver', MercureOptionsResolver::class)
+        ->args([
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.iri_converter'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+        ]);
 
     $services->set('api_platform.mercure.processor.add_link_header', MercureLinkProcessor::class)
         ->decorate('api_platform.state_processor.respond', null, 400)

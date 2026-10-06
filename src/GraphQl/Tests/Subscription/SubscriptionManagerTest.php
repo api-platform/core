@@ -755,7 +755,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            Argument::in([$itemSubscription, $collectionOperation]),
             [],
             ['fields' => ['fieldsFoo']]
         )->willReturn(
@@ -764,7 +764,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            Argument::in([$itemSubscription, $collectionOperation]),
             [],
             ['fields' => ['fieldsBar']]
         )->willReturn(
@@ -819,7 +819,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $itemSubscription,
             [],
             ['fields' => ['fieldsFoo']]
         )->willReturn(
@@ -858,7 +858,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $collectionOperation,
             [],
             ['fields' => ['collectionFields']]
         )->willReturn(
@@ -896,7 +896,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $collectionOperation,
             [],
             ['fields' => ['collectionFields']]
         )->willReturn(
@@ -939,7 +939,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $collectionOperation,
             [],
             ['fields' => ['collectionFields']]
         )->willReturn(
@@ -980,7 +980,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $collectionOperation,
             [],
             ['fields' => ['collectionFields']]
         )->willReturn(
@@ -1023,7 +1023,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $collectionOperation,
             [],
             ['fields' => ['collectionFields']]
         )->willReturn(
@@ -1072,7 +1072,7 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
+            $collectionOperation,
             [],
             ['fields' => ['collectionFields']]
         )->willReturn(

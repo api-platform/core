@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Tests\Doctrine\EventListener;
 
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionPayloadProviderInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\Subscription;
@@ -39,6 +40,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -47,6 +49,8 @@ use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
 use Symfony\Component\Mercure\MockHub;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -1004,6 +1008,66 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals([true, true], $private);
         $this->assertEquals([null, null], $retry);
         $this->assertEquals(['2', '["data"]'], $data);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testEachOperationChoosesItsDeliveryMode(bool $restAsync): void
+    {
+        $object = new Dummy();
+        $resolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resolver->method('getResourceClass')->willReturn(Dummy::class);
+        $resolver->method('isResourceClass')->willReturn(true);
+        $iri = $this->createStub(IriConverterInterface::class);
+        $iri->method('getIriFromResource')->willReturn('https://example.com/dummies/1');
+        $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([new Get(mercure: ['enable_async_update' => $restAsync])]))->withGraphQlOperations([
+                new Subscription(name: 'sync', mercure: ['private' => true, 'hub' => 'scoped', 'enable_async_update' => false]),
+                new Subscription(name: 'async', mercure: ['private' => false, 'enable_async_update' => true]),
+                new Subscription(name: 'disabled', mercure: false),
+            ]),
+        ]));
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('serialize')->willReturn('{}');
+        $payloads = $this->createMock(SubscriptionPayloadProviderInterface::class);
+        $payloads->expects($this->never())->method('getPushPayloads');
+        $payloads->expects($this->exactly(2))->method('getPushPayloadsForOperation')->willReturnCallback(static function (object $data, Subscription $operation, string $type) use ($object): array {
+            self::assertSame($object, $data);
+            self::assertSame('update', $type);
+            self::assertContains($operation->getName(), ['sync', 'async']);
+
+            return [[$operation->getName(), ['name' => $operation->getName()]]];
+        });
+        $topics = $this->createStub(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topics->method('generateTopicIri')->willReturnCallback(static fn (string $id): string => 'https://example.com/subscriptions/'.$id);
+        $dispatched = [];
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->exactly($restAsync ? 2 : 1))->method('dispatch')->willReturnCallback(static function (Update $update) use (&$dispatched): Envelope {
+            $dispatched[] = $update;
+
+            return new Envelope($update);
+        });
+        $defaultHub = $this->createMock(HubInterface::class);
+        $defaultHub->expects($restAsync ? $this->never() : $this->once())->method('publish')->with($this->callback(static fn (Update $update): bool => ['https://example.com/dummies/1'] === $update->getTopics()))->willReturn('rest-id');
+        $scopedHub = $this->createMock(HubInterface::class);
+        $scopedHub->expects($this->once())->method('publish')->with($this->callback(static fn (Update $update): bool => $update->isPrivate() && ['https://example.com/subscriptions/sync'] === $update->getTopics() && '{"name":"sync"}' === $update->getData()))->willReturn('graphql-id');
+        $listener = new PublishMercureUpdatesListener($resolver, $iri, $metadata, $serializer, ['json' => ['application/json']], $bus, new HubRegistry($defaultHub, ['scoped' => $scopedHub]), $payloads, $topics);
+        $uow = $this->createStub(UnitOfWork::class);
+        $uow->method('getScheduledEntityInsertions')->willReturn([]);
+        $uow->method('getScheduledEntityUpdates')->willReturn([$object]);
+        $uow->method('getScheduledEntityDeletions')->willReturn([]);
+        $manager = $this->createStub(EntityManagerInterface::class);
+        $manager->method('getUnitOfWork')->willReturn($uow);
+        $listener->onFlush(new OnFlushEventArgs($manager));
+        $listener->postFlush();
+
+        $update = $dispatched[array_key_last($dispatched)];
+        $this->assertSame(['https://example.com/subscriptions/async'], $update->getTopics());
+        $this->assertFalse($update->isPrivate());
+        $this->assertSame('{"name":"async"}', $update->getData());
+        // A second flush cannot replay publications already delivered.
+        $listener->postFlush();
     }
 
     public function testDeleteSnapshotRejectsMissingPrivateFields(): void

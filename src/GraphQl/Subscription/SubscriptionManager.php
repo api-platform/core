@@ -36,7 +36,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class SubscriptionManager implements OperationAwareSubscriptionManagerInterface
+final class SubscriptionManager implements OperationAwareSubscriptionManagerInterface, SubscriptionPayloadProviderInterface
 {
     use IdentifierTrait;
     use ResourceClassInfoTrait;
@@ -84,11 +84,53 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
     public function getPushPayloads(object $object, string $type = 'update'): array
     {
-        if ('delete' === $type) {
-            return $this->getDeletePushPayloads($object);
+        $resourceClass = 'delete' === $type ? $object->resourceClass : $this->getObjectClass($object);
+        $payloads = [];
+        foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
+            foreach ($resource->getGraphQlOperations() ?? [] as $operation) {
+                if (!$operation instanceof Subscription) {
+                    continue;
+                }
+                foreach ($this->getPushPayloadsForOperation($object, $operation, $type) as [$id, $data]) {
+                    $payloads[$id] = [$id, $data];
+                }
+            }
         }
 
-        return $this->getCreatedOrUpdatedPayloads($object, $type);
+        return array_values($payloads);
+    }
+
+    public function getPushPayloadsForOperation(object $object, Subscription $operation, string $type = 'update'): array
+    {
+        if (false === $operation->getMercure()) {
+            return [];
+        }
+        if ('delete' === $type) {
+            return $this->getDeletePushPayloads($object, $operation);
+        }
+        if ('create' === $type && !$operation instanceof CollectionOperationInterface) {
+            return [];
+        }
+
+        $privateFieldData = $this->getPrivateFieldData($operation, $object);
+        $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
+        $subscriptionKey = $this->getSubscriptionKey($this->iriConverter->getIriFromResource($object), $operation);
+        $payloads = [];
+        if ($operation instanceof CollectionOperationInterface) {
+            $this->appendNormalizedPayloads($payloads, $this->getSubscriptions($subscriptionKey, $privatePartitionKey), $object, $operation);
+
+            return array_values($payloads);
+        }
+
+        $cacheItem = $this->getSubscriptionsCacheItem($subscriptionKey, $privatePartitionKey);
+        $subscriptions = $cacheItem->isHit() ? $cacheItem->get() : [];
+        $updated = $this->appendNormalizedPayloads($payloads, $subscriptions, $object, $operation, true);
+        if ($updated !== $subscriptions) {
+            $cacheItem->set($updated);
+            $this->subscriptionsCache->save($cacheItem);
+        }
+
+        return array_values($payloads);
     }
 
     /**
@@ -170,57 +212,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return hash('sha256', serialize($privateFieldData));
     }
 
-    private function getCreatedOrUpdatedPayloads(object $object, string $type): array
-    {
-        $resourceClass = $this->getObjectClass($object);
-        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $shortName = $resourceMetadata->getOperation()->getShortName();
-
-        $payloadsBySubscriptionId = [];
-        foreach ($resourceMetadata as $apiResource) {
-            foreach ($apiResource->getGraphQlOperations() as $operation) {
-                if (!$operation instanceof Subscription) {
-                    continue;
-                }
-                if ('create' === $type && !$operation instanceof CollectionOperationInterface) {
-                    continue;
-                }
-                $privateFieldData = $this->getPrivateFieldData($operation, $object);
-                $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
-
-                $iri = $this->iriConverter->getIriFromResource($object);
-                $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
-                if ($operation instanceof CollectionOperationInterface) {
-                    $this->appendNormalizedPayloads(
-                        $payloadsBySubscriptionId,
-                        $this->getSubscriptions($subscriptionKey, $privatePartitionKey),
-                        $object,
-                        $shortName
-                    );
-
-                    continue;
-                }
-
-                $itemSubscriptionsCacheItem = $this->getSubscriptionsCacheItem($subscriptionKey, $privatePartitionKey);
-                $itemSubscriptions = $itemSubscriptionsCacheItem->isHit() ? $itemSubscriptionsCacheItem->get() : [];
-                $updatedItemSubscriptions = $this->appendNormalizedPayloads(
-                    $payloadsBySubscriptionId,
-                    $itemSubscriptions,
-                    $object,
-                    $shortName,
-                    true
-                );
-
-                if ($updatedItemSubscriptions !== $itemSubscriptions) {
-                    $itemSubscriptionsCacheItem->set($updatedItemSubscriptions);
-                    $this->subscriptionsCache->save($itemSubscriptionsCacheItem);
-                }
-            }
-        }
-
-        return array_values($payloadsBySubscriptionId);
-    }
-
     /**
      * @param array<string, array{string, mixed}> $payloadsBySubscriptionId
      *
@@ -230,12 +221,10 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
      *
      * @return array<array{string, array<string, mixed>, array<string, mixed>}>
      */
-    private function appendNormalizedPayloads(array &$payloadsBySubscriptionId, array $subscriptions, object $object, string $shortName, bool $updateCachedResult = false): array
+    private function appendNormalizedPayloads(array &$payloadsBySubscriptionId, array $subscriptions, object $object, Subscription $operation, bool $updateCachedResult = false): array
     {
-        $subscriptionOperation = (new Subscription())->withName('mercure_subscription')->withShortName($shortName);
-
         foreach ($subscriptions as $index => [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-            $data = $this->normalizeProcessor->process($object, $subscriptionOperation, [], ['fields' => $subscriptionFields]);
+            $data = $this->normalizeProcessor->process($object, $operation, [], ['fields' => $subscriptionFields]);
 
             unset($data['clientSubscriptionId']);
 
@@ -251,34 +240,24 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return $subscriptions;
     }
 
-    private function getDeletePushPayloads(object $object): array
+    private function getDeletePushPayloads(object $object, Subscription $operation): array
     {
-        $iri = $object->id;
-        $payloads = [];
-        $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
-        foreach ($this->resourceMetadataCollectionFactory->create($object->resourceClass) as $apiResource) {
-            foreach ($apiResource->getGraphQlOperations() ?? [] as $operation) {
-                if (!$operation instanceof Subscription) {
-                    continue;
-                }
-
-                $privateFieldData = [];
-                foreach ($this->getPrivateFields($operation) as $privateField) {
-                    if (!\array_key_exists($privateField, $object->private)) {
-                        throw new RuntimeException(\sprintf('Private field "%s" is missing from the delete snapshot for subscription "%s".', $privateField, $operation->getName()));
-                    }
-                    $privateFieldData[$privateField] = $object->private[$privateField];
-                }
-                $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
-                $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
-                foreach ($this->getSubscriptions($subscriptionKey, $privatePartitionKey) as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-                    $payloads[] = [$subscriptionId, $payload];
-                }
-
-                if (!$operation instanceof CollectionOperationInterface) {
-                    $this->removeItemFromSubscriptionCache($subscriptionKey, $privatePartitionKey);
-                }
+        $privateFieldData = [];
+        foreach ($this->getPrivateFields($operation) as $privateField) {
+            if (!\array_key_exists($privateField, $object->private)) {
+                throw new RuntimeException(\sprintf('Private field "%s" is missing from the delete snapshot for subscription "%s".', $privateField, $operation->getName()));
             }
+            $privateFieldData[$privateField] = $object->private[$privateField];
+        }
+        $partition = $this->getPrivatePartitionKey($privateFieldData);
+        $key = $this->getSubscriptionKey($object->id, $operation);
+        $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
+        $payloads = [];
+        foreach ($this->getSubscriptions($key, $partition) as [$id]) {
+            $payloads[] = [$id, $payload];
+        }
+        if (!$operation instanceof CollectionOperationInterface) {
+            $this->removeItemFromSubscriptionCache($key, $partition);
         }
 
         return $payloads;

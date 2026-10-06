@@ -32,6 +32,7 @@ return static function (ContainerConfigurator $container) {
             null,
             '%api_platform.mercure.include_type%',
             service('api_platform.api.identifiers_extractor'),
+            service('api_platform.mercure.options_resolver'),
         ])
         ->tag('doctrine_mongodb.odm.event_listener', ['event' => 'onFlush'])
         ->tag('doctrine_mongodb.odm.event_listener', ['event' => 'postFlush']);
