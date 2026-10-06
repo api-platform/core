@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
@@ -40,6 +41,7 @@ use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -261,9 +263,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if (null === $objectToPopulate = $this->extractObjectToPopulate($resourceClass, $context, static::OBJECT_TO_POPULATE)) {
+        // An IRI references an existing resource, its type is resolved when it is retrieved
+        if (null === ($objectToPopulate = $this->extractObjectToPopulate($resourceClass, $context, static::OBJECT_TO_POPULATE)) && !\is_string($data)) {
             $normalizedData = \is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
-            $type = $this->getClassDiscriminatorResolvedClass($normalizedData, $type, $context);
+            // Nested discriminator maps are resolved down to the most specific class
+            $resolvedTypes = [];
+            do {
+                $resolvedTypes[$type] = true;
+                $type = $this->getClassDiscriminatorResolvedClass($normalizedData, $type, $context);
+            } while (!isset($resolvedTypes[$type]));
         }
 
         $context['api_denormalize'] = true;
@@ -271,6 +279,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if ($this->resourceClassResolver->isResourceClass($type)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $type);
             $context['resource_class'] = $resourceClass;
+
+            // A subtype declared in the serializer discriminator map of the resource is described by its own
+            // metadata: pin the resource class to it so its properties can be written.
+            if (\is_array($data) && null !== $discriminatorMapping = $this->getDiscriminatorMapping($resourceClass, null !== $objectToPopulate ? $this->getObjectClass($objectToPopulate) : $type)) {
+                $data = $this->prepareDiscriminatedData($data, $discriminatorMapping, $objectToPopulate, $type, $context);
+                $resourceClass = $context['resource_class'] = $discriminatorMapping['class'];
+            }
         } elseif (($context['api_platform_input'] ?? false) && isset($context['resource_class'])) {
             // A discriminated input DTO base (not itself a resource) resolves to a concrete
             // subclass here: pin the resource class to that concrete class so constructor and
@@ -462,6 +477,57 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $mappedClass;
     }
 
+    /**
+     * @return array{class: class-string, type_properties: list<string>, mappings: list<ClassDiscriminatorMapping>}|null
+     */
+    private function getDiscriminatorMapping(string $resourceClass, string $class): ?array
+    {
+        return null === $this->classDiscriminatorResolver ? null : ClassDiscriminatorHelper::resolve($this->classDiscriminatorResolver, $resourceClass, $class);
+    }
+
+    /**
+     * @param array{class: class-string, type_properties: list<string>, mappings: list<ClassDiscriminatorMapping>} $discriminatorMapping
+     */
+    private function prepareDiscriminatedData(array $data, array $discriminatorMapping, ?object $objectToPopulate, string $type, array $context): array
+    {
+        // A class declaring its own map is resolved again by the Symfony serializer, which reads the type property of that map
+        $resolvedTypeProperty = null === $objectToPopulate ? $this->classDiscriminatorResolver?->getMappingForClass($type)?->getTypeProperty() : null;
+        foreach ($discriminatorMapping['mappings'] as $mapping) {
+            $typeProperty = $mapping->getTypeProperty();
+            if (!\array_key_exists($typeProperty, $data)) {
+                continue;
+            }
+
+            // The type of an existing object cannot be changed
+            if (null !== $objectToPopulate && (!\is_string($data[$typeProperty]) || null === ($typeClass = $mapping->getClassForType($data[$typeProperty])) || !$objectToPopulate instanceof $typeClass)) {
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type "%s" does not match the type of the object being updated.', \is_scalar($data[$typeProperty]) ? $data[$typeProperty] : get_debug_type($data[$typeProperty])), $data[$typeProperty], ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$typeProperty : $typeProperty, true);
+            }
+
+            // The type property is computed from the discriminator map, it is not a writable property of the object
+            if ($typeProperty !== $resolvedTypeProperty && !property_exists($discriminatorMapping['class'], $typeProperty)) {
+                unset($data[$typeProperty]);
+            }
+        }
+
+        return $data;
+    }
+
+    private function getDiscriminatorTypeValue(object $object, string $attribute, string $resourceClass): ?string
+    {
+        if (null === $this->classDiscriminatorResolver?->getMappingForMappedObject($object) || !$this->resourceClassResolver->isResourceClass($resourceClass)) {
+            return null;
+        }
+
+        $discriminatorMapping = $this->getDiscriminatorMapping($this->resourceClassResolver->getResourceClass(null, $resourceClass), $this->getObjectClass($object));
+        foreach ($discriminatorMapping['mappings'] ?? [] as $mapping) {
+            if ($attribute === $mapping->getTypeProperty()) {
+                return $mapping->getMappedObjectType($object);
+            }
+        }
+
+        return null;
+    }
+
     protected function createConstructorArgument(mixed $parameterData, string $key, \ReflectionParameter $constructorParameter, array $context, ?string $format = null): mixed
     {
         return $this->createAndValidateAttributeValue($constructorParameter->name, $parameterData, $format, $context);
@@ -489,6 +555,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
+        // Subtypes are only exposed when they are explicitly declared in the serializer discriminator map of the resource
+        $discriminatorMapping = $this->getDiscriminatorMapping($resourceClass, $context['resource_class']);
+        if (null !== $discriminatorMapping) {
+            $resourceClass = $discriminatorMapping['class'];
+        }
+
         $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
@@ -504,6 +576,20 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ) {
                 $allowedAttributes[] = $propertyName;
             }
+        }
+
+        // The type property is always part of a discriminated output, its value is computed from the discriminator map
+        if (null !== $discriminatorMapping && isset($context['api_normalize'])) {
+            foreach ($discriminatorMapping['type_properties'] as $typeProperty) {
+                if (!\in_array($typeProperty, $allowedAttributes, true) && $this->isAllowedAttribute($classOrObject, $typeProperty, null, $context)) {
+                    array_unshift($allowedAttributes, $typeProperty);
+                }
+            }
+        }
+
+        // The type property of the map declared by the class being created is read by the serializer to resolve the class
+        if (isset($context['api_denormalize']) && \is_string($classOrObject) && null !== ($typeProperty = $this->classDiscriminatorResolver?->getMappingForClass($classOrObject)?->getTypeProperty()) && !\in_array($typeProperty, $allowedAttributes, true)) {
+            $allowedAttributes[] = $typeProperty;
         }
 
         return $allowedAttributes;
@@ -560,14 +646,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $options = $this->getFactoryOptions($context);
-        $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
         $this->safeCacheKeysCache[$resourceClass] = true;
-        foreach ($propertyNames as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
-            if (null !== $propertyMetadata->getSecurity()) {
-                $this->safeCacheKeysCache[$resourceClass] = false;
-                break;
+        // Subtypes declared in the discriminator map of the resource are exposed too, their properties must be checked as well
+        foreach ([$resourceClass, ...(null === $this->classDiscriminatorResolver ? [] : ClassDiscriminatorHelper::getSubtypes($this->classDiscriminatorResolver, $resourceClass))] as $class) {
+            foreach ($this->propertyNameCollectionFactory->create($class, $options) as $propertyName) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($class, $propertyName, $options);
+                if (null !== $propertyMetadata->getSecurity()) {
+                    return $this->safeCacheKeysCache[$resourceClass] = false;
+                }
             }
         }
 
@@ -598,6 +685,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
+        // The type property is computed from the discriminator map, it is not a writable property of the object
+        if ($attribute === $this->classDiscriminatorResolver?->getMappingForMappedObject($object)?->getTypeProperty() && !property_exists($object, $attribute)) {
+            return;
+        }
+
         try {
             $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
         } catch (NotNormalizableValueException $exception) {
@@ -796,6 +888,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
+        // Symfony only computes the type property of the innermost discriminator map, compute those of the outer ones
+        if (!($context['api_denormalize'] ?? false) && isset($context['resource_class']) && null !== $typeValue = $this->getDiscriminatorTypeValue($object, $attribute, $context['resource_class'])) {
+            return $typeValue;
+        }
+
         $context['api_attribute'] = $attribute;
         $context['property_metadata'] = $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 

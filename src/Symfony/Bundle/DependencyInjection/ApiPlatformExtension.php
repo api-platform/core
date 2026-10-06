@@ -850,6 +850,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('doctrine_orm.php');
 
+        if (!$config['doctrine']['discriminator_map']) {
+            $container->removeDefinition('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        }
+
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
         }
@@ -880,6 +884,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.odm.links_handler');
 
         $loader->load('doctrine_mongodb_odm.php');
+
+        if (!$config['doctrine_mongodb_odm']['discriminator_map']) {
+            $container->removeDefinition('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
+        }
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
