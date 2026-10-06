@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use Symfony\Bridge\Doctrine\Serializer\Normalizer\CollectionDenormalizer;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -1110,6 +1111,19 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 unset($context['resource_class'], $context['uri_variables']);
 
                 try {
+                    // When the collection is declared with a class, such as a Doctrine collection,
+                    // ask the Serializer to build that class and pass the element and key types
+                    // through the context, the same way the core Serializer does. The class is
+                    // checked so older Symfony versions, which cannot build the collection, keep
+                    // the array type. A plain array or iterable keeps the "Foo[]" type too.
+                    $collectionClass = self::getCollectionContainerClass($t);
+                    if (null !== $collectionClass && class_exists(CollectionDenormalizer::class)) {
+                        $context['value_type'] = $unwrappedCollectionValueType;
+                        $context['key_type'] = $t->getCollectionKeyType();
+
+                        return $this->serializer->denormalize($value, $collectionClass, $format, $context);
+                    }
+
                     return $this->serializer->denormalize($value, $className.'[]', $format, $context);
                 } catch (NotNormalizableValueException $e) {
                     // union/intersect types: try the next type, if not valid, an exception will be thrown at the end
@@ -1270,6 +1284,20 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $value;
+    }
+
+    /**
+     * Returns the class of the container of a collection type, or null when the container is a plain array or iterable.
+     */
+    private static function getCollectionContainerClass(CollectionType $type): ?string
+    {
+        $containerType = $type->getWrappedType();
+
+        while ($containerType instanceof WrappingTypeInterface) {
+            $containerType = $containerType->getWrappedType();
+        }
+
+        return $containerType instanceof ObjectType ? $containerType->getClassName() : null;
     }
 
     /**
