@@ -16,6 +16,7 @@ namespace ApiPlatform\GraphQl\Subscription;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -28,8 +29,6 @@ use ApiPlatform\State\ProcessorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
  * Manages all the queried subscriptions by creating their ID
@@ -147,17 +146,16 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     private function getPrivateFieldData(?Operation $operation, ?object $object): array
     {
         $privateFields = $this->getPrivateFields($operation);
-        if ([] === $privateFields || null === $object) {
+        if ([] === $privateFields) {
             return [];
+        }
+        if (null === $object) {
+            throw new RuntimeException(\sprintf('Cannot resolve private fields for subscription "%s" without a resource object.', $operation?->getName()));
         }
 
         $privateFieldData = [];
         foreach ($privateFields as $privateField) {
-            try {
-                $privateFieldData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
-            } catch (NoSuchPropertyException|AccessException) {
-                continue;
-            }
+            $privateFieldData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
         }
 
         return $privateFieldData;
@@ -266,9 +264,10 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
                 $privateFieldData = [];
                 foreach ($this->getPrivateFields($operation) as $privateField) {
-                    if (\array_key_exists($privateField, $object->private)) {
-                        $privateFieldData[$privateField] = $object->private[$privateField];
+                    if (!\array_key_exists($privateField, $object->private)) {
+                        throw new RuntimeException(\sprintf('Private field "%s" is missing from the delete snapshot for subscription "%s".', $privateField, $operation->getName()));
                     }
+                    $privateFieldData[$privateField] = $object->private[$privateField];
                 }
                 $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
                 $subscriptionKey = $this->getSubscriptionKey($iri, $operation);

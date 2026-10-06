@@ -38,8 +38,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -240,11 +238,7 @@ final class PublishMercureUpdatesListener
                                     continue;
                                 }
 
-                                try {
-                                    $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
-                                } catch (NoSuchPropertyException|AccessException) {
-                                    continue;
-                                }
+                                $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
                             }
                         }
                     }

@@ -18,6 +18,7 @@ use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
@@ -29,6 +30,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\ProcessorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Argument\Token\TokenInterface;
@@ -37,6 +39,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -350,6 +353,87 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
         $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, $result, $operation));
+    }
+
+    #[DataProvider('invalidPrivateScopes')]
+    public function testInvalidPrivateScopeCannotRegister(bool $collection, ?object $object, array $fields, string $exception): void
+    {
+        $operation = $collection
+            ? $this->createCollectionSubscription(['private' => true, 'private_fields' => $fields])
+            : $this->createItemSubscription(['private' => true, 'private_fields' => $fields]);
+        $info = $this->createStub(ResolveInfo::class);
+        $info->method('getFieldSelection')->willReturn(['dummy' => ['id' => true]]);
+        $this->subscriptionsCacheProphecy->getItem(Argument::any())->shouldNotBeCalled();
+        $this->subscriptionsCacheProphecy->save(Argument::any())->shouldNotBeCalled();
+        $this->expectException($exception);
+
+        $this->subscriptionManager->retrieveSubscriptionId([
+            'args' => ['input' => ['id' => '/dummies/1']],
+            'info' => $info,
+            'graphql_context' => ['previous_object' => $object],
+        ], [], $operation);
+    }
+
+    public static function invalidPrivateScopes(): iterable
+    {
+        foreach ([false, true] as $collection) {
+            $prefix = $collection ? 'collection ' : 'item ';
+            yield $prefix.'missing object' => [$collection, null, ['tenant'], RuntimeException::class];
+            yield $prefix.'missing field' => [$collection, new \stdClass(), ['tenant'], AccessException::class];
+            yield $prefix.'partial fields' => [$collection, (object) ['tenant' => 'tenant-a'], ['tenant', 'chat'], AccessException::class];
+            yield $prefix.'inaccessible field' => [$collection, new class {
+                private string $tenant = 'tenant-a';
+
+                public function __toString(): string
+                {
+                    return $this->tenant;
+                }
+            }, ['tenant'], AccessException::class];
+        }
+    }
+
+    #[TestWith(['create'])]
+    #[TestWith(['update'])]
+    public function testIncompletePrivateScopeCannotPublish(string $type): void
+    {
+        $object = (object) ['tenant' => 'tenant-a'];
+        $this->resourceMetadataCollectionFactory->create(\stdClass::class)->willReturn(new ResourceMetadataCollection(\stdClass::class, [
+            (new ApiResource())->withOperations(new Operations([new Get(shortName: 'Dummy')]))->withGraphQlOperations([
+                $this->createCollectionSubscription(['private' => true, 'private_fields' => ['tenant', 'chat']]),
+            ]),
+        ]));
+        $this->subscriptionsCacheProphecy->getItem(Argument::any())->shouldNotBeCalled();
+        $this->expectException(AccessException::class);
+
+        $this->subscriptionManager->getPushPayloads($object, $type);
+    }
+
+    #[DataProvider('missingDeleteFields')]
+    public function testDeleteWithIncompletePrivateFieldsCannotReadOrRemoveSubscriptionBuckets(array $private): void
+    {
+        $this->resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withGraphQlOperations([
+                $this->createItemSubscription(['private' => true, 'private_fields' => ['tenant', 'chat']]),
+            ]),
+        ]));
+        $this->subscriptionsCacheProphecy->getItem(Argument::any())->shouldNotBeCalled();
+        $this->subscriptionsCacheProphecy->deleteItem(Argument::any())->shouldNotBeCalled();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('missing from the delete snapshot');
+
+        $this->subscriptionManager->getPushPayloads((object) [
+            'resourceClass' => Dummy::class,
+            'id' => '/dummies/1',
+            'iri' => 'http://example.com/dummies/1',
+            'type' => 'Dummy',
+            'private' => $private,
+        ], 'delete');
+    }
+
+    public static function missingDeleteFields(): iterable
+    {
+        yield 'all missing' => [[]];
+        yield 'one missing' => [['tenant' => 'tenant-a']];
     }
 
     #[DataProvider('subscriptionKinds')]

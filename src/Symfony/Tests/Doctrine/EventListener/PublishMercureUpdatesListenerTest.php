@@ -47,6 +47,7 @@ use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
 use Symfony\Component\Mercure\MockHub;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -1003,6 +1004,40 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals([true, true], $private);
         $this->assertEquals([null, null], $retry);
         $this->assertEquals(['2', '["data"]'], $data);
+    }
+
+    public function testDeleteSnapshotRejectsMissingPrivateFields(): void
+    {
+        $object = new \stdClass();
+        $resolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resolver->getResourceClass($object)->willReturn(\stdClass::class);
+        $resolver->isResourceClass(\stdClass::class)->willReturn(true);
+        $metadata = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->create(\stdClass::class)->willReturn(new ResourceMetadataCollection(\stdClass::class, [
+            (new ApiResource())->withOperations(new Operations([new Get(shortName: 'Dummy', mercure: true)]))->withGraphQlOperations([
+                new Subscription(name: 'watch', mercure: ['private' => true, 'private_fields' => ['tenant']]),
+            ]),
+        ]));
+        $hub = $this->createMock(HubInterface::class);
+        $hub->expects($this->never())->method('publish');
+        $listener = new PublishMercureUpdatesListener(
+            $resolver->reveal(),
+            $this->createStub(IriConverterInterface::class),
+            $metadata->reveal(),
+            $this->createStub(SerializerInterface::class),
+            ['jsonld' => ['application/ld+json']],
+            hubRegistry: new HubRegistry($hub),
+            graphQlSubscriptionManager: $this->createStub(GraphQlSubscriptionManagerInterface::class),
+        );
+        $uow = $this->createStub(UnitOfWork::class);
+        $uow->method('getScheduledEntityInsertions')->willReturn([]);
+        $uow->method('getScheduledEntityUpdates')->willReturn([]);
+        $uow->method('getScheduledEntityDeletions')->willReturn([$object]);
+        $manager = $this->createStub(EntityManagerInterface::class);
+        $manager->method('getUnitOfWork')->willReturn($uow);
+
+        $this->expectException(AccessException::class);
+        $listener->onFlush(new OnFlushEventArgs($manager));
     }
 
     public function testPublishRestDeleteDoesNotReadGraphQlPrivateFields(): void
