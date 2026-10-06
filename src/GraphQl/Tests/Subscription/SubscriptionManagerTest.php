@@ -584,7 +584,7 @@ class SubscriptionManagerTest extends TestCase
                     $object,
                     Argument::type(Subscription::class),
                     [],
-                    ['fields' => $fields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+                    ['fields' => $fields]
                 )->shouldBeCalledTimes(1)->willReturn($data);
             }
             $expected[] = [$name, $data];
@@ -673,7 +673,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['fieldsFoo']]
         )->willReturn(
             ['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -682,7 +682,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['fieldsBar']]
         )->willReturn(
             ['resultBar', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -737,7 +737,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['fieldsFoo']]
         )->willReturn(
             ['freshResultFoo', 'clientSubscriptionId' => 'client-subscription-id'],
             ['freshResultFoo', 'clientSubscriptionId' => 'client-subscription-id']
@@ -776,7 +776,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['collectionFields'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['collectionFields']]
         )->willReturn(
             ['createdResult', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -814,7 +814,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['collectionFields'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['collectionFields']]
         )->willReturn(
             ['sharedPrivateCreatedResult', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -857,7 +857,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['collectionFields'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['collectionFields']]
         )->willReturn(
             ['partitionedCreatedResult', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -898,7 +898,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['collectionFields'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['collectionFields']]
         )->willReturn(
             ['updatedCollectionResult', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -941,7 +941,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['collectionFields'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['collectionFields']]
         )->willReturn(
             ['sharedPrivateUpdatedResult', 'clientSubscriptionId' => 'client-subscription-id']
         );
@@ -990,7 +990,7 @@ class SubscriptionManagerTest extends TestCase
             $object,
             (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
-            ['fields' => ['collectionFields'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+            ['fields' => ['collectionFields']]
         )->willReturn(
             ['partitionedUpdatedResult', 'clientSubscriptionId' => 'client-subscription-id']
         );

@@ -234,13 +234,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $subscriptionOperation = (new Subscription())->withName('mercure_subscription')->withShortName($shortName);
 
         foreach ($subscriptions as $index => [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-            $resolverContext = [
-                'fields' => $subscriptionFields,
-                'is_collection' => false,
-                'is_mutation' => false,
-                'is_subscription' => true,
-            ];
-            $data = $this->normalizeProcessor->process($object, $subscriptionOperation, [], $resolverContext);
+            $data = $this->normalizeProcessor->process($object, $subscriptionOperation, [], ['fields' => $subscriptionFields]);
 
             unset($data['clientSubscriptionId']);
 
