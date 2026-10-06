@@ -21,6 +21,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientP
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MercureMessengerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\SerializerMappingLoaderPass;
@@ -56,6 +57,8 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new MetadataAwareNameConverterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new TestMercureHubPass());
+        // Mark Mercure handlers before MessengerPass creates their descriptors.
+        $container->addCompilerPass(new MercureMessengerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
         $container->addCompilerPass(new AuthenticatorManagerPass());
         $container->addCompilerPass(new SerializerMappingLoaderPass());
         $container->addCompilerPass(new MutatorPass());

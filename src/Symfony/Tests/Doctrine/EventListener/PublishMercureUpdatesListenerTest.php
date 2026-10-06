@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Doctrine\EventListener\PublishMercureUpdatesListener;
+use ApiPlatform\Symfony\Messenger\MercureHubStamp;
 use ApiPlatform\Symfony\Tests\Fixtures\NotAResource;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyCar;
@@ -1024,7 +1025,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $metadata->method('create')->willReturn(new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withOperations(new Operations([new Get(mercure: ['enable_async_update' => $restAsync])]))->withGraphQlOperations([
                 new Subscription(name: 'sync', mercure: ['private' => true, 'hub' => 'scoped', 'enable_async_update' => false]),
-                new Subscription(name: 'async', mercure: ['private' => false, 'enable_async_update' => true]),
+                new Subscription(name: 'async', mercure: ['private' => false, 'hub' => 'async', 'enable_async_update' => true]),
                 new Subscription(name: 'disabled', mercure: false),
             ]),
         ]));
@@ -1043,10 +1044,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $topics->method('generateTopicIri')->willReturnCallback(static fn (string $id): string => 'https://example.com/subscriptions/'.$id);
         $dispatched = [];
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->exactly($restAsync ? 2 : 1))->method('dispatch')->willReturnCallback(static function (Update $update) use (&$dispatched): Envelope {
-            $dispatched[] = $update;
+        $bus->expects($this->exactly($restAsync ? 2 : 1))->method('dispatch')->willReturnCallback(static function (Envelope $envelope) use (&$dispatched): Envelope {
+            $dispatched[] = $envelope;
 
-            return new Envelope($update);
+            return $envelope;
         });
         $defaultHub = $this->createMock(HubInterface::class);
         $defaultHub->expects($restAsync ? $this->never() : $this->once())->method('publish')->with($this->callback(static fn (Update $update): bool => ['https://example.com/dummies/1'] === $update->getTopics()))->willReturn('rest-id');
@@ -1062,7 +1063,12 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush(new OnFlushEventArgs($manager));
         $listener->postFlush();
 
-        $update = $dispatched[array_key_last($dispatched)];
+        $envelope = $dispatched[array_key_last($dispatched)];
+        $this->assertSame('async', $envelope->last(MercureHubStamp::class)->getHub());
+        if ($restAsync) {
+            $this->assertNull($dispatched[0]->last(MercureHubStamp::class)->getHub());
+        }
+        $update = $envelope->getMessage();
         $this->assertSame(['https://example.com/subscriptions/async'], $update->getTopics());
         $this->assertFalse($update->isPrivate());
         $this->assertSame('{"name":"async"}', $update->getData());

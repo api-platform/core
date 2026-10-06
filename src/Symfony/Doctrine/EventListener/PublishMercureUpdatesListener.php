@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\State\Util\MercureOptionsResolver;
+use ApiPlatform\Symfony\Messenger\MercureHubStamp;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
@@ -38,6 +39,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -294,7 +296,7 @@ final class PublishMercureUpdatesListener
     private function publish(Update $update, array $options): void
     {
         if ($options['enable_async_update'] && $this->messageBus) {
-            $this->dispatch($update);
+            $this->dispatch(new Envelope($update, [new MercureHubStamp($options['hub'] ?? null)]));
 
             return;
         }
