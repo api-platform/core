@@ -91,6 +91,40 @@ class TypeConverterTest extends TestCase
         ];
     }
 
+    #[DataProvider('convertScalarCollectionTypeProvider')]
+    public function testConvertScalarCollectionType(Type $type, GraphQLType|string $expectedGraphqlType): void
+    {
+        $operation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, false, $operation, 'resourceClass', 'rootClass', null, 0);
+
+        if (\is_string($expectedGraphqlType)) {
+            $this->assertSame($expectedGraphqlType, $graphqlType);
+
+            return;
+        }
+
+        $this->assertEquals($expectedGraphqlType, $graphqlType);
+    }
+
+    public static function convertScalarCollectionTypeProvider(): array
+    {
+        return [
+            'list of string' => [Type::list(Type::string()), GraphQLType::listOf(GraphQLType::string())],
+            'list of int' => [Type::list(Type::int()), GraphQLType::listOf(GraphQLType::int())],
+            'list of float' => [Type::list(Type::float()), GraphQLType::listOf(GraphQLType::float())],
+            'list of bool' => [Type::list(Type::bool()), GraphQLType::listOf(GraphQLType::boolean())],
+            'array of string (string[])' => [Type::array(Type::string()), GraphQLType::listOf(GraphQLType::string())],
+            'array<int, string>' => [Type::array(Type::string(), Type::int()), GraphQLType::listOf(GraphQLType::string())],
+            'iterable of int' => [Type::iterable(Type::int()), GraphQLType::listOf(GraphQLType::int())],
+            'dictionary array<string, string>' => [Type::array(Type::string(), Type::string()), 'Iterable'],
+            'array of mixed' => [Type::array(Type::mixed()), 'Iterable'],
+            'nullable list of string' => [Type::nullable(Type::list(Type::string())), GraphQLType::listOf(GraphQLType::string())],
+            'list of nullable string' => [Type::list(Type::nullable(Type::string())), GraphQLType::listOf(GraphQLType::string())],
+            'list of int|string' => [Type::list(Type::union(Type::int(), Type::string())), 'Iterable'],
+            'nested list' => [Type::list(Type::list(Type::string())), 'Iterable'],
+        ];
+    }
+
     public function testConvertTypeNoGraphQlResourceMetadata(): void
     {
         $type = Type::object('dummy');
