@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -27,12 +28,14 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\ProcessorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -65,6 +68,7 @@ class SubscriptionManagerTest extends TestCase
     {
         return (new SubscriptionCollection())
             ->withName('update_collection')
+            ->withClass(Dummy::class)
             ->withShortName('Dummy')
             ->withMercure($mercure);
     }
@@ -351,7 +355,7 @@ class SubscriptionManagerTest extends TestCase
         $infoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
 
         $context = ['args' => ['input' => ['id' => '/foos/34']], 'info' => $infoProphecy->reveal(), 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => true];
-        $operation = $this->createCollectionSubscription();
+        $operation = new SubscriptionCollection(name: 'update_collection', shortName: 'Dummy');
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false);
@@ -378,7 +382,7 @@ class SubscriptionManagerTest extends TestCase
         $subscriptionId = 'sharedPrivateCollectionSubscriptionId';
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields + ['__collection' => true])->willReturn($subscriptionId);
         $cacheItemProphecy->set([[$subscriptionId, $fields, []]])->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_foos')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
         $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, null, $operation));
@@ -412,7 +416,7 @@ class SubscriptionManagerTest extends TestCase
         $subscriptionId = 'partitionedCollectionSubscriptionId';
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields + ['__collection' => true])->willReturn($subscriptionId);
         $cacheItemProphecy->set([[$subscriptionId, $fields, []]])->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_foos_'.hash('sha256', 'tenant=42'))->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection_'.hash('sha256', 'tenant=42'))->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
         $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, null, $operation));
@@ -436,6 +440,71 @@ class SubscriptionManagerTest extends TestCase
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
         $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, null, $operation));
+    }
+
+    #[DataProvider('collectionChangeTypes')]
+    public function testEachCollectionOperationReceivesItsRegisteredPayload(string $type): void
+    {
+        $object = new Dummy();
+        $first = $this->createCollectionSubscription(true)->withClass(Dummy::class);
+        $second = $first->withName('other_collection');
+        $this->resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())
+                ->withOperations(new Operations([(new Get())->withShortName('Dummy')]))
+                ->withGraphQlOperations([
+                    'collection_query' => new QueryCollection(name: 'collection_query', shortName: 'Dummy', class: Dummy::class),
+                    'update' => $this->createItemSubscription(true),
+                    'update_collection' => $first,
+                ]),
+            (new ApiResource())->withGraphQlOperations(['other_collection' => $second]),
+        ]));
+        $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
+        $manager = new SubscriptionManager(new ArrayAdapter(), $this->subscriptionIdentifierGeneratorProphecy->reveal(), $this->normalizeProcessor->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal());
+
+        $expected = [];
+        foreach (['first' => $first, 'second' => $second] as $name => $operation) {
+            // Different selections keep this regression independent of subscription ID scoping.
+            $fields = [$name => true];
+            $info = $this->prophesize(ResolveInfo::class);
+            $info->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
+            $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields + ['__collection' => true])->willReturn($name);
+            $this->assertSame($name, $manager->retrieveSubscriptionId([
+                'args' => ['input' => ['id' => '/dummies/1']],
+                'info' => $info->reveal(),
+            ], null, $operation));
+
+            $data = [$name => 'changed'];
+            if ('delete' === $type) {
+                $data = ['type' => 'delete', 'payload' => ['id' => '/dummies/2', 'iri' => 'https://example.com/dummies/2', 'type' => 'Dummy']];
+            } else {
+                $this->normalizeProcessor->process(
+                    $object,
+                    Argument::type(Subscription::class),
+                    [],
+                    ['fields' => $fields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+                )->shouldBeCalledTimes(1)->willReturn($data);
+            }
+            $expected[] = [$name, $data];
+        }
+
+        if ('delete' === $type) {
+            $object = (object) [
+                'resourceClass' => Dummy::class,
+                'id' => '/dummies/2',
+                'iri' => 'https://example.com/dummies/2',
+                'type' => 'Dummy',
+                'private' => [],
+            ];
+        }
+
+        $this->assertSame($expected, $manager->getPushPayloads($object, $type));
+    }
+
+    public static function collectionChangeTypes(): iterable
+    {
+        yield 'create' => ['create'];
+        yield 'update' => ['update'];
+        yield 'delete' => ['delete'];
     }
 
     public function testGetPushPayloadsNoHit(): void
@@ -829,11 +898,18 @@ class SubscriptionManagerTest extends TestCase
     public function testGetPushPayloadsDeleteReturnsLightweightPayloadAndRemovesItemCache(): void
     {
         $object = new class {
+            public string $resourceClass = Dummy::class;
             public string $id = '/dummies/2';
             public string $iri = '/dummies/2';
             public string $type = 'Dummy';
             public array $private = [];
         };
+
+        $this->resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withGraphQlOperations([
+                'update_collection' => $this->createCollectionSubscription(true),
+            ]),
+        ]));
 
         $itemCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $itemCacheItemProphecy->isHit()->willReturn(true);
@@ -848,7 +924,7 @@ class SubscriptionManagerTest extends TestCase
         ]);
 
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->shouldBeCalled()->willReturn($itemCacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_dummies')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->hasItem('_dummies_2')->shouldBeCalled()->willReturn(true);
         $this->subscriptionsCacheProphecy->deleteItem('_dummies_2')->shouldBeCalled();
 
@@ -863,11 +939,18 @@ class SubscriptionManagerTest extends TestCase
     public function testGetPushPayloadsDeleteReturnsPartitionedPrivatePayloadsAndRemovesPartitionedItemCache(): void
     {
         $object = new class {
+            public string $resourceClass = Dummy::class;
             public string $id = '/dummies/2';
             public string $iri = '/dummies/2';
             public string $type = 'Dummy';
             public array $private = ['tenant' => '42'];
         };
+
+        $this->resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withGraphQlOperations([
+                'update_collection' => $this->createCollectionSubscription(['private' => true, 'private_fields' => ['tenant']]),
+            ]),
+        ]));
 
         $partitionKey = hash('sha256', 'tenant=42');
 
@@ -884,7 +967,7 @@ class SubscriptionManagerTest extends TestCase
         ]);
 
         $this->subscriptionsCacheProphecy->getItem('_dummies_2_'.$partitionKey)->shouldBeCalled()->willReturn($itemCacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_dummies_'.$partitionKey)->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection_'.$partitionKey)->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->hasItem('_dummies_2_'.$partitionKey)->shouldBeCalled()->willReturn(true);
         $this->subscriptionsCacheProphecy->deleteItem('_dummies_2_'.$partitionKey)->shouldBeCalled();
 
