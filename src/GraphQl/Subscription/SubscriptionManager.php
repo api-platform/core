@@ -57,11 +57,8 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $fields = $info->getFieldSelection(\PHP_INT_MAX);
         $this->arrayRecursiveSort($fields, 'ksort');
 
-        $options = $operation ? ($operation->getMercure() ?? false) : false;
-        $private = $options['private'] ?? false;
-        $privateFields = $options['private_fields'] ?? [];
         $previousObject = $context['graphql_context']['previous_object'] ?? null;
-        $privateFieldData = $this->getPrivateFieldData($private, $privateFields, $previousObject);
+        $privateFieldData = $this->getPrivateFieldData($operation, $previousObject);
         $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
         $subscriptionKey = $this->getSubscriptionKey($iri, $operation);
 
@@ -139,8 +136,12 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     /**
      * @return array<string, string>
      */
-    private function getPrivateFieldData(bool $private, array $privateFields, ?object $object): array
+    private function getPrivateFieldData(?Operation $operation, ?object $object): array
     {
+        $options = $operation?->getMercure() ?? false;
+        $private = $options['private'] ?? false;
+        $privateFields = $options['private_fields'] ?? [];
+
         if (!$private || [] === $privateFields || null === $object) {
             return [];
         }
@@ -181,10 +182,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                 if ('create' === $type && !$operation instanceof CollectionOperationInterface) {
                     continue;
                 }
-                $mercure = $operation->getMercure() ?? false;
-                $private = $mercure['private'] ?? false;
-                $privateFieldsConfig = $mercure['private_fields'] ?? [];
-                $privateFieldData = $this->getPrivateFieldData($private, $privateFieldsConfig, $object);
+                $privateFieldData = $this->getPrivateFieldData($operation, $object);
                 $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
 
                 $iri = $this->iriConverter->getIriFromResource($object);
