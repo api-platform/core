@@ -537,6 +537,7 @@
         <xsd:attribute type="xsd:boolean" name="hideHydraOperation"/>
         <xsd:attribute type="xsd:boolean" name="queryParameterValidationEnabled"/>
         <xsd:attribute type="xsd:string" name="routePrefix"/>
+        <xsd:attribute type="xsd:string" name="canonicalUriTemplate"/>
         <xsd:attribute type="xsd:boolean" name="stateless"/>
         <xsd:attribute type="xsd:string" name="sunset"/>
         <xsd:attribute type="xsd:string" name="acceptPatch"/>

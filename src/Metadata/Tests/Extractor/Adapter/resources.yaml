@@ -350,3 +350,4 @@ resources:
                     'Lorem ipsum': 'Dolor sit amet'
             map: null
             mcp: null
+            canonicalUriTemplate: '/users/{userId}/comments/{commentId}{._format}'
