@@ -103,6 +103,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         array|string|null $middleware = null,
         ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        array|false|null $hydraOperations = null,
         ?bool $jsonStream = null,
         array $extraProperties = [],
         ?bool $throwOnNotFound = null,
@@ -193,6 +194,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            hydraOperations: $hydraOperations,
             stateOptions: $stateOptions,
             map: $map
         );
