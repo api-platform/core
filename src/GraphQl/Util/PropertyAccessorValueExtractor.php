@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Util;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -23,21 +26,35 @@ final class PropertyAccessorValueExtractor
 {
     private static ?PropertyAccessorInterface $propertyAccessor = null;
 
-    public static function getValue(object $object, string $property): string
+    public static function getValue(object $object, string $property, ?IdentifiersExtractorInterface $identifiersExtractor = null, ?ResourceClassResolverInterface $resourceClassResolver = null): string
     {
         self::$propertyAccessor ??= PropertyAccess::createPropertyAccessor();
 
         $value = self::$propertyAccessor->getValue($object, $property);
-        if (\is_object($value) && method_exists($value, 'getId')) {
-            $value = $value->getId();
-        }
-
         if ($value instanceof \BackedEnum) {
             return (string) $value->value;
         }
 
         if ($value instanceof \UnitEnum) {
             return $value->name;
+        }
+
+        if (\is_object($value) && (!$value instanceof \Stringable || ($resourceClassResolver?->isResourceClass($value::class) ?? false))) {
+            if (null === $identifiersExtractor) {
+                throw new \LogicException('An identifiers extractor is required to resolve object-valued subscription private fields.');
+            }
+
+            $identifiers = $identifiersExtractor->getIdentifiersFromItem($value);
+            if ([] === $identifiers) {
+                throw new RuntimeException(\sprintf('No identifiers found for private field "%s".', $property));
+            }
+
+            if (1 === \count($identifiers)) {
+                $value = reset($identifiers);
+            } else {
+                ksort($identifiers);
+                $value = $identifiers;
+            }
         }
 
         if (\is_bool($value)) {

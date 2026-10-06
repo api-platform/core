@@ -18,8 +18,10 @@ use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Util\SortTrait;
 use ApiPlatform\State\ProcessorInterface;
@@ -41,8 +43,9 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ProcessorInterface $normalizeProcessor, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ProcessorInterface $normalizeProcessor, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null, ?ResourceClassResolverInterface $resourceClassResolver = null)
     {
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string
@@ -144,7 +147,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $privateFieldData = [];
         foreach ($privateFields as $privateField) {
             try {
-                $privateFieldData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField);
+                $privateFieldData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
             } catch (NoSuchPropertyException|AccessException) {
                 continue;
             }

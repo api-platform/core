@@ -31,6 +31,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.graphql.subscription.mercure_iri_generator')->ignoreOnInvalid(),
             null,
             '%api_platform.mercure.include_type%',
+            service('api_platform.api.identifiers_extractor'),
         ])
         ->tag('doctrine.event_listener', ['event' => 'onFlush'])
         ->tag('doctrine.event_listener', ['event' => 'postFlush']);

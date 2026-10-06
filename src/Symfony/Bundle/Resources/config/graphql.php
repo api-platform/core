@@ -265,6 +265,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.graphql.state_processor.normalize')->ignoreOnInvalid(),
             service('api_platform.symfony.iri_converter'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.api.identifiers_extractor'),
+            service('api_platform.resource_class_resolver'),
         ]);
 
     $services->set('api_platform.graphql.normalizer.error', ErrorNormalizer::class)

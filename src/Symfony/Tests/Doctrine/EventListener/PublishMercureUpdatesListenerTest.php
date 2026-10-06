@@ -17,6 +17,7 @@ use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
@@ -36,6 +37,7 @@ use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGet
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -1148,12 +1150,26 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals(['{"@id":"\/partitioned_dummies\/2","@type":"PartitionedDummy"}', '["data"]'], $data);
     }
 
-    public function testPublishGraphQlDeleteUpdatesKeepsPrivatePartitionDataUsingPropertyAccess(): void
+    public static function privateFieldValues(): iterable
+    {
+        yield 'scalar field' => [false];
+        yield 'related resource' => [true];
+    }
+
+    #[DataProvider('privateFieldValues')]
+    public function testPublishGraphQlDeleteUpdatesKeepsPrivatePartitionDataUsingPropertyAccess(bool $related): void
     {
         $toDelete = new class {
             public int $id = 2;
-            public int $tenant = 42;
+            public int|object $tenant = 42;
         };
+        $identifiersExtractor = $this->createMock(IdentifiersExtractorInterface::class);
+        if ($related) {
+            $toDelete->tenant = (object) ['code' => 42];
+            $identifiersExtractor->expects($this->once())->method('getIdentifiersFromItem')->with($toDelete->tenant)->willReturn(['code' => 42]);
+        } else {
+            $identifiersExtractor->expects($this->never())->method('getIdentifiersFromItem');
+        }
         $resourceClass = $toDelete::class;
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -1207,6 +1223,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             $graphQlMercureSubscriptionIriGenerator->reveal(),
             null,
             true,
+            $identifiersExtractor,
         );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
