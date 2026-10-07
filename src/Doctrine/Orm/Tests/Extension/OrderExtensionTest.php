@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\Tests\Extension;
 use ApiPlatform\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\EmbeddedDummy;
+use ApiPlatform\Doctrine\Orm\Util\BCHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\EntityManager;
@@ -37,7 +38,7 @@ class OrderExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
-        $queryBuilderProphecy->addOrderBy('o.name', 'asc')->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addOrderBy('o.name', BCHelper::sortDirection('asc'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
@@ -58,7 +59,7 @@ class OrderExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
-        $queryBuilderProphecy->addOrderBy('o.name', 'asc')->shouldNotBeCalled();
+        $queryBuilderProphecy->addOrderBy('o.name', BCHelper::sortDirection('asc'))->shouldNotBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
@@ -79,7 +80,7 @@ class OrderExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
-        $queryBuilderProphecy->addOrderBy('o.foo', 'DESC')->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addOrderBy('o.foo', BCHelper::sortDirection('DESC'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
@@ -100,8 +101,8 @@ class OrderExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
-        $queryBuilderProphecy->addOrderBy('o.foo', 'ASC')->shouldBeCalled()->willReturn($queryBuilderProphecy);
-        $queryBuilderProphecy->addOrderBy('o.bar', 'DESC')->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addOrderBy('o.foo', BCHelper::sortDirection('ASC'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addOrderBy('o.bar', BCHelper::sortDirection('DESC'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
@@ -124,7 +125,7 @@ class OrderExtensionTest extends TestCase
         $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->getDQLPart('join')->willReturn(['o' => []])->shouldBeCalled();
         $queryBuilderProphecy->innerJoin('o.author', 'author_a1', null, null)->shouldBeCalled()->willReturn($queryBuilderProphecy);
-        $queryBuilderProphecy->addOrderBy('author_a1.name', 'ASC')->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addOrderBy('author_a1.name', BCHelper::sortDirection('ASC'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
@@ -145,7 +146,7 @@ class OrderExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
-        $queryBuilderProphecy->addOrderBy('o.embeddedDummy.dummyName', 'DESC')->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addOrderBy('o.embeddedDummy.dummyName', BCHelper::sortDirection('DESC'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['id']);
