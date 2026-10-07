@@ -68,6 +68,14 @@ collection registrations and different partitions have separate lookups. Item
 fingerprints are fetched in bulk per bucket and acknowledged individually.
 Processing an item bucket for deletion removes all its registrations and fingerprints,
 including those for operations whose delivery is currently disabled; collection buckets remain.
+After a successful flush, the listener processes deletions before creates and updates.
+Delete delivery errors are retained while the remaining delete notifications are attempted,
+allowing the store to retire every affected item bucket as it is read. Delete updates
+are acknowledged in `finally`, including after failed delivery. The first delivery
+error is rethrown after the deletion pass, and the listener resets its buffers. Create and
+update delivery errors propagate immediately. Collection registrations remain available.
+Synchronous deletion delivery has no automatic replay; messages already accepted by
+Messenger can still be retried using their queued topic and payload.
 The publisher uses each operation's own Mercure options, publishes the update, then
 explicitly calls `acknowledge()` for that update.
 The manager handles normalization; the store owns fingerprint comparison and
@@ -79,7 +87,7 @@ Messenger's responsibility; acceptance does not imply client delivery.
 Custom subscription managers must implement the complete `SubscriptionManagerInterface`:
 registration receives the subscription operation, `getUpdates()` accepts a list of
 object/operation pairs for one changed resource and yields operation/update pairs,
-and `acknowledge()` records successful publication. The previous
+and `acknowledge()` records successful publication or completion of a delete attempt. The previous
 `getPushPayloads()` contract is removed.
 
 The cache layout is internal and has no migration path. When upgrading, stop old

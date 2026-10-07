@@ -33,6 +33,7 @@ interface SubscriptionManagerInterface
      * Yield the supplied operation instance with each update to preserve resolved delivery options.
      * For delete events, the object is a snapshot with resourceClass, id (relative IRI),
      * iri (absolute IRI), type (string or list of strings), and private (field/value map).
+     * Fully iterating item-delete updates retires their registry entries regardless of delivery.
      * Other events receive the resource object.
      *
      * @param list<array{object: object, operation: Subscription}> $publications Publications for one changed resource
@@ -41,6 +42,6 @@ interface SubscriptionManagerInterface
      */
     public function getUpdates(array $publications, string $type = 'update'): iterable;
 
-    /** Records successful publication or dispatch of the prepared update. */
+    /** Acknowledges successful delivery, or completion of a delete attempt even when delivery fails. */
     public function acknowledge(SubscriptionUpdate $update): void;
 }

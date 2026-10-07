@@ -111,14 +111,14 @@ final class PublishMercureUpdatesListener
     public function postFlush(): void
     {
         try {
+            $this->publishUpdates($this->deletedObjects, 'delete');
+            $this->deletedObjects = [];
+
             $this->publishUpdates($this->createdObjects, 'create');
             $this->createdObjects = [];
 
             $this->publishUpdates($this->updatedObjects, 'update');
             $this->updatedObjects = [];
-
-            $this->publishUpdates($this->deletedObjects, 'delete');
-            $this->deletedObjects = [];
         } finally {
             $this->reset();
         }
@@ -233,22 +233,46 @@ final class PublishMercureUpdatesListener
      */
     private function publishUpdates(array $entries, string $type): void
     {
+        $failure = null;
         foreach ($entries as $entry) {
             if (isset($entry['subscriptions'])) {
                 foreach ($this->graphQlSubscriptionManager->getUpdates($entry['subscriptions'], $type) as [$operation, $update]) {
-                    $options = $operation->getMercure();
-                    $this->publish($this->buildUpdate(
-                        $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($update->getId()),
-                        (string) (new JsonResponse($update->data))->getContent(),
-                        $options
-                    ), $options);
-                    $this->graphQlSubscriptionManager->acknowledge($update);
+                    $published = false;
+                    try {
+                        $options = $operation->getMercure();
+                        $this->publish($this->buildUpdate(
+                            $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($update->getId()),
+                            (string) (new JsonResponse($update->data))->getContent(),
+                            $options
+                        ), $options);
+                        $published = true;
+                    } catch (\Throwable $e) {
+                        if ('delete' !== $type) {
+                            throw $e;
+                        }
+                        // Keep iterating so the store retires every deleted item's buckets.
+                        $failure ??= $e;
+                    } finally {
+                        if ($published || 'delete' === $type) {
+                            $this->graphQlSubscriptionManager->acknowledge($update);
+                        }
+                    }
                 }
 
                 continue;
             }
 
-            $this->publishHttpUpdate($entry['object'], $entry['options'], $entry['operation']);
+            try {
+                $this->publishHttpUpdate($entry['object'], $entry['options'], $entry['operation']);
+            } catch (\Throwable $e) {
+                if ('delete' !== $type) {
+                    throw $e;
+                }
+                $failure ??= $e;
+            }
+        }
+        if (null !== $failure) {
+            throw $failure;
         }
     }
 

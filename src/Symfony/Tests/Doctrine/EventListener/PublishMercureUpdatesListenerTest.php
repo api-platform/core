@@ -236,10 +236,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertEquals(['1', '2', 'mercure_custom_data', 'mercure_options', '{"@id":"\/dummies\/3","@type":"Dummy"}', '{"@id":"\/dummy_friends\/4","@type":"https:\/\/schema.org\/Person"}', '{"@id":"\/dummy_offers\/5","@type":"DummyOffer"}'], $data);
-        $this->assertEquals(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
-        $this->assertEquals([false, false, false, false, false, true, false], $private);
-        $this->assertEquals([null, null, null, null, null, 10, null], $retry);
+        $this->assertEquals(['{"@id":"\/dummies\/3","@type":"Dummy"}', '{"@id":"\/dummy_friends\/4","@type":"https:\/\/schema.org\/Person"}', '{"@id":"\/dummy_offers\/5","@type":"DummyOffer"}', '1', '2', 'mercure_custom_data', 'mercure_options'], $data);
+        $this->assertEquals(['http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1', 'http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3'], $topics);
+        $this->assertEquals([false, true, false, false, false, false, false], $private);
+        $this->assertEquals([null, 10, null, null, null, null, null], $retry);
     }
 
     public function testPublishUpdateMultipleTopicsUsingExpressionLanguage(): void
@@ -347,14 +347,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->postFlush();
 
         $this->assertEquals([
+            '{"@id":"\/mercure_with_topics_and_get_operations\/3","@type":"MercureWithTopicsAndGetOperation"}',
             '{"@type":"MercureWithTopicsAndGetOperation","@id":"/mercure_with_topics_and_get_operations/1","id":1,"name":"Hello World!"}',
             '{"@type":"MercureWithTopicsAndGetOperation","@id":"/mercure_with_topics_and_get_operations/2","id":2,"name":"Hello World!"}',
-            '{"@id":"\/mercure_with_topics_and_get_operations\/3","@type":"MercureWithTopicsAndGetOperation"}',
         ], $data);
         $this->assertEquals([
+            'http://example.com/mercure_with_topics_and_get_operations/3', '/mercure_with_topics_and_get_operations/3', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/3',
             'http://example.com/mercure_with_topics_and_get_operations/1', '/mercure_with_topics_and_get_operations/1', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/1',
             'http://example.com/mercure_with_topics_and_get_operations/2', '/mercure_with_topics_and_get_operations/2', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/2',
-            'http://example.com/mercure_with_topics_and_get_operations/3', '/mercure_with_topics_and_get_operations/3', 'http://example.com/custom_resource/mercure_with_topics_and_get_operations/3',
         ], $topics);
     }
 
@@ -1570,8 +1570,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         // Both resources should have published updates
         $this->assertCount(4, $data, 'Expected 4 updates: 2 inserts (admin + public) + 2 deletes (admin + public)');
-        $this->assertEquals('{"admin":1}', $data[0]);
-        $this->assertEquals('{"public":1}', $data[1]);
+        $this->assertSame(['@id' => '/admin/dummy_mercures/2', '@type' => 'AdminDummyMercure'], json_decode($data[0], true, flags: \JSON_THROW_ON_ERROR));
+        $this->assertSame(['@id' => '/dummy_mercures/2', '@type' => 'DummyMercure'], json_decode($data[1], true, flags: \JSON_THROW_ON_ERROR));
+        $this->assertEquals('{"admin":1}', $data[2]);
+        $this->assertEquals('{"public":1}', $data[3]);
     }
 
     private function createMockHub(callable $callable): HubInterface
