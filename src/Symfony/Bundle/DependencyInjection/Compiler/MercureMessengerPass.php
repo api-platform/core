@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Symfony\Messenger\MercureHandlersLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mercure\HubRegistry;
-use Symfony\Component\Mercure\Messenger\UpdateHandler;
 
 /**
  * @internal
@@ -31,12 +31,16 @@ final class MercureMessengerPass implements CompilerPassInterface
             return;
         }
 
+        $handlers = [];
         foreach ($container->findTaggedServiceIds('messenger.message_handler') as $id => $tags) {
-            $definition = $container->findDefinition($id);
-            if (UpdateHandler::class !== $definition->getClass()) {
+            // MercureBundle registers one handler service per named hub. Reference
+            // that service so Symfony retains its decorators and replacements.
+            if (!preg_match('/^mercure\.hub\.(.+)\.message_handler$/D', $id, $matches)) {
                 continue;
             }
 
+            $handlers[$matches[1]] = new Reference($id);
+            $definition = $container->findDefinition($id);
             $definition->clearTag('messenger.message_handler');
             foreach ($tags as $tag) {
                 $definition->addTag('messenger.message_handler', $tag + [MercureHandlersLocator::HANDLER_OPTION => true]);
@@ -47,7 +51,7 @@ final class MercureMessengerPass implements CompilerPassInterface
             $decorator = 'api_platform.mercure.handlers_locator.'.$id;
             $container->register($decorator, MercureHandlersLocator::class)
                 ->setDecoratedService($id.'.messenger.handlers_locator')
-                ->setArguments([new Reference($decorator.'.inner'), new Reference(HubRegistry::class)]);
+                ->setArguments([new Reference($decorator.'.inner'), new Reference(HubRegistry::class), new ServiceLocatorArgument($handlers)]);
         }
     }
 }

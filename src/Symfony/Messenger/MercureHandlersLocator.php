@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Messenger;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Messenger\UpdateHandler;
 use Symfony\Component\Mercure\Update;
@@ -29,8 +30,11 @@ final class MercureHandlersLocator implements HandlersLocatorInterface
 {
     public const HANDLER_OPTION = 'api_platform_mercure_handler';
 
-    public function __construct(private readonly HandlersLocatorInterface $decorated, private readonly HubRegistry $hubRegistry)
-    {
+    public function __construct(
+        private readonly HandlersLocatorInterface $decorated,
+        private readonly HubRegistry $hubRegistry,
+        private readonly ContainerInterface $handlers,
+    ) {
     }
 
     public function getHandlers(Envelope $envelope): iterable
@@ -41,7 +45,20 @@ final class MercureHandlersLocator implements HandlersLocatorInterface
             return;
         }
 
-        $publisher = new HandlerDescriptor(new UpdateHandler($this->hubRegistry->getHub($stamp->getHub())), ['alias' => 'api_platform.mercure']);
+        $name = $stamp->getHub();
+        $hub = $this->hubRegistry->getHub($name);
+        if (null === $name) {
+            foreach ($this->hubRegistry->all() as $registeredName => $registeredHub) {
+                if ($hub === $registeredHub) {
+                    $name = $registeredName;
+                    break;
+                }
+            }
+        }
+
+        // Custom registries can expose hubs without a MercureBundle handler.
+        $handler = null !== $name && $this->handlers->has($name) ? $this->handlers->get($name) : new UpdateHandler($hub);
+        $publisher = new HandlerDescriptor($handler, ['alias' => 'api_platform.mercure']);
         foreach ($this->decorated->getHandlers($envelope) as $handler) {
             if (!$handler->getOption(self::HANDLER_OPTION)) {
                 yield $handler;

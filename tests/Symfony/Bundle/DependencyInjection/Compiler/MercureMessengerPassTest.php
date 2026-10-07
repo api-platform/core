@@ -41,6 +41,69 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
 class MercureMessengerPassTest extends TestCase
 {
+    #[TestWith([null, 'messenger.bus.default'])]
+    #[TestWith(['primary', 'messenger.bus.other'])]
+    #[TestWith(['private', 'messenger.bus.other'])]
+    #[TestWith(['private', 'messenger.bus.default'])]
+    #[TestWith(['private', 'messenger.bus.empty'])]
+    public function testSelectedHubRetainsHandlerDecorators(?string $hub, string $busId): void
+    {
+        $update = new Update('https://example.com/decorated', 'decorated', true);
+        $default = $this->createMock(HubInterface::class);
+        $private = $this->createMock(HubInterface::class);
+        $default->expects('private' === $hub ? $this->never() : $this->once())->method('publish')->willReturn('published');
+        $private->expects('private' === $hub ? $this->once() : $this->never())->method('publish')->willReturn('published');
+        $transport = new InMemoryTransport(Serializer::create());
+        $messenger = $this->createMessenger($default, $private, $transport, true);
+        $bus = $messenger['buses'][$busId];
+
+        $bus->dispatch(new Envelope($update, [new MercureHubStamp($hub)]));
+        $this->assertEmpty($messenger['decorators']['primary']->updates);
+        $this->assertEmpty($messenger['decorators']['private']->updates);
+        $received = iterator_to_array($transport->get())[0];
+        $handled = $bus->dispatch($received->with(new ReceivedStamp('async')));
+        $bus->dispatch($handled);
+
+        $this->assertEquals('private' === $hub ? [] : [$update], $messenger['decorators']['primary']->updates);
+        $this->assertEquals('private' === $hub ? [$update] : [], $messenger['decorators']['private']->updates);
+        $this->assertEquals('private' === $hub ? [$update] : [], $messenger['decorators']['private.outer']->updates);
+        $this->assertEquals([$update], $messenger['observer']->updates);
+    }
+
+    public function testApplicationUpdateHandlerIsPreserved(): void
+    {
+        $update = new Update('https://example.com/custom', 'custom');
+        $default = $this->createMock(HubInterface::class);
+        $default->expects($this->never())->method('publish');
+        $private = $this->createMock(HubInterface::class);
+        $private->expects($this->once())->method('publish')->with($update)->willReturn('published');
+        $audit = $this->createMock(HubInterface::class);
+        $audit->expects($this->once())->method('publish')->with($update)->willReturn('audited');
+        $messenger = $this->createMessenger($default, $private, audit: $audit);
+
+        $handled = $messenger['buses']['messenger.bus.default']->dispatch(new Envelope($update, [new MercureHubStamp('private')]));
+
+        $this->assertCount(3, $handled->all(HandledStamp::class));
+        $this->assertSame([$update], $messenger['observer']->updates);
+    }
+
+    #[TestWith([null])]
+    #[TestWith(['private'])]
+    public function testRegistryWithoutBundleHandlersStillPublishes(?string $hub): void
+    {
+        $default = $this->createMock(HubInterface::class);
+        $private = $this->createMock(HubInterface::class);
+        $default->expects(null === $hub ? $this->once() : $this->never())->method('publish')->willReturn('published');
+        $private->expects(null === $hub ? $this->never() : $this->once())->method('publish')->willReturn('published');
+        $messenger = $this->createMessenger($default, $private, bundleHandlers: false);
+        $update = new Update('https://example.com/custom-registry', 'custom registry');
+
+        $handled = $messenger['buses']['messenger.bus.default']->dispatch(new Envelope($update, [new MercureHubStamp($hub)]));
+
+        $this->assertCount(2, $handled->all(HandledStamp::class));
+        $this->assertSame([$update], $messenger['observer']->updates);
+    }
+
     #[TestWith([null, false, 'messenger.bus.default'])]
     #[TestWith(['private', false, 'messenger.bus.default'])]
     #[TestWith([null, true, 'messenger.bus.other'])]
@@ -81,12 +144,14 @@ class MercureMessengerPassTest extends TestCase
         $default->expects($this->once())->method('publish')->willReturn('default');
         $private = $this->createMock(HubInterface::class);
         $private->expects($this->never())->method('publish');
-        $messenger = $this->createMessenger($default, $private);
+        $messenger = $this->createMessenger($default, $private, decorate: true);
         $update = new Update('https://example.com/custom', 'legacy');
 
         $messenger['buses']['messenger.bus.default']->dispatch($update);
 
         $this->assertSame([$update], $messenger['observer']->updates);
+        $this->assertSame([$update], $messenger['decorators']['primary']->updates);
+        $this->assertEmpty($messenger['decorators']['private']->updates);
     }
 
     public function testPublicationWithoutTransportUsesSelectedHub(): void
@@ -116,7 +181,7 @@ class MercureMessengerPassTest extends TestCase
 
             return 'published';
         });
-        $messenger = $this->createMessenger($default, $private);
+        $messenger = $this->createMessenger($default, $private, decorate: true);
         $bus = $messenger['buses']['messenger.bus.default'];
         $update = new Update('https://example.com/private', 'retry', true);
         try {
@@ -131,6 +196,8 @@ class MercureMessengerPassTest extends TestCase
         $handled = $bus->dispatch($retry);
         $this->assertCount(2, $handled->all(HandledStamp::class));
         $this->assertSame([$update], $messenger['observer']->updates);
+        $this->assertEquals([$update, $update], $messenger['decorators']['private']->updates);
+        $this->assertEmpty($messenger['decorators']['primary']->updates);
     }
 
     public function testOtherMessagesAreUnaffected(): void
@@ -159,16 +226,35 @@ class MercureMessengerPassTest extends TestCase
         $this->assertSame($definitions, $container->getDefinitions());
     }
 
-    /** @return array{buses: array<string, MessageBusInterface>, observer: MercureUpdateObserver} */
-    private function createMessenger(HubInterface $default, HubInterface $private, ?InMemoryTransport $transport = null): array
+    /** @return array{buses: array<string, MessageBusInterface>, observer: MercureUpdateObserver, decorators: array<string, MercureUpdateHandlerDecorator>} */
+    private function createMessenger(HubInterface $default, HubInterface $private, ?InMemoryTransport $transport = null, bool $decorate = false, ?HubInterface $audit = null, bool $bundleHandlers = true): array
     {
         $container = new ContainerBuilder();
         $container->setParameter('api_platform.mercure.include_type', false);
         $container->register('hub.default', HubInterface::class)->setSynthetic(true)->setPublic(true);
         $container->register('hub.private', HubInterface::class)->setSynthetic(true)->setPublic(true);
-        $container->register(HubRegistry::class, HubRegistry::class)->setArguments([new Reference('hub.default'), ['private' => new Reference('hub.private')]]);
-        $container->register('mercure.default.handler', UpdateHandler::class)->addArgument(new Reference('hub.default'))->addTag('messenger.message_handler', ['bus' => 'messenger.bus.default']);
-        $container->register('mercure.private.handler', UpdateHandler::class)->addArgument(new Reference('hub.private'))->addTag('messenger.message_handler', ['bus' => 'messenger.bus.other']);
+        $container->register(HubRegistry::class, HubRegistry::class)->setArguments([new Reference('hub.default'), ['primary' => new Reference('hub.default'), 'private' => new Reference('hub.private')]]);
+        if ($bundleHandlers) {
+            $container->register('mercure.hub.primary.message_handler', UpdateHandler::class)->addArgument(new Reference('hub.default'))->addTag('messenger.message_handler', ['bus' => 'messenger.bus.default']);
+            $container->register('mercure.hub.private.message_handler', UpdateHandler::class)->addArgument(new Reference('hub.private'))->addTag('messenger.message_handler', ['bus' => 'messenger.bus.other']);
+        }
+        if ($audit) {
+            $container->register('hub.audit', HubInterface::class)->setSynthetic(true)->setPublic(true);
+            // Messenger identifies handlers by class and method unless an alias is set.
+            $container->register('app.audit_handler', UpdateHandler::class)->addArgument(new Reference('hub.audit'))->addTag('messenger.message_handler', ['alias' => 'app.audit']);
+        }
+        if ($decorate) {
+            foreach (['primary', 'private'] as $name) {
+                $container->register('decorator.'.$name, MercureUpdateHandlerDecorator::class)
+                    ->setDecoratedService('mercure.hub.'.$name.'.message_handler')
+                    ->addArgument(new Reference('decorator.'.$name.'.inner'))
+                    ->setPublic(true);
+            }
+            $container->register('decorator.private.outer', MercureUpdateHandlerDecorator::class)
+                ->setDecoratedService('mercure.hub.private.message_handler', priority: -1)
+                ->addArgument(new Reference('decorator.private.outer.inner'))
+                ->setPublic(true);
+        }
         $container->register('observer', MercureUpdateObserver::class)->addTag('messenger.message_handler')->setSynthetic(true)->setPublic(true);
         $container->register('senders', SendersLocator::class)->setSynthetic(true)->setPublic(true);
         $container->register('messenger.middleware.send_message', SendMessageMiddleware::class)->addArgument(new Reference('senders'));
@@ -183,6 +269,9 @@ class MercureMessengerPassTest extends TestCase
         $container->compile();
         $container->set('hub.default', $default);
         $container->set('hub.private', $private);
+        if ($audit) {
+            $container->set('hub.audit', $audit);
+        }
         $container->set('senders', new SendersLocator($transport ? [Update::class => ['async']] : [], new ServiceLocator($transport ? ['async' => static fn () => $transport] : [])));
 
         $observer = new MercureUpdateObserver();
@@ -192,7 +281,14 @@ class MercureMessengerPassTest extends TestCase
             $buses[$busId] = $container->get($busId);
         }
 
-        return ['buses' => $buses, 'observer' => $observer];
+        $decorators = [];
+        if ($decorate) {
+            foreach (['primary', 'private', 'private.outer'] as $name) {
+                $decorators[$name] = $container->get('decorator.'.$name);
+            }
+        }
+
+        return ['buses' => $buses, 'observer' => $observer, 'decorators' => $decorators];
     }
 }
 
@@ -203,5 +299,20 @@ class MercureUpdateObserver
     public function __invoke(Update $update): void
     {
         $this->updates[] = $update;
+    }
+}
+
+class MercureUpdateHandlerDecorator
+{
+    public array $updates = [];
+
+    public function __construct(private readonly object $inner)
+    {
+    }
+
+    public function __invoke(Update $update): void
+    {
+        $this->updates[] = $update;
+        ($this->inner)($update);
     }
 }
