@@ -46,7 +46,7 @@ final class SubscriptionConcurrencyTest extends TestCase
     private static function publish(SubscriptionManager $manager, object $object, Subscription $operation, string $type = 'update'): array
     {
         $payloads = [];
-        foreach ($manager->getUpdates($object, $operation, $type) as $update) {
+        foreach ($manager->getUpdates([['object' => $object, 'operation' => $operation]], $type) as [, $update]) {
             $payloads[] = [$update->getId(), $update->data];
             $manager->acknowledge($update);
         }
@@ -65,11 +65,11 @@ final class SubscriptionConcurrencyTest extends TestCase
         $earlier->description = 'earlier';
         $later = new Dummy();
         $later->description = 'later';
-        $pending = iterator_to_array($first->getUpdates($earlier, $operation));
+        $pending = iterator_to_array($first->getUpdates([['object' => $earlier, 'operation' => $operation]]));
         $this->assertCount(1, $pending);
         // Preparing an update holds no lock while another publisher completes.
         $this->assertSame([[$id, ['dummy' => ['name' => 'later']]]], self::publish($second, $later, $operation));
-        $first->acknowledge($pending[0]);
+        $first->acknowledge($pending[0][1]);
 
         $this->assertSame([[$id, ['dummy' => ['name' => 'later']]]], self::publish($first, $later, $operation));
         $this->assertSame([], self::publish($first, $later, $operation));
@@ -97,7 +97,7 @@ final class SubscriptionConcurrencyTest extends TestCase
         $manager = $this->createManager($cache);
         $operation = new Subscription(name: 'watch', class: Dummy::class, mercure: true);
         $id = $manager->retrieveSubscriptionId($this->context(['name' => true]), [], $operation);
-        $pending = iterator_to_array($manager->getUpdates(new Dummy(), $operation));
+        $pending = iterator_to_array($manager->getUpdates([['object' => new Dummy(), 'operation' => $operation]]));
         $this->assertCount(1, $pending);
         // Failed delivery does not acknowledge the prepared update.
 
@@ -105,9 +105,11 @@ final class SubscriptionConcurrencyTest extends TestCase
         $this->assertSame([], self::publish($manager, new Dummy(), $operation));
     }
 
-    #[TestWith([false])]
-    #[TestWith([true])]
-    public function testConcurrentRegistrationsBothReceiveUpdates(bool $collection): void
+    #[TestWith([false, false])]
+    #[TestWith([true, false])]
+    #[TestWith([false, true])]
+    #[TestWith([true, true])]
+    public function testConcurrentRegistrationsBothReceiveUpdates(bool $collection, bool $differentOperations): void
     {
         $cache = new InterleavedSubscriptionCache();
         $firstManager = $this->createManager($cache);
@@ -116,12 +118,15 @@ final class SubscriptionConcurrencyTest extends TestCase
             ? new SubscriptionCollection(name: 'watch', class: Dummy::class, mercure: true)
             : new Subscription(name: 'watch', class: Dummy::class, mercure: true);
 
+        $secondOperation = $differentOperations ? $operation->withName('other') : $operation;
+        $secondFields = $differentOperations ? ['id' => true] : ['name' => true];
+
         // Pause A after reading its cache snapshot; B registers before A saves.
         $cache->pauseNextRead = true;
         $first = new \Fiber(fn () => $firstManager->retrieveSubscriptionId($this->context(['id' => true]), [], $operation));
         $first->start();
         $this->assertTrue($first->isSuspended());
-        $second = new \Fiber(fn () => $secondManager->retrieveSubscriptionId($this->context(['name' => true]), [], $operation));
+        $second = new \Fiber(fn () => $secondManager->retrieveSubscriptionId($this->context($secondFields), [], $secondOperation));
         $second->start();
         $this->assertTrue($second->isSuspended(), 'Registration must wait for the same bucket lock.');
         $first->resume();
@@ -130,10 +135,19 @@ final class SubscriptionConcurrencyTest extends TestCase
         $firstId = $first->getReturn();
         $this->assertNotSame($firstId, $secondId);
 
+        $publications = [['object' => new Dummy(), 'operation' => $operation]];
+        if ($differentOperations) {
+            $publications[] = ['object' => $publications[0]['object'], 'operation' => $secondOperation];
+        }
+        $updates = [];
+        foreach ($firstManager->getUpdates($publications) as [, $update]) {
+            $updates[] = [$update->getId(), $update->data];
+            $firstManager->acknowledge($update);
+        }
         $this->assertEqualsCanonicalizing([
             [$firstId, ['dummy' => ['id' => '/dummies/1']]],
-            [$secondId, ['dummy' => ['name' => 'Changed']]],
-        ], self::publish($firstManager, new Dummy(), $operation));
+            [$secondId, ['dummy' => $differentOperations ? ['id' => '/dummies/1'] : ['name' => 'Changed']]],
+        ], $updates);
     }
 
     public function testPayloadRefreshDoesNotEraseConcurrentRegistration(): void

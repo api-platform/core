@@ -29,13 +29,17 @@ interface SubscriptionManagerInterface
 
     /**
      * Prepares updates for a create, update, or delete event without acknowledging publication.
-     * For delete events, $object is a snapshot with resourceClass, id (relative IRI),
+     * Each publication pairs a subscription operation with its resource object.
+     * Yield the supplied operation instance with each update to preserve resolved delivery options.
+     * For delete events, the object is a snapshot with resourceClass, id (relative IRI),
      * iri (absolute IRI), type (string or list of strings), and private (field/value map).
      * Other events receive the resource object.
      *
-     * @return iterable<SubscriptionUpdate>
+     * @param list<array{object: object, operation: Subscription}> $publications Publications for one changed resource
+     *
+     * @return iterable<array{Subscription, SubscriptionUpdate}>
      */
-    public function getUpdates(object $object, Subscription $operation, string $type = 'update'): iterable;
+    public function getUpdates(array $publications, string $type = 'update'): iterable;
 
     /** Records successful publication or dispatch of the prepared update. */
     public function acknowledge(SubscriptionUpdate $update): void;

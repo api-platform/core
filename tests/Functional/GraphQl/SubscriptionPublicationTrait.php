@@ -24,17 +24,20 @@ trait SubscriptionPublicationTrait
         $manager = $container->get('api_platform.graphql.subscription.subscription_manager');
         $metadata = $container->get('api_platform.metadata.resource.metadata_collection_factory');
         $resourceClass = 'delete' === $type ? $object->resourceClass : $object::class;
-        $payloads = [];
+        $publications = [];
         foreach ($metadata->create($resourceClass) as $resource) {
             foreach ($resource->getGraphQlOperations() ?? [] as $operation) {
                 if (!$operation instanceof Subscription) {
                     continue;
                 }
-                foreach ($manager->getUpdates($object, $operation, $type) as $update) {
-                    $payloads[] = [$update->getId(), $update->data];
-                    $manager->acknowledge($update);
-                }
+                $publications[] = ['object' => $object, 'operation' => $operation];
             }
+        }
+
+        $payloads = [];
+        foreach ($manager->getUpdates($publications, $type) as [, $update]) {
+            $payloads[] = [$update->getId(), $update->data];
+            $manager->acknowledge($update);
         }
 
         return $payloads;

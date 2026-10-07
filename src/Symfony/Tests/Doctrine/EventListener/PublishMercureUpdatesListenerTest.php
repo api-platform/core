@@ -47,6 +47,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Argument\Token\TokenInterface;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\HubRegistry;
@@ -65,15 +66,61 @@ class PublishMercureUpdatesListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @return list<SubscriptionUpdate> */
-    private static function preparedUpdates(array $payloads): array
+    private static function publication(object $object, string $operationClass): TokenInterface
+    {
+        return Argument::that(static fn (array $publications): bool => 1 === \count($publications)
+            && $publications[0]['operation'] instanceof $operationClass
+            && ($object instanceof TokenInterface ? (bool) $object->scoreArgument($publications[0]['object']) : $object === $publications[0]['object']));
+    }
+
+    /** @return list<array{Subscription, SubscriptionUpdate}> */
+    private static function preparedUpdates(array $payloads, Subscription $operation): array
     {
         $updates = [];
         foreach ($payloads as [$id, $data]) {
-            $updates[] = new SubscriptionUpdate(new RegisteredSubscription('key', $id, [], false, null), $data, null);
+            $updates[] = [$operation, new SubscriptionUpdate(new RegisteredSubscription('key', $id, [], false, null), $data, null)];
         }
 
         return $updates;
+    }
+
+    public function testSubscriptionBatchesContainOnlyOneChangedResource(): void
+    {
+        $first = new Dummy();
+        $second = new Dummy();
+        $operations = [
+            new Subscription(name: 'watch', class: Dummy::class, mercure: true),
+            new Subscription(name: 'details', class: Dummy::class, mercure: true),
+        ];
+        $resolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resolver->method('getResourceClass')->willReturn(Dummy::class);
+        $resolver->method('isResourceClass')->willReturn(true);
+        $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([]))->withGraphQlOperations($operations),
+        ]));
+        $batches = [];
+        $subscriptions = $this->createMock(GraphQlSubscriptionManagerInterface::class);
+        $subscriptions->expects($this->exactly(2))->method('getUpdates')->willReturnCallback(static function (array $publications, string $type) use (&$batches): iterable {
+            self::assertSame('update', $type);
+            self::assertCount(2, $publications);
+            self::assertSame($publications[0]['object'], $publications[1]['object']);
+            self::assertSame(['watch', 'details'], array_map(static fn (array $publication) => $publication['operation']->getName(), $publications));
+            $batches[] = $publications[0]['object'];
+
+            return [];
+        });
+        $hub = $this->createStub(HubInterface::class);
+        $listener = new PublishMercureUpdatesListener($resolver, $this->createStub(IriConverterInterface::class), $metadata, $this->createStub(SerializerInterface::class), ['json' => ['application/json']], null, new HubRegistry($hub), $subscriptions, $this->createStub(GraphQlMercureSubscriptionIriGeneratorInterface::class));
+        $uow = $this->createStub(UnitOfWork::class);
+        $uow->method('getScheduledEntityInsertions')->willReturn([]);
+        $uow->method('getScheduledEntityUpdates')->willReturn([$first, $second]);
+        $uow->method('getScheduledEntityDeletions')->willReturn([]);
+        $manager = $this->createStub(EntityManagerInterface::class);
+        $manager->method('getUnitOfWork')->willReturn($uow);
+        $listener->onFlush(new OnFlushEventArgs($manager));
+        $listener->postFlush();
+        $this->assertSame([$first, $second], $batches);
     }
 
     public function testPublishUpdate(): void
@@ -350,7 +397,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toUpdate, Argument::type(Subscription::class), 'update')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toUpdate, Subscription::class), 'update')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -427,7 +474,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toInsert, Argument::type(Subscription::class), 'create')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toInsert, Subscription::class), 'create')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -506,7 +553,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             ['collection-subscription-id-1', ['data' => ['collection' => 'first']]],
             ['collection-subscription-id-2', ['data' => ['collection' => 'second']]],
         ];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toInsert, Argument::type(Subscription::class), 'create')->willReturn(self::preparedUpdates($graphQlCollectionSubscriptionPayloads));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toInsert, Subscription::class), 'create')->will(static fn (array $args) => self::preparedUpdates($graphQlCollectionSubscriptionPayloads, $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $graphQlMercureSubscriptionIriGenerator->generateTopicIri('collection-subscription-id-1')->willReturn('collection-subscription-topic-iri-1');
@@ -583,7 +630,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates(Argument::that(static fn ($object): bool => $object instanceof \stdClass && Dummy::class === $object->resourceClass && '/dummies/2' === $object->id && 'http://example.com/dummies/2' === $object->iri), Argument::type(Subscription::class), 'delete')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication(Argument::that(static fn ($object): bool => $object instanceof \stdClass && Dummy::class === $object->resourceClass && '/dummies/2' === $object->id && 'http://example.com/dummies/2' === $object->iri), Subscription::class), 'delete')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -660,7 +707,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates(Argument::that(static fn ($object): bool => $object instanceof \stdClass && Dummy::class === $object->resourceClass && '/dummies/2' === $object->id && 'http://example.com/dummies/2' === $object->iri && [] === $object->private), Argument::type(Subscription::class), 'delete')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication(Argument::that(static fn ($object): bool => $object instanceof \stdClass && Dummy::class === $object->resourceClass && '/dummies/2' === $object->id && 'http://example.com/dummies/2' === $object->iri && [] === $object->private), Subscription::class), 'delete')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -739,7 +786,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             ['collection-subscription-id-1', ['data' => ['collection' => 'first']]],
             ['collection-subscription-id-2', ['data' => ['collection' => 'second']]],
         ];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toUpdate, Argument::type(SubscriptionCollection::class), 'update')->willReturn(self::preparedUpdates($graphQlCollectionSubscriptionPayloads));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toUpdate, SubscriptionCollection::class), 'update')->will(static fn (array $args) => self::preparedUpdates($graphQlCollectionSubscriptionPayloads, $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $graphQlMercureSubscriptionIriGenerator->generateTopicIri('collection-subscription-id-1')->willReturn('collection-subscription-topic-iri-1');
@@ -816,7 +863,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toUpdate, Argument::type(Subscription::class), 'update')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toUpdate, Subscription::class), 'update')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -906,7 +953,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toInsert, Argument::type(Subscription::class), 'create')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toInsert, Subscription::class), 'create')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -996,7 +1043,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates($toUpdate, Argument::type(Subscription::class), 'update')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication($toUpdate, Subscription::class), 'update')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -1121,12 +1168,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $serializer->method('serialize')->willReturn('{}');
         $payloads = $this->createMock(GraphQlSubscriptionManagerInterface::class);
         $payloads->expects($this->exactly(2))->method('acknowledge')->with($this->isInstanceOf(SubscriptionUpdate::class));
-        $payloads->expects($this->exactly(2))->method('getUpdates')->willReturnCallback(static function (object $data, Subscription $operation, string $type) use ($object): iterable {
-            self::assertSame($object, $data);
+        $payloads->expects($this->once())->method('getUpdates')->willReturnCallback(static function (array $publications, string $type) use ($object): iterable {
+            self::assertCount(2, $publications);
             self::assertSame('update', $type);
-            self::assertContains($operation->getName(), ['sync', 'async']);
-
-            yield new SubscriptionUpdate(new RegisteredSubscription('key', $operation->getName(), [], true, null), ['name' => $operation->getName()], null);
+            foreach ($publications as ['object' => $data, 'operation' => $operation]) {
+                self::assertSame($object, $data);
+                self::assertContains($operation->getName(), ['sync', 'async']);
+                yield [$operation, new SubscriptionUpdate(new RegisteredSubscription('key', $operation->getName(), [], true, null), ['name' => $operation->getName()], null)];
+            }
         });
         $topics = $this->createStub(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topics->method('generateTopicIri')->willReturnCallback(static fn (string $id): string => 'https://example.com/subscriptions/'.$id);
@@ -1310,7 +1359,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates(Argument::that(static fn ($object) => $object instanceof \stdClass && $resourceClass === $object->resourceClass && '/partitioned_dummies/2' === $object->id && 'http://example.com/partitioned_dummies/2' === $object->iri && ['tenant' => '42'] === $object->private), Argument::type(Subscription::class), 'delete')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication(Argument::that(static fn ($object) => $object instanceof \stdClass && $resourceClass === $object->resourceClass && '/partitioned_dummies/2' === $object->id && 'http://example.com/partitioned_dummies/2' === $object->iri && ['tenant' => '42'] === $object->private), Subscription::class), 'delete')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
@@ -1406,7 +1455,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getUpdates(Argument::that(static fn ($object) => $object instanceof \stdClass && $resourceClass === $object->resourceClass && '/partitioned_dummies/2' === $object->id && 'http://example.com/partitioned_dummies/2' === $object->iri && 'PartitionedDummy' === $object->type && ['tenant' => '42'] === $object->private), Argument::type(Subscription::class), 'delete')->willReturn(self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]]));
+        $graphQlSubscriptionManagerProphecy->getUpdates(self::publication(Argument::that(static fn ($object) => $object instanceof \stdClass && $resourceClass === $object->resourceClass && '/partitioned_dummies/2' === $object->id && 'http://example.com/partitioned_dummies/2' === $object->iri && 'PartitionedDummy' === $object->type && ['tenant' => '42'] === $object->private), Subscription::class), 'delete')->will(static fn (array $args) => self::preparedUpdates([[$graphQlSubscriptionId, $graphQlSubscriptionData]], $args[0][0]['operation']));
         $graphQlSubscriptionManagerProphecy->acknowledge(Argument::type(SubscriptionUpdate::class))->shouldBeCalled();
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';

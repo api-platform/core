@@ -98,36 +98,52 @@ final class SubscriptionPublicationTest extends ApiTestCase
         $created->id = 2;
         $created->restEnabled = $restEnabled;
         $manager->persist($created);
+        $this->cache->clearCalls();
         $manager->flush();
+        $this->assertRegistryReads(1);
         $this->assertUpdates($updates, array_intersect_key($topics, array_flip(['watch', 'conditional'])), 2, 'Initial');
         $this->assertCount($restEnabled ? 2 : 0, $restUpdates);
 
         $updates = [];
         $restUpdates = [];
         $resource->name = 'Changed';
+        $this->cache->clearCalls();
         $manager->flush();
+        $this->assertRegistryReads(2);
         $this->assertUpdates($updates, $topics, 1, 'Changed');
         $this->assertCount($restEnabled ? 2 : 0, $restUpdates);
 
         $updates = [];
         $resource->name = null;
+        $this->cache->clearCalls();
         $manager->flush();
+        $this->assertRegistryReads(2);
         $this->assertUpdates($updates, $topics, 1, null);
 
         // A disabled expression suppresses delivery even when its subscription is cached.
         $updates = [];
         $restUpdates = [];
         $resource->name = 'Muted';
+        $this->cache->clearCalls();
         $manager->flush();
+        $this->assertRegistryReads(2);
         unset($topics['conditional']);
         $this->assertUpdates($updates, $topics, 1, 'Muted');
 
         $updates = [];
         $restUpdates = [];
         $manager->remove($resource);
+        $this->cache->clearCalls();
         $manager->flush();
+        $this->assertRegistryReads(2);
         $this->assertUpdates($updates, $topics, 1, null, true);
         $this->assertCount($restEnabled ? 2 : 0, $restUpdates);
+    }
+
+    private function assertRegistryReads(int $expected): void
+    {
+        $reads = array_filter($this->cache->getCalls(), static fn ($call) => 'getItem' === $call->name);
+        $this->assertCount($expected, $reads, 'Read once per item/collection partition, regardless of the number of operations.');
     }
 
     private function subscribe(Client $client, string $operation): string

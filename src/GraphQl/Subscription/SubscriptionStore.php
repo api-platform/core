@@ -32,7 +32,7 @@ final class SubscriptionStore implements LoggerAwareInterface
     {
     }
 
-    /** @return list<array{string, array}> */
+    /** @return array<string, list<array{string, array}>> */
     public function all(string $key): array
     {
         $item = $this->registry->getItem($key);
@@ -41,14 +41,14 @@ final class SubscriptionStore implements LoggerAwareInterface
     }
 
     /** @param callable(): string $generateId */
-    public function register(string $key, array $fields, ?array $payload, bool $collection, callable $generateId): string
+    public function register(string $key, string $operation, array $fields, ?array $payload, bool $collection, callable $generateId): string
     {
         $fingerprint = $collection ? null : $this->fingerprint($payload);
 
-        return $this->synchronized($key, function () use ($key, $fields, $fingerprint, $generateId): string {
+        return $this->synchronized($key, function () use ($key, $operation, $fields, $fingerprint, $generateId): string {
             $item = $this->registry->getItem($key);
             $entries = $item->isHit() ? $item->get() : [];
-            foreach ($entries as [$id, $selection]) {
+            foreach ($entries[$operation] ?? [] as [$id, $selection]) {
                 if ($selection === $fields) {
                     return $id;
                 }
@@ -57,7 +57,7 @@ final class SubscriptionStore implements LoggerAwareInterface
             if (null !== $fingerprint) {
                 $this->initialize($id, $fingerprint);
             }
-            $entries[] = [$id, $fields];
+            $entries[$operation][] = [$id, $fields];
             try {
                 $this->save($this->registry, $item->set($entries));
             } catch (\Exception $e) {
@@ -71,7 +71,7 @@ final class SubscriptionStore implements LoggerAwareInterface
         });
     }
 
-    /** @return list<array{string, array}> */
+    /** @return array<string, list<array{string, array}>> */
     public function remove(string $key): array
     {
         return $this->synchronized($key, function () use ($key): array {
@@ -83,7 +83,7 @@ final class SubscriptionStore implements LoggerAwareInterface
             } catch (\Exception $e) {
                 $this->logger?->warning('Could not clean up deleted GraphQL subscriptions.', ['exception' => $e]);
             }
-            foreach ($entries as [$id]) {
+            foreach ($this->subscriptionIds($entries) as $id) {
                 try {
                     $this->synchronized($this->fingerprintKey($id), fn () => $this->discardFingerprint($id));
                 } catch (\Exception $e) {
@@ -95,14 +95,16 @@ final class SubscriptionStore implements LoggerAwareInterface
         });
     }
 
-    /** @return list<RegisteredSubscription> */
+    /** @return array<string, list<RegisteredSubscription>> */
     public function getSubscriptions(string $key, bool $collection): array
     {
         $entries = $this->all($key);
-        $snapshots = $collection ? [] : $this->snapshots(array_column($entries, 0));
+        $snapshots = $collection ? [] : $this->snapshots($this->subscriptionIds($entries));
         $subscriptions = [];
-        foreach ($entries as [$id, $fields]) {
-            $subscriptions[] = new RegisteredSubscription($key, $id, $fields, $collection, $snapshots[$id] ?? null);
+        foreach ($entries as $operation => $registrations) {
+            foreach ($registrations as [$id, $fields]) {
+                $subscriptions[$operation][] = new RegisteredSubscription($key, $id, $fields, $collection, $snapshots[$id] ?? null);
+            }
         }
 
         return $subscriptions;
@@ -121,12 +123,18 @@ final class SubscriptionStore implements LoggerAwareInterface
         return new SubscriptionUpdate($subscription, $data, $hash);
     }
 
-    /** @return iterable<SubscriptionUpdate> */
-    public function getDeleteUpdates(string $key, bool $collection, array $data): iterable
+    /**
+     * @param array<string, array> $payloads Payloads for the active operations
+     *
+     * @return iterable<array{string, SubscriptionUpdate}>
+     */
+    public function getDeleteUpdates(string $key, bool $collection, array $payloads): iterable
     {
         $entries = $collection ? $this->all($key) : $this->remove($key);
-        foreach ($entries as [$id, $fields]) {
-            yield new SubscriptionUpdate(new RegisteredSubscription($key, $id, $fields, $collection, null), $data, null);
+        foreach ($payloads as $operation => $data) {
+            foreach ($entries[$operation] ?? [] as [$id, $fields]) {
+                yield [$operation, new SubscriptionUpdate(new RegisteredSubscription($key, $id, $fields, $collection, null), $data, null)];
+            }
         }
     }
 
@@ -144,6 +152,23 @@ final class SubscriptionStore implements LoggerAwareInterface
             $this->discardFingerprint($subscription->id);
             $this->logger?->warning('Could not record a GraphQL subscription publication.', ['exception' => $e]);
         }
+    }
+
+    /**
+     * @param array<string, list<array{string, array}>> $operations
+     *
+     * @return list<string>
+     */
+    private function subscriptionIds(array $operations): array
+    {
+        $ids = [];
+        foreach ($operations as $registrations) {
+            foreach ($registrations as [$id]) {
+                $ids[] = $id;
+            }
+        }
+
+        return $ids;
     }
 
     /** @return array<string, array{hash: string, version: string}|null> */
@@ -178,7 +203,7 @@ final class SubscriptionStore implements LoggerAwareInterface
             // With an existing fingerprint, deletion will either have removed it
             // already or remove it after acquiring this lock. A cache miss needs
             // an additional membership check to avoid recreating orphaned state.
-            if (null === $previous && !\in_array($subscription->id, array_column($this->all($subscription->key), 0), true)) {
+            if (null === $previous && !\in_array($subscription->id, $this->subscriptionIds($this->all($subscription->key)), true)) {
                 return;
             }
             $this->writeFingerprint($item, $hash);

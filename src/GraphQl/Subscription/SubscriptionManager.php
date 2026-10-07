@@ -58,10 +58,11 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         $cacheKey = $this->getSubscriptionKey($iri, $operation, $privateFieldData);
         unset($result['clientSubscriptionId']);
 
-        $identity = $fields + ($collection ? ['__collection' => true] : []) + ['__subscription_scope' => $cacheKey];
+        $identity = $fields + ($collection ? ['__collection' => true] : []) + ['__subscription_scope' => $cacheKey, '__subscription_operation' => $this->getOperationKey($operation)];
 
         return $this->store->register(
             $cacheKey,
+            $this->getOperationKey($operation),
             $fields,
             $result,
             $collection,
@@ -69,25 +70,54 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         );
     }
 
-    /** @return iterable<SubscriptionUpdate> */
-    public function getUpdates(object $object, Subscription $operation, string $type = 'update'): iterable
+    /**
+     * @param list<array{object: object, operation: Subscription}> $publications
+     *
+     * @return iterable<array{Subscription, SubscriptionUpdate}>
+     */
+    public function getUpdates(array $publications, string $type = 'update'): iterable
     {
-        if ((!$operation instanceof CollectionOperationInterface && 'create' === $type) || false === $operation->getMercure()) {
-            return;
+        $groups = [];
+        foreach ($publications as $publication) {
+            ['object' => $object, 'operation' => $operation] = $publication;
+            if ((!$operation instanceof CollectionOperationInterface && 'create' === $type) || false === $operation->getMercure()) {
+                continue;
+            }
+            if ('delete' === $type) {
+                $iri = $object->id;
+                $private = $this->getDeletedPrivateFieldData($object, $operation);
+            } else {
+                $iri = $this->iriConverter->getIriFromResource($object);
+                $private = $this->getPrivateFieldData($operation, $object);
+            }
+            $key = $this->getSubscriptionKey($iri, $operation, $private);
+            $groups[$key][$this->getOperationKey($operation)] = $publication;
         }
-        if ('delete' === $type) {
-            yield from $this->getDeleteUpdates($object, $operation);
 
-            return;
-        }
+        foreach ($groups as $key => $operations) {
+            $collection = reset($operations)['operation'] instanceof CollectionOperationInterface;
+            if ('delete' === $type) {
+                $payloads = [];
+                foreach ($operations as $name => ['object' => $object]) {
+                    $payloads[$name] = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
+                }
+                foreach ($this->store->getDeleteUpdates($key, $collection, $payloads) as [$name, $update]) {
+                    yield [$operations[$name]['operation'], $update];
+                }
 
-        $key = $this->getSubscriptionKey($this->iriConverter->getIriFromResource($object), $operation, $this->getPrivateFieldData($operation, $object));
-        foreach ($this->store->getSubscriptions($key, $operation instanceof CollectionOperationInterface) as $subscription) {
-            $data = $this->normalizeProcessor->process($object, $operation, [], ['fields' => $subscription->fields]);
-            unset($data['clientSubscriptionId']);
-            $update = $this->store->prepareUpdate($subscription, $data);
-            if (null !== $update) {
-                yield $update;
+                continue;
+            }
+
+            $subscriptions = $this->store->getSubscriptions($key, $collection);
+            foreach ($operations as $name => ['object' => $object, 'operation' => $operation]) {
+                foreach ($subscriptions[$name] ?? [] as $subscription) {
+                    $data = $this->normalizeProcessor->process($object, $operation, [], ['fields' => $subscription->fields]);
+                    unset($data['clientSubscriptionId']);
+                    $update = $this->store->prepareUpdate($subscription, $data);
+                    if (null !== $update) {
+                        yield [$operation, $update];
+                    }
+                }
             }
         }
     }
@@ -97,18 +127,23 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         $this->store->acknowledge($update);
     }
 
+    private function getOperationKey(Subscription $operation): string
+    {
+        return $operation->getShortName().':'.$operation->getName();
+    }
+
     private function getSubscriptionKey(string $iri, Subscription $operation, array $privateFieldData): string
     {
         $collection = $operation instanceof CollectionOperationInterface;
 
-        $key = 'graphql_subscription_'.hash('sha256', serialize([
+        ksort($privateFieldData);
+
+        return 'graphql_subscription_'.hash('sha256', serialize([
             'resource' => $operation->getClass(),
-            'operation' => $operation->getName(),
             'collection' => $collection,
             'iri' => $collection ? null : $iri,
+            'private' => $privateFieldData,
         ]));
-
-        return [] === $privateFieldData ? $key : $key.'_'.hash('sha256', serialize($privateFieldData));
     }
 
     /**
@@ -142,8 +177,8 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         return $privateFieldData;
     }
 
-    /** @return iterable<SubscriptionUpdate> */
-    private function getDeleteUpdates(object $object, Subscription $operation): iterable
+    /** @return array<string, string> */
+    private function getDeletedPrivateFieldData(object $object, Subscription $operation): array
     {
         $privateFieldData = [];
         foreach ($this->getPrivateFields($operation) as $privateField) {
@@ -152,9 +187,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
             }
             $privateFieldData[$privateField] = $object->private[$privateField];
         }
-        $key = $this->getSubscriptionKey($object->id, $operation, $privateFieldData);
-        $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
 
-        return $this->store->getDeleteUpdates($key, $operation instanceof CollectionOperationInterface, $payload);
+        return $privateFieldData;
     }
 }

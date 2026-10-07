@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -52,11 +51,11 @@ final class PublishMercureUpdatesListener
     use DispatchTrait;
     use ResourceClassInfoTrait;
     private readonly MercureOptionsResolver $optionsResolver;
-    /** @var list<array{object: object, options: array, operation: ?Operation}> */
+    /** @var list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> */
     private array $createdObjects;
-    /** @var list<array{object: object, options: array, operation: ?Operation}> */
+    /** @var list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> */
     private array $updatedObjects;
-    /** @var list<array{object: object, options: array, operation: ?Operation}> */
+    /** @var list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> */
     private array $deletedObjects;
 
     /**
@@ -112,19 +111,13 @@ final class PublishMercureUpdatesListener
     public function postFlush(): void
     {
         try {
-            foreach ($this->createdObjects as $entry) {
-                $this->publishUpdate($entry['object'], $entry['options'], 'create', $entry['operation']);
-            }
+            $this->publishUpdates($this->createdObjects, 'create');
             $this->createdObjects = [];
 
-            foreach ($this->updatedObjects as $entry) {
-                $this->publishUpdate($entry['object'], $entry['options'], 'update', $entry['operation']);
-            }
+            $this->publishUpdates($this->updatedObjects, 'update');
             $this->updatedObjects = [];
 
-            foreach ($this->deletedObjects as $entry) {
-                $this->publishUpdate($entry['object'], $entry['options'], 'delete', $entry['operation']);
-            }
+            $this->publishUpdates($this->deletedObjects, 'delete');
             $this->deletedObjects = [];
         } finally {
             $this->reset();
@@ -175,7 +168,7 @@ final class PublishMercureUpdatesListener
                     $types = [$operation->getShortName()];
                 }
 
-                // We need to evaluate it here, because in publishUpdate() the resource would be already deleted
+                // We need to evaluate it here, because in publishHttpUpdate() the resource would be already deleted
                 $this->optionsResolver->evaluateTopics($options, $object);
 
                 $this->deletedObjects[] = [
@@ -202,6 +195,7 @@ final class PublishMercureUpdatesListener
             return;
         }
         $privateValues = [];
+        $publications = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operation) {
                 if (!$operation instanceof Subscription || ('createdObjects' === $property && !$operation instanceof CollectionOperationInterface)) {
@@ -226,26 +220,40 @@ final class PublishMercureUpdatesListener
                         'private' => $private,
                     ];
                 }
-                $this->{$property}[] = ['object' => $toPublish, 'options' => $options, 'operation' => $operation];
+                $publications[] = ['object' => $toPublish, 'operation' => $operation];
             }
+        }
+        if ([] !== $publications) {
+            $this->{$property}[] = ['subscriptions' => $publications];
         }
     }
 
-    private function publishUpdate(object $object, array $options, string $type, ?Operation $operation = null): void
+    /**
+     * @param list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> $entries
+     */
+    private function publishUpdates(array $entries, string $type): void
     {
-        if ($operation instanceof Subscription) {
-            foreach ($this->graphQlSubscriptionManager->getUpdates($object, $operation, $type) as $update) {
-                $this->publish($this->buildUpdate(
-                    $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($update->getId()),
-                    (string) (new JsonResponse($update->data))->getContent(),
-                    $options
-                ), $options);
-                $this->graphQlSubscriptionManager->acknowledge($update);
+        foreach ($entries as $entry) {
+            if (isset($entry['subscriptions'])) {
+                foreach ($this->graphQlSubscriptionManager->getUpdates($entry['subscriptions'], $type) as [$operation, $update]) {
+                    $options = $operation->getMercure();
+                    $this->publish($this->buildUpdate(
+                        $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($update->getId()),
+                        (string) (new JsonResponse($update->data))->getContent(),
+                        $options
+                    ), $options);
+                    $this->graphQlSubscriptionManager->acknowledge($update);
+                }
+
+                continue;
             }
 
-            return;
+            $this->publishHttpUpdate($entry['object'], $entry['options'], $entry['operation']);
         }
+    }
 
+    private function publishHttpUpdate(object $object, array $options, HttpOperation $operation): void
+    {
         if ($object instanceof \stdClass) {
             // By convention, if the object has been deleted, we send only its IRI and its type.
             // This may change in the feature, because it's not JSON Merge Patch compliant,
@@ -254,7 +262,7 @@ final class PublishMercureUpdatesListener
             /** @var non-empty-string $data */
             $data = json_encode(['@id' => $object->id] + ($this->includeType ? ['@type' => $object->type] : []), \JSON_THROW_ON_ERROR);
         } else {
-            $context = $options['normalization_context'] ?? $operation?->getNormalizationContext() ?? [];
+            $context = $options['normalization_context'] ?? $operation->getNormalizationContext() ?? [];
 
             // We need to evaluate it here, because in storeObjectToPublish() the resource would not have been persisted yet
             $this->optionsResolver->evaluateTopics($options, $object);

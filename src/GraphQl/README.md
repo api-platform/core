@@ -13,10 +13,16 @@ The [GraphQL](https://graphql.org/) component of the [API Platform](https://api-
 
 ## Subscription state and publication
 
-The subscription registry stores IDs and selected fields. Individual-item payloads
-are represented by SHA-256 fingerprints in separate cache entries; collection
-subscriptions do not retain payloads or fingerprints. IDs and Mercure topics are
-unchanged.
+The subscription registry groups operations in a shared bucket for each resource,
+item IRI (for item subscriptions), and private partition. Item and collection
+registrations use separate buckets. Each bucket maps GraphQL short name/operation name pairs to
+lists of subscription IDs and selected fields. Operation identity remains part of each
+subscription ID, so sharing a bucket does not merge registrations across operations.
+Private field names and values determine the partition; their configured order does
+not create separate buckets.
+
+Individual-item payloads are represented by SHA-256 fingerprints in separate cache
+entries; collection subscriptions do not retain payloads or fingerprints.
 
 Symfony wires two cache pools:
 
@@ -53,8 +59,17 @@ subscription state when necessary.
 Concurrent identical publications can still occur; this is change suppression,
 not an exactly-once delivery or ordering guarantee.
 
-The Doctrine publisher iterates `SubscriptionManagerInterface::getUpdates()`,
-publishes each prepared update, then explicitly calls `acknowledge()` for that update.
+The Doctrine publisher passes the applicable operations and their objects/delete
+snapshots for one changed resource to `SubscriptionManagerInterface::getUpdates()`.
+The manager groups them by registry key and loads each shared bucket once per call,
+then yields each prepared update together with its operation. This is one registry
+read for three item subscription operations sharing an item and private partition;
+collection registrations and different partitions have separate lookups. Item
+fingerprints are fetched in bulk per bucket and acknowledged individually.
+Processing an item bucket for deletion removes all its registrations and fingerprints,
+including those for operations whose delivery is currently disabled; collection buckets remain.
+The publisher uses each operation's own Mercure options, publishes the update, then
+explicitly calls `acknowledge()` for that update.
 The manager handles normalization; the store owns fingerprint comparison and
 acknowledgement. Preparing or iterating updates does not advance their fingerprints.
 A fingerprint advances only after successful hub acceptance for synchronous delivery
@@ -62,11 +77,13 @@ or Messenger dispatch acceptance for asynchronous delivery. Worker retries remai
 Messenger's responsibility; acceptance does not imply client delivery.
 
 Custom subscription managers must implement the complete `SubscriptionManagerInterface`:
-registration receives the subscription operation, `getUpdates()` prepares updates
-for that operation, and `acknowledge()` records successful publication. The previous
+registration receives the subscription operation, `getUpdates()` accepts a list of
+object/operation pairs for one changed resource and yields operation/update pairs,
+and `acknowledge()` records successful publication. The previous
 `getPushPayloads()` contract is removed.
 
 The cache layout is internal and has no migration path. When upgrading, stop old
 registration and publication workers, clear subscription state, and re-establish
-subscriptions. Old and new workers must not share this registry. Fingerprint cache
+subscriptions: subscription IDs and Mercure topics change with this layout.
+Old and new workers must not share this registry. Fingerprint cache
 eviction can cause an additional publication without losing registrations.
