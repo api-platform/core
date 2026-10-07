@@ -74,7 +74,7 @@ class JsonSchemaExplicitContextTest extends ApiTestCase
         $this->assertArrayNotHasKey('secretToken', $properties31);
         $this->assertArrayNotHasKey('secretToken', $properties30);
         $this->assertSame(array_keys($properties31), array_keys($properties30));
-        $this->assertArrayNotHasKey('ReadWriteGroupedItem', $json31['components']['schemas']);
+        $this->assertStringEndsWith('-rw.read', $json31['paths']['/json_schema_context_groups/read_write_grouped_items/{id}']['get']['responses']['200']['content']['application/json']['schema']['$ref']);
     }
 
     public function testExplicitOperationWithForceSubschemaKeepsOperationGroups(): void
@@ -90,6 +90,19 @@ class JsonSchemaExplicitContextTest extends ApiTestCase
             $this->assertArrayNotHasKey('readOnly', $property);
             $this->assertArrayNotHasKey('writeOnly', $property);
         }
+    }
+
+    public function testJsonApiSchemaDisablesSerializerGroupsByDefault(): void
+    {
+        $operation = $this->operationMetadataFactory->create('/json_schema_context_groups/read_write_grouped_items/{id}', ['resource_class' => ReadWriteGroupedItem::class, 'operation_name' => '_api_/json_schema_context_groups/read_write_grouped_items/{id}_get']);
+
+        $schema = $this->schemaFactory->buildSchema(ReadWriteGroupedItem::class, 'jsonapi', Schema::TYPE_OUTPUT, $operation);
+
+        $this->assertStringNotContainsString('rw.read', $schema->getRootDefinitionKey());
+        $definition = $schema->getDefinitions()[$schema->getRootDefinitionKey()];
+        $attributes = $definition['properties']['data']['properties']['attributes']['properties'];
+        $this->assertArrayHasKey('secretToken', $attributes);
+        $this->assertArrayHasKey('title', $attributes);
     }
 
     public function testIgnoredAttributesOnInput(): void
