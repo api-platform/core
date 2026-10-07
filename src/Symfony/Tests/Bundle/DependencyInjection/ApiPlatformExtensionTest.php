@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Tests\Bundle\DependencyInjection;
 
+use ApiPlatform\GraphQl\Subscription\SubscriptionStore;
 use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -29,12 +30,17 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -171,6 +177,36 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($tags as $tag) {
             $this->assertArrayHasKey($tag, $serviceTags, \sprintf('Tag "%s" not found on the service "%s".', $tag, $service));
         }
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testSubscriptionStorageWithAndWithoutConfiguredLocking(bool $locking): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['graphql']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        // Compile the real storage definitions independently of HTTP and Doctrine.
+        $storage = new ContainerBuilder();
+        foreach (['api_platform.graphql.cache.subscription', 'api_platform.graphql.cache.subscription_fingerprint', 'api_platform.graphql.subscription.store'] as $id) {
+            $storage->setDefinition($id, $this->container->getDefinition($id))->setPublic(true);
+        }
+        $storage->setAlias('api_platform.graphql.subscription.lock_factory', $this->container->getAlias('api_platform.graphql.subscription.lock_factory'));
+        $storage->register('cache.system', ArrayAdapter::class);
+        if ($locking) {
+            $storage->register('test.lock_store', InMemoryStore::class);
+            $storage->register('lock.factory', LockFactory::class)->setArguments([new Reference('test.lock_store')]);
+        }
+        $storage->compile();
+        $store = $storage->get('api_platform.graphql.subscription.store');
+        $this->assertInstanceOf(SubscriptionStore::class, $store);
+        $this->assertNotSame($storage->get('api_platform.graphql.cache.subscription'), $storage->get('api_platform.graphql.cache.subscription_fingerprint'));
+        if (!$locking) {
+            $this->expectException(\LogicException::class);
+            $this->expectExceptionMessage('GraphQL subscriptions require a configured Symfony Lock factory.');
+        }
+        $this->assertSame('id', $store->register('bucket', ['name' => true], [], false, static fn () => 'id'));
     }
 
     public function testCommonConfiguration(): void

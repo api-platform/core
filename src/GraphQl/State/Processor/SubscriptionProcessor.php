@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\State\Processor;
 
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
-use ApiPlatform\GraphQl\Subscription\OperationAwareSubscriptionManagerInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Operation;
@@ -41,11 +40,7 @@ final class SubscriptionProcessor implements ProcessorInterface
             return $data;
         }
 
-        if ($this->subscriptionManager instanceof OperationAwareSubscriptionManagerInterface) {
-            $subscriptionId = $this->subscriptionManager->retrieveSubscriptionId($context, $data, $operation);
-        } else {
-            $subscriptionId = $this->subscriptionManager->retrieveSubscriptionId($context, $data);
-        }
+        $subscriptionId = $this->subscriptionManager->retrieveSubscriptionId($context, $data, $operation);
 
         if ($subscriptionId) {
             if (!$this->mercureSubscriptionIriGenerator) {

@@ -25,6 +25,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 final class PrivateCollectionSubscriptionTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
+    use SubscriptionPublicationTrait;
 
     protected static ?bool $alwaysBootKernel = false;
     private ?TraceableAdapter $cache = null;
@@ -49,7 +50,6 @@ final class PrivateCollectionSubscriptionTest extends ApiTestCase
         $secondTopic = $this->subscribe($client, 3);
         $this->assertNotSame($firstTopic, $secondTopic);
 
-        $manager = self::getContainer()->get('api_platform.graphql.subscription.subscription_manager');
         $topicGenerator = self::getContainer()->get('api_platform.graphql.subscription.mercure_iri_generator');
         foreach ([2 => $firstTopic, 4 => $secondTopic] as $id => $topic) {
             $object = PrivateCollectionSubscriptionResource::provide(new Get(), ['id' => $id]);
@@ -67,7 +67,7 @@ final class PrivateCollectionSubscriptionTest extends ApiTestCase
                 $expected = ['type' => 'delete', 'payload' => ['id' => $iri, 'iri' => $object->iri, 'type' => $object->type]];
             }
 
-            $payloads = $manager->getPushPayloads($object, $event);
+            $payloads = $this->publishSubscriptions($object, $event);
             $this->assertCount(1, $payloads);
             $this->assertSame($topic, $topicGenerator->generateTopicIri($payloads[0][0]));
             $this->assertEquals($expected, $payloads[0][1]);
@@ -100,7 +100,7 @@ final class PrivateCollectionSubscriptionTest extends ApiTestCase
         $this->assertEmpty($json['data']['securedPrivateCollectionSubscriptionResourceSubscribe']['mercureUrl'] ?? null);
         $object = PrivateCollectionSubscriptionResource::provide(new Get(), ['id' => 3]);
         $this->assertNotNull($object);
-        $this->assertSame([], self::getContainer()->get('api_platform.graphql.subscription.subscription_manager')->getPushPayloads($object));
+        $this->assertSame([], $this->publishSubscriptions($object));
     }
 
     private function createSubscriptionClient(): Client

@@ -25,6 +25,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 final class SubscriptionNamingTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
+    use SubscriptionPublicationTrait;
 
     protected static ?bool $alwaysBootKernel = false;
 
@@ -85,7 +86,7 @@ final class SubscriptionNamingTest extends ApiTestCase
             $data = ['type' => 'delete', 'payload' => ['id' => $iri, 'iri' => $object->iri, 'type' => $object->type]];
         }
 
-        $payloads = self::getContainer()->get('api_platform.graphql.subscription.subscription_manager')->getPushPayloads($object, $event);
+        $payloads = $this->publishSubscriptions($object, $event);
         $this->assertCount(1, $payloads);
         [$id, $payload] = $payloads[0];
         $this->assertSame($query['topic'], self::getContainer()->get('api_platform.graphql.subscription.mercure_iri_generator')->generateTopicIri($id));

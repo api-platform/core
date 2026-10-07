@@ -25,6 +25,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 final class RelatedPrivateSubscriptionTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
+    use SubscriptionPublicationTrait;
 
     protected static ?bool $alwaysBootKernel = false;
 
@@ -65,7 +66,7 @@ final class RelatedPrivateSubscriptionTest extends ApiTestCase
             $object->name = 'Changed';
             $this->assertSame([
                 [$ids[$index], ['relatedPrivateSubscriptionResource' => ['name' => 'Changed']]],
-            ], $manager->getPushPayloads($object));
+            ], $this->publishSubscriptions($object));
         }
     }
 }

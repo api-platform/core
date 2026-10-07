@@ -35,6 +35,7 @@ use ApiPlatform\GraphQl\State\Provider\ReadProvider;
 use ApiPlatform\GraphQl\State\Provider\ResolverProvider;
 use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGenerator;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
+use ApiPlatform\GraphQl\Subscription\SubscriptionStore;
 use ApiPlatform\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\GraphQl\Type\Definition\UploadType;
 use ApiPlatform\GraphQl\Type\FieldsBuilder;
@@ -259,13 +260,26 @@ return function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -995]);
 
-    $services->set('api_platform.graphql.subscription.subscription_manager', SubscriptionManager::class)
+    $services->set('api_platform.graphql.cache.subscription_fingerprint')
+        ->parent('api_platform.graphql.cache.subscription')
+        ->tag('cache.pool');
+
+    $services->alias('api_platform.graphql.subscription.lock_factory', 'lock.factory');
+
+    $services->set('api_platform.graphql.subscription.store', SubscriptionStore::class)
         ->args([
             service('api_platform.graphql.cache.subscription'),
+            service('api_platform.graphql.cache.subscription_fingerprint'),
+            service('api_platform.graphql.subscription.lock_factory')->nullOnInvalid(),
+        ])
+        ->call('setLogger', [service('logger')->ignoreOnInvalid()]);
+
+    $services->set('api_platform.graphql.subscription.subscription_manager', SubscriptionManager::class)
+        ->args([
+            service('api_platform.graphql.subscription.store'),
             service('api_platform.graphql.subscription.subscription_identifier_generator'),
             service('api_platform.graphql.state_processor.normalize')->ignoreOnInvalid(),
             service('api_platform.symfony.iri_converter'),
-            service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.api.identifiers_extractor'),
             service('api_platform.resource_class_resolver'),
         ]);

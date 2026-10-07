@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Doctrine\EventListener;
 use ApiPlatform\Doctrine\Common\Messenger\DispatchTrait;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
-use ApiPlatform\GraphQl\Subscription\SubscriptionPayloadProviderInterface;
 use ApiPlatform\GraphQl\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -179,36 +178,12 @@ final class PublishMercureUpdatesListener
                 // We need to evaluate it here, because in publishUpdate() the resource would be already deleted
                 $this->optionsResolver->evaluateTopics($options, $object);
 
-                $privateData = [];
-                if ($this->graphQlSubscriptionManager && !$this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface) {
-                    foreach ($resourceMetadataCollection as $graphQlResource) {
-                        foreach ($graphQlResource->getGraphQlOperations() ?? [] as $graphQlOperation) {
-                            if (!$graphQlOperation instanceof Subscription) {
-                                continue;
-                            }
-                            $mercureOptions = $graphQlOperation->getMercure() ?? false;
-                            if (!($mercureOptions['private'] ?? false)) {
-                                continue;
-                            }
-
-                            foreach ($mercureOptions['private_fields'] ?? [] as $privateField) {
-                                if (\array_key_exists($privateField, $privateData)) {
-                                    continue;
-                                }
-
-                                $privateData[$privateField] = PropertyAccessorValueExtractor::getValue($object, $privateField, $this->identifiersExtractor, $this->resourceClassResolver);
-                            }
-                        }
-                    }
-                }
-
                 $this->deletedObjects[] = [
                     'object' => (object) [
                         'resourceClass' => $resourceClass,
                         'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation),
                         'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $operation),
                         'type' => 1 === \count($types) ? $types[0] : $types,
-                        'private' => $privateData,
                     ],
                     'options' => $options,
                     'operation' => $operation,
@@ -223,7 +198,7 @@ final class PublishMercureUpdatesListener
 
     private function collectGraphQlPublications(object $object, string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, string $property): void
     {
-        if (!$this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface || !$this->graphQlMercureSubscriptionIriGenerator) {
+        if (!$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
             return;
         }
         $privateValues = [];
@@ -258,13 +233,14 @@ final class PublishMercureUpdatesListener
 
     private function publishUpdate(object $object, array $options, string $type, ?Operation $operation = null): void
     {
-        if ($operation instanceof Subscription && $this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface) {
-            foreach ($this->graphQlSubscriptionManager->getPushPayloadsForOperation($object, $operation, $type) as [$id, $data]) {
+        if ($operation instanceof Subscription) {
+            foreach ($this->graphQlSubscriptionManager->getUpdates($object, $operation, $type) as $update) {
                 $this->publish($this->buildUpdate(
-                    $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($id),
-                    (string) (new JsonResponse($data))->getContent(),
+                    $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($update->getId()),
+                    (string) (new JsonResponse($update->data))->getContent(),
                     $options
                 ), $options);
+                $this->graphQlSubscriptionManager->acknowledge($update);
             }
 
             return;
@@ -287,10 +263,7 @@ final class PublishMercureUpdatesListener
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
         }
 
-        $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getLegacyGraphQlSubscriptionUpdates($object, $options, $type));
-        foreach ($updates as $update) {
-            $this->publish($update, $options);
-        }
+        $this->publish($this->buildUpdate($iri, $data, $options), $options);
     }
 
     private function publish(Update $update, array $options): void
@@ -302,31 +275,6 @@ final class PublishMercureUpdatesListener
         }
 
         $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update);
-    }
-
-    /**
-     * Keeps custom managers using the original payload API on the existing HTTP publication path.
-     *
-     * @return Update[]
-     */
-    private function getLegacyGraphQlSubscriptionUpdates(object $object, array $options, string $type): array
-    {
-        if (!$this->graphQlSubscriptionManager || $this->graphQlSubscriptionManager instanceof SubscriptionPayloadProviderInterface || !$this->graphQlMercureSubscriptionIriGenerator) {
-            return [];
-        }
-
-        $payloads = $this->graphQlSubscriptionManager->getPushPayloads($object, $type);
-
-        $updates = [];
-        foreach ($payloads as [$subscriptionId, $data]) {
-            $updates[] = $this->buildUpdate(
-                $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($subscriptionId),
-                (string) (new JsonResponse($data))->getContent(),
-                $options
-            );
-        }
-
-        return $updates;
     }
 
     /**

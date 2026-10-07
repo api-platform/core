@@ -24,6 +24,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 final class SubscriptionIdentityTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
+    use SubscriptionPublicationTrait;
 
     protected static ?bool $alwaysBootKernel = false;
     private TraceableAdapter $cache;
@@ -65,11 +66,10 @@ final class SubscriptionIdentityTest extends ApiTestCase
             $this->subscribe($client, 1, 'watch'),
         ]);
 
-        $manager = self::getContainer()->get('api_platform.graphql.subscription.subscription_manager');
         $topicGenerator = self::getContainer()->get('api_platform.graphql.subscription.mercure_iri_generator');
         $resource = PrivateSubscriptionResource::provide(new Get(), ['id' => 1]);
         $resource->name = 'Changed';
-        $payloads = $manager->getPushPayloads($resource, 'update');
+        $payloads = $this->publishSubscriptions($resource, 'update');
         $this->assertCount(2, $payloads);
         $this->assertSame([$topics[0], $topics[3]], array_map(static fn (array $payload) => $topicGenerator->generateTopicIri($payload[0]), $payloads));
         foreach ($payloads as [$id, $payload]) {
@@ -83,17 +83,17 @@ final class SubscriptionIdentityTest extends ApiTestCase
             'type' => 'PrivateSubscriptionResource',
             'private' => ['tenant' => 'tenant-a'],
         ];
-        $payloads = $manager->getPushPayloads($snapshot, 'delete');
+        $payloads = $this->publishSubscriptions($snapshot, 'delete');
         $this->assertCount(2, $payloads);
         $this->assertSame([$topics[0], $topics[3]], array_map(static fn (array $payload) => $topicGenerator->generateTopicIri($payload[0]), $payloads));
         foreach ($payloads as [$id, $payload]) {
             $this->assertSame(['type' => 'delete', 'payload' => ['id' => $snapshot->id, 'iri' => $snapshot->iri, 'type' => $snapshot->type]], $payload);
         }
-        $this->assertSame([], $manager->getPushPayloads($snapshot, 'delete'));
+        $this->assertSame([], $this->publishSubscriptions($snapshot, 'delete'));
 
         $other = PrivateSubscriptionResource::provide(new Get(), ['id' => 2]);
         $other->name = 'Another change';
-        $payloads = $manager->getPushPayloads($other, 'update');
+        $payloads = $this->publishSubscriptions($other, 'update');
         $this->assertCount(1, $payloads);
         $this->assertSame($topics[1], $topicGenerator->generateTopicIri($payloads[0][0]));
     }

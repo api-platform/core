@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Subscription;
 
+use ApiPlatform\Metadata\GraphQl\Subscription;
+
 /**
- * Manages all the queried subscriptions and creates their ID.
+ * Registers subscriptions, prepares updates, and acknowledges successful publication.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -23,7 +25,18 @@ interface SubscriptionManagerInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function retrieveSubscriptionId(array $context, ?array $result): ?string;
+    public function retrieveSubscriptionId(array $context, ?array $result, Subscription $operation): ?string;
 
-    public function getPushPayloads(object $object, string $type = 'update'): array;
+    /**
+     * Prepares updates for a create, update, or delete event without acknowledging publication.
+     * For delete events, $object is a snapshot with resourceClass, id (relative IRI),
+     * iri (absolute IRI), type (string or list of strings), and private (field/value map).
+     * Other events receive the resource object.
+     *
+     * @return iterable<SubscriptionUpdate>
+     */
+    public function getUpdates(object $object, Subscription $operation, string $type = 'update'): iterable;
+
+    /** Records successful publication or dispatch of the prepared update. */
+    public function acknowledge(SubscriptionUpdate $update): void;
 }

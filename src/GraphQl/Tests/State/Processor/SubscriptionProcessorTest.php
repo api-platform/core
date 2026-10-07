@@ -15,7 +15,6 @@ namespace ApiPlatform\GraphQl\Tests\State\Processor;
 
 use ApiPlatform\GraphQl\State\Processor\SubscriptionProcessor;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
-use ApiPlatform\GraphQl\Subscription\OperationAwareSubscriptionManagerInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
@@ -31,7 +30,7 @@ class SubscriptionProcessorTest extends TestCase
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->expects($this->once())->method('process')->willReturn([]);
         $subscriptionManager = $this->createMock(SubscriptionManagerInterface::class);
-        $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->willReturn('/1');
+        $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->with($context, [], $operation)->willReturn('/1');
         $mercureSubscriptionIriGenerator = $this->createMock(MercureSubscriptionIriGeneratorInterface::class);
         $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub'])->willReturn('mercure-url');
         $processor = new SubscriptionProcessor($decorated, $subscriptionManager, $mercureSubscriptionIriGenerator);
@@ -68,13 +67,13 @@ class SubscriptionProcessorTest extends TestCase
         $processor->process([], $operation, [], $context);
     }
 
-    public function testProcessForwardsCollectionOperationToOperationAwareManager(): void
+    public function testProcessForwardsCollectionOperationToManager(): void
     {
         $operation = new SubscriptionCollection(mercure: ['hub' => 'mercure.rocks']);
         $context = ['context' => 'value'];
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->expects($this->once())->method('process')->willReturn([]);
-        $subscriptionManager = $this->createMock(OperationAwareSubscriptionManagerInterface::class);
+        $subscriptionManager = $this->createMock(SubscriptionManagerInterface::class);
         $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->with($context, [], $operation)->willReturn('/1');
         $mercureSubscriptionIriGenerator = $this->createMock(MercureSubscriptionIriGeneratorInterface::class);
         $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub'])->willReturn('mercure-url');
@@ -96,7 +95,7 @@ class SubscriptionProcessorTest extends TestCase
 
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->expects($this->once())->method('process')->willReturn($decoratedPayload);
-        $subscriptionManager = $this->createMock(OperationAwareSubscriptionManagerInterface::class);
+        $subscriptionManager = $this->createMock(SubscriptionManagerInterface::class);
         $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->with($context, $decoratedPayload, $operation)->willReturn('/1');
         $mercureSubscriptionIriGenerator = $this->createMock(MercureSubscriptionIriGeneratorInterface::class);
         $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub'])->willReturn('mercure-url');
