@@ -52,17 +52,17 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         $fields = $info->getFieldSelection(\PHP_INT_MAX);
         $this->arrayRecursiveSort($fields, 'ksort');
 
-        $previousObject = $context['graphql_context']['previous_object'] ?? null;
-        $privateFieldData = $this->getPrivateFieldData($operation, $previousObject);
+        $privateFieldData = $this->getPrivateFieldData($operation, $context['graphql_context']['previous_object'] ?? null);
         $collection = $operation instanceof CollectionOperationInterface;
         $cacheKey = $this->getSubscriptionKey($iri, $operation, $privateFieldData);
+        $operationKey = $this->getOperationKey($operation);
         unset($result['clientSubscriptionId']);
 
-        $identity = $fields + ($collection ? ['__collection' => true] : []) + ['__subscription_scope' => $cacheKey, '__subscription_operation' => $this->getOperationKey($operation)];
+        $identity = $fields + ($collection ? ['__collection' => true] : []) + ['__subscription_scope' => $cacheKey, '__subscription_operation' => $operationKey];
 
         return $this->store->register(
             $cacheKey,
-            $this->getOperationKey($operation),
+            $operationKey,
             $fields,
             $result,
             $collection,
@@ -87,7 +87,8 @@ final class SubscriptionManager implements SubscriptionManagerInterface
                 $iri = $object->id;
                 $private = $this->getDeletedPrivateFieldData($object, $operation);
             } else {
-                $iri = $this->iriConverter->getIriFromResource($object);
+                // Collection registry keys do not include the item IRI.
+                $iri = $operation instanceof CollectionOperationInterface ? null : $this->iriConverter->getIriFromResource($object);
                 $private = $this->getPrivateFieldData($operation, $object);
             }
             $key = $this->getSubscriptionKey($iri, $operation, $private);
@@ -132,7 +133,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         return $operation->getShortName().':'.$operation->getName();
     }
 
-    private function getSubscriptionKey(string $iri, Subscription $operation, array $privateFieldData): string
+    private function getSubscriptionKey(?string $iri, Subscription $operation, array $privateFieldData): string
     {
         $collection = $operation instanceof CollectionOperationInterface;
 

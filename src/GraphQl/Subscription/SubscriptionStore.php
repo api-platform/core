@@ -76,13 +76,10 @@ final class SubscriptionStore implements LoggerAwareInterface
     {
         return $this->synchronized($key, function () use ($key): array {
             $entries = $this->all($key);
-            try {
-                if (!$this->registry->deleteItem($key)) {
-                    throw new \RuntimeException('Cannot remove the GraphQL subscription registry.');
-                }
-            } catch (\Exception $e) {
-                $this->logger?->warning('Could not clean up deleted GraphQL subscriptions.', ['exception' => $e]);
+            if ([] === $entries) {
+                return [];
             }
+            $this->discard($this->registry, $key, 'Could not clean up deleted GraphQL subscriptions.');
             foreach ($this->subscriptionIds($entries) as $id) {
                 try {
                     $this->synchronized($this->fingerprintKey($id), fn () => $this->discardFingerprint($id));
@@ -177,8 +174,8 @@ final class SubscriptionStore implements LoggerAwareInterface
         $keys = array_map($this->fingerprintKey(...), $ids);
         $items = iterator_to_array($this->fingerprints->getItems($keys));
         $snapshots = [];
-        foreach ($ids as $id) {
-            $item = $items[$this->fingerprintKey($id)];
+        foreach ($ids as $i => $id) {
+            $item = $items[$keys[$i]];
             $snapshots[$id] = $item->isHit() ? $item->get() : null;
         }
 
@@ -187,8 +184,9 @@ final class SubscriptionStore implements LoggerAwareInterface
 
     private function recordFingerprint(RegisteredSubscription $subscription, string $hash): void
     {
-        $this->synchronized($this->fingerprintKey($subscription->id), function () use ($subscription, $hash): void {
-            $item = $this->fingerprints->getItem($this->fingerprintKey($subscription->id));
+        $key = $this->fingerprintKey($subscription->id);
+        $this->synchronized($key, function () use ($key, $subscription, $hash): void {
+            $item = $this->fingerprints->getItem($key);
             $current = $item->isHit() ? $item->get() : null;
             $previous = $subscription->fingerprint;
             // Concurrent publications may complete in either order. Keeping either
@@ -212,9 +210,9 @@ final class SubscriptionStore implements LoggerAwareInterface
 
     private function initialize(string $id, string $hash): void
     {
-        $this->synchronized($this->fingerprintKey($id), function () use ($id, $hash): void {
-            $item = $this->fingerprints->getItem($this->fingerprintKey($id));
-            $this->writeFingerprint($item, $hash);
+        $key = $this->fingerprintKey($id);
+        $this->synchronized($key, function () use ($key, $hash): void {
+            $this->writeFingerprint($this->fingerprints->getItem($key), $hash);
         });
     }
 
@@ -225,13 +223,7 @@ final class SubscriptionStore implements LoggerAwareInterface
 
     private function discardFingerprint(string $id): void
     {
-        try {
-            if (!$this->fingerprints->deleteItem($this->fingerprintKey($id))) {
-                throw new \RuntimeException('Cannot remove the GraphQL subscription fingerprint.');
-            }
-        } catch (\Exception $e) {
-            $this->logger?->warning('Could not discard a GraphQL subscription fingerprint.', ['exception' => $e]);
-        }
+        $this->discard($this->fingerprints, $this->fingerprintKey($id), 'Could not discard a GraphQL subscription fingerprint.');
     }
 
     private function fingerprint(?array $payload): string
@@ -248,6 +240,20 @@ final class SubscriptionStore implements LoggerAwareInterface
     {
         if (!$pool->save($item)) {
             throw new \RuntimeException('Cannot save GraphQL subscription state.');
+        }
+    }
+
+    /**
+     * Deletes expendable state, logging instead of throwing on failure.
+     */
+    private function discard(CacheItemPoolInterface $pool, string $key, string $warning): void
+    {
+        try {
+            if (!$pool->deleteItem($key)) {
+                throw new \RuntimeException('Cannot delete GraphQL subscription state.');
+            }
+        } catch (\Exception $e) {
+            $this->logger?->warning($warning, ['exception' => $e]);
         }
     }
 

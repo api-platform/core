@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Tests\Resolver\Util;
 
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,29 +28,29 @@ class IdentifierTraitTest extends TestCase
     {
         return new class {
             use IdentifierTrait {
-                IdentifierTrait::getIdentifierFromContext as public;
+                IdentifierTrait::getIdentifierFromOperation as public;
             }
         };
     }
 
-    public function testGetIdentifierFromQueryContext(): void
+    public function testGetIdentifierFromQueryOperation(): void
     {
         $identifierTrait = $this->getIdentifierTraitImplementation();
 
-        $this->assertSame('foo', $identifierTrait->getIdentifierFromContext(['args' => ['id' => 'foo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false]));
+        $this->assertSame('foo', $identifierTrait->getIdentifierFromOperation(new Query(), ['id' => 'foo']));
     }
 
-    public function testGetIdentifierFromMutationContext(): void
+    public function testGetIdentifierFromMutationOperation(): void
     {
         $identifierTrait = $this->getIdentifierTraitImplementation();
 
-        $this->assertSame('foo', $identifierTrait->getIdentifierFromContext(['args' => ['input' => ['id' => 'foo']], 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false]));
+        $this->assertSame('foo', $identifierTrait->getIdentifierFromOperation(new Mutation(), ['input' => ['id' => 'foo']]));
     }
 
-    public function testGetIdentifierFromSubscriptionContext(): void
+    public function testGetIdentifierFromSubscriptionOperation(): void
     {
         $identifierTrait = $this->getIdentifierTraitImplementation();
 
-        $this->assertSame('foo', $identifierTrait->getIdentifierFromContext(['args' => ['input' => ['id' => 'foo']], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]));
+        $this->assertSame('foo', $identifierTrait->getIdentifierFromOperation(new Subscription(), ['input' => ['id' => 'foo']]));
     }
 }

@@ -58,7 +58,7 @@ final class SubscriptionPublicationTest extends ApiTestCase
         $client = self::createClient();
         $client->disableReboot();
         $container = self::getContainer();
-        $this->cache = new TraceableAdapter(new FilesystemAdapter('subscription_privacy_'.bin2hex(random_bytes(8))));
+        $this->cache = new TraceableAdapter(new FilesystemAdapter('subscription_publication_'.bin2hex(random_bytes(8))));
         $container->set('api_platform.graphql.cache.subscription', $this->cache);
         $updates = [];
         $hub = new MockHub('http://example.com/.well-known/mercure', new StaticTokenProvider('test'), static function (Update $update) use (&$updates): string {

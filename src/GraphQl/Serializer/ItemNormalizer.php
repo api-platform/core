@@ -117,7 +117,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             $normalizedData[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null);
         }
 
-        if (($context['root_operation'] ?? null) instanceof Subscription && ($context['no_resolver_data'] ?? false) && \is_object($data) && isset($normalizedData['id']) && !isset($normalizedData['_id'])) {
+        if ($this->isSubscriptionPayload($context) && isset($normalizedData['id']) && !isset($normalizedData['_id'])) {
             $normalizedData['_id'] = $normalizedData['id'];
             $normalizedData['id'] = $this->iriConverter->getIriFromResource($data);
         }
@@ -137,7 +137,7 @@ final class ItemNormalizer extends BaseItemNormalizer
         }
 
         // Serialize selected relationships in subscription event payloads.
-        if ($operation instanceof QueryCollection && ($context['root_operation'] ?? null) instanceof Subscription && ($context['no_resolver_data'] ?? false) && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
+        if ($operation instanceof QueryCollection && $this->isSubscriptionPayload($context) && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
             $relationContext = $context;
             $relationContext['attributes'] = $context['attributes']['collection'];
             $data['collection'] = [];
@@ -154,23 +154,34 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     private function addPagination(int $totalCount, array $data, array $context): array
     {
-        if ($context['attributes']['paginationInfo'] ?? false) {
-            $data['paginationInfo'] = [];
-            if (\array_key_exists('hasNextPage', $context['attributes']['paginationInfo'])) {
-                $data['paginationInfo']['hasNextPage'] = $totalCount > ($context['pagination']['itemsPerPage'] ?? 10);
-            }
-            if (\array_key_exists('itemsPerPage', $context['attributes']['paginationInfo'])) {
-                $data['paginationInfo']['itemsPerPage'] = $context['pagination']['itemsPerPage'] ?? 10;
-            }
-            if (\array_key_exists('lastPage', $context['attributes']['paginationInfo'])) {
-                $data['paginationInfo']['lastPage'] = (int) ceil($totalCount / ($context['pagination']['itemsPerPage'] ?? 10));
-            }
-            if (\array_key_exists('totalCount', $context['attributes']['paginationInfo'])) {
-                $data['paginationInfo']['totalCount'] = $totalCount;
-            }
+        if (!$selection = $context['attributes']['paginationInfo'] ?? false) {
+            return $data;
+        }
+
+        $itemsPerPage = $context['pagination']['itemsPerPage'] ?? 10;
+        $data['paginationInfo'] = [];
+        if (\array_key_exists('hasNextPage', $selection)) {
+            $data['paginationInfo']['hasNextPage'] = $totalCount > $itemsPerPage;
+        }
+        if (\array_key_exists('itemsPerPage', $selection)) {
+            $data['paginationInfo']['itemsPerPage'] = $itemsPerPage;
+        }
+        if (\array_key_exists('lastPage', $selection)) {
+            $data['paginationInfo']['lastPage'] = (int) ceil($totalCount / $itemsPerPage);
+        }
+        if (\array_key_exists('totalCount', $selection)) {
+            $data['paginationInfo']['totalCount'] = $totalCount;
         }
 
         return $data;
+    }
+
+    /**
+     * Subscription event payloads are normalized without the GraphQL resolvers.
+     */
+    private function isSubscriptionPayload(array $context): bool
+    {
+        return ($context['root_operation'] ?? null) instanceof Subscription && ($context['no_resolver_data'] ?? false);
     }
 
     /**

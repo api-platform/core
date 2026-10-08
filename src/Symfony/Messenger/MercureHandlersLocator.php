@@ -45,19 +45,12 @@ final class MercureHandlersLocator implements HandlersLocatorInterface
             return;
         }
 
-        $name = $stamp->getHub();
-        $hub = $this->hubRegistry->getHub($name);
-        if (null === $name) {
-            foreach ($this->hubRegistry->all() as $registeredName => $registeredHub) {
-                if ($hub === $registeredHub) {
-                    $name = $registeredName;
-                    break;
-                }
-            }
-        }
+        $hub = $this->hubRegistry->getHub($stamp->getHub());
+        // The registry does not expose the default hub's name, so match it by identity.
+        $name = $stamp->getHub() ?? array_search($hub, $this->hubRegistry->all(), true);
 
         // Custom registries can expose hubs without a MercureBundle handler.
-        $handler = null !== $name && $this->handlers->has($name) ? $this->handlers->get($name) : new UpdateHandler($hub);
+        $handler = false !== $name && $this->handlers->has($name) ? $this->handlers->get($name) : new UpdateHandler($hub);
         $publisher = new HandlerDescriptor($handler, ['alias' => 'api_platform.mercure']);
         foreach ($this->decorated->getHandlers($envelope) as $handler) {
             if (!$handler->getOption(self::HANDLER_OPTION)) {

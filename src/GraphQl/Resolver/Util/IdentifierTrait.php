@@ -26,17 +26,6 @@ use ApiPlatform\Metadata\GraphQl\Subscription;
  */
 trait IdentifierTrait
 {
-    private function getIdentifierFromContext(array $context): ?string
-    {
-        $args = $context['args'];
-
-        if ($context['is_mutation'] || $context['is_subscription']) {
-            return $args['input']['id'] ?? null;
-        }
-
-        return $args['id'] ?? null;
-    }
-
     /**
      * @param array<string, mixed> $args
      */

@@ -44,6 +44,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * Publishes resources updates to the Mercure hub.
  *
+ * @phpstan-type Publication array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class PublishMercureUpdatesListener
@@ -51,11 +53,11 @@ final class PublishMercureUpdatesListener
     use DispatchTrait;
     use ResourceClassInfoTrait;
     private readonly MercureOptionsResolver $optionsResolver;
-    /** @var list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> */
+    /** @var list<Publication> */
     private array $createdObjects;
-    /** @var list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> */
+    /** @var list<Publication> */
     private array $updatedObjects;
-    /** @var list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> */
+    /** @var list<Publication> */
     private array $deletedObjects;
 
     /**
@@ -163,21 +165,11 @@ final class PublishMercureUpdatesListener
             }
 
             if ('deletedObjects' === $property) {
-                $types = $operation->getTypes();
-                if (null === $types) {
-                    $types = [$operation->getShortName()];
-                }
-
                 // We need to evaluate it here, because in publishHttpUpdate() the resource would be already deleted
                 $this->optionsResolver->evaluateTopics($options, $object);
 
                 $this->deletedObjects[] = [
-                    'object' => (object) [
-                        'resourceClass' => $resourceClass,
-                        'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation),
-                        'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $operation),
-                        'type' => 1 === \count($types) ? $types[0] : $types,
-                    ],
+                    'object' => (object) $this->getDeletedResource($object, $operation->getTypes() ?? [$operation->getShortName()], $operation),
                     'options' => $options,
                     'operation' => $operation,
                 ];
@@ -197,6 +189,7 @@ final class PublishMercureUpdatesListener
         $privateValues = [];
         $publications = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
+            $deletedResource = null;
             foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operation) {
                 if (!$operation instanceof Subscription || ('createdObjects' === $property && !$operation instanceof CollectionOperationInterface)) {
                     continue;
@@ -208,17 +201,12 @@ final class PublishMercureUpdatesListener
                 $toPublish = $object;
                 if ('deletedObjects' === $property) {
                     $private = [];
-                    foreach (($options['private'] ?? false) ? ($options['private_fields'] ?? []) : [] as $field) {
+                    // Resolved options only carry private fields for private updates.
+                    foreach ($options['private_fields'] ?? [] as $field) {
                         $private[$field] = $privateValues[$field] ??= PropertyAccessorValueExtractor::getValue($object, $field, $this->identifiersExtractor, $this->resourceClassResolver);
                     }
-                    $types = $resourceMetadata->getTypes() ?? [$resourceMetadata->getShortName()];
-                    $toPublish = (object) [
-                        'resourceClass' => $resourceClass,
-                        'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH),
-                        'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL),
-                        'type' => 1 === \count($types) ? $types[0] : $types,
-                        'private' => $private,
-                    ];
+                    $deletedResource ??= ['resourceClass' => $resourceClass] + $this->getDeletedResource($object, $resourceMetadata->getTypes() ?? [$resourceMetadata->getShortName()]);
+                    $toPublish = (object) ($deletedResource + ['private' => $private]);
                 }
                 $publications[] = ['object' => $toPublish, 'operation' => $operation];
             }
@@ -229,7 +217,7 @@ final class PublishMercureUpdatesListener
     }
 
     /**
-     * @param list<array{object: object, options: array, operation: HttpOperation}|array{subscriptions: list<array{object: object, operation: Subscription}>}> $entries
+     * @param list<Publication> $entries
      */
     private function publishUpdates(array $entries, string $type): void
     {
@@ -237,7 +225,6 @@ final class PublishMercureUpdatesListener
         foreach ($entries as $entry) {
             if (isset($entry['subscriptions'])) {
                 foreach ($this->graphQlSubscriptionManager->getUpdates($entry['subscriptions'], $type) as [$operation, $update]) {
-                    $published = false;
                     try {
                         $options = $operation->getMercure();
                         $this->publish($this->buildUpdate(
@@ -245,18 +232,15 @@ final class PublishMercureUpdatesListener
                             (string) (new JsonResponse($update->data))->getContent(),
                             $options
                         ), $options);
-                        $published = true;
                     } catch (\Throwable $e) {
                         if ('delete' !== $type) {
                             throw $e;
                         }
-                        // Keep iterating so the store retires every deleted item's buckets.
+                        // Keep iterating so the store retires every deleted item's buckets;
+                        // the failed delete attempt is still acknowledged.
                         $failure ??= $e;
-                    } finally {
-                        if ($published || 'delete' === $type) {
-                            $this->graphQlSubscriptionManager->acknowledge($update);
-                        }
                     }
+                    $this->graphQlSubscriptionManager->acknowledge($update);
                 }
 
                 continue;
@@ -296,6 +280,22 @@ final class PublishMercureUpdatesListener
         }
 
         $this->publish($this->buildUpdate($iri, $data, $options), $options);
+    }
+
+    /**
+     * Captures the identity of a resource before Doctrine deletes it.
+     *
+     * @param string[] $types
+     *
+     * @return array{id: string, iri: string, type: string|string[]}
+     */
+    private function getDeletedResource(object $object, array $types, ?HttpOperation $operation = null): array
+    {
+        return [
+            'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation),
+            'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $operation),
+            'type' => 1 === \count($types) ? $types[0] : $types,
+        ];
     }
 
     private function publish(Update $update, array $options): void

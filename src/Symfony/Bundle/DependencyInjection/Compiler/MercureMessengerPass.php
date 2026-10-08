@@ -47,7 +47,7 @@ final class MercureMessengerPass implements CompilerPassInterface
             }
         }
 
-        foreach ($container->findTaggedServiceIds('messenger.bus') as $id => $tags) {
+        foreach (array_keys($container->findTaggedServiceIds('messenger.bus')) as $id) {
             $decorator = 'api_platform.mercure.handlers_locator.'.$id;
             $container->register($decorator, MercureHandlersLocator::class)
                 ->setDecoratedService($id.'.messenger.handlers_locator')

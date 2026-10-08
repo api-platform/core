@@ -71,7 +71,7 @@ including those for operations whose delivery is currently disabled; collection 
 After a successful flush, the listener processes deletions before creates and updates.
 Delete delivery errors are retained while the remaining delete notifications are attempted,
 allowing the store to retire every affected item bucket as it is read. Delete updates
-are acknowledged in `finally`, including after failed delivery. The first delivery
+are acknowledged after every attempt, including failed delivery. The first delivery
 error is rethrown after the deletion pass, and the listener resets its buffers. Create and
 update delivery errors propagate immediately. Collection registrations remain available.
 Synchronous deletion delivery has no automatic replay; messages already accepted by

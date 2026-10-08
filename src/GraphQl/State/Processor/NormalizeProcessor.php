@@ -57,9 +57,10 @@ final class NormalizeProcessor implements ProcessorInterface
      */
     private function getData(mixed $itemOrCollection, GraphQlOperation $operation, array $uriVariables = [], array $context = []): ?array
     {
-        $subscriptionPush = $operation instanceof Subscription && isset($context['fields']);
+        // Subscription pushes normalize the changed item, including for collection subscriptions.
+        $isCollection = $operation instanceof CollectionOperationInterface && !($operation instanceof Subscription && isset($context['fields']));
         if (!($operation->canSerialize() ?? true)) {
-            if (!$subscriptionPush && $operation instanceof CollectionOperationInterface) {
+            if ($isCollection) {
                 if ($this->pagination->isGraphQlEnabled($operation, $context)) {
                     return 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                         $this->getDefaultCursorBasedPaginatedData() :
@@ -83,7 +84,7 @@ final class NormalizeProcessor implements ProcessorInterface
         $normalizationContext = $this->serializerContextBuilder->create($operation->getClass(), $operation, $context, normalization: true);
 
         $data = null;
-        if ($subscriptionPush || !$operation instanceof CollectionOperationInterface) {
+        if (!$isCollection) {
             if ($operation instanceof Mutation && $operation instanceof DeleteOperationInterface) {
                 $data = ['id' => $this->getIdentifierFromOperation($operation, $context['args'] ?? [])];
             } else {
@@ -91,7 +92,7 @@ final class NormalizeProcessor implements ProcessorInterface
             }
         }
 
-        if (!$subscriptionPush && $operation instanceof CollectionOperationInterface && is_iterable($itemOrCollection)) {
+        if ($isCollection && is_iterable($itemOrCollection)) {
             if (!$this->pagination->isGraphQlEnabled($operation, $context)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {

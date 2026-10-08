@@ -47,13 +47,7 @@ class SubscriptionManagerTest extends TestCase
 
     private static function publish(SubscriptionManager $manager, object $object, Subscription $operation, string $type = 'update'): array
     {
-        $payloads = [];
-        foreach ($manager->getUpdates([['object' => $object, 'operation' => $operation]], $type) as [, $update]) {
-            $payloads[] = [$update->getId(), $update->data];
-            $manager->acknowledge($update);
-        }
-
-        return $payloads;
+        return self::publishOperations($manager, $object, [$operation], $type);
     }
 
     /** @param Subscription[] $operations */
