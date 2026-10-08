@@ -50,6 +50,10 @@ final class SubscriptionStore implements LoggerAwareInterface
             $entries = $item->isHit() ? $item->get() : [];
             foreach ($entries[$operation] ?? [] as [$id, $selection]) {
                 if ($selection === $fields) {
+                    if (null !== $fingerprint) {
+                        $this->invalidateIfChanged($id, $fingerprint);
+                    }
+
                     return $id;
                 }
             }
@@ -168,7 +172,7 @@ final class SubscriptionStore implements LoggerAwareInterface
         return $ids;
     }
 
-    /** @return array<string, array{hash: string, version: string}|null> */
+    /** @return array<string, array{hash: string|null, version: string}|null> */
     private function snapshots(array $ids): array
     {
         $keys = array_map($this->fingerprintKey(...), $ids);
@@ -192,7 +196,7 @@ final class SubscriptionStore implements LoggerAwareInterface
             // Concurrent publications may complete in either order. Keeping either
             // different hash could suppress a later correction, so forget it.
             if ($current !== $previous) {
-                if (null !== $current && $current['hash'] !== $hash) {
+                if (null !== ($current['hash'] ?? null) && $current['hash'] !== $hash) {
                     $this->discardFingerprint($subscription->id);
                 }
 
@@ -216,7 +220,22 @@ final class SubscriptionStore implements LoggerAwareInterface
         });
     }
 
-    private function writeFingerprint(CacheItemInterface $item, string $hash): void
+    private function invalidateIfChanged(string $id, string $hash): void
+    {
+        $key = $this->fingerprintKey($id);
+        $this->synchronized($key, function () use ($key, $hash): void {
+            $item = $this->fingerprints->getItem($key);
+            if ($item->isHit() && $hash === $item->get()['hash']) {
+                return;
+            }
+            // Subscribers sharing this ID may now have different payloads. Keep
+            // a versioned invalidation so older acknowledgements cannot restore
+            // suppression, even when their snapshot was a cache miss.
+            $this->writeFingerprint($item, null);
+        });
+    }
+
+    private function writeFingerprint(CacheItemInterface $item, ?string $hash): void
     {
         $this->save($this->fingerprints, $item->set(['hash' => $hash, 'version' => bin2hex(random_bytes(16))]));
     }

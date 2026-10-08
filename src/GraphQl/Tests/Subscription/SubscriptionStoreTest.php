@@ -37,9 +37,81 @@ final class SubscriptionStoreTest extends TestCase
         $this->assertSame(64, \strlen($snapshot['hash']));
         $this->assertSame(32, \strlen($snapshot['version']));
         $this->assertStringNotContainsString('private payload', serialize($snapshot));
-        $this->assertSame($id, $store->register('bucket', 'watch', ['name' => true], ['name' => 'new subscriber response'], false, static fn () => 'different'));
-        $this->assertSame($snapshot, $fingerprints->getItem(array_key_first($fingerprints->getValues()))->get(), 'Re-enrollment must not reset the publication fingerprint.');
+        $this->assertSame($id, $store->register('bucket', 'watch', ['name' => true], $payload, false, static fn () => 'different'));
+        $this->assertSame($snapshot, $fingerprints->getItem(array_key_first($fingerprints->getValues()))->get(), 'Re-enrollment with the same payload must preserve suppression.');
         $this->assertSame([], self::publish($store, $payload));
+    }
+
+    #[TestWith(['A'])]
+    #[TestWith(['B'])]
+    public function testReregistrationWithDifferentPayloadDoesNotSuppressEitherClientsCorrection(string $nextValue): void
+    {
+        $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), new LockFactory(new InMemoryStore()));
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'A'], false, static fn () => 'id');
+        $pending = $store->prepareUpdate($store->getSubscriptions('bucket', false)['watch'][0], ['name' => 'B']);
+        $this->assertNotNull($pending);
+        // B failed delivery. Existing clients still have A; the new client reads B.
+        $this->assertSame('id', $store->register('bucket', 'watch', ['name' => true], ['name' => 'B'], false, static fn () => 'different'));
+        $this->assertSame(['watch' => [['id', ['name' => true]]]], $store->all('bucket'));
+
+        $payload = ['name' => $nextValue];
+        $this->assertSame([['id', $payload]], self::publish($store, $payload));
+        $this->assertSame([], self::publish($store, $payload));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testOldAcknowledgementsCannotRestoreSuppressionAfterReregistration(bool $missingFingerprint): void
+    {
+        $fingerprints = new ArrayAdapter();
+        $store = new SubscriptionStore(new ArrayAdapter(), $fingerprints, new LockFactory(new InMemoryStore()));
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'old'], false, static fn () => 'id');
+        if ($missingFingerprint) {
+            $fingerprints->clear();
+        }
+        $subscription = $store->getSubscriptions('bucket', false)['watch'][0];
+        $first = $store->prepareUpdate($subscription, ['name' => 'A']);
+        $second = $store->prepareUpdate($subscription, ['name' => 'A']);
+        $this->assertNotNull($first);
+        $this->assertNotNull($second);
+        // Both deliveries precede enrollment, but their acknowledgements are delayed.
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'B'], false, static fn () => 'different');
+        $store->acknowledge($first);
+        $store->acknowledge($second);
+
+        $this->assertSame([['id', ['name' => 'A']]], self::publish($store, ['name' => 'A']));
+        $this->assertSame([], self::publish($store, ['name' => 'A']));
+    }
+
+    public function testAnotherReregistrationInvalidatesAnAlreadyPreparedCorrection(): void
+    {
+        $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), new LockFactory(new InMemoryStore()));
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'A'], false, static fn () => 'id');
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'B'], false, static fn () => 'different');
+        $pending = $store->prepareUpdate($store->getSubscriptions('bucket', false)['watch'][0], ['name' => 'A']);
+        $this->assertNotNull($pending);
+        // A further client enrolls after this delivery but before its acknowledgement.
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'B'], false, static fn () => 'different');
+        $store->acknowledge($pending);
+
+        $this->assertSame([['id', ['name' => 'A']]], self::publish($store, ['name' => 'A']));
+        $this->assertSame([], self::publish($store, ['name' => 'A']));
+    }
+
+    public function testReregistrationFailsWhenFingerprintInvalidationCannotBeSaved(): void
+    {
+        $fingerprints = new class extends ArrayAdapter {
+            public function save(\Psr\Cache\CacheItemInterface $item): bool
+            {
+                return null !== $item->get()['hash'] && parent::save($item);
+            }
+        };
+        $store = new SubscriptionStore(new ArrayAdapter(), $fingerprints, new LockFactory(new InMemoryStore()));
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'A'], false, static fn () => 'id');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot save GraphQL subscription state.');
+        $store->register('bucket', 'watch', ['name' => true], ['name' => 'B'], false, static fn () => 'different');
     }
 
     public function testConflictingPublicationInvalidatesFingerprintEvenAfterValueReturns(): void
@@ -90,6 +162,7 @@ final class SubscriptionStoreTest extends TestCase
         $fingerprints->expects($this->never())->method('save');
         $store = new SubscriptionStore(new ArrayAdapter(), $fingerprints, new LockFactory(new InMemoryStore()));
         $store->register('bucket', 'watch', ['name' => true], ['name' => 'A'], true, static fn () => 'id');
+        $this->assertSame('id', $store->register('bucket', 'watch', ['name' => true], ['name' => 'B'], true, static fn () => 'different'));
         for ($i = 0; $i < 2; ++$i) {
             $this->assertSame([['id', ['name' => 'A']]], self::publish($store, ['name' => 'A'], true));
         }

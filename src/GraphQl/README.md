@@ -50,8 +50,17 @@ update their fingerprint under a separate per-subscription lock. Normalization,
 hashing, and Mercure/Messenger calls occur outside those locks. Versioned
 comparison detects fingerprints changed in the meantime. Conflicting completions
 invalidate the fingerprint so the next event is not incorrectly suppressed.
-Fingerprint write failures are logged and the stale fingerprint is discarded on
-a best-effort basis so delivery continues to other subscribers. Delete cleanup
+Re-registration reuses the subscription ID. If its initial payload differs from
+the stored fingerprint, subscribers sharing that topic may now hold different
+values. The store writes a null hash with a new version, allowing the next event
+through regardless of which value it contains. Older acknowledgements preserve
+this invalidation; a publication prepared against the new version can restore
+normal suppression. An identical initial payload leaves a matching fingerprint
+unchanged. Collections still have no fingerprints.
+
+Fingerprint writes during registration must succeed for enrollment to succeed.
+After publication, fingerprint write failures are logged and the stale fingerprint
+is discarded on a best-effort basis so delivery continues to other subscribers. Delete cleanup
 failures are also logged without dropping the delete recipients. Cache failures
 can leave stale entries if invalidation also fails; restore cache health and clear
 subscription state when necessary.
