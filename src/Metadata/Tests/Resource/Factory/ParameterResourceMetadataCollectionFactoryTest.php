@@ -884,6 +884,44 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertTrue($getParameters->has('X-API-Key', HeaderParameter::class));
     }
 
+    public function testQueryParameterOnPropertiesWithOperationsDoesNotLeakThroughResourceParameters(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'title']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resource = $parameterFactory->create(QueryParameterOnPropertiesWithOperationsAndResourceParameters::class)[0];
+        $operations = array_values(iterator_to_array($resource->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        [$getOperation, $collectionOperation] = $operations;
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('q'));
+        $this->assertFalse($getOperation->getParameters()->has('title'));
+
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('q'));
+        $this->assertTrue($collectionOperation->getParameters()->has('title'));
+
+        $this->assertNotSame($getOperation->getParameters(), $collectionOperation->getParameters());
+        $this->assertFalse($resource->getParameters()->has('title'));
+    }
+
     public function testNestedPropertyWithNameConverter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -1399,4 +1437,19 @@ class HeaderParameterOnPropertiesWithOperations
 
     #[HeaderParameter(key: 'X-API-Key', description: 'API key header', operations: [new GetCollection(), new Get()])]
     public string $apiKey = '';
+}
+
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ],
+    parameters: ['q' => new QueryParameter()],
+)]
+class QueryParameterOnPropertiesWithOperationsAndResourceParameters
+{
+    public string $id = '';
+
+    #[QueryParameter(operations: [new GetCollection()])]
+    public string $title = '';
 }
