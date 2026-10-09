@@ -28,7 +28,7 @@ final class McpResource extends HttpOperation
     /**
      * @param string                                         $uri               The specific URI identifying this resource instance. Must be unique within the server.
      * @param ?string                                        $name              A human-readable name for this resource. If null, a default might be generated from the method name.
-     * @param ?string                                        $description       An optional description of the resource. Defaults to class DocBlock summary.
+     * @param string|\Stringable|null                        $description       An optional description of the resource. Defaults to class DocBlock summary.
      * @param bool|null                                      $structuredContent Whether to include structured content in the response (defaults to true)
      * @param ?string                                        $mimeType          the MIME type, if known and constant for this resource
      * @param ?int                                           $size              the size in bytes, if known and constant
@@ -94,7 +94,7 @@ final class McpResource extends HttpOperation
     public function __construct(
         protected string $uri,
         ?string $name = null,
-        ?string $description = null,
+        string|\Stringable|null $description = null,
         protected ?bool $structuredContent = null,
         protected ?string $mimeType = null,
         protected ?int $size = null,
