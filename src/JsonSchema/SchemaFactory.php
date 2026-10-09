@@ -311,7 +311,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     continue;
                 }
 
-                $childSerializerContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true];
+                $childSerializerContext = [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? ($serializerContext['gen_id'] ?? true)] + $serializerContext;
                 if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
                     $attributes = $serializerContext[AbstractNormalizer::ATTRIBUTES];
                     if (\is_array($attributes) && \array_key_exists($normalizedPropertyName, $attributes) && \is_array($attributes[$normalizedPropertyName])) {
