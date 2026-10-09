@@ -370,19 +370,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     protected function isHalCircularReference(object $object, array &$context): bool
     {
-        $objectHash = spl_object_hash($object);
+        $objectId = spl_object_id($object);
 
         $circularReferenceLimit = $context[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT];
-        if (isset($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash])) {
-            if ($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash] >= $circularReferenceLimit) {
-                unset($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash]);
+        if (isset($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectId])) {
+            if ($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectId] >= $circularReferenceLimit) {
+                unset($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectId]);
 
                 return true;
             }
 
-            ++$context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash];
+            ++$context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectId];
         } else {
-            $context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash] = 1;
+            $context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectId] = 1;
         }
 
         return false;
