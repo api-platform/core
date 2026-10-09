@@ -74,7 +74,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         } else {
             $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
             $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
-            $serializerContext ??= $this->getSerializerContext($operation, $type);
+            if ($operationWasProvided || !($serializerContext[self::FORCE_SUBSCHEMA] ?? false)) {
+                $serializerContext = ($serializerContext ?? []) + $this->getSerializerContext($operation, $type);
+            }
         }
 
         if (null === $inputOrOutputClass) {
@@ -151,7 +153,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
-        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
+        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
 
@@ -384,7 +386,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     /**
      * Gets the options for the property name collection / property metadata factories.
      */
-    private function getFactoryOptions(array $serializerContext, array $validationGroups, ?HttpOperation $operation = null): array
+    private function getFactoryOptions(array $serializerContext, array $validationGroups): array
     {
         $options = [
             /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
@@ -396,31 +398,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $options['serializer_groups'] = (array) $serializerContext[AbstractNormalizer::GROUPS];
         }
 
-        if ($operation && ($normalizationGroups = $operation->getNormalizationContext()['groups'] ?? null)) {
-            $options['normalization_groups'] = $normalizationGroups;
-        }
-
-        if ($operation && ($denormalizationGroups = $operation->getDenormalizationContext()['groups'] ?? null)) {
-            $options['denormalization_groups'] = $denormalizationGroups;
-        }
-
         if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
             $options['serializer_attributes'] = (array) $serializerContext[AbstractNormalizer::ATTRIBUTES];
-        }
-
-        if ($operation && ($normalizationAttributes = $operation->getNormalizationContext()['attributes'] ?? null)) {
-            $options['normalization_attributes'] = $normalizationAttributes;
-        }
-
-        if ($operation && ($denormalizationAttributes = $operation->getDenormalizationContext()['attributes'] ?? null)) {
-            $options['denormalization_attributes'] = $denormalizationAttributes;
         }
 
         if ($validationGroups) {
             $options['validation_groups'] = $validationGroups;
         }
 
-        if ($operation && ($ignoredAttributes = $operation->getNormalizationContext()['ignored_attributes'] ?? null)) {
+        if ($ignoredAttributes = $serializerContext['ignored_attributes'] ?? null) {
             $options['ignored_attributes'] = $ignoredAttributes;
         }
 
