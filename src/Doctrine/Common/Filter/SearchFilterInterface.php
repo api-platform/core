@@ -70,4 +70,14 @@ interface SearchFilterInterface
      * @var string Finds fields that are starting with the word case-insensitive
      */
     public const STRATEGY_IWORD_START = 'iword_start';
+
+    /**
+     * @var string Finds fields that match the user-specified pattern
+     */
+    public const STRATEGY_PATTERN = 'pattern';
+
+    /**
+     * @var string Finds fields that match the user-specified pattern case-insensitive
+     */
+    public const STRATEGY_IPATTERN = 'ipattern';
 }
