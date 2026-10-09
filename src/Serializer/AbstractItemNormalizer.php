@@ -256,7 +256,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             try {
                 return $this->serializer->denormalize($data, $inputClass, $format, $context);
-            } catch (NotNormalizableValueException $e) {
+            } catch (NotNormalizableValueException|MissingConstructorArgumentsException $e) {
                 throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
             }
         }
