@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.4.4
+
+### Bug fixes
+
+* [1335871be](https://github.com/api-platform/core/commit/1335871beff7aa5d5505879732890f44b1ba2e8e) fix(hydra): handle string and null serialization groups in DocumentationNormalizer (#7890)
+* [b6555c846](https://github.com/api-platform/core/commit/b6555c846a472a82099e3d7fcf6f7ec6b71aaba8) fix(laravel): ignore invalid range filter values (#8632)
+* [56c0be24b](https://github.com/api-platform/core/commit/56c0be24b74366e88bdf16721b479b4cfb43877f) revert(openapi): array query params bracket notation (#8637)
+* [454262ba8](https://github.com/api-platform/core/commit/454262ba8a3614d2cced01e092dcc7e14d4bb778) fix(symfony): avoid deprecated translation command probe (#8627)
+
 ## v4.4.3
 
 ### Bug fixes
