@@ -50,41 +50,34 @@ Lock acquisition uses Symfony's blocking `acquire(true)` with a **5-second
 lease** on expiring backends. Symfony handles waiting and retries. There is no
 separate acquisition deadline: repeated contention can keep a waiter blocked
 longer than five seconds. Registration and bucket-removal acquisition failures
-propagate; acknowledgement and per-fingerprint delete-cleanup failures are logged
-so other publications can continue. Failed acquisition never deletes fingerprint
-state.
+propagate. The store does not add lease-expiry checks or exceptions; operations
+that outlast the lease may overlap another writer. Configure backend
+connection/read timeouts well below the lease duration.
+For Redis, also configure the lock store's initial TTL to 5 seconds: Symfony
+applies the requested lease after its initial acquisition. Non-expiring stores
+retain their backend-specific release behavior.
 
-Cache writes and deletes check for a known expired lease. Cleanup stops when its
-bucket lease expires, preserving the already-read delete recipients. These checks
-do not make a cache request atomic with the lock backend or cancel blocked I/O.
-Configure backend connection/read timeouts well below the lease duration. For
-Redis, also configure the lock store's initial TTL to 5 seconds: Symfony applies the
-requested lease after its initial acquisition, and a process can die between
-those steps. Non-expiring stores retain their backend-specific release behavior.
-
-Registration and deletion lock their registry bucket. Successful item publications
-update their fingerprint under a separate per-subscription lock. Normalization,
-hashing, and Mercure/Messenger calls occur outside those locks. Versioned
-comparison detects fingerprints changed in the meantime. Conflicting completions
-invalidate the fingerprint so the next event is not incorrectly suppressed.
+Registration and deletion lock their registry bucket to serialize concurrent mutations
+while the lease is held.
+Item fingerprints are plain SHA-256 hashes, read in bulk and replaced after
+successful publication without additional locks: the last successful fingerprint
+write wins. Normalization, hashing, and Mercure/Messenger calls occur outside locks.
 Re-registration reuses the subscription ID. If its initial payload differs from
-the stored fingerprint, subscribers sharing that topic may now hold different
-values. The store writes a null hash with a new version, allowing the next event
-through regardless of which value it contains. Older acknowledgements preserve
-this invalidation; a publication prepared against the new version can restore
-normal suppression. An identical initial payload leaves a matching fingerprint
-unchanged. Collections still have no fingerprints.
+the stored fingerprint, the store writes null so the next event is eligible for
+existing and newly enrolled clients. An identical initial payload preserves the
+fingerprint. Collections have no fingerprints.
 
 Fingerprint writes during registration must succeed for enrollment to succeed.
-After publication, fingerprint write failures are logged and, while the fingerprint
-lock remains valid, the stale fingerprint is discarded on a best-effort basis so
-delivery continues to other subscribers. Delete cleanup failures are also logged
-without dropping the delete recipients. Cache failures
-can leave stale entries if invalidation also fails; restore cache health and clear
-subscription state when necessary.
+After publication, fingerprint write failures are logged and the stale fingerprint
+is discarded on a best-effort basis so delivery continues to other subscribers.
+Delete cleanup errors are logged without dropping recipients. A late acknowledgement
+can replace re-registration invalidation or recreate an unused fingerprint after
+deletion, but cannot recreate a registration. Neither pool is assigned an expiry;
+entries remain until explicit deletion, clearing, or backend-configured removal.
 
 Concurrent identical publications can still occur; this is change suppression,
-not an exactly-once delivery or ordering guarantee.
+not an exactly-once delivery or ordering guarantee. Durable delivery is outside
+this feature's scope because it requires a generic delivery design for API Platform.
 
 The Doctrine publisher passes the applicable operations and their objects/delete
 snapshots for one changed resource to `SubscriptionManagerInterface::getUpdates()`.

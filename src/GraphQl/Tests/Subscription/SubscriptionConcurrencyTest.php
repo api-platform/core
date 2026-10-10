@@ -54,7 +54,7 @@ final class SubscriptionConcurrencyTest extends TestCase
         return $payloads;
     }
 
-    public function testConcurrentPublicationsLeaveAmbiguousFingerprintUncached(): void
+    public function testConcurrentPublicationsKeepTheLastAcknowledgedFingerprint(): void
     {
         $cache = new InterleavedSubscriptionCache();
         $first = $this->createManager($cache);
@@ -70,6 +70,7 @@ final class SubscriptionConcurrencyTest extends TestCase
         // Preparing an update holds no lock while another publisher completes.
         $this->assertSame([[$id, ['dummy' => ['name' => 'later']]]], self::publish($second, $later, $operation));
         $first->acknowledge($pending[0][1]);
+        $this->assertSame([], self::publish($first, $earlier, $operation));
 
         $this->assertSame([[$id, ['dummy' => ['name' => 'later']]]], self::publish($first, $later, $operation));
         $this->assertSame([], self::publish($first, $later, $operation));
@@ -191,7 +192,9 @@ final class SubscriptionConcurrencyTest extends TestCase
         $this->assertCacheHasNoItems($cache);
         $publication->resume();
 
-        $this->assertCacheHasNoItems($cache);
+        $this->assertSame([], array_filter($cache->getValues()));
+        $this->assertCount(1, array_filter($this->fingerprints->getValues()), 'A late acknowledgement may leave a fingerprint without a registration.');
+        $this->assertSame([], self::publish($publisher, new Dummy(), $operation));
     }
 
     private function assertCacheHasNoItems(ArrayAdapter $cache): void

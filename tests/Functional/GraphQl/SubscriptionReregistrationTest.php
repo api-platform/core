@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PrivateSubscriptionResource;
@@ -71,6 +72,43 @@ final class SubscriptionReregistrationTest extends ApiTestCase
         $this->assertSame([
             'privateSubscriptionResource' => ['id' => '/private_subscription_resources/1', 'name' => $nextValue, '_id' => 1],
         ], $correction[0][1]);
+        $this->assertSame([], $this->publishSubscriptions($resource));
+    }
+
+    public function testLastAcknowledgementWinsAfterRealEnrollment(): void
+    {
+        $client = self::createClient();
+        $client->disableReboot();
+        $this->cache = new TraceableAdapter(new FilesystemAdapter('subscription_last_ack_'.bin2hex(random_bytes(8))));
+        self::getContainer()->set('api_platform.graphql.cache.subscription', $this->cache);
+        $this->subscribe($client);
+
+        $resource = PrivateSubscriptionResource::provide(new Get(), ['id' => 1]);
+        $resource->name = 'Earlier';
+        $publications = [];
+        $metadata = self::getContainer()->get('api_platform.metadata.resource.metadata_collection_factory');
+        foreach ($metadata->create($resource::class) as $apiResource) {
+            foreach ($apiResource->getGraphQlOperations() ?? [] as $operation) {
+                if ($operation instanceof Subscription) {
+                    $publications[] = ['object' => $resource, 'operation' => $operation];
+                }
+            }
+        }
+        $manager = self::getContainer()->get('api_platform.graphql.subscription.subscription_manager');
+        $pending = iterator_to_array($manager->getUpdates($publications));
+        $this->assertCount(1, $pending);
+        $this->assertSame('Earlier', $pending[0][1]->data['privateSubscriptionResource']['name']);
+
+        $resource->name = 'Later';
+        $delivered = $this->publishSubscriptions($resource);
+        $this->assertCount(1, $delivered);
+        $this->assertSame('Later', $delivered[0][1]['privateSubscriptionResource']['name']);
+        $manager->acknowledge($pending[0][1]);
+
+        $resource->name = 'Earlier';
+        $this->assertSame([], $this->publishSubscriptions($resource));
+        $resource->name = 'Later';
+        $this->assertSame($delivered, $this->publishSubscriptions($resource));
         $this->assertSame([], $this->publishSubscriptions($resource));
     }
 

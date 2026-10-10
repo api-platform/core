@@ -78,7 +78,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
     {
         $updates = [];
         foreach ($payloads as [$id, $data]) {
-            $updates[] = [$operation, new SubscriptionUpdate(new RegisteredSubscription('key', $id, [], false, null), $data, null)];
+            $updates[] = [$operation, new SubscriptionUpdate(new RegisteredSubscription($id, [], false, null), $data, null)];
         }
 
         return $updates;
@@ -1026,7 +1026,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             foreach ($publications as ['object' => $data, 'operation' => $operation]) {
                 self::assertSame($object, $data);
                 self::assertContains($operation->getName(), ['sync', 'async']);
-                yield [$operation, new SubscriptionUpdate(new RegisteredSubscription('key', $operation->getName(), [], true, null), ['name' => $operation->getName()], null)];
+                yield [$operation, new SubscriptionUpdate(new RegisteredSubscription($operation->getName(), [], true, null), ['name' => $operation->getName()], null)];
             }
         });
         $topics = $this->createStub(GraphQlMercureSubscriptionIriGeneratorInterface::class);

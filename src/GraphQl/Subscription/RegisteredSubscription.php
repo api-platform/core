@@ -20,8 +20,7 @@ namespace ApiPlatform\GraphQl\Subscription;
  */
 final readonly class RegisteredSubscription
 {
-    /** @param array{hash: string|null, version: string}|null $fingerprint */
-    public function __construct(public string $key, public string $id, public array $fields, public bool $collection, public ?array $fingerprint)
+    public function __construct(public string $id, public array $fields, public bool $collection, public ?string $fingerprint)
     {
     }
 }

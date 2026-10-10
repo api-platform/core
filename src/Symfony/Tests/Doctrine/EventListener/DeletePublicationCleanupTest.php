@@ -186,7 +186,7 @@ final class DeletePublicationCleanupTest extends TestCase
         $subscriptions->expects($this->once())->method('getUpdates')->willReturnCallback(static function (array $publications, string $event) use ($type): iterable {
             self::assertSame($type, $event);
             foreach (['first', 'second'] as $id) {
-                yield [$publications[0]['operation'], new SubscriptionUpdate(new RegisteredSubscription('bucket', $id, [], false, null), ['id' => $id], 'delete' === $type ? null : 'fingerprint')];
+                yield [$publications[0]['operation'], new SubscriptionUpdate(new RegisteredSubscription($id, [], false, null), ['id' => $id], 'delete' === $type ? null : 'fingerprint')];
             }
         });
         $events = [];

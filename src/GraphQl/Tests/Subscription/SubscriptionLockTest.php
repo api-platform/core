@@ -18,13 +18,10 @@ use ApiPlatform\GraphQl\Subscription\SubscriptionStore;
 use ApiPlatform\GraphQl\Subscription\SubscriptionUpdate;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Lock\BlockingStoreInterface;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
@@ -60,10 +57,10 @@ final class SubscriptionLockTest extends TestCase
         $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), $factory);
 
         $this->assertSame('id', $store->register('bucket', 'watch', [], null, true, static fn () => 'id'));
-        $this->assertSame(['watch' => [['id', []]]], $store->all('bucket'));
+        $this->assertSame(['watch' => [['id', []]]], $store->fetch('bucket'));
     }
 
-    public function testExpiredRegistryReadCannotOverwriteAnotherRegistration(): void
+    public function testLeaseExpiryDoesNotFailRegistration(): void
     {
         $expired = false;
         $lock = $this->createMock(SharedLockInterface::class);
@@ -79,11 +76,10 @@ final class SubscriptionLockTest extends TestCase
 
             return new CacheItem();
         });
-        $registry->expects($this->never())->method('save');
+        $registry->expects($this->once())->method('save')->willReturn(true);
         $store = new SubscriptionStore($registry, new ArrayAdapter(), $factory);
 
-        $this->expectException(LockExpiredException::class);
-        $store->register('bucket', 'watch', [], null, true, static fn () => 'id');
+        $this->assertSame('id', $store->register('bucket', 'watch', [], null, true, static fn () => 'id'));
     }
 
     public function testBlockingRegistrationResumesWhenDeadOwnersLeaseExpires(): void
@@ -96,92 +92,52 @@ final class SubscriptionLockTest extends TestCase
         $registration = new \Fiber(static fn () => $store->register('bucket', 'watch', [], null, true, static fn () => 'id'));
         $registration->start();
         $this->assertTrue($registration->isSuspended());
-        $this->assertSame([], $store->all('bucket'));
+        $this->assertSame([], $store->fetch('bucket'));
 
         $locks->advance(5);
         $registration->resume();
         $this->assertSame('id', $registration->getReturn());
-        $this->assertSame(['watch' => [['id', []]]], $store->all('bucket'));
+        $this->assertSame(['watch' => [['id', []]]], $store->fetch('bucket'));
     }
 
-    public function testResumingAfterLeaseExpiryDoesNotOverwriteTheNewOwner(): void
+    public function testLeaseExpiryDoesNotPreventDeletion(): void
     {
-        $locks = new ExpiringSubscriptionLockStore();
-        $factory = new LockFactory($locks);
-        $registry = new class extends ArrayAdapter {
-            public bool $pause = true;
-
-            public function getItem(mixed $key): CacheItem
-            {
-                $item = parent::getItem($key);
-                if ($this->pause) {
-                    $this->pause = false;
-                    \Fiber::suspend();
-                }
-
-                return $item;
-            }
-        };
-        $store = new SubscriptionStore($registry, new ArrayAdapter(), $factory);
-        $first = new \Fiber(static fn () => $store->register('bucket', 'first', [], null, true, static fn () => 'old'));
-        $first->start();
-        $this->assertTrue($first->isSuspended());
-        $locks->advance(5);
-        $this->assertSame('new', $store->register('bucket', 'second', [], null, true, static fn () => 'new'));
-        try {
-            $first->resume();
-            $this->fail('An expired owner must not persist its old cache snapshot.');
-        } catch (LockExpiredException) {
-            $this->assertSame(['second' => [['new', []]]], $store->all('bucket'));
-        }
-    }
-
-    public function testDeletePreservesRecipientsWithoutCleaningNewStateAfterBucketExpiry(): void
-    {
-        $registry = new ArrayAdapter();
-        $entries = ['watch' => [['first', []], ['second', []]]];
-        $registry->save($registry->getItem('bucket')->set($entries));
-        $fingerprints = $this->createMock(CacheItemPoolInterface::class);
-        $fingerprints->expects($this->never())->method('deleteItem');
+        $entries = ['watch' => [['id', []]]];
+        $cache = new ArrayAdapter();
+        $cache->save($cache->getItem('bucket')->set($entries));
         $expired = false;
-        $bucketLock = $this->createMock(SharedLockInterface::class);
-        $bucketLock->expects($this->once())->method('acquire')->willReturn(true);
-        $bucketLock->method('isExpired')->willReturnCallback(static function () use (&$expired): bool { return $expired; });
-        $bucketLock->expects($this->once())->method('release');
-        $fingerprintLock = $this->createMock(SharedLockInterface::class);
-        $fingerprintLock->expects($this->once())->method('acquire')->willReturnCallback(static function () use (&$expired): bool {
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->expects($this->once())->method('acquire')->with(true)->willReturn(true);
+        $lock->method('isExpired')->willReturnCallback(static function () use (&$expired): bool { return $expired; });
+        $lock->expects($this->once())->method('release');
+        $factory = $this->createMock(LockFactory::class);
+        $factory->expects($this->once())->method('createLock')->willReturn($lock);
+        $registry = $this->createMock(CacheItemPoolInterface::class);
+        $registry->expects($this->once())->method('getItem')->willReturnCallback(static function () use (&$expired, $cache): CacheItem {
             $expired = true;
 
-            return true;
+            return $cache->getItem('bucket');
         });
-        $fingerprintLock->expects($this->once())->method('release');
-        $factory = $this->createMock(LockFactory::class);
-        $factory->expects($this->exactly(2))->method('createLock')->willReturn($bucketLock, $fingerprintLock);
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with('Could not lock deleted GraphQL subscription state for cleanup.', $this->isArray());
-        $store = new SubscriptionStore($registry, $fingerprints, $factory);
-        $store->setLogger($logger);
+        $registry->expects($this->once())->method('deleteItem')->with('bucket')->willReturnCallback($cache->deleteItem(...));
+        $store = new SubscriptionStore($registry, new ArrayAdapter(), $factory);
 
         $this->assertSame($entries, $store->remove('bucket'));
-        $this->assertFalse($registry->hasItem('bucket'));
+        $this->assertFalse($cache->hasItem('bucket'));
     }
 
-    public function testAcknowledgementAcquisitionFailureLeavesAnotherWorkersFingerprintUntouched(): void
+    public function testAcknowledgementDoesNotReadTheRegistryOrAcquireLocks(): void
     {
-        $lock = $this->createMock(SharedLockInterface::class);
-        $lock->expects($this->once())->method('acquire')->with(true)->willThrowException(new LockAcquiringException('Backend unavailable.'));
-        $lock->expects($this->never())->method('release');
-        $factory = $this->createStub(LockFactory::class);
-        $factory->method('createLock')->willReturn($lock);
-        $fingerprints = $this->createMock(CacheItemPoolInterface::class);
-        $fingerprints->expects($this->never())->method('getItem');
-        $fingerprints->expects($this->never())->method('deleteItem');
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with('Could not record a GraphQL subscription publication.', $this->isArray());
-        $store = new SubscriptionStore(new ArrayAdapter(), $fingerprints, $factory);
-        $store->setLogger($logger);
+        $registry = $this->createMock(CacheItemPoolInterface::class);
+        $registry->expects($this->never())->method('getItem');
+        $registry->expects($this->never())->method('save');
+        $factory = $this->createMock(LockFactory::class);
+        $factory->expects($this->never())->method('createLock');
+        $fingerprints = new ArrayAdapter();
+        $store = new SubscriptionStore($registry, $fingerprints, $factory);
 
-        $store->acknowledge(new SubscriptionUpdate(new RegisteredSubscription('bucket', 'id', [], false, null), [], 'hash'));
+        $store->acknowledge(new SubscriptionUpdate(new RegisteredSubscription('id', [], false, null), [], 'hash'));
+
+        $this->assertSame('hash', $fingerprints->getItem('graphql_subscription_fingerprint_id')->get());
     }
 }
 
