@@ -35,6 +35,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
 {
     use IdentifierTrait;
     use SortTrait;
+    use SubscriptionFieldSelectionTrait;
 
     public function __construct(private readonly SubscriptionStore $store, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ProcessorInterface $normalizeProcessor, private readonly IriConverterInterface $iriConverter, private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null, private readonly ?ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -49,7 +50,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
 
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        $fields = $info->getFieldSelection(\PHP_INT_MAX);
+        $fields = $this->normalizeFieldSelection($info->getFieldSelection(\PHP_INT_MAX));
         $this->arrayRecursiveSort($fields, 'ksort');
 
         $privateFieldData = $this->getPrivateFieldData($operation, $context['graphql_context']['previous_object'] ?? null);

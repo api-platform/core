@@ -21,6 +21,12 @@ subscription ID, so sharing a bucket does not merge registrations across operati
 Private field names and values determine the partition; their configured order does
 not create separate buckets.
 
+Registration stores the same normalized selection used for subscription identity
+and event normalization: `__typename` is removed recursively, and only the
+response-envelope `mercureUrl` and `clientSubscriptionId` fields are removed.
+Resource fields with those names remain significant. Equivalent selections reuse
+one registration/topic; different payload selections remain distinct.
+
 Individual-item payloads are represented by SHA-256 fingerprints in separate cache
 entries; collection subscriptions do not retain payloads or fingerprints.
 
@@ -113,5 +119,9 @@ and `acknowledge()` records successful publication or completion of a delete att
 The cache layout is internal and has no migration path. When upgrading, stop old
 registration and publication workers, clear subscription state, and re-establish
 subscriptions: subscription IDs and Mercure topics change with this layout.
-Old and new workers must not share this registry. Fingerprint cache
+Old and new workers must not share this registry. This also applies when upgrading
+from raw stored selections to normalized selections: clear the registry and
+fingerprint pools and have clients enroll again. That selection fix preserves
+default generated IDs, but does not repair existing duplicate registrations;
+re-enrollment alone is insufficient. Fingerprint cache
 eviction can cause an additional publication without losing registrations.

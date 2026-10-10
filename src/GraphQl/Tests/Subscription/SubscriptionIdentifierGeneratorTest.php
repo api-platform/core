@@ -57,10 +57,13 @@ class SubscriptionIdentifierGeneratorTest extends TestCase
         ]);
 
         $subscriptionId2 = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+            '__typename' => true,
             'dummyMercure' => [
+                '__typename' => true,
                 'id' => true,
                 'name' => true,
                 'relatedDummy' => [
+                    '__typename' => true,
                     'name' => true,
                 ],
             ],
@@ -91,5 +94,16 @@ class SubscriptionIdentifierGeneratorTest extends TestCase
                 ],
             ],
         ]));
+    }
+
+    public function testEnvelopeFieldNamesInsidePayloadRemainSignificant(): void
+    {
+        $fields = ['dummyMercure' => ['name' => true]];
+        $id = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields);
+        foreach (['mercureUrl', 'clientSubscriptionId'] as $field) {
+            $selection = $fields;
+            $selection['dummyMercure'][$field] = true;
+            $this->assertNotSame($id, $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($selection));
+        }
     }
 }

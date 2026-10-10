@@ -20,24 +20,10 @@ namespace ApiPlatform\GraphQl\Subscription;
  */
 final class SubscriptionIdentifierGenerator implements SubscriptionIdentifierGeneratorInterface
 {
+    use SubscriptionFieldSelectionTrait;
+
     public function generateSubscriptionIdentifier(array $fields): string
     {
-        unset($fields['mercureUrl'], $fields['clientSubscriptionId']);
-        $fields = $this->removeTypename($fields);
-
-        return hash('sha256', print_r($fields, true));
-    }
-
-    private function removeTypename(array $data): array
-    {
-        foreach ($data as $key => $value) {
-            if ('__typename' === $key) {
-                unset($data[$key]);
-            } elseif (\is_array($value)) {
-                $data[$key] = $this->removeTypename($value);
-            }
-        }
-
-        return $data;
+        return hash('sha256', print_r($this->normalizeFieldSelection($fields), true));
     }
 }
