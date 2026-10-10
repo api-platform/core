@@ -270,7 +270,7 @@ return function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.graphql.cache.subscription'),
             service('api_platform.graphql.cache.subscription_fingerprint'),
-            service('api_platform.graphql.subscription.lock_factory')->nullOnInvalid(),
+            service('api_platform.graphql.subscription.lock_factory'),
         ])
         ->call('setLogger', [service('logger')->ignoreOnInvalid()]);
 

@@ -36,6 +36,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
@@ -181,7 +182,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     #[TestWith([false])]
     #[TestWith([true])]
-    public function testSubscriptionStorageWithAndWithoutConfiguredLocking(bool $locking): void
+    public function testSubscriptionStorageRequiresConfiguredLocking(bool $locking): void
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['graphql']['enabled'] = true;
@@ -197,16 +198,15 @@ class ApiPlatformExtensionTest extends TestCase
         if ($locking) {
             $storage->register('test.lock_store', InMemoryStore::class);
             $storage->register('lock.factory', LockFactory::class)->setArguments([new Reference('test.lock_store')]);
+        } else {
+            $this->expectException(ServiceNotFoundException::class);
+            $this->expectExceptionMessage('lock.factory');
         }
         $storage->compile();
         $store = $storage->get('api_platform.graphql.subscription.store');
         $this->assertInstanceOf(SubscriptionStore::class, $store);
         $this->assertNotSame($storage->get('api_platform.graphql.cache.subscription'), $storage->get('api_platform.graphql.cache.subscription_fingerprint'));
-        if (!$locking) {
-            $this->expectException(\LogicException::class);
-            $this->expectExceptionMessage('GraphQL subscriptions require a configured Symfony Lock factory.');
-        }
-        $this->assertSame('id', $store->register('bucket', ['name' => true], [], false, static fn () => 'id'));
+        $this->assertSame('id', $store->register('bucket', 'watch', ['name' => true], [], false, static fn () => 'id'));
     }
 
     public function testCommonConfiguration(): void

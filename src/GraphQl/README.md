@@ -34,9 +34,10 @@ Symfony wires two cache pools:
 injection. The `api_platform.graphql.subscription.lock_factory` alias points to
 Symfony's `lock.factory`, configured through `framework.lock`. It can instead
 reference a named lock factory when subscriptions need their own lock backend.
-API Platform does not construct or select a lock store. Query-only applications
-can leave locking disabled; registering subscriptions requires a configured
-factory and fails explicitly if it is missing. There is no unlocked fallback.
+API Platform does not construct or select a lock store. The factory is a required
+dependency: enable `framework.lock` or supply the subscription lock factory alias.
+A missing factory fails container compilation, including for query-only GraphQL
+applications using the default service wiring. There is no unlocked fallback.
 
 When sharing subscription caches between servers, configure a shared lock backend
 (such as Redis) accessible to every registration and publication worker. Both cache
@@ -44,6 +45,22 @@ pools must also use shared, coherent storage. Cache pools expose no portable way
 to derive their connection for the Lock component; configure the cache and lock
 backends together. Local locks are suitable only when all writers share the same
 local storage and lock scope.
+
+Lock acquisition uses Symfony's blocking `acquire(true)` with a **5-second
+lease** on expiring backends. Symfony handles waiting and retries. There is no
+separate acquisition deadline: repeated contention can keep a waiter blocked
+longer than five seconds. Registration and bucket-removal acquisition failures
+propagate; acknowledgement and per-fingerprint delete-cleanup failures are logged
+so other publications can continue. Failed acquisition never deletes fingerprint
+state.
+
+Cache writes and deletes check for a known expired lease. Cleanup stops when its
+bucket lease expires, preserving the already-read delete recipients. These checks
+do not make a cache request atomic with the lock backend or cancel blocked I/O.
+Configure backend connection/read timeouts well below the lease duration. For
+Redis, also configure the lock store's initial TTL to 5 seconds: Symfony applies the
+requested lease after its initial acquisition, and a process can die between
+those steps. Non-expiring stores retain their backend-specific release behavior.
 
 Registration and deletion lock their registry bucket. Successful item publications
 update their fingerprint under a separate per-subscription lock. Normalization,
@@ -59,9 +76,10 @@ normal suppression. An identical initial payload leaves a matching fingerprint
 unchanged. Collections still have no fingerprints.
 
 Fingerprint writes during registration must succeed for enrollment to succeed.
-After publication, fingerprint write failures are logged and the stale fingerprint
-is discarded on a best-effort basis so delivery continues to other subscribers. Delete cleanup
-failures are also logged without dropping the delete recipients. Cache failures
+After publication, fingerprint write failures are logged and, while the fingerprint
+lock remains valid, the stale fingerprint is discarded on a best-effort basis so
+delivery continues to other subscribers. Delete cleanup failures are also logged
+without dropping the delete recipients. Cache failures
 can leave stale entries if invalidation also fails; restore cache health and clear
 subscription state when necessary.
 

@@ -221,15 +221,6 @@ final class SubscriptionStoreTest extends TestCase
         }
     }
 
-    public function testMissingLockFactoryCannotRegisterWithoutLocking(): void
-    {
-        $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), null);
-        $this->assertSame([], $store->all('bucket'));
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('GraphQL subscriptions require a configured Symfony Lock factory.');
-        $store->register('bucket', 'watch', [], [], false, static fn () => 'id');
-    }
-
     public function testFingerprintWriteFailureDoesNotStopRemainingPublications(): void
     {
         $fingerprints = new class extends ArrayAdapter {
