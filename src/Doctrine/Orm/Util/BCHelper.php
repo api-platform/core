@@ -24,7 +24,7 @@ final class BCHelper
 
     /**
      * Maps a string sort direction to the \SortDirection enum expected by doctrine/orm >= 3.7,
-     * keeping the plain string for older versions.
+     * keeping the plain string for older versions and preserving existing enum values.
      *
      * doctrine/orm 3.7 deprecates passing strings (or null) as sort directions to
      * QueryBuilder::orderBy()/addOrderBy() in favor of the PHP 8.6 \SortDirection enum
@@ -33,8 +33,12 @@ final class BCHelper
      *
      * @see https://github.com/doctrine/orm/blob/3.7.x/UPGRADE.md
      */
-    public static function sortDirection(string $direction): string|object
+    public static function sortDirection(string|\SortDirection $direction): string|object
     {
+        if ($direction instanceof \SortDirection) {
+            return $direction;
+        }
+
         if (!interface_exists('Doctrine\ORM\Tools\Pagination\PaginatorInterface')) {
             // doctrine/orm < 3.7
             return $direction;
