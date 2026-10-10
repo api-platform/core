@@ -107,7 +107,8 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
             }
 
             $violations = new ConstraintViolationList();
-            foreach ($e->getErrors() as $exception) {
+            $errors = method_exists($e, 'getNotNormalizableValueErrors') ? $e->getNotNormalizableValueErrors() : $e->getErrors();
+            foreach ($errors as $exception) {
                 if (!$exception instanceof NotNormalizableValueException) {
                     continue;
                 }
