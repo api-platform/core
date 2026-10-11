@@ -138,7 +138,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             $link = $link->withIdentifiers($this->getIdentifiersFromResourceClass($link->getFromClass()));
         }
 
-        if (1 < \count((array)$link->getIdentifiers())) {
+        if (1 < \count((array) $link->getIdentifiers())) {
             $link = $link->withCompositeIdentifier(true);
         }
 
