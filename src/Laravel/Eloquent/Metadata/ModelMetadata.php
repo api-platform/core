@@ -103,6 +103,8 @@ final class ModelMetadata
             ];
         }
 
+        $this->annotateBelongsToNullability($model, $columns);
+
         $result = array_merge($attributes, $this->getVirtualAttributes($model, $columns));
 
         // Don't cache an empty result for a missing table: the table may be created later
@@ -114,6 +116,42 @@ final class ModelMetadata
         }
 
         return $this->attributes[$model::class] = $result;
+    }
+
+    /**
+     * Records whether a BelongsTo foreign key column is nullable, using the same
+     * schema column flag as plain attributes. The foreign key name comes from the
+     * relation, not from a guessed column.
+     *
+     * @param list<array<string, mixed>> $columns
+     */
+    private function annotateBelongsToNullability(Model $model, array $columns): void
+    {
+        if (!isset($this->relations[$model::class])) {
+            return;
+        }
+
+        $nullableByColumn = [];
+        foreach ($columns as $column) {
+            if (!isset($column['name'])) {
+                continue;
+            }
+
+            $nullableByColumn[$column['name']] = (bool) $column['nullable'];
+        }
+
+        foreach ($this->relations[$model::class] as $name => $relation) {
+            if (!isset($relation['type']) || !is_a($relation['type'], BelongsTo::class, true)) {
+                continue;
+            }
+
+            $foreignKey = $relation['foreign_key'] ?? null;
+            if (!\is_string($foreignKey) || !\array_key_exists($foreignKey, $nullableByColumn)) {
+                continue;
+            }
+
+            $this->relations[$model::class][$name]['nullable'] = $nullableByColumn[$foreignKey];
+        }
     }
 
     /**
