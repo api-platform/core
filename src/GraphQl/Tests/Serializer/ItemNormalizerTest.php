@@ -32,6 +32,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\State\Pagination\Pagination;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -266,12 +267,21 @@ class ItemNormalizerTest extends TestCase
 
     public static function subscriptionOperations(): iterable
     {
-        yield 'item subscription' => [new Subscription(name: 'renamed_event')];
-        yield 'collection subscription' => [new SubscriptionCollection(name: 'renamed_event')];
+        foreach ([new Subscription(name: 'renamed_event'), new SubscriptionCollection(name: 'renamed_event')] as $operation) {
+            foreach ([
+                'default limit' => [null, [], ['alpha', 'beta', 'gamma'], 30, false, 1],
+                'application limit' => [null, ['items_per_page' => 2], ['alpha', 'beta'], 2, true, 2],
+                'operation override' => [1, ['items_per_page' => 2], ['alpha'], 1, true, 3],
+                'exact limit' => [3, [], ['alpha', 'beta', 'gamma'], 3, false, 1],
+                'zero limit' => [0, [], [], 0, true, 1],
+            ] as $name => $case) {
+                yield $operation::class.' '.$name => [$operation, ...$case];
+            }
+        }
     }
 
     #[DataProvider('subscriptionOperations')]
-    public function testNormalizeMercureSubscriptionNestedCollectionRelations(Subscription $operation): void
+    public function testNormalizeMercureSubscriptionNestedCollectionRelations(Subscription $operation, ?int $operationLimit, array $paginationOptions, array $expectedNames, int $expectedLimit, bool $hasMore, int $lastPage): void
     {
         $firstChild = new MercureSubscriptionChildDummy();
         $firstChild->setName('alpha');
@@ -298,7 +308,7 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(MercureSubscriptionChildDummy::class)->willReturn(new ResourceMetadataCollection(MercureSubscriptionChildDummy::class, [
             (new ApiResource())->withGraphQlOperations([
-                'collection_query' => (new QueryCollection())->withName('collection_query')->withClass(MercureSubscriptionChildDummy::class),
+                'collection_query' => (new QueryCollection(paginationItemsPerPage: $operationLimit))->withName('collection_query')->withClass(MercureSubscriptionChildDummy::class),
             ]),
         ]));
 
@@ -311,9 +321,14 @@ class ItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('alpha', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('alpha');
-        $serializerProphecy->normalize('beta', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('beta');
-        $serializerProphecy->normalize('gamma', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('gamma');
+        foreach (['alpha', 'beta', 'gamma'] as $name) {
+            $prediction = $serializerProphecy->normalize($name, ItemNormalizer::FORMAT, Argument::type('array'));
+            if (\in_array($name, $expectedNames, true)) {
+                $prediction->willReturn($name)->shouldBeCalled();
+            } else {
+                $prediction->shouldNotBeCalled();
+            }
+        }
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -325,7 +340,8 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            $resourceMetadataCollectionFactoryProphecy->reveal()
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            pagination: new Pagination($paginationOptions)
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -342,15 +358,11 @@ class ItemNormalizerTest extends TestCase
         );
 
         $this->assertSame([
-            'collection' => [
-                ['name' => 'alpha'],
-                ['name' => 'beta'],
-                ['name' => 'gamma'],
-            ],
+            'collection' => array_map(static fn (string $name): array => ['name' => $name], $expectedNames),
             'paginationInfo' => [
-                'hasNextPage' => true,
-                'itemsPerPage' => 2,
-                'lastPage' => 2,
+                'hasNextPage' => $hasMore,
+                'itemsPerPage' => $expectedLimit,
+                'lastPage' => $lastPage,
                 'totalCount' => 3,
             ],
         ], $normalizeCollectionOfRelations(
@@ -370,7 +382,8 @@ class ItemNormalizerTest extends TestCase
                         'totalCount' => true,
                     ],
                 ],
-                'pagination' => ['itemsPerPage' => 2],
+                'pagination' => ['itemsPerPage' => 99],
+                'filters' => ['page' => 2, 'first' => 1, 'after' => base64_encode('1')],
                 'no_resolver_data' => true,
             ]
         ));

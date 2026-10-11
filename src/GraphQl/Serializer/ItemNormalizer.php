@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ItemNormalizer as BaseItemNormalizer;
+use ApiPlatform\State\Pagination\Pagination;
 use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -52,7 +53,7 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     private array $safeCacheKeysCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, ?LoggerInterface $logger = null, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, ?LoggerInterface $logger = null, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, private readonly Pagination $pagination = new Pagination())
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $logger ?: new NullLogger(), $resourceMetadataCollectionFactory, $resourceAccessChecker);
     }
@@ -137,28 +138,31 @@ final class ItemNormalizer extends BaseItemNormalizer
         }
 
         // Serialize selected relationships in subscription event payloads.
-        if ($operation instanceof QueryCollection && $this->isSubscriptionPayload($context) && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
-            $relationContext = $context;
-            $relationContext['attributes'] = $context['attributes']['collection'];
-            $data['collection'] = [];
-            foreach ($attributeValue as $item) {
-                $data['collection'][] = $this->normalize($item, $format, $relationContext);
+        if ($operation instanceof QueryCollection && $attributeValue instanceof Collection && $this->isSubscriptionPayload($context)) {
+            $limit = $this->pagination->getLimit($operation);
+            $data = [];
+            if (isset($context['attributes']['collection'])) {
+                $relationContext = $context;
+                $relationContext['attributes'] = $context['attributes']['collection'];
+                $data['collection'] = [];
+                foreach ($attributeValue->slice(0, $limit) as $item) {
+                    $data['collection'][] = $this->normalize($item, $format, $relationContext);
+                }
             }
 
-            return $this->addPagination($attributeValue->count(), $data, $context);
+            return $this->addPagination($attributeValue->count(), $limit, $data, $context);
         }
 
         // to-many are handled directly by the GraphQL resolver
         return [];
     }
 
-    private function addPagination(int $totalCount, array $data, array $context): array
+    private function addPagination(int $totalCount, int $itemsPerPage, array $data, array $context): array
     {
         if (!$selection = $context['attributes']['paginationInfo'] ?? false) {
             return $data;
         }
 
-        $itemsPerPage = $context['pagination']['itemsPerPage'] ?? 10;
         $data['paginationInfo'] = [];
         if (\array_key_exists('hasNextPage', $selection)) {
             $data['paginationInfo']['hasNextPage'] = $totalCount > $itemsPerPage;
@@ -167,7 +171,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             $data['paginationInfo']['itemsPerPage'] = $itemsPerPage;
         }
         if (\array_key_exists('lastPage', $selection)) {
-            $data['paginationInfo']['lastPage'] = (int) ceil($totalCount / $itemsPerPage);
+            $data['paginationInfo']['lastPage'] = 0 < $itemsPerPage ? (int) ceil($totalCount / $itemsPerPage) : 1;
         }
         if (\array_key_exists('totalCount', $selection)) {
             $data['paginationInfo']['totalCount'] = $totalCount;

@@ -1234,7 +1234,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(SerializerClassMetadataFactory::class),
                 null,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(ResourceAccessCheckerInterface::class)
+                $app->make(ResourceAccessCheckerInterface::class),
+                $app->make(Pagination::class)
             );
         });
 

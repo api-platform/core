@@ -249,6 +249,7 @@ return function (ContainerConfigurator $container) {
             null,
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
+            service('api_platform.pagination'),
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 

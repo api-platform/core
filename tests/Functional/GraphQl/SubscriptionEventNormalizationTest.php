@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SubscriptionEventResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -65,17 +66,70 @@ final class SubscriptionEventNormalizationTest extends ApiTestCase
         $this->assertSame(1, $payload['subscriptionEventResource']['id']);
         $this->assertArrayNotHasKey('_id', $payload['subscriptionEventResource']);
         $this->assertSame([], $payload['subscriptionEventResource']['children']);
+        $empty = $this->normalize(new Subscription(name: $name), initialResponse: true, childCount: 0);
+        $this->assertSame([], $empty['subscriptionEventResource']['children']);
     }
 
-    private function normalize(Subscription $operation, bool $initialResponse = false): array
+    #[DataProvider('relatedCollections')]
+    public function testRelatedCollectionUsesConfiguredLimit(int $count, bool $collectionSubscription): void
+    {
+        $operation = $collectionSubscription ? new SubscriptionCollection(name: 'watch') : new Subscription(name: 'watch');
+        $payload = $this->normalize($operation, childCount: $count, relationFields: [
+            'collection' => ['id' => true, '_id' => true, 'name' => true],
+            'paginationInfo' => ['hasNextPage' => true, 'itemsPerPage' => true, 'lastPage' => true, 'totalCount' => true],
+        ]);
+        $expected = [];
+        for ($i = 0; $i < min($count, 3); ++$i) {
+            $expected[] = ['id' => '/subscription_event_resources/'.($i + 2), 'name' => 'Child', '_id' => $i + 2];
+        }
+        // The test application configures pagination_items_per_page to 3.
+        $itemsPerPage = 3;
+        $this->assertSame([
+            'collection' => $expected,
+            'paginationInfo' => [
+                'hasNextPage' => $count > $itemsPerPage,
+                'itemsPerPage' => $itemsPerPage,
+                'lastPage' => (int) ceil($count / $itemsPerPage),
+                'totalCount' => $count,
+            ],
+        ], $payload['subscriptionEventResource']['children']);
+    }
+
+    public static function relatedCollections(): iterable
+    {
+        foreach ([false, true] as $collection) {
+            foreach ([0, 2, 3, 12] as $count) {
+                yield ($collection ? 'collection' : 'item').' with '.$count.' relations' => [$count, $collection];
+            }
+        }
+    }
+
+    #[DataProvider('relationSelections')]
+    public function testRelatedCollectionIncludesOnlySelectedFields(int $count, array $fields, array $expected): void
+    {
+        $payload = $this->normalize(new Subscription(name: 'watch'), childCount: $count, relationFields: $fields);
+        $this->assertSame($expected, $payload['subscriptionEventResource']['children']);
+    }
+
+    public static function relationSelections(): iterable
+    {
+        foreach ([0, 1] as $count) {
+            yield 'collection only, '.$count => [$count, ['collection' => ['name' => true]], ['collection' => $count ? [['name' => 'Child']] : []]];
+            yield 'total count only, '.$count => [$count, ['paginationInfo' => ['totalCount' => true]], ['paginationInfo' => ['totalCount' => $count]]];
+        }
+    }
+
+    private function normalize(Subscription $operation, bool $initialResponse = false, int $childCount = 1, ?array $relationFields = null): array
     {
         $parent = new SubscriptionEventResource();
         $parent->id = 1;
         $parent->name = 'Parent';
-        $child = new SubscriptionEventResource();
-        $child->id = 2;
-        $child->name = 'Child';
-        $parent->children->add($child);
+        for ($i = 0; $i < $childCount; ++$i) {
+            $child = new SubscriptionEventResource();
+            $child->id = $i + 2;
+            $child->name = 'Child';
+            $parent->children->add($child);
+        }
 
         $operation = $operation->withClass(SubscriptionEventResource::class)->withShortName('SubscriptionEventResource');
 
@@ -84,7 +138,7 @@ final class SubscriptionEventNormalizationTest extends ApiTestCase
                 'id' => true,
                 '_id' => true,
                 'name' => true,
-                'children' => [
+                'children' => $relationFields ?? [
                     'collection' => ['id' => true, '_id' => true, 'name' => true],
                     'paginationInfo' => ['totalCount' => true],
                 ],

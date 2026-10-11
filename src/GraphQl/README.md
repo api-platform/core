@@ -30,6 +30,20 @@ one registration/topic; different payload selections remain distinct.
 Individual-item payloads are represented by SHA-256 fingerprints in separate cache
 entries; collection subscriptions do not retain payloads or fingerprints.
 
+Selected to-many relationships in subscription events include at most the first
+configured number of related items, in the collection's order. The injected
+`Pagination` service resolves the related collection operation's
+`paginationItemsPerPage`, falling back to `api_platform.defaults.pagination_items_per_page`
+(30 by default). This limits the serialized items; events do not navigate pages
+or use client-supplied page/cursor/limit arguments.
+
+Selected `paginationInfo.totalCount` reports the full relationship count,
+`itemsPerPage` reports the configured limit, and `hasNextPage` indicates omitted
+items. Additional items can be fetched through a normal GraphQL query. Empty
+relationships retain `collection: []` and selected metadata. Only selected wrapper
+fields are emitted; metadata-only selections do not serialize related items.
+Initial GraphQL responses retain normal resolver-driven pagination.
+
 Symfony wires two cache pools:
 
 - `api_platform.graphql.cache.subscription`: the registration registry;
