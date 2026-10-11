@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Metadata;
@@ -137,8 +138,12 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             $link = $link->withIdentifiers($this->getIdentifiersFromResourceClass($link->getFromClass()));
         }
 
-        if (1 < \count((array) $link->getIdentifiers())) {
+        if (1 < \count((array)$link->getIdentifiers())) {
             $link = $link->withCompositeIdentifier(true);
+        }
+
+        if (null === $link->getSchema() && null !== ($schema = $this->getSchemaFromLinkedProperty($link))) {
+            $link = $link->withSchema($schema);
         }
 
         return $link;
@@ -197,5 +202,42 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
         }
 
         return TypeHelper::getClassName($type);
+    }
+
+    private function getSchemaFromLinkedProperty(Link $link): ?array
+    {
+        $resourceClass = $link->getFromClass() ?? $link->getToClass();
+        $property = $link->getFromProperty() ?? $link->getToProperty() ?? $link->getParameterName();
+        if (!$resourceClass || !$property) {
+            return null;
+        }
+
+        try {
+            $schema = $this->propertyMetadataFactory->create($resourceClass, $property)->getSchema();
+        } catch (PropertyNotFoundException) {
+            return null;
+        }
+
+        if (null === $schema || !isset($schema['type'])) {
+            return null;
+        }
+
+        if (!\is_array($schema['type'])) {
+            $schema['type'] = [$schema['type']];
+        }
+
+        // Properties can be nullable, but the uriVariable won't be
+        $schema['type'] = array_diff($schema['type'], ['null']);
+
+        // Link types are limited to primitive types
+        $schema['type'] = array_values(array_filter($schema['type'], static fn ($type) => \in_array($type, ['string', 'number', 'integer', 'boolean'], true)));
+        if (!$schema['type']) {
+            unset($schema['type']);
+        } elseif (1 === \count($schema['type'])) {
+            $schema['type'] = $schema['type'][0];
+        }
+
+        // only allow the type/format fields
+        return array_intersect_key($schema, array_flip(['type', 'format'])) ?: null;
     }
 }
