@@ -143,6 +143,45 @@ final class LinkFactoryTest extends TestCase
         );
     }
 
+    #[DataProvider('provideCompleteLinkSchemaCases')]
+    public function testCompleteLinkSchema(Link $link, ?array $propertySchema, ?array $expectedSchema): void
+    {
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->expects($this->never())->method('create');
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->expects($this->any())->method('create')->with(AttributeResource::class, 'uuid')->willReturn(new ApiProperty(schema: $propertySchema));
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);
+
+        self::assertEquals(
+            null === $expectedSchema ? $link : $link->withSchema($expectedSchema),
+            $linkFactory->completeLink($link)
+        );
+    }
+
+    public static function provideCompleteLinkSchemaCases(): \Generator
+    {
+        $schema = ['type' => 'string', 'format' => 'uuid'];
+
+        yield 'fromClass and toProperty' => [new Link(toProperty: 'uuid', fromClass: AttributeResource::class, identifiers: ['uuid']), $schema, $schema];
+        yield 'fromClass and parameterName' => [new Link(parameterName: 'uuid', fromClass: AttributeResource::class, identifiers: ['uuid']), $schema, $schema];
+        yield 'fromClass and fromProperty' => [new Link(fromProperty: 'uuid', fromClass: AttributeResource::class, identifiers: ['uuid']), $schema, $schema];
+        yield 'no class' => [new Link(parameterName: 'uuid', identifiers: ['uuid']), $schema, null];
+        yield 'no property' => [new Link(fromClass: AttributeResource::class, identifiers: ['uuid']), $schema, null];
+
+        yield 'existing schema - string type is preserved' => [
+            new Link(fromProperty: 'uuid', fromClass: AttributeResource::class, identifiers: ['uuid'], schema: ['type' => 'string', 'format' => 'custom']),
+            $schema,
+            ['type' => 'string', 'format' => 'custom'],
+        ];
+        yield 'existing schema - array type is ignored' => [new Link(fromProperty: 'uuid', fromClass: AttributeResource::class, identifiers: ['uuid']), ['type' => 'array'], null];
+        yield 'nullable type is filtered' => [
+            new Link(fromProperty: 'uuid', fromClass: AttributeResource::class, identifiers: ['uuid']),
+            ['type' => ['string', 'null'], 'format' => 'uuid'],
+            ['type' => 'string', 'format' => 'uuid'],
+        ];
+    }
+
     public function testCreateLinksFromAttributesWithExtendedLink(): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
