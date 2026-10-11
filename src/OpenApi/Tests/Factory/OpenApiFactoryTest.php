@@ -216,6 +216,28 @@ class OpenApiFactoryTest extends TestCase
                         description: 'Extended description for the new Dummy resource',
                     ),
                 )),
+                'postDummyCollectionWithRequestBodyMediaTypeWithoutSchema' => (new Post())->withUriTemplate('/dummiesRequestBodyMediaTypeWithoutSchema')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    requestBody: new RequestBody(
+                        content: new \ArrayObject([
+                            'application/ld+json' => new MediaType(
+                                examples: new \ArrayObject([
+                                    'hello world' => new Model\Example(description: 'Submitting a "hello world" entity', value: ['name' => 'Hello world']),
+                                ]),
+                            ),
+                        ]),
+                    ),
+                )),
+                'postDummyCollectionWithRequestBodyArrayObjectWithoutSchema' => (new Post())->withUriTemplate('/dummiesRequestBodyArrayObjectWithoutSchema')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    requestBody: new RequestBody(
+                        content: new \ArrayObject([
+                            'application/ld+json' => new \ArrayObject([
+                                'examples' => new \ArrayObject([
+                                    'hello world' => new Model\Example(description: 'Submitting a "hello world" entity', value: ['name' => 'Hello world']),
+                                ]),
+                            ]),
+                        ]),
+                    ),
+                )),
                 'putDummyItemWithResponse' => (new Put())->withUriTemplate('/dummyitems/{id}')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
                     responses: [
                         '200' => new OpenApiResponse(
@@ -1065,6 +1087,7 @@ class OpenApiFactoryTest extends TestCase
                             ],
                         ],
                     ],
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
                 false
             ),
@@ -1102,6 +1125,90 @@ class OpenApiFactoryTest extends TestCase
                 'Extended description for the new Dummy resource',
                 new \ArrayObject([
                     'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
+                ]),
+                false
+            ),
+        ), $requestBodyPath->getPost());
+
+        $requestBodyPath = $paths->getPath('/dummiesRequestBodyMediaTypeWithoutSchema');
+        $this->assertEquals(new Operation(
+            'postDummyCollectionWithRequestBodyMediaTypeWithoutSchema',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response(
+                    'Invalid input',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '422' => new Response(
+                    'Unprocessable entity',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'The new Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new MediaType(
+                        schema: new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld']),
+                        examples: new \ArrayObject([
+                            'hello world' => new Model\Example(description: 'Submitting a "hello world" entity', value: ['name' => 'Hello world']),
+                        ]),
+                    ),
+                ]),
+                false
+            ),
+        ), $requestBodyPath->getPost());
+
+        $requestBodyPath = $paths->getPath('/dummiesRequestBodyArrayObjectWithoutSchema');
+        $this->assertEquals(new Operation(
+            'postDummyCollectionWithRequestBodyArrayObjectWithoutSchema',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response(
+                    'Invalid input',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '422' => new Response(
+                    'Unprocessable entity',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'The new Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new \ArrayObject([
+                        'schema' => new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld']),
+                        'examples' => new \ArrayObject([
+                            'hello world' => new Model\Example(description: 'Submitting a "hello world" entity', value: ['name' => 'Hello world']),
+                        ]),
+                    ]),
                 ]),
                 false
             ),

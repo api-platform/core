@@ -492,24 +492,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 (\in_array($method, ['PATCH', 'PUT', 'POST'], true) || true === $operation->canDeserialize())
                 && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
             ) {
-                $content = $openapiOperation->getRequestBody()?->getContent();
-                if (null === $content) {
-                    $operationInputSchemas = [];
-                    foreach ($requestMimeTypes as $operationFormat) {
-                        $operationInputSchema = null;
-                        $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, $schemaSerializerContext, $forceSchemaCollection);
-                        $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
+                $operationInputSchemas = [];
+                foreach ($requestMimeTypes as $operationFormat) {
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, $schemaSerializerContext, $forceSchemaCollection);
+                    $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
 
-                        $operationInputSchemas[$operationFormat] = $operationInputSchema;
-                    }
-                    $content = $this->buildContent($requestMimeTypes, $operationInputSchemas);
+                    $operationInputSchemas[$operationFormat] = $operationInputSchema;
                 }
 
-                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody(
-                    description: $openapiOperation->getRequestBody()?->getDescription() ?? \sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName),
-                    content: $content,
-                    required: $openapiOperation->getRequestBody()?->getRequired() ?? true,
-                ));
+                $openapiOperation = $openapiOperation->withRequestBody($this->buildOpenApiRequestBody($requestMimeTypes, $operationInputSchemas, $openapiOperation, $method, $resourceShortName));
             }
 
             // RFC 10008: the HTTP QUERY method carries its criteria in the request body, not the URI
@@ -561,6 +552,46 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $openapiOperation->withResponse($status, $response);
+    }
+
+    /**
+     * @param array<string, string> $requestMimeTypes
+     * @param array<string, Schema> $operationInputSchemas
+     */
+    private function buildOpenApiRequestBody(array $requestMimeTypes, array $operationInputSchemas, Operation $openapiOperation, string $method, string $resourceShortName): RequestBody
+    {
+        $content = $openapiOperation->getRequestBody()?->getContent();
+        if (null === $content) {
+            $content = $this->buildContent($requestMimeTypes, $operationInputSchemas);
+        } else {
+            $generatedContent = $this->buildContent($requestMimeTypes, $operationInputSchemas);
+            foreach ($generatedContent as $mimeType => $generatedMediaType) {
+                if (!isset($content[$mimeType])) {
+                    $content[$mimeType] = $generatedMediaType;
+                    continue;
+                }
+
+                $mediaType = $content[$mimeType];
+                $format = $requestMimeTypes[$mimeType] ?? null;
+                $operationInputSchema = $format && isset($operationInputSchemas[$format]) ? $operationInputSchemas[$format] : null;
+
+                if ($operationInputSchema) {
+                    $schemaArrayObject = new \ArrayObject($operationInputSchema->getArrayCopy(false));
+                    if ($mediaType instanceof MediaType && null === $mediaType->getSchema()) {
+                        $content[$mimeType] = $mediaType->withSchema($schemaArrayObject);
+                    } elseif ((\is_array($mediaType) || $mediaType instanceof \ArrayObject) && !isset($mediaType['schema'])) {
+                        $mediaType['schema'] = $schemaArrayObject;
+                        $content[$mimeType] = $mediaType;
+                    }
+                }
+            }
+        }
+
+        return new RequestBody(
+            description: $openapiOperation->getRequestBody()?->getDescription() ?? \sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName),
+            content: $content,
+            required: $openapiOperation->getRequestBody()?->getRequired() ?? true,
+        );
     }
 
     /**
