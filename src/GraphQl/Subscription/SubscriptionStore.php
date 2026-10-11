@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Subscription;
 
+use ApiPlatform\Metadata\Util\SortTrait;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\Lock\LockFactory;
 final class SubscriptionStore implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use SortTrait;
 
     public function __construct(private readonly CacheItemPoolInterface $registry, private readonly CacheItemPoolInterface $fingerprints, private readonly LockFactory $lockFactory)
     {
@@ -43,7 +45,7 @@ final class SubscriptionStore implements LoggerAwareInterface
     /** @param callable(): string $generateId */
     public function register(string $key, string $operation, array $fields, ?array $payload, bool $collection, callable $generateId): string
     {
-        $fingerprint = $collection ? null : $this->fingerprint($payload);
+        $fingerprint = $collection ? null : $this->fingerprint($payload, $fields);
 
         return $this->synchronized($key, function () use ($key, $operation, $fields, $fingerprint, $generateId): string {
             $item = $this->registry->getItem($key);
@@ -124,7 +126,7 @@ final class SubscriptionStore implements LoggerAwareInterface
         if ($subscription->collection) {
             return new SubscriptionUpdate($subscription, $data, null);
         }
-        $hash = $this->fingerprint($data);
+        $hash = $this->fingerprint($data, $subscription->fields);
         if ($hash === $subscription->fingerprint) {
             return null;
         }
@@ -199,8 +201,28 @@ final class SubscriptionStore implements LoggerAwareInterface
         $this->save($this->fingerprints, $item->set($hash));
     }
 
-    private function fingerprint(?array $payload): string
+    private function fingerprint(?array $payload, array $fields): string
     {
+        if (null !== $payload) {
+            $payload = array_intersect_key($payload, $fields);
+            foreach ($payload as $name => $item) {
+                if (!\is_array($fields[$name]) || !\is_array($item)) {
+                    continue;
+                }
+
+                // Enrollment has the raw identifier in id; publications expose it as _id.
+                if (\array_key_exists('_id', $item)) {
+                    $item['id'] = $item['_id'];
+                } elseif (\array_key_exists('id', $item)) {
+                    $item['_id'] = $item['id'];
+                }
+
+                // Nested selections describe related resources, not the root item's values.
+                $payload[$name] = array_intersect_key($item, array_filter($fields[$name], static fn ($selection) => !\is_array($selection)));
+            }
+            $this->arrayRecursiveSort($payload, 'ksort');
+        }
+
         return hash('sha256', serialize($payload));
     }
 

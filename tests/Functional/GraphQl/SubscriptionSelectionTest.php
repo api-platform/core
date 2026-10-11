@@ -18,6 +18,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PrivateCollectionSubscriptionResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PrivateSubscriptionResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SubscriptionFingerprintResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -44,7 +45,7 @@ final class SubscriptionSelectionTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [PrivateSubscriptionResource::class, PrivateCollectionSubscriptionResource::class];
+        return [PrivateSubscriptionResource::class, PrivateCollectionSubscriptionResource::class, SubscriptionFingerprintResource::class];
     }
 
     #[DataProvider('equivalentSelections')]
@@ -138,6 +139,72 @@ final class SubscriptionSelectionTest extends ApiTestCase
         $iri = $collection ? '/private_collection_subscription_resources/1' : '/private_subscription_resources/1';
         $this->assertSame([lcfirst($shortName) => ['id' => $iri, 'name' => 'Changed', '_id' => 1]], $payloads[0][1]);
         $this->assertSame([lcfirst($shortName) => ['name' => 'Changed']], $payloads[1][1]);
+    }
+
+    #[TestWith(['name'])]
+    #[TestWith(['id name'])]
+    #[TestWith(['_id name'])]
+    #[TestWith(['id _id name'])]
+    public function testInitialSelectedValuesSuppressUpdatesAndReregistration(string $fields): void
+    {
+        $client = $this->createSubscriptionClient();
+        $initial = $this->enroll($client, 'PrivateSubscriptionResource', $fields, 'mercureUrl');
+        $resource = PrivateSubscriptionResource::provide(new Get(), ['id' => 1]);
+        $this->assertSame('Initial', $initial['privateSubscriptionResource']['name']);
+        $this->assertSame([], $this->publishSubscriptions($resource));
+
+        $resource->name = 'Changed';
+        $updates = $this->publishSubscriptions($resource);
+        $this->assertCount(1, $updates);
+        $this->assertSame('Changed', $updates[0][1]['privateSubscriptionResource']['name']);
+        $this->assertSame([], $this->publishSubscriptions($resource));
+
+        // Return to the provider's initial value, then enroll another client.
+        $resource->name = 'Initial';
+        $this->assertCount(1, $this->publishSubscriptions($resource));
+        $reenrolled = $this->enroll($client, 'PrivateSubscriptionResource', $fields, 'mercureUrl');
+        $this->assertSame($initial['mercureUrl'], $reenrolled['mercureUrl']);
+        $this->assertSame([], $this->publishSubscriptions($resource));
+    }
+
+    #[TestWith([1])]
+    #[TestWith([3])]
+    public function testRelatedCollectionsDoNotAffectFingerprintButRemainInPublications(int $id): void
+    {
+        $client = $this->createSubscriptionClient();
+        $response = $client->request('POST', '/graphql', ['json' => ['query' => \sprintf(
+            'subscription { watchSubscriptionFingerprintResourceSubscribe(input: {id: "/subscription_fingerprint_resources/%d"}) { subscriptionFingerprintResource { id _id name children { collection { id _id name } paginationInfo { totalCount } } } mercureUrl } }',
+            $id
+        )]]);
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray(false);
+        $this->assertArrayNotHasKey('errors', $json, json_encode($json, \JSON_THROW_ON_ERROR));
+        $initial = $json['data']['watchSubscriptionFingerprintResourceSubscribe']['subscriptionFingerprintResource'];
+        $this->assertCount(1 === $id ? 1 : 0, $initial['children']['collection']);
+        $resource = SubscriptionFingerprintResource::provide(new Get(), ['id' => $id]);
+        $this->assertInstanceOf(SubscriptionFingerprintResource::class, $resource);
+        $this->assertSame([], $this->publishSubscriptions($resource));
+
+        $child = new SubscriptionFingerprintResource();
+        $child->id = 4;
+        $child->name = 'New child';
+        $resource->children->clear();
+        $resource->children->add($child);
+        $this->assertSame([], $this->publishSubscriptions($resource), 'Related changes do not trigger an item publication.');
+
+        $resource->name = 'Changed';
+        $updates = $this->publishSubscriptions($resource);
+        $this->assertCount(1, $updates);
+        $this->assertSame(['subscriptionFingerprintResource' => [
+            'id' => '/subscription_fingerprint_resources/'.$id,
+            'name' => 'Changed',
+            'children' => [
+                'collection' => [['id' => '/subscription_fingerprint_resources/4', 'name' => 'New child', '_id' => 4]],
+                'paginationInfo' => ['totalCount' => 1],
+            ],
+            '_id' => $id,
+        ]], $updates[0][1]);
+        $this->assertSame([], $this->publishSubscriptions($resource));
     }
 
     private function createSubscriptionClient(): Client

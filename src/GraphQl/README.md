@@ -27,8 +27,15 @@ response-envelope `mercureUrl` and `clientSubscriptionId` fields are removed.
 Resource fields with those names remain significant. Equivalent selections reuse
 one registration/topic; different payload selections remain distinct.
 
-Individual-item payloads are represented by SHA-256 fingerprints in separate cache
-entries; collection subscriptions do not retain payloads or fingerprints.
+Individual-item subscriptions compare SHA-256 fingerprints of the directly selected
+root-item fields. Registration and publication use the same projection: resolver
+metadata and unselected fields are omitted, `id` and `_id` use the raw identifier
+for comparison, and associative keys are sorted. Scalar arrays retain their values
+and list order. Nested object and collection selections do not participate in
+change detection; they remain in the delivered payload when a selected root value
+changes. This also suppresses an unchanged first update after enrollment.
+Only the hash is cached in a separate entry, not the comparison data or payload.
+Collection subscriptions do not retain payloads or fingerprints.
 
 Selected to-many relationships in subscription events include at most the first
 configured number of related items, in the collection's order. The injected
@@ -82,9 +89,9 @@ while the lease is held.
 Item fingerprints are plain SHA-256 hashes, read in bulk and replaced after
 successful publication without additional locks: the last successful fingerprint
 write wins. Normalization, hashing, and Mercure/Messenger calls occur outside locks.
-Re-registration reuses the subscription ID. If its initial payload differs from
+Re-registration reuses the subscription ID. If its selected root values differ from
 the stored fingerprint, the store writes null so the next event is eligible for
-existing and newly enrolled clients. An identical initial payload preserves the
+existing and newly enrolled clients. Identical selected root values preserve the
 fingerprint. Collections have no fingerprints.
 
 Fingerprint writes during registration must succeed for enrollment to succeed.

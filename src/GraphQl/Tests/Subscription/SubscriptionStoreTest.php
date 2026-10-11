@@ -215,7 +215,7 @@ final class SubscriptionStoreTest extends TestCase
         $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), new LockFactory(new InMemoryStore()));
         $store->register('bucket', 'watch', ['value' => true], ['value' => 1], false, static fn () => 'id');
         $this->assertSame([], self::publish($store, ['value' => 1]));
-        foreach ([['value' => '1'], ['value' => 1.0], ['value' => 1], ['nested' => [['name' => 'same']]]] as $payload) {
+        foreach ([['value' => '1'], ['value' => 1.0], ['value' => 1], ['value' => [['name' => 'same']]]] as $payload) {
             $this->assertSame([['id', $payload]], self::publish($store, $payload));
             $this->assertSame([], self::publish($store, $payload));
         }
@@ -242,7 +242,7 @@ final class SubscriptionStoreTest extends TestCase
         $logger->expects($this->once())->method('warning')->with('Could not record a GraphQL subscription publication.', $this->isArray());
         $store->setLogger($logger);
         $store->register('bucket', 'watch', ['name' => true], [], false, static fn () => 'first');
-        $store->register('bucket', 'watch', ['id' => true], [], false, static fn () => 'second');
+        $store->register('bucket', 'watch', ['name' => true, 'extra' => true], [], false, static fn () => 'second');
         $fingerprints->fail = true;
 
         $this->assertSame([['first', ['name' => 'changed']], ['second', ['name' => 'changed']]], self::publish($store, ['name' => 'changed']));
@@ -294,10 +294,10 @@ final class SubscriptionStoreTest extends TestCase
         $pending = $store->prepareUpdate($store->getSubscriptions('bucket', false)['watch'][0], ['name' => 'late']);
         $this->assertNotNull($pending);
         $store->remove('bucket');
-        $store->register('bucket', 'watch', ['id' => true], [], false, static fn () => 'new');
+        $store->register('bucket', 'watch', ['name' => true, 'extra' => true], [], false, static fn () => 'new');
         $store->acknowledge($pending);
 
-        $this->assertSame(['watch' => [['new', ['id' => true]]]], $store->fetch('bucket'));
+        $this->assertSame(['watch' => [['new', ['name' => true, 'extra' => true]]]], $store->fetch('bucket'));
         $this->assertCount(2, $fingerprints->getValues());
         $this->assertSame([['new', ['name' => 'late']]], self::publish($store, ['name' => 'late']));
     }
@@ -307,7 +307,7 @@ final class SubscriptionStoreTest extends TestCase
         $fingerprints = new ArrayAdapter();
         $store = new SubscriptionStore(new ArrayAdapter(), $fingerprints, new LockFactory(new InMemoryStore()));
         $store->register('bucket', 'watch', ['name' => true], [], false, static fn () => 'first');
-        $store->register('bucket', 'watch', ['id' => true], [], false, static fn () => 'second');
+        $store->register('bucket', 'watch', ['name' => true, 'extra' => true], [], false, static fn () => 'second');
         $before = $fingerprints->getValues();
         $subscriptions = $store->getSubscriptions('bucket', false)['watch'];
         $first = $store->prepareUpdate($subscriptions[0], ['name' => 'changed']);
@@ -332,6 +332,48 @@ final class SubscriptionStoreTest extends TestCase
         $this->assertSame([], self::publish($store, ['name' => 'changed']));
         $store->remove('bucket');
         $this->assertEmpty($fingerprints->getValues());
+    }
+
+    public function testFingerprintUsesOnlySelectedRootFieldsWithoutChangingDeliveredData(): void
+    {
+        $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), new LockFactory(new InMemoryStore()));
+        $fields = ['item' => ['id' => true, '_id' => true, 'name' => true, 'children' => ['collection' => ['name' => true]], 'owner' => ['name' => true]]];
+        $initial = ['item' => ['id' => 1, 'name' => 'Initial', 'children' => [], 'owner' => ['name' => 'Owner'], '#itemResourceClass' => 'Resource', '#itemIdentifiers' => ['id' => 1]]];
+        $store->register('bucket', 'watch', $fields, $initial, false, static fn () => 'id');
+        $payload = ['item' => ['name' => 'Initial', '_id' => 1, 'id' => '/items/1', 'children' => ['collection' => [['name' => 'Child']]], 'owner' => ['name' => 'Other'], 'unselected' => 'ignored']];
+        $this->assertSame([], self::publish($store, $payload));
+
+        $payload['item']['name'] = 'Changed';
+        $this->assertSame([['id', $payload]], self::publish($store, $payload));
+        $this->assertSame([], self::publish($store, $payload));
+        $payload['item']['id'] = '/items/2';
+        $payload['item']['_id'] = 2;
+        $this->assertSame([['id', $payload]], self::publish($store, $payload));
+    }
+
+    public function testScalarArraysKeepListOrderButIgnoreAssociativeKeyOrder(): void
+    {
+        $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), new LockFactory(new InMemoryStore()));
+        $initial = ['item' => ['settings' => ['b' => 2, 'a' => 1], 'tags' => ['first', 'second']]];
+        $store->register('bucket', 'watch', ['item' => ['settings' => true, 'tags' => true]], $initial, false, static fn () => 'id');
+        $payload = ['item' => ['tags' => ['first', 'second'], 'settings' => ['a' => 1, 'b' => 2]]];
+        $this->assertSame([], self::publish($store, $payload));
+        $payload['item']['tags'] = ['second', 'first'];
+        $this->assertSame([['id', $payload]], self::publish($store, $payload));
+        $payload['item']['settings']['b'] = 3;
+        $this->assertSame([['id', $payload]], self::publish($store, $payload));
+    }
+
+    public function testSelectedNullMissingAndScalarTypesRemainDistinct(): void
+    {
+        $store = new SubscriptionStore(new ArrayAdapter(), new ArrayAdapter(), new LockFactory(new InMemoryStore()));
+        $store->register('bucket', 'watch', ['item' => ['value' => true]], ['item' => ['value' => null]], false, static fn () => 'id');
+        $this->assertSame([], self::publish($store, ['item' => ['value' => null, 'extra' => 'ignored']]));
+        foreach ([[], ['value' => null], ['value' => 1], ['value' => '1'], ['value' => 1.0]] as $value) {
+            $payload = ['item' => $value];
+            $this->assertSame([['id', $payload]], self::publish($store, $payload));
+            $this->assertSame([], self::publish($store, $payload));
+        }
     }
 
     private static function publish(SubscriptionStore $store, array $payload, bool $collection = false): array

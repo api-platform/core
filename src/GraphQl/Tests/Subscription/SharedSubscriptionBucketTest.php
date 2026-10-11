@@ -188,7 +188,7 @@ final class SharedSubscriptionBucketTest extends TestCase
         $iri = $this->createStub(IriConverterInterface::class);
         $iri->method('getIriFromResource')->willReturnCallback(static fn (object $object) => $object->id);
         $normalizer = $this->createStub(ProcessorInterface::class);
-        $normalizer->method('process')->willReturnCallback(static fn ($object, Subscription $operation, $variables, $context) => ['operation' => $operation->getName(), 'shortName' => $operation->getShortName(), 'fields' => $context['fields']]);
+        $normalizer->method('process')->willReturnCallback(static fn ($object, Subscription $operation, $variables, $context) => ['id' => $object->id, 'name' => 'Changed', 'operation' => $operation->getName(), 'shortName' => $operation->getShortName(), 'fields' => $context['fields']]);
 
         $this->fingerprints = new ArrayAdapter();
 

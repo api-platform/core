@@ -57,7 +57,6 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         $collection = $operation instanceof CollectionOperationInterface;
         $cacheKey = $this->getSubscriptionKey($iri, $operation, $privateFieldData);
         $operationKey = $this->getOperationKey($operation);
-        unset($result['clientSubscriptionId']);
 
         $identity = $fields + ($collection ? ['__collection' => true] : []) + ['__subscription_scope' => $cacheKey, '__subscription_operation' => $operationKey];
 
