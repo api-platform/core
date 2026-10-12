@@ -299,9 +299,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithMixed::class, 'mixedProperty');
 
-        $this->assertEquals([
-            'type' => ['string', 'null'],
-        ], $apiProperty->getSchema());
+        $this->assertSame([], $apiProperty->getSchema());
 
         $apiProperty = new ApiProperty(nativeType: Type::array(Type::mixed()));
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
@@ -312,9 +310,25 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
 
         $this->assertEquals([
             'type' => 'array',
-            'items' => [
-                'type' => ['string', 'null'],
-            ],
+            'items' => new \ArrayObject(),
         ], $apiProperty->getSchema());
+    }
+
+    public function testMixedMapValuesAcceptAnyValue(): void
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $apiProperty = new ApiProperty(nativeType: Type::array(Type::mixed(), Type::string()));
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithMixed::class, 'mixedArrayProperty')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $schema = $schemaPropertyMetadataFactory->create(DummyWithMixed::class, 'mixedArrayProperty')->getSchema();
+
+        $this->assertSame('object', $schema['type']);
+        $this->assertSame('{}', json_encode($schema['additionalProperties']));
     }
 }
