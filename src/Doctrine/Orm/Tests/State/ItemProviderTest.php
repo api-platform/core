@@ -36,6 +36,8 @@ use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ManyToOneAssociationMapping;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\TokenType;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
@@ -494,7 +496,7 @@ class ItemProviderTest extends TestCase
         $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->expects($this->once())->method('join')->with(Employee::class, 'm_a1', 'WITH', 'o.id = m_a1.company');
+        $queryBuilderMock->expects($this->once())->method('join')->with(Employee::class, 'm_a1', \defined(TokenType::class.'::T_ON') ? Join::ON : Join::WITH, 'o.id = m_a1.company');
         $queryBuilderMock->expects($this->once())->method('getQuery')->willReturn($queryMock);
         $queryBuilderMock->expects($this->once())->method('getRootAliases')->willReturn(['o']);
         $queryBuilderMock->expects($this->once())->method('andWhere')->with('m_a1.id = :id_p1');
