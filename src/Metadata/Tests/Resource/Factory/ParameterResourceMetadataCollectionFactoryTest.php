@@ -1046,6 +1046,45 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $parameterFactory->create(ParameterOnPropertiesWithUndeclaredOperationClassString::class);
     }
 
+    public function testOperationParameterTakesPrecedenceOverParameterAttributeOnProperty(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(QueryParameterOnPropertiesOverriddenByOperation::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        [$collectionOperation, $getOperation] = $operations;
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $collectionParameter = $collectionOperation->getParameters()->get('name');
+        $this->assertInstanceOf(QueryParameter::class, $collectionParameter);
+        $this->assertSame('From operation', $collectionParameter->getDescription());
+        $this->assertFalse($collectionParameter->getRequired());
+
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $getParameter = $getOperation->getParameters()->get('name');
+        $this->assertInstanceOf(QueryParameter::class, $getParameter);
+        $this->assertSame('From property', $getParameter->getDescription());
+        $this->assertTrue($getParameter->getRequired());
+    }
+
     public function testNestedPropertyWithNameConverter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -1629,5 +1668,19 @@ class ParameterOnPropertiesWithOperationClassStrings
 class ParameterOnPropertiesWithUndeclaredOperationClassString
 {
     #[QueryParameter(key: 'search', description: 'Search by name', operations: [Patch::class])]
+    public string $name = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(parameters: ['name' => new QueryParameter(description: 'From operation', required: false)]),
+        new Get(),
+    ]
+)]
+class QueryParameterOnPropertiesOverriddenByOperation
+{
+    public int $id = 0;
+
+    #[QueryParameter(description: 'From property', required: true)]
     public string $name = '';
 }
