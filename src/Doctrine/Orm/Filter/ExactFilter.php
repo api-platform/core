@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\EmptyValueParameterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -28,6 +29,7 @@ use Doctrine\ORM\QueryBuilder;
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use EmptyValueParameterTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -38,6 +40,10 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 
         // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
         if (\is_array($value) && !array_is_list($value)) {
+            return;
+        }
+
+        if ($this->ignoreEmptyValue($parameter, $value)) {
             return;
         }
 

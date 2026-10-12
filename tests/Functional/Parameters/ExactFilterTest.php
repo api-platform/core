@@ -87,6 +87,12 @@ final class ExactFilterTest extends ApiTestCase
             0,
             [],
         ];
+
+        yield 'filter by an empty string-typed name still filters' => [
+            '/chickens?name=',
+            0,
+            [],
+        ];
     }
 
     public function testExactSearchFilterByCoopId(): void
