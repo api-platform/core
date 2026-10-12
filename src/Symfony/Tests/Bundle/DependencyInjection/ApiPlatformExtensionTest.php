@@ -202,6 +202,17 @@ class ApiPlatformExtensionTest extends TestCase
         self::assertFalse(class_exists(FrameworkTranslationExtractCommand::class, false));
     }
 
+    public function testSkolemIriConverterIsResetBetweenRequests(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $this->assertServiceHasTags('api_platform.symfony.iri_converter.skolem', ['kernel.reset']);
+        $this->assertSame(
+            [['method' => 'reset']],
+            $this->container->getDefinition('api_platform.symfony.iri_converter.skolem')->getTag('kernel.reset'),
+        );
+    }
+
     public function testCommonConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
