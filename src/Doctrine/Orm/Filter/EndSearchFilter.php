@@ -46,7 +46,7 @@ final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterIn
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
         $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 

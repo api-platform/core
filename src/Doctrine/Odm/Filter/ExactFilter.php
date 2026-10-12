@@ -65,7 +65,7 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
         $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
