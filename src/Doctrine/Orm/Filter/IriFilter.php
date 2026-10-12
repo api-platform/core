@@ -47,7 +47,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
 
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
 
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
