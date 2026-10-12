@@ -28,6 +28,7 @@ use Doctrine\ORM\QueryBuilder;
 final class StartSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -53,9 +54,7 @@ final class StartSearchFilter implements FilterInterface, OpenApiParameterFilter
             $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
 
-            $likeExpression = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpression = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
             $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
 
             return;
@@ -64,9 +63,7 @@ final class StartSearchFilter implements FilterInterface, OpenApiParameterFilter
         $likeExpressions = [];
         foreach ($values as $val) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $likeExpressions[] = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpressions[] = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
 
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($val));
         }
@@ -78,6 +75,6 @@ final class StartSearchFilter implements FilterInterface, OpenApiParameterFilter
 
     private function formatLikeValue(string $value): string
     {
-        return addcslashes($value, '\\%_').'%';
+        return $this->escapeLikeValue($value).'%';
     }
 }
