@@ -269,6 +269,9 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         if ($type instanceof CollectionType) {
             $valueType = $type->getCollectionValueType();
             $valueSchema = $this->getJsonSchemaFromType($valueType, $readableLink);
+            if ([] === $valueSchema) {
+                $valueSchema = new \ArrayObject();
+            }
             $keyType = $type->getCollectionKeyType();
 
             // Associative array (string keys)
@@ -294,6 +297,10 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         if ($type instanceof BuiltinType) {
+            if (TypeIdentifier::MIXED === $type->getTypeIdentifier()) {
+                return [];
+            }
+
             $schema = match ($type->getTypeIdentifier()) {
                 TypeIdentifier::INT => ['type' => 'integer'],
                 TypeIdentifier::FLOAT => ['type' => 'number'],
@@ -306,7 +313,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 TypeIdentifier::OBJECT => ['type' => 'object'],
                 TypeIdentifier::RESOURCE => ['type' => 'string'],
                 TypeIdentifier::CALLABLE => ['type' => 'string'],
-                TypeIdentifier::MIXED => ['type' => 'string'],
                 default => ['type' => 'null'],
             };
 
