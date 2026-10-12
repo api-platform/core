@@ -49,6 +49,6 @@ final class PropertySchemaFormatFunctionalTest extends ApiTestCase
         $this->assertSame('ipv4', $properties['ipv4']['format'] ?? null);
         $this->assertSame('ipv6', $properties['ipv6']['format'] ?? null);
 
-        $this->assertSame([['format' => 'ipv4'], ['format' => 'ipv6'],], $properties['ip']['oneOf'] ?? null);
+        $this->assertSame([['format' => 'ipv4'], ['format' => 'ipv6']], $properties['ip']['oneOf'] ?? null);
     }
 }
