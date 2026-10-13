@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\EmptyValueParameterTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
@@ -32,6 +33,7 @@ use Doctrine\ODM\MongoDB\Mapping\MappingException;
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use EmptyValueParameterTrait;
     use ManagerRegistryAwareTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
@@ -47,6 +49,10 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 
         if (\is_array($value) && !array_is_list($value)) {
             // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
+
+        if ($this->ignoreEmptyValue($parameter, $value)) {
             return;
         }
 
