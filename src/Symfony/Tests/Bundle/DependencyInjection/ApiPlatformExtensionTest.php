@@ -269,6 +269,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertServiceHasTags('api_platform.cache.route_name_resolver', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.symfony.iri_converter.skolem', ['kernel.reset']);
         $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
