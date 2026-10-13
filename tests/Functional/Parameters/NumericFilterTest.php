@@ -66,23 +66,24 @@ final class NumericFilterTest extends ApiTestCase
         yield 'amount_alias_int_equal' => ['/filtered_numeric_parameters?amount=20', 2];
     }
 
-    /**
-     * An empty value cannot be cast to the int/float native type, so the caster rejects it with a
-     * Bad Request before the filter runs.
-     */
     #[DataProvider('emptyScenariosProvider')]
-    public function testRangeFilterWithEmptyValues(string $url): void
+    public function testRangeFilterWithEmptyValues(string $url, int $expectedCount): void
     {
-        self::createClient()->request('GET', $url);
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
 
-        $this->assertResponseStatusCodeSame(400);
+        $filteredItems = $response->toArray()['hydra:member'];
+
+        $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
     }
 
     public static function emptyScenariosProvider(): \Generator
     {
-        yield 'quantity_int_empty_value' => ['/filtered_numeric_parameters?quantity='];
-        yield 'ratio_float_empty_value' => ['/filtered_numeric_parameters?ratio='];
-        yield 'amount_alias_int_empty_value' => ['/filtered_numeric_parameters?amount='];
+        yield 'quantity_int_empty_value' => ['/filtered_numeric_parameters?quantity=', 4];
+        yield 'ratio_float_empty_value' => ['/filtered_numeric_parameters?ratio=', 4];
+        yield 'amount_alias_int_empty_value' => ['/filtered_numeric_parameters?amount=', 4];
+        yield 'quantities_list_only_empty_value' => ['/filtered_numeric_parameters?quantities[]=', 4];
+        yield 'quantities_list_value_and_empty_value' => ['/filtered_numeric_parameters?quantities[]=20&quantities[]=', 2];
     }
 
     /**
