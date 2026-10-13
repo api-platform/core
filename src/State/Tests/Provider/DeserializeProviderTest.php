@@ -365,4 +365,47 @@ class DeserializeProviderTest extends TestCase
         $request->attributes->set('input_format', 'format');
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
     }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8650
+     */
+    public function testDeserializeCollectsPartialDenormalizationErrorsWithoutDeprecation(): void
+    {
+        $operation = new Post(deserialize: true, class: \stdClass::class);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn(null);
+
+        $exception = NotNormalizableValueException::createForUnexpectedDataType('Internal error detail', 42, ['string'], 'name', false);
+        $partialException = new PartialDenormalizationException(null, [$exception]);
+
+        $serializerContextBuilder = $this->createStub(SerializerContextBuilderInterface::class);
+        $serializerContextBuilder->method('createFromRequest')->willReturn([SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => false]);
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('deserialize')->willThrowException($partialException);
+
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
+        $request = new Request(content: '{"name":42}');
+        $request->headers->set('CONTENT_TYPE', 'application/json');
+        $request->attributes->set('input_format', 'json');
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            $provider->provide($operation, [], ['request' => $request]);
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violations = $e->getConstraintViolationList();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+        $this->assertCount(1, $violations);
+        $this->assertSame('name', $violations[0]->getPropertyPath());
+    }
 }
