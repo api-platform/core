@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Query;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
@@ -332,6 +333,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     $parameter = $parameter->withNativeType(Type::int());
                 } elseif ('number' === ($parameter->getSchema()['type'] ?? null)) {
                     $parameter = $parameter->withNativeType(Type::float());
+                } elseif ($parameter instanceof ScalarHeaderParameter) {
+                    $parameter = $parameter->withNativeType(Type::string());
                 } else {
                     $parameter = $parameter->withNativeType(Type::union(Type::string(), Type::list(Type::string())));
                 }
