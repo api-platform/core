@@ -120,6 +120,41 @@ final class DenormalizationViolationFactoryTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
+    public function testBackedEnumWithoutConstraintThrowsValidationException(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType(
+            'The data must be one of the following values: "a", "b".',
+            'invalid',
+            [DenormBackedEnumFixture::class, 'null'],
+            'enum',
+            true,
+        );
+
+        try {
+            $this->factory->handle($exception, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violation = $e->getConstraintViolationList()[0];
+            $this->assertSame('enum', $violation->getPropertyPath());
+            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violation->getCode());
+            // The enum's backing scalar is reported, never the internal FQCN.
+            $this->assertSame('This value should be of type string|null.', (string) $violation->getMessage());
+        }
+    }
+
+    public function testBackedEnumWrappedInPreviousExceptionThrowsValidationException(): void
+    {
+        $previous = NotNormalizableValueException::createForUnexpectedDataType('msg', 'invalid', [DenormBackedEnumFixture::class], 'enum', true);
+        $exception = new NotNormalizableValueException('The data must be one of the following values: "a", "b".', 0, $previous, 'string', null, 'enum', true);
+
+        try {
+            $this->factory->handle($exception, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $e->getConstraintViolationList()[0]->getCode());
+        }
+    }
+
     public function testUnknownClassReturnsVoid(): void
     {
         $exception = NotNormalizableValueException::createForUnexpectedDataType('Type error.', null, ['string'], 'name');
@@ -215,4 +250,12 @@ class DenormHandlerFixture
 
     #[NotBlank(groups: ['admin'])]
     public string $adminOnly = '';
+
+    public ?DenormBackedEnumFixture $enum = null;
+}
+
+enum DenormBackedEnumFixture: string
+{
+    case A = 'a';
+    case B = 'b';
 }
