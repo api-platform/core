@@ -218,6 +218,32 @@ final class DenormalizationViolationFactoryTest extends TestCase
         }
     }
 
+    public function testHandlePartialDenormalizationExceptionWithoutDeprecation(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType('Internal error detail', 42, ['string'], 'name', false);
+        $partial = new PartialDenormalizationException(null, [$exception]);
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            $this->factory->handle($partial, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violations = $e->getConstraintViolationList();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+        $this->assertCount(1, $violations);
+        $this->assertSame('name', $violations[0]->getPropertyPath());
+    }
+
     /**
      * @param array<string>|null $groups
      */
