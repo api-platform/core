@@ -17,6 +17,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\DeliveryRequest;
+use Workbench\App\Models\NullableMorphNote;
+use Workbench\Database\Factories\NullableMorphNoteFactory;
 use Workbench\Database\Factories\TimeSlotFactory;
 
 /**
@@ -63,6 +65,22 @@ final class NullableBelongsToTest extends TestCase
         $deliveryRequest = DeliveryRequest::query()->sole();
         $this->assertSame($slotId, $deliveryRequest->pickup_time_slot_id); // @phpstan-ignore-line
         $this->assertSame('updated', $deliveryRequest->note); // @phpstan-ignore-line
+    }
+
+    public function testPatchWithExplicitNullClearsMorphTo(): void
+    {
+        $slot = TimeSlotFactory::new()->create();
+        $note = NullableMorphNoteFactory::new()->for($slot, 'noteable')->create();
+        $this->assertNotNull(NullableMorphNote::query()->sole()->noteable_id); // @phpstan-ignore-line
+
+        $response = $this->patchJson('/api/nullable_morph_notes/'.$note->id, [ // @phpstan-ignore-line
+            'noteable' => null,
+        ], ['accept' => 'application/ld+json', 'content-type' => 'application/merge-patch+json']);
+
+        $response->assertStatus(200);
+        $note = NullableMorphNote::query()->sole();
+        $this->assertNull($note->noteable_id); // @phpstan-ignore-line
+        $this->assertNull($note->noteable_type); // @phpstan-ignore-line
     }
 
     private function createDeliveryRequestWithSlot(): string
