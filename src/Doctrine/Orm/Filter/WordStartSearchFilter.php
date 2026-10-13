@@ -29,6 +29,7 @@ use Doctrine\ORM\QueryBuilder;
 final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -46,7 +47,7 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
         $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 
@@ -60,8 +61,8 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
             $wordName = $queryNameGenerator->generateParameterName($property);
 
             $expressions[] = $queryBuilder->expr()->orX(
-                $this->createLikeExpression($field, $startName),
-                $this->createLikeExpression($field, $wordName),
+                $this->createLikeExpression($field, $startName, $this->caseSensitive),
+                $this->createLikeExpression($field, $wordName, $this->caseSensitive),
             );
 
             $queryBuilder->setParameter($startName, $this->formatStartValue($val));
@@ -73,20 +74,13 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
         );
     }
 
-    private function createLikeExpression(string $field, string $parameterName): string
-    {
-        return $this->caseSensitive
-            ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-            : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
-    }
-
     private function formatStartValue(string $value): string
     {
-        return addcslashes($value, '\\%_').'%';
+        return $this->escapeLikeValue($value).'%';
     }
 
     private function formatWordValue(string $value): string
     {
-        return '% '.addcslashes($value, '\\%_').'%';
+        return '% '.$this->escapeLikeValue($value).'%';
     }
 }

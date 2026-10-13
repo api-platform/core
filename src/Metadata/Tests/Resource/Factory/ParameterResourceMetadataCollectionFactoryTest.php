@@ -20,6 +20,8 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\Metadata\Parameters;
@@ -884,6 +886,205 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertTrue($getParameters->has('X-API-Key', HeaderParameter::class));
     }
 
+    public function testQueryParameterOnPropertiesWithOperationsDoesNotLeakThroughResourceParameters(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'title']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resource = $parameterFactory->create(QueryParameterOnPropertiesWithOperationsAndResourceParameters::class)[0];
+        $operations = array_values(iterator_to_array($resource->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        [$getOperation, $collectionOperation] = $operations;
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('q'));
+        $this->assertFalse($getOperation->getParameters()->has('title'));
+
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('q'));
+        $this->assertTrue($collectionOperation->getParameters()->has('title'));
+
+        $this->assertNotSame($getOperation->getParameters(), $collectionOperation->getParameters());
+        $this->assertFalse($resource->getParameters()->has('title'));
+    }
+
+    public function testQueryParameterOnPropertiesWithGraphQlOperations(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true),
+            $filterLocator
+        );
+
+        $resource = $parameterFactory->create(QueryParameterOnPropertiesWithGraphQlOperations::class)[0];
+
+        $operations = array_values(iterator_to_array($resource->getOperations()));
+        $this->assertCount(1, $operations);
+        $this->assertInstanceOf(GetCollection::class, $operations[0]);
+        $this->assertFalse($operations[0]->getParameters()?->has('search', QueryParameter::class) ?? false);
+
+        $graphQlCollectionOperations = array_values(array_filter(
+            $resource->getGraphQlOperations(),
+            static fn ($graphQlOperation): bool => $graphQlOperation instanceof QueryCollection,
+        ));
+        $this->assertCount(1, $graphQlCollectionOperations);
+        $this->assertTrue($graphQlCollectionOperations[0]->getParameters()->has('search', QueryParameter::class));
+    }
+
+    public function testQueryParameterOnPropertiesThrowsExceptionWhenGraphQlOperationIsNotDeclared(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Parameter attribute on property "name" is restricted to the operation "%s" which is not declared on the resource "%s".', Mutation::class, QueryParameterOnPropertiesWithUndeclaredGraphQlOperation::class));
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true),
+            $filterLocator
+        );
+
+        $parameterFactory->create(QueryParameterOnPropertiesWithUndeclaredGraphQlOperation::class);
+    }
+
+    public function testParameterOnPropertiesWithOperationClassStrings(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['name', 'authToken']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(ParameterOnPropertiesWithOperationClassStrings::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        [$collectionOperation, $getOperation] = $operations;
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('search', QueryParameter::class));
+        $this->assertTrue($collectionOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertFalse($getOperation->getParameters()->has('search', QueryParameter::class));
+        $this->assertTrue($getOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+    }
+
+    public function testParameterOnPropertiesThrowsExceptionWhenOperationClassStringIsNotDeclared(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Parameter attribute on property "name" is restricted to the operation "%s" which is not declared on the resource "%s".', Patch::class, ParameterOnPropertiesWithUndeclaredOperationClassString::class));
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(ParameterOnPropertiesWithUndeclaredOperationClassString::class);
+    }
+
+    public function testOperationParameterTakesPrecedenceOverParameterAttributeOnProperty(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(QueryParameterOnPropertiesOverriddenByOperation::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        [$collectionOperation, $getOperation] = $operations;
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $collectionParameter = $collectionOperation->getParameters()->get('name');
+        $this->assertInstanceOf(QueryParameter::class, $collectionParameter);
+        $this->assertSame('From operation', $collectionParameter->getDescription());
+        $this->assertFalse($collectionParameter->getRequired());
+
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $getParameter = $getOperation->getParameters()->get('name');
+        $this->assertInstanceOf(QueryParameter::class, $getParameter);
+        $this->assertSame('From property', $getParameter->getDescription());
+        $this->assertTrue($getParameter->getRequired());
+    }
+
     public function testNestedPropertyWithNameConverter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -1399,4 +1600,87 @@ class HeaderParameterOnPropertiesWithOperations
 
     #[HeaderParameter(key: 'X-API-Key', description: 'API key header', operations: [new GetCollection(), new Get()])]
     public string $apiKey = '';
+}
+
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ],
+    parameters: ['q' => new QueryParameter()],
+)]
+class QueryParameterOnPropertiesWithOperationsAndResourceParameters
+{
+    public string $id = '';
+
+    #[QueryParameter(operations: [new GetCollection()])]
+    public string $title = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+    ],
+    graphQlOperations: [
+        new QueryCollection(),
+    ]
+)]
+class QueryParameterOnPropertiesWithGraphQlOperations
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [new QueryCollection()])]
+    public string $name = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+    ],
+    graphQlOperations: [
+        new QueryCollection(),
+    ]
+)]
+class QueryParameterOnPropertiesWithUndeclaredGraphQlOperation
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [new Mutation(name: 'create')])]
+    public string $name = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ]
+)]
+class ParameterOnPropertiesWithOperationClassStrings
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [GetCollection::class])]
+    public string $name = '';
+
+    #[HeaderParameter(key: 'X-Authorization', description: 'Authorization header', operations: [Get::class, new GetCollection()])]
+    public string $authToken = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+    ]
+)]
+class ParameterOnPropertiesWithUndeclaredOperationClassString
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [Patch::class])]
+    public string $name = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(parameters: ['name' => new QueryParameter(description: 'From operation', required: false)]),
+        new Get(),
+    ]
+)]
+class QueryParameterOnPropertiesOverriddenByOperation
+{
+    public int $id = 0;
+
+    #[QueryParameter(description: 'From property', required: true)]
+    public string $name = '';
 }

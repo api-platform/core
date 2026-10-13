@@ -28,6 +28,7 @@ use Doctrine\ORM\QueryBuilder;
 final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -45,7 +46,7 @@ final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterIn
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
         $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 
@@ -53,9 +54,7 @@ final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterIn
             $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
 
-            $likeExpression = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpression = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
             $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
 
             return;
@@ -64,9 +63,7 @@ final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterIn
         $likeExpressions = [];
         foreach ($values as $val) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $likeExpressions[] = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpressions[] = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
 
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($val));
         }
@@ -78,6 +75,6 @@ final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterIn
 
     private function formatLikeValue(string $value): string
     {
-        return '%'.addcslashes($value, '\\%_');
+        return '%'.$this->escapeLikeValue($value);
     }
 }

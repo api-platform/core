@@ -70,7 +70,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
 use Symfony\AI\McpBundle\McpBundle;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -89,6 +89,7 @@ use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
+use Symfony\Component\Translation\Command\TranslationExtractCommand;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -212,7 +213,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service.
         // willBeAvailable mirrors FrameworkBundle's own gate: when symfony/object-mapper is in dev-only,
         // FrameworkBundle skips object_mapper.php and the "object_mapper" service we alias to does not exist.
-        if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
+        if (class_exists(ObjectMapper::class) && (class_exists(TranslationExtractCommand::class) || class_exists(FrameworkTranslationExtractCommand::class)) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('state/object_mapper.php');
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }

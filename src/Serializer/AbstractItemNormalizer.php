@@ -256,7 +256,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             try {
                 return $this->serializer->denormalize($data, $inputClass, $format, $context);
-            } catch (NotNormalizableValueException $e) {
+            } catch (NotNormalizableValueException|MissingConstructorArgumentsException $e) {
                 throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
             }
         }
@@ -892,6 +892,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
+            $serializer = $this->serializer;
+
             unset(
                 $context['resource_class'],
                 $context['force_resource_class'],
@@ -903,7 +905,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
-                return $this->serializer->normalize($attributeValue, $format, $childContext);
+                return $serializer->normalize($attributeValue, $format, $childContext);
             }
 
             if ($type instanceof CollectionType) {
