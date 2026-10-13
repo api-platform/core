@@ -21,7 +21,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
@@ -78,25 +77,6 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 
         yield 'native type: supported' => [new AtLeastOneOf([new NotBlank()]), (new ApiProperty())->withNativeType(Type::mixed()), true];
         yield 'native type: not supported' => [new Positive(), (new ApiProperty())->withNativeType(Type::mixed()), false];
-    }
-
-    #[IgnoreDeprecations]
-    public function testCreate(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []],
-            'one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), [
-                'oneOf' => [['minLength' => 3]],
-            ]],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
-        }
     }
 
     #[DataProvider('createProviderWithNativeType')]

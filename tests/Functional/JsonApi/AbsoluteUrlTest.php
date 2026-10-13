@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\AbsoluteUrlDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\AbsoluteUrlRelationDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;

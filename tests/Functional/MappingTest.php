@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BookStoreResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7563\BookDto;
@@ -108,7 +108,7 @@ final class MappingTest extends ApiTestCase
 
     /**
      * When an API resource has multiple #[Map] targets (e.g. MappedEntity + AnotherMappedObject),
-     * the ObjectMapperProcessor must resolve the correct target using stateOptions during POST.
+     * the ObjectMapperInputProcessor must resolve the correct target using stateOptions during POST.
      */
     public function testPostWithMultipleMapTargetsResolvesCorrectEntity(): void
     {

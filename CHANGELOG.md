@@ -1,5 +1,98 @@
 # Changelog
 
+## v5.0.3
+
+API Platform 5.0.3 contains every change shipped in [v4.4.4](#v444) except the revert of #8600 ([#8637](https://github.com/api-platform/core/pull/8637)): 5.0 keeps documenting filterless array query parameters as both `key` and `key[]`, now guarded against `key[][]`, plus the changes below.
+
+### Bug fixes
+
+* [13a9c11db](https://github.com/api-platform/core/commit/13a9c11dbd7529bf792411ec002b45dca5c3c29b) fix(doctrine): avoid more deprecation from doctrine
+* [37798944c](https://github.com/api-platform/core/commit/37798944c6dee10cdc6c7e4d05f008b3adb71660) fix(hal): use spl_object_id() for circular reference counters (#8657)
+* [ff1bfbdde](https://github.com/api-platform/core/commit/ff1bfbddedc18fd582c855fc90da2c8660a24c68) fix(metadata): do not mutate parameters shared between operations (#8622)
+* [88fab3bab](https://github.com/api-platform/core/commit/88fab3babb64e7befd44045d71ef423e97b00f66) fix(openapi): don't suffix [] on bracketed array keys (#8636)
+* [ce647452b](https://github.com/api-platform/core/commit/ce647452bbc8e3ad340950f745e8c95f9fa1b75d) fix(serializer): catch MissingConstructorArgumentsException (#8659)
+* [b10e80f61](https://github.com/api-platform/core/commit/b10e80f611cb0c3a9e7164a0a2156e846e456a14) fix(symfony): check HttpClientTrait before loading the test client (#8613)
+* [c3eabbb9a](https://github.com/api-platform/core/commit/c3eabbb9a6bf63f7796759afd5db334b78c3d880) fix(symfony): hide the "Other API docs" label when there is only a single option (#8631)
+
+### Dependencies
+
+* [40711a61c](https://github.com/api-platform/core/commit/40711a61c99cee7db83256342bf6220c8925543c) chore(openapi): require json-schema ^5.0.2 (#8630)
+* [5fcc64d0b](https://github.com/api-platform/core/commit/5fcc64d0b719d5cf1f725e5550615817f28b9c8d) chore: suggest ext-deepclone (#8658)
+
+## v5.0.2
+
+API Platform 5.0.2 contains every change shipped in [v4.4.3](#v443), plus the changes below.
+
+### Behavior changes
+
+* [0c0b608f4](https://github.com/api-platform/core/commit/0c0b608f469e2fd76683c9160d4306f3102d07ef) fix(openapi): document request body on operations that deserialize (#8598). An operation with `deserialize: true` on a method other than `POST`, `PUT` or `PATCH` (for example `GET` or `DELETE`) now gets a `requestBody` and an input JSON Schema in the OpenAPI document. **This can change your generated schema**, so clients generated from it or snapshot tests of it can differ. It is acceptable in 5.0, but it was reverted from 4.4 because a schema change must not ship in a patch release.
+
+### Bug fixes
+
+* [773c6cca0](https://github.com/api-platform/core/commit/773c6cca04b05ac98da588c794bec14ca4d43f45) fix(doctrine): avoid deprecation with SortFilter (#8617)
+* [54add936f](https://github.com/api-platform/core/commit/54add936f92b9bf5bf9fa865d00abdcbaad9f7e2) fix(jsonapi): sparse fieldsets on included resources (#8584)
+* [f590d9438](https://github.com/api-platform/core/commit/f590d9438bed057826eab02553514ef6a2179db7) fix(laravel): don't duplicate the filter interface use statement (#8593)
+* [c092cd0df](https://github.com/api-platform/core/commit/c092cd0dfefd2827f978649c2848110bbff0e737) fix(metadata): use operation shortName for resources without ApiResource (#8609)
+* [d25771aa7](https://github.com/api-platform/core/commit/d25771aa76deeaee517d2e612640fa510bfc49ab) fix: throw exception when an operation is not declared in ApiResource for parameter attributes on properties (#8552)
+
+## v5.0.1
+
+API Platform 5.0.1 contains every change shipped in [v4.4.1](#v441) and [v4.4.2](#v442), plus the fixes below.
+
+### Bug fixes
+
+* [1dc16378c](https://github.com/api-platform/core/commit/1dc16378cb8370be4c9b8930a905720a110b628a) fix(symfony): use StrictUnifiedDiffOutputBuilder in api:upgrade-filter (#8559)
+* [27153419c](https://github.com/api-platform/core/commit/27153419c4bacb2445d4d67b4f6bf51800ceec9b) fix(symfony,graphql): resolve twig runtime csp_nonce function (#8575)
+* [6f9837b25](https://github.com/api-platform/core/commit/6f9837b256dc6a66028da8976f1fbff753a06ff0) fix(metadata): format-agnostic uriTemplate match (#8540)
+* [a4b814308](https://github.com/api-platform/core/commit/a4b81430828b0eec51d53688f262140b777019eb) fix(symfony): guard test client service when api-platform/test is absent (#8574)
+* [c5e19e1a6](https://github.com/api-platform/core/commit/c5e19e1a6ae819aeb623b110cde71d032b1dfc93) fix(mongodb): nullable from php type, not mapping (#8298)
+* [ca8c8fc4b](https://github.com/api-platform/core/commit/ca8c8fc4bab33cd822cb6f2714181c3e5e383cf0) fix(validator): do not emit an unresolved {{ type }} placeholder (#8546)
+* [fe9a06c71](https://github.com/api-platform/core/commit/fe9a06c71ac80887bd88670542411087bf0c3cb9) fix(redoc): update ReDoc to 2.5.4 to fix crash on OpenAPI 3.2 documents (#8569)
+
+## v5.0.0
+
+API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the removals and breaking changes below.
+
+### Breaking changes
+
+* [14ce74352](https://github.com/api-platform/core/commit/14ce74352510c8f2cff7256dcea9a72b6e52c4e8) feat(jsonapi)!: default use_iri_as_id to false (#8512)
+* [ce741c851](https://github.com/api-platform/core/commit/ce741c8515f7b4ce992b14efa236c1fa49f43160) feat(state)!: drop TranslatorInterface support from DeserializeProvider (#8514)
+* [906a36dca](https://github.com/api-platform/core/commit/906a36dca9b1a1e8e48fc7990c187331b72b370e) feat!: drop the Request::getContentType() fallbacks (#8517)
+* [cf1d5a9fc](https://github.com/api-platform/core/commit/cf1d5a9fc629876f031d3cbc9aabd692a97e790c) feat(symfony)!: drop the Symfony 6 value resolver shim (#8516)
+* [e22e74464](https://github.com/api-platform/core/commit/e22e74464e49d0dc0bd86e7407f1e19b6c5db9ca) feat!: remove deprecated APIs scheduled for 5.0 (#8367)
+* [4a9a14507](https://github.com/api-platform/core/commit/4a9a14507e5ca97c85fcf8dd1e240008f000c525) feat!: remove legacy PropertyInfo Type system (#8364)
+* [1e6d13ae1](https://github.com/api-platform/core/commit/1e6d13ae117471dd6e549cd1cc5dc8816d5804fd) feat!: core 5.0 cleanups (getProperties interface, json:api status string) (#8366)
+* Denormalization errors on a property carrying a Symfony Validator constraint now return `422` with a `ConstraintViolation` payload instead of `400` with a `hydra:Error` payload ([#8211](https://github.com/api-platform/core/pull/8211), [#8389](https://github.com/api-platform/core/pull/8389)). Properties without constraint metadata still return `400`. This shipped in the 4.4 betas and was moved to 5.0; there is no configuration flag, but the behaviour can be disabled by overriding the `api_platform.state.denormalization_violation_factory` service.
+
+### Features
+
+* [edead1f0c](https://github.com/api-platform/core/commit/edead1f0cd2375604d9929f16a005954d94b3a17) feat: HTTP QUERY method support (RFC 10008) (#8349)
+* [826e847b6](https://github.com/api-platform/core/commit/826e847b6d1ee607f2f671d0a03d8f8ec0daa429) feat(metadata): resolve %param% in yaml/xml and attribute resource config (#8284)
+* [56c4ae204](https://github.com/api-platform/core/commit/56c4ae2040be32a42b8b42aec976697f0d82941d) feat(symfony): add routePriority to control route matching order (#8309)
+* [c3b6bb41f](https://github.com/api-platform/core/commit/c3b6bb41f0afe6988356e5c5099f60e0524c7d96) feat: allow restricting operations for parameter attributes on properties (#7899)
+* [fce2bdfe6](https://github.com/api-platform/core/commit/fce2bdfe6a55c117014337c5339a98c6401609d4) feat(state): apply uri variable provider values (#8491)
+* [56daf41c4](https://github.com/api-platform/core/commit/56daf41c4de9e737f2374a2696f6016425958dad) feat: allow Parameter attributes on properties (#7870)
+* [24871a9ac](https://github.com/api-platform/core/commit/24871a9ac05468cf864de6771ebceceb720fb273) feat(symfony): emit a csp nonce on the swagger ui and graphiql scripts (#8310)
+* [a8af8e1b9](https://github.com/api-platform/core/commit/a8af8e1b97601d94f10f8dfa057e827e5611c0d9) feat(doctrine): embed joined/sti relations when a discriminator subclass declares the group (#8283)
+* [711f00657](https://github.com/api-platform/core/commit/711f006577c2f60fa2c71755f1f27825bf9722ce) feat: extract ApiTestCase in its own api-platform/test package (#7887)
+* [672d48e25](https://github.com/api-platform/core/commit/672d48e2510ca08aed92958677c8f861cb36f959) feat(symfony): map UniqueConstraintViolationException to 422 by default (#8478)
+* [d37a75379](https://github.com/api-platform/core/commit/d37a753790f8a8e1481a118b6a8fc9a08f57e962) feat(doctrine): standalone Date/Exists filters, ComparisonFilter [between], deprecate RangeFilter (#8351)
+
+### Bug fixes
+
+* [5ad54c9d9](https://github.com/api-platform/core/commit/5ad54c9d9803b124bc34af16553fa9eca0503dc9) fix(symfony): separate route priority (#8529)
+* [239e44c44](https://github.com/api-platform/core/commit/239e44c44a6db7a399af463f4ff217483e75cc5b) fix(symfony): make api-platform/test a dev dependency (#8527)
+* [7afb7c8a7](https://github.com/api-platform/core/commit/7afb7c8a760b54324c49fa780be7320cc119d392) fix(test): restore main CI after the ApiTestCase extraction (#8526)
+* [88f98d961](https://github.com/api-platform/core/commit/88f98d9616f8fdbebd8308086c666882289f0959) fix(serializer): read Symfony attributes through their public properties (#8519)
+* [78151b7d1](https://github.com/api-platform/core/commit/78151b7d19da1dfba9a37362bb23a9cb4ff4acd1) fix(mcp): return resource read results for resources (#8436)
+* [8360186ed](https://github.com/api-platform/core/commit/8360186eda109c3e3ed2dd22d054b6ce6cb7404a) fix(serializer): remove dead native-type guards in AbstractItemNormalizerTest
+* [88f458a11](https://github.com/api-platform/core/commit/88f458a1108ba2fcd052a58d7647f23dad1b186b) fix(jsonschema): drop removed getBuiltinTypes path in SchemaPropertyMetadataFactory
+
+### Dependencies
+
+* `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
+* Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
+
 ## v4.4.4
 
 ### Bug fixes

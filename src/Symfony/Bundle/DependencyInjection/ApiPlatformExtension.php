@@ -410,7 +410,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.stale_while_revalidate', $config['defaults']['cache_headers']['stale_while_revalidate'] ?? null);
         $container->setParameter('api_platform.http_cache.stale_if_error', $config['defaults']['cache_headers']['stale_if_error'] ?? null);
         $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
-        $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
+        $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? ' ');
 
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
         $container->setAlias('api_platform.inflector', $config['inflector']);
@@ -480,13 +480,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('metadata/resource_name.php');
         $loader->load('metadata/property_name.php');
-
-        if (!empty($config['resource_class_directories'])) {
-            $container->setParameter('api_platform.resource_class_directories', array_merge(
-                $config['resource_class_directories'],
-                $container->getParameter('api_platform.resource_class_directories')
-            ));
-        }
 
         // V3 metadata
         $loader->load('metadata/php.php');
@@ -724,10 +717,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('state/jsonapi.php');
 
         $useIriAsId = $config['jsonapi']['use_iri_as_id'];
-        if (null === $useIriAsId) {
-            trigger_deprecation('api-platform/core', '4.4', 'Not setting "api_platform.jsonapi.use_iri_as_id" explicitly is deprecated. Its default value will change from "true" to "false" in API Platform 5.0. Set it to "true" to keep the current behavior or to "false" to use entity identifiers as the "id" field, and silence this deprecation.');
-            $useIriAsId = true;
-        }
 
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
         $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
@@ -920,9 +909,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $definition->addTag('api_platform.http_cache.http_client');
         }
 
-        if (!($urls = $config['http_cache']['invalidation']['urls'])) {
-            $urls = $config['http_cache']['invalidation']['varnish_urls'];
-        }
+        $urls = $config['http_cache']['invalidation']['urls'];
 
         foreach ($urls as $key => $url) {
             $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);

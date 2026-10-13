@@ -143,7 +143,7 @@ final class ApiLoader extends Loader
                         $exposedOperations[$operationName] = true;
                     }
 
-                    $routeCollection->add($operationName, $route);
+                    $routeCollection->add($operationName, $route, $operation->getRoutePriority() ?? 0);
                 }
             }
         }

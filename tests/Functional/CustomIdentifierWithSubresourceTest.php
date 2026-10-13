@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugChildDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -101,7 +101,7 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
-            '@context' => '/contexts/SlugChildDummy',
+            '@context' => '/contexts/SlugChildDummy2',
             '@id' => '/slug_parent_dummies/parent-dummy/child_dummies',
             '@type' => 'hydra:Collection',
             'hydra:member' => [
@@ -126,9 +126,9 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
-            '@context' => '/contexts/SlugParentDummy',
+            '@context' => '/contexts/SlugParentDummy3',
             '@id' => '/slug_child_dummies/child-dummy/parent_dummy',
-            '@type' => 'SlugParentDummy',
+            '@type' => 'SlugParentDummy3',
             'id' => 1,
             'slug' => 'parent-dummy',
             'childDummies' => ['/slug_child_dummies/child-dummy'],

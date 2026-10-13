@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\GraphQl;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8076\Facility;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8076\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8076\Variant;

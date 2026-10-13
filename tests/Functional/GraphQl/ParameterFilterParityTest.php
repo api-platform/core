@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\GraphQl\Test\GraphQlTestTrait;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\GraphQlFilteredResource as GraphQlFilteredResourceDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\GraphQlFilteredResourceColor as GraphQlFilteredResourceColorDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\GraphQlFilteredResource;

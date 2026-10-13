@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Util\UriTemplateHelper;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -153,9 +154,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
         $operation = $operation->withUriVariables($uriVariables);
 
-        if (str_ends_with($uriTemplate, '{._format}') || str_ends_with($uriTemplate, '.{_format}')) {
-            $uriTemplate = substr($uriTemplate, 0, -10);
-        }
+        $uriTemplate = UriTemplateHelper::withoutFormatSuffix($uriTemplate);
 
         // TODO: move this to the Symfony bridge
         if (class_exists(Route::class)) {

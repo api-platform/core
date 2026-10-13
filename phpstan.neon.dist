@@ -13,7 +13,7 @@ parameters:
 		objectManagerLoader: tests/Fixtures/app/object-manager.php
 	bootstrapFiles:
 		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
-		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
+		- src/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 
 	excludePaths:
@@ -33,8 +33,6 @@ parameters:
 		- src/Doctrine/Odm/Tests/var/*
 		- src/Doctrine/*/vendor/*
 		- src/*/vendor/*
-		# Symfony 6 support
-		- src/Symfony/Bundle/ArgumentResolver/CompatibleValueResolverInterface.php
 		- tests/Fixtures/app/config/reference.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
@@ -42,6 +40,10 @@ parameters:
 		ApiPlatform\Metadata\Resource\ResourceMetadataCollection:
 			- handleNotFound
 	ignoreErrors:
+		# BC shims for the test helpers moved to api-platform/test in 5.0
+		-
+			identifier: trait.unused
+			path: src/Symfony/Bundle/Test/*
 		# ignore type todo remove in 5.0
 		-
 			message: '#Symfony\\Component\\PropertyInfo\\Type#'
@@ -97,16 +99,10 @@ parameters:
 		# Expected, due to backward compatibility
 		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
 		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\PropertyInfo\\\\\\\\PropertyInfoExtractor' and 'getType' will always evaluate to true\\.#"
-		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\HttpFoundation\\\\\\\\Request' and 'getContentTypeFormat' will always evaluate to true\\.#"
-		- '#Call to an undefined method Symfony\\Component\\HttpFoundation\\Request::getContentType\(\)\.#'
 		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\Serializer\\\\\\\\Serializer' and 'getSupportedTypes' will always evaluate to true\\.#"
-		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Normalizer\\\\NormalizerInterface and 'getSupportedTypes' will always evaluate to true\\.#"
 		- "#Call to function method_exists\\(\\) with Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\ClassMetadata\\|Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata and 'isChangeTrackingDef…' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Exception\\\\PartialDenormalizationException and 'getNotNormalizableV…' will always evaluate to true\\.#"
 
-		# See https://github.com/phpstan/phpstan-symfony/issues/27
-		-
-			message: '#^Service "[^"]+" is private.$#'
-			path: src
 
 
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
@@ -162,7 +158,7 @@ parameters:
 				- src/Metadata/Tests
 				- src/OpenApi/Tests
 				- src/Serializer/Tests
-				- src/Symfony/Bundle/Test
+				- src/Test
 				- src/Symfony/Tests
 				- tests
 		-
@@ -184,7 +180,7 @@ parameters:
 		-
 			identifier: argument.templateType
 			paths:
-				- src/Symfony/Bundle/Test
+				- src/Test
 				- tests
 				- src # TODO
 

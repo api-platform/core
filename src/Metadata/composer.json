@@ -36,12 +36,12 @@
         "symfony/type-info": "^7.4 || ^8.0"
     },
     "require-dev": {
-        "api-platform/json-schema": "^4.4",
-        "api-platform/openapi": "^4.4",
-        "api-platform/state": "^4.4",
+        "api-platform/json-schema": "^5.0",
+        "api-platform/openapi": "^5.0",
+        "api-platform/state": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
-        "phpunit/phpunit": "^11.5 || ^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "symfony/config": "^7.4 || ^8.0",
         "symfony/routing": "^7.4 || ^8.0",
         "symfony/var-dumper": "^7.4 || ^8.0",
@@ -73,7 +73,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.4.x-dev",
+            "dev-main": "5.0.x-dev",
             "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"

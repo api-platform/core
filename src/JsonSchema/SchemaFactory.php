@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
@@ -49,10 +48,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
     public const PARTIAL_UPDATE = 'partial_update';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
         if (!$definitionNameFactory) {
-            $this->definitionNameFactory = new DefinitionNameFactory($distinctFormats);
+            $this->definitionNameFactory = new DefinitionNameFactory();
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -91,7 +90,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         // In case of FORCE_SUBSCHEMA an object can be writable through another class even though it has no POST operation
-        if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT', 'QUERY'], true)) {
+        // QUERY (RFC 10008) is a safe read but still carries an input body (its criteria object).
+        if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT', 'QUERY'], true) && true !== $operation?->canDeserialize()) {
             return $schema;
         }
 
@@ -164,148 +164,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $definition['required'][] = $normalizedPropertyName;
             }
 
-            if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-                $this->buildLegacyPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
-            } else {
-                $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
-            }
+            $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
 
         return $schema;
-    }
-
-    /**
-     * Builds the JSON Schema for a property using the legacy PropertyInfo component.
-     */
-    private function buildLegacyPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void
-    {
-        $version = $schema->getVersion();
-        if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
-            $additionalPropertySchema = $propertyMetadata->getOpenapiContext();
-        } else {
-            $additionalPropertySchema = $propertyMetadata->getJsonSchemaContext();
-        }
-
-        $propertySchema = array_merge(
-            $propertyMetadata->getSchema() ?? [],
-            $additionalPropertySchema ?? []
-        );
-
-        // @see https://github.com/api-platform/core/issues/6299
-        if (Schema::UNKNOWN_TYPE === ($propertySchema['type'] ?? null) && isset($propertySchema['$ref'])) {
-            unset($propertySchema['type']);
-        }
-
-        $extraProperties = $propertyMetadata->getExtraProperties();
-        // see AttributePropertyMetadataFactory
-        if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
-            // schema seems to have been declared by the user: do not override nor complete user value
-            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
-
-            return;
-        }
-
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-        // never override the following keys if at least one is already set
-        // or if property has no type(s) defined
-        // or if property schema is already fully defined (type=string + format || enum)
-        $propertySchemaType = $propertySchema['type'] ?? false;
-
-        $isUnknown = Schema::UNKNOWN_TYPE === $propertySchemaType
-            || ('array' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['items']['type'] ?? null))
-            || ('object' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['additionalProperties']['type'] ?? null));
-
-        // Scalar properties
-        if (
-            !$isUnknown && (
-                [] === $types
-                || ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
-                || (\is_array($propertySchemaType) ? \array_key_exists('string', $propertySchemaType) : 'string' !== $propertySchemaType)
-                || ($propertySchema['format'] ?? $propertySchema['enum'] ?? false)
-            )
-        ) {
-            if (isset($propertySchema['$ref'])) {
-                unset($propertySchema['type']);
-            }
-
-            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
-
-            return;
-        }
-
-        // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
-        // complete property schema with resource reference ($ref) only if it's related to an object
-        $version = $schema->getVersion();
-        $refs = [];
-        $isNullable = null;
-
-        foreach ($types as $type) {
-            $subSchema = new Schema($version);
-            $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
-
-            $isCollection = $type->isCollection();
-            if ($isCollection) {
-                $valueType = $type->getCollectionValueTypes()[0] ?? null;
-            } else {
-                $valueType = $type;
-            }
-
-            $className = $valueType?->getClassName();
-            if (null === $className) {
-                continue;
-            }
-
-            $childSerializerContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true];
-            if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
-                $attributes = $serializerContext[AbstractNormalizer::ATTRIBUTES];
-                if (\is_array($attributes) && \array_key_exists($normalizedPropertyName, $attributes) && \is_array($attributes[$normalizedPropertyName])) {
-                    $childSerializerContext[AbstractNormalizer::ATTRIBUTES] = $attributes[$normalizedPropertyName];
-                } else {
-                    unset($childSerializerContext[AbstractNormalizer::ATTRIBUTES]);
-                }
-            }
-
-            $subSchemaFactory = $this->schemaFactory ?: $this;
-            $subSchema = $subSchemaFactory->buildSchema(
-                $className,
-                $format,
-                $parentType,
-                null,
-                $subSchema,
-                $childSerializerContext,
-                false,
-            );
-
-            if (!isset($subSchema['$ref'])) {
-                continue;
-            }
-
-            if ($isCollection) {
-                $key = ($propertySchema['type'] ?? null) === 'object' ? 'additionalProperties' : 'items';
-                $propertySchema[$key]['$ref'] = $subSchema['$ref'];
-                unset($propertySchema[$key]['type']);
-                break;
-            }
-
-            $refs[] = ['$ref' => $subSchema['$ref']];
-            $isNullable = $isNullable ?? $type->isNullable();
-        }
-
-        if ($isNullable) {
-            $refs[] = ['type' => 'null'];
-        }
-
-        $c = \count($refs);
-        if ($c > 1) {
-            $propertySchema['anyOf'] = $refs;
-            unset($propertySchema['type']);
-        } elseif (1 === $c) {
-            $propertySchema['$ref'] = $refs[0]['$ref'];
-            unset($propertySchema['type']);
-        }
-
-        $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
     }
 
     private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void

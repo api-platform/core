@@ -44,7 +44,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.mcp.state_provider.deserialize.inner'),
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
-            service('translator')->nullOnInvalid(),
         ]);
 
     $services->set('api_platform.mcp.state_provider.parameter', ParameterProvider::class)

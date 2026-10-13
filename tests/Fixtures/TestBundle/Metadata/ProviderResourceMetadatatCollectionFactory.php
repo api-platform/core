@@ -21,11 +21,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface as ResourceInterfaceDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider;
-use ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider;
 
 class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataCollectionFactoryInterface
@@ -47,10 +45,6 @@ class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataColl
 
         if (ContainNonResource::class === $resourceClass || ContainNonResourceDocument::class === $resourceClass) {
             return $this->setProvider($resourceMetadataCollection, ContainNonResourceProvider::class);
-        }
-
-        if (SerializableResource::class === $resourceClass) {
-            return $this->setProvider($resourceMetadataCollection, SerializableProvider::class);
         }
 
         if (Taxon::class === $resourceClass || TaxonDocument::class === $resourceClass || TaxonInterface::class === $resourceClass) {

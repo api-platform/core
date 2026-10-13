@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Operation\Factory;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\UriTemplateHelper;
 
 final class OperationMetadataFactory implements OperationMetadataFactoryInterface
 {
@@ -31,14 +32,25 @@ final class OperationMetadataFactory implements OperationMetadataFactoryInterfac
             return $this->localCache[$uriTemplate];
         }
 
+        $fallback = null;
+        $strippedUriTemplate = UriTemplateHelper::withoutFormatSuffix($uriTemplate);
+
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
                 foreach ($resource->getOperations() as $operation) {
                     if ($operation->getUriTemplate() === $uriTemplate || $operation->getName() === $uriTemplate) {
                         return $this->localCache[$uriTemplate] = $operation;
                     }
+
+                    if (null === $fallback && null !== ($operationUriTemplate = $operation->getUriTemplate()) && UriTemplateHelper::withoutFormatSuffix($operationUriTemplate) === $strippedUriTemplate) {
+                        $fallback = $operation;
+                    }
                 }
             }
+        }
+
+        if (null !== $fallback) {
+            return $this->localCache[$uriTemplate] = $fallback;
         }
 
         return null;

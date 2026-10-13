@@ -76,15 +76,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['types'] = $types;
         }
 
-        // TODO: remove this as uri variables are available in the SerializerProcessor but correctly parsed
-        if ($operation->getUriVariables()) {
-            $context['uri_variables'] = [];
-
-            foreach (array_keys($operation->getUriVariables()) as $parameterName) {
-                $context['uri_variables'][$parameterName] = $request->attributes->get($parameterName);
-            }
-        }
-
         if (null === $context['output'] && $this->getStateOptionsClass($operation)) {
             $context['force_resource_class'] = $operation->getClass();
         }
@@ -106,7 +97,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 }
             }
 
-            if ('csv' === (method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType())) {
+            if ('csv' === $request->getContentTypeFormat()) {
                 $context[CsvEncoder::AS_COLLECTION_KEY] = $context[CsvEncoder::AS_COLLECTION_KEY] ?? false;
             }
         }

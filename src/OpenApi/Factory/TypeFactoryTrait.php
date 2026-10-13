@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Factory;
 
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type as NativeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -30,30 +29,9 @@ trait TypeFactoryTrait
     /**
      * @return array<string, mixed>
      */
-    private function getType(LegacyType|NativeType $type): array
+    private function getType(NativeType $type): array
     {
-        if ($type instanceof NativeType) {
-            return $this->getNativeType($type);
-        }
-
-        if ($type->isCollection()) {
-            $keyType = $type->getCollectionKeyTypes()[0] ?? null;
-            $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new LegacyType($type->getBuiltinType(), false, $type->getClassName(), false);
-
-            if (null !== $keyType && LegacyType::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
-                return $this->addNullabilityToTypeDefinition([
-                    'type' => 'object',
-                    'additionalProperties' => $this->getType($subType),
-                ], $type);
-            }
-
-            return $this->addNullabilityToTypeDefinition([
-                'type' => 'array',
-                'items' => $this->getType($subType),
-            ], $type);
-        }
-
-        return $this->addNullabilityToTypeDefinition($this->makeLegacyBasicType($type), $type);
+        return $this->getNativeType($type);
     }
 
     /**
@@ -79,20 +57,6 @@ trait TypeFactoryTrait
         }
 
         return $this->addNullabilityToTypeDefinition($this->makeBasicType($type), $type);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function makeLegacyBasicType(LegacyType $type): array
-    {
-        return match ($type->getBuiltinType()) {
-            LegacyType::BUILTIN_TYPE_INT => ['type' => 'integer'],
-            LegacyType::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
-            LegacyType::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
-            LegacyType::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable()),
-            default => ['type' => 'string'],
-        };
     }
 
     /**
@@ -182,7 +146,7 @@ trait TypeFactoryTrait
      *
      * @return array<string, mixed>
      */
-    private function addNullabilityToTypeDefinition(array $jsonSchema, LegacyType|NativeType $type): array
+    private function addNullabilityToTypeDefinition(array $jsonSchema, NativeType $type): array
     {
         if (!$type->isNullable()) {
             return $jsonSchema;

@@ -265,6 +265,7 @@ class EntrypointActionTest extends TestCase
 
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $twigProphecy->render(Argument::cetera())->willReturn('');
+        $twigProphecy->getFunction('csp_nonce')->willReturn(null);
 
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('api_graphql_entrypoint')->willReturn('/graphiql');

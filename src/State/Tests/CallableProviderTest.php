@@ -41,9 +41,9 @@ class CallableProviderTest extends TestCase
         $operation = new Get(name: 'hello', provider: 'provider');
         $provider = $this->createMock(ProviderInterface::class);
         $provider->method('provide')->willReturn(['ok']);
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with('provider')->willReturn(true);
-        $container->method('get')->with('provider')->willReturn($provider);
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnMap([['provider', true]]);
+        $container->method('get')->willReturnMap([['provider', $provider]]);
         $this->assertEquals((new CallableProvider($container))->provide($operation), ['ok']);
     }
 }

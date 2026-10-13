@@ -24,9 +24,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/state": "^4.4",
-        "api-platform/metadata": "^4.4",
-        "api-platform/serializer": "^4.4"
+        "api-platform/state": "^5.0",
+        "api-platform/metadata": "^5.0",
+        "api-platform/serializer": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -51,7 +51,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.4.x-dev",
+            "dev-main": "5.0.x-dev",
             "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"
@@ -69,7 +69,7 @@
     },
     "require-dev": {
         "symfony/type-info": "^7.4 || ^8.0",
-        "phpunit/phpunit": "^11.5 || ^12.2"
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0"
     },
     "minimum-stability": "beta",
     "prefer-stable": true

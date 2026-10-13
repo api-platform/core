@@ -84,10 +84,10 @@ return [
     ],
 
     'jsonapi' => [
-        // When false, the JSON:API `data.id` uses the resource scalar identifier
-        // and a `data.links.self` IRI is added. When true (default), `data.id`
+        // When false (default), the JSON:API `data.id` uses the resource scalar
+        // identifier and a `data.links.self` IRI is added. When true, `data.id`
         // is the resource IRI.
-        'use_iri_as_id' => true,
+        'use_iri_as_id' => false,
 
         // Allow client-generated IDs on JSON:API POST per
         // https://jsonapi.org/format/#crud-creating-client-ids. Off by default

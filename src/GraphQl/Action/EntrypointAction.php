@@ -100,7 +100,7 @@ final class EntrypointAction
             return [$query, $operationName, $variables];
         }
 
-        $contentType = method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
+        $contentType = $request->getContentTypeFormat();
         if ('json' === $contentType) {
             return $this->parseData($query, $operationName, $variables, $request->getContent());
         }

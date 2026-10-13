@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Owner as DocumentOwner;
@@ -162,7 +162,7 @@ final class ComparisonFilterTest extends ApiTestCase
 
         $parameters = $response->toArray()['paths']['/chickens']['get']['parameters'];
         $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'nameComparison['));
-        $this->assertCount(5, $comparisonParams);
+        $this->assertCount(6, $comparisonParams);
 
         foreach ($comparisonParams as $param) {
             $this->assertSame(['type' => 'string'], $param['schema'], $param['name']);

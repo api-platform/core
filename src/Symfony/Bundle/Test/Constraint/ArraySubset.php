@@ -13,22 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test\Constraint;
 
-use PHPUnit\Framework\Constraint\Constraint;
+use ApiPlatform\Test\Constraint\ArraySubset;
 
-/**
- * Is used for phpunit >= 9.
- *
- * @internal
- */
-final class ArraySubset extends Constraint
-{
-    use ArraySubsetTrait;
+trigger_deprecation('api-platform/core', '5.0', 'The "%s" class is deprecated, use "%s" instead.', 'ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset', ArraySubset::class);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
-    {
-        return $this->_evaluate($other, $description, $returnResult);
-    }
-}
+class_alias(ArraySubset::class, 'ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset');

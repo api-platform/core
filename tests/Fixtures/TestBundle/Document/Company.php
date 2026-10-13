@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Get]
 #[Post]
 #[ApiResource(
+    shortName: 'CompanyByRoom',
     uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
     uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']]
 )]

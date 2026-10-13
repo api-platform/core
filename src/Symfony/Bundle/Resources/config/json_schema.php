@@ -30,7 +30,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.property.metadata_factory'),
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('api_platform.resource_class_resolver'),
-            [],
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
         ]);
 

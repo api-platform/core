@@ -99,9 +99,9 @@ class Dummy
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public Collection|iterable $relatedDummies;
     #[ODM\Field(type: 'hash', nullable: true)]
-    public array $jsonData = [];
+    public ?array $jsonData = [];
     #[ODM\Field(type: 'collection', nullable: true)]
-    public array $arrayData = [];
+    public ?array $arrayData = [];
     /**
      * @var string|null
      */

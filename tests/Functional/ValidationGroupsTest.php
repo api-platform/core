@@ -17,7 +17,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyValidation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyValidationSerializedName;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5912\Dummy as Issue5912Dummy;
 
-final class ValidationGroupsTest extends \ApiPlatform\Symfony\Bundle\Test\ApiTestCase
+final class ValidationGroupsTest extends \ApiPlatform\Test\ApiTestCase
 {
     use \ApiPlatform\Tests\RecreateSchemaTrait;
     use \ApiPlatform\Tests\SetupClassResourcesTrait;

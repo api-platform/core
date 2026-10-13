@@ -75,6 +75,27 @@ class MakeFilterCommandTest extends TestCase
         $this->filesystem->delete($filePath);
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
+    public function testMakeFilterCommandTwiceKeepsOneFilterInterfaceUseStatement(): void
+    {
+        $appServiceFilterPath = $this->pathResolver->getServiceProviderFilePath();
+
+        foreach (['FirstFilter', 'SecondFilter'] as $filterName) {
+            $this->artisan(self::MAKE_FILTER_COMMAND)
+                ->expectsQuestion(self::FILTER_CLASS_NAME, $filterName)
+                ->assertExitCode(Command::SUCCESS);
+        }
+
+        $appServiceFilterContent = $this->filesystem->get($appServiceFilterPath);
+        $this->assertSame(1, substr_count($appServiceFilterContent, 'use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface;'));
+        $this->assertStringContainsString('use App\\Filter\\SecondFilter;', $appServiceFilterContent);
+
+        $this->filesystem->delete($this->pathResolver->generateFilterFilename('FirstFilter'));
+        $this->filesystem->delete($this->pathResolver->generateFilterFilename('SecondFilter'));
+    }
+
     public function testWhenStateFilterClassAlreadyExists(): void
     {
         $filterName = 'ExistingFilter';

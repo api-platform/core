@@ -110,6 +110,7 @@ use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
 use ApiPlatform\Laravel\Serializer\EloquentOperationResourceClassResolver;
 use ApiPlatform\Laravel\State\AccessCheckerProvider;
+use ApiPlatform\Laravel\State\DenormalizationViolationFactory as LaravelDenormalizationViolationFactory;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
@@ -163,6 +164,7 @@ use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
+use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
@@ -466,8 +468,17 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(DenormalizationViolationFactoryInterface::class, static function () {
+            return new LaravelDenormalizationViolationFactory();
+        });
+
         $this->app->singleton(DeserializeProvider::class, static function (Application $app) {
-            return new DeserializeProvider($app->make(SwaggerUiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+            return new DeserializeProvider(
+                $app->make(SwaggerUiProvider::class),
+                $app->make(SerializerInterface::class),
+                $app->make(SerializerContextBuilderInterface::class),
+                $app->make(DenormalizationViolationFactoryInterface::class),
+            );
         });
 
         $this->app->singleton(ValidateProvider::class, static function (Application $app) {
@@ -941,16 +952,12 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(SchemaFactory::class, static function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-
             return new SchemaFactory(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
-                $config->get('api-platform.formats'),
                 $app->make(DefinitionNameFactoryInterface::class),
             );
         });
@@ -1059,7 +1066,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
             $defaultContext[JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID] = (bool) $config->get('api-platform.jsonapi.allow_client_generated_id', false);
-            $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', true);
+            $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', false);
 
             return new JsonApiItemNormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),

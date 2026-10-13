@@ -50,7 +50,7 @@
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev",
             "dev-4.2": "4.2.x-dev",
-            "dev-main": "4.4.x-dev"
+            "dev-main": "5.0.x-dev"
         },
         "symfony": {
             "require": "^7.4 || ^8.0"
@@ -104,6 +104,7 @@
         "api-platform/serializer": "self.version",
         "api-platform/state": "self.version",
         "api-platform/symfony": "self.version",
+        "api-platform/test": "self.version",
         "api-platform/validator": "self.version"
     },
     "require": {
@@ -152,7 +153,7 @@
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "^11.5 || ^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
@@ -194,6 +195,7 @@
         "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
+        "ext-deepclone": "To speed up the PHP files metadata cache with symfony/var-exporter 8.1+ (install symfony/deepclone with PIE).",
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "opensearch-project/opensearch-php": "To support OpenSearch (^2.5).",

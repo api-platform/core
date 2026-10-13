@@ -1,0 +1,7 @@
+resources:
+    '%user.class%':
+        -   routePrefix: '%user.route_prefix%'
+            security: '%user.security%'
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    security: 'is_granted("ROLE_USER")'

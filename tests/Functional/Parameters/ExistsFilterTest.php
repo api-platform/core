@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredExistsParameter as FilteredExistsParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredExistsParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -48,6 +50,15 @@ final class ExistsFilterTest extends ApiTestCase
 
         $this->recreateSchema([$entityClass]);
         $this->loadFixtures($entityClass);
+    }
+
+    public function testExistsFilterIsStandalone(): void
+    {
+        self::assertNotContains(
+            AbstractFilter::class,
+            class_parents(ExistsFilter::class) ?: [],
+            'ExistsFilter must not extend the deprecated AbstractFilter (5.0 standalone rewrite).'
+        );
     }
 
     #[DataProvider('existsFilterScenariosProvider')]

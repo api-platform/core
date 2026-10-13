@@ -17,7 +17,6 @@ use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ErrorResourceAttributeLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
@@ -47,8 +46,6 @@ class ApiPlatformBundleTest extends TestCase
         $passes = $container->getCompilerPassConfig()->getBeforeOptimizationPasses();
         $passClasses = array_map(static fn (object $p): string => $p::class, $passes);
 
-        // TODO: remove in 5.x
-        $this->assertContains(DataProviderPass::class, $passClasses);
         $this->assertContains(AttributeFilterPass::class, $passClasses);
         $this->assertContains(AttributeResourcePass::class, $passClasses);
         $this->assertContains(FilterPass::class, $passClasses);

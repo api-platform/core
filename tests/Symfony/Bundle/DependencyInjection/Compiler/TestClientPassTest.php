@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
-use ApiPlatform\Symfony\Bundle\Test\Client;
+use ApiPlatform\Test\Client;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -22,6 +22,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\HttpClient\HttpClientTrait;
 
 final class TestClientPassTest extends TestCase
 {
@@ -65,5 +66,29 @@ final class TestClientPassTest extends TestCase
             ->shouldBeCalledOnce();
 
         $this->testClientPass->process($this->containerBuilderProphecy->reveal());
+    }
+
+    /**
+     * ApiPlatform\Test\Client uses HttpClientTrait, so checking for the client class
+     * must not autoload it before the pass knows that symfony/http-client is installed.
+     */
+    #[RunInSeparateProcess]
+    public function testProcessWithoutHttpClient(): void
+    {
+        foreach (spl_autoload_functions() as $autoloader) {
+            spl_autoload_unregister($autoloader);
+            spl_autoload_register(static function (string $class) use ($autoloader): void {
+                if (HttpClientTrait::class !== $class) {
+                    $autoloader($class);
+                }
+            });
+        }
+
+        $container = new ContainerBuilder();
+        $container->setParameter('test.client.parameters', []);
+
+        $this->testClientPass->process($container);
+
+        self::assertFalse($container->hasDefinition('test.api_platform.client'));
     }
 }

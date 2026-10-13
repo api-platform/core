@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters\Legacy;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy\SearchFilterParameter as SearchFilterParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\SearchFilterParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;

@@ -17,6 +17,10 @@ use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
 
+/**
+ * The HTTP QUERY method (RFC 10008): a safe, idempotent collection operation
+ * that carries its filtering criteria in the request body instead of the URI.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Query extends HttpOperation implements CollectionOperationInterface
 {

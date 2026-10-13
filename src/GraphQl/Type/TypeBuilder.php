@@ -30,7 +30,6 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -219,16 +218,6 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
         $this->typesContainer->set($enumName, $enumType);
 
         return $enumType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection(LegacyType $type): bool
-    {
-        trigger_deprecation('api-platform/graphql', '4.2', 'The "%s()" method is deprecated and will be removed.', __METHOD__, self::class);
-
-        return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
     }
 
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array

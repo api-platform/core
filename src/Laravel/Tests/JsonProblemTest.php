@@ -111,7 +111,7 @@ class JsonProblemTest extends TestCase
                 [
                     'errors' => [
                         [
-                            'id' => '/api/errors/401',
+                            'id' => '401',
                             'detail' => 'Unauthorized',
                             'type' => 'about:blank',
                             'title' => 'Error 401',

@@ -21,6 +21,7 @@ use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\DoctrineEnum;
 use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\DoctrineFooType;
 use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\DoctrineRelation;
+use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\DoctrineTypedNullability;
 use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\EnumInt;
 use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\EnumString;
@@ -318,6 +319,36 @@ class DoctrineExtractorTest extends TestCase
     public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
     {
         $this->assertNull($this->createExtractor()->getType(DoctrineWithEmbedded::class, 'embedManyOmittingTargetDocument'));
+    }
+
+    public function testNullableByPhpTypeOverridesMappingDefault(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineTypedNullability::class, 'nullableByPhpType');
+        $this->assertTrue($type->isNullable());
+    }
+
+    public function testNotNullableByPhpTypeOverridesMappingNullable(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineTypedNullability::class, 'notNullableByPhpType');
+        $this->assertFalse($type->isNullable());
+    }
+
+    public function testUntypedPropertyFallsBackToMappingNullable(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineTypedNullability::class, 'untypedNullableByMapping');
+        $this->assertTrue($type->isNullable());
+    }
+
+    public function testNullableReferenceByPhpType(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineTypedNullability::class, 'nullableReference');
+        $this->assertTrue($type->isNullable());
+    }
+
+    public function testNullableEnumByPhpType(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineTypedNullability::class, 'nullableEnumByPhpType');
+        $this->assertTrue($type->isNullable());
     }
 
     private function createExtractor(): DoctrineExtractor

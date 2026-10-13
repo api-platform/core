@@ -16,10 +16,8 @@ namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanOrEqualRestriction;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
@@ -40,27 +38,6 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
         $this->propertySchemaLessThanOrEqualRestriction = new PropertySchemaLessThanOrEqualRestriction();
     }
 
-    #[IgnoreDeprecations]
-    public function testSupports(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'supported int/float with union types' => [new LessThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
-            'supported int' => [new LessThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
-            'supported float' => [new LessThanOrEqual(value: 10.99), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
-            'supported negative or zero' => [new NegativeOrZero(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
-            'not supported negative' => [new Negative(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false],
-            'not supported property path' => [new LessThanOrEqual(propertyPath: 'greaterThanMe'), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaLessThanOrEqualRestriction->supports($constraint, $propertyMetadata));
-        }
-    }
-
     #[DataProvider('supportsProviderWithNativeType')]
     public function testSupportsWithNativeType(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
@@ -75,16 +52,6 @@ final class PropertySchemaLessThanOrEqualRestrictionTest extends TestCase
         yield 'native type: supported negative or zero' => [new NegativeOrZero(), (new ApiProperty())->withNativeType(Type::int()), true];
         yield 'native type: not supported negative' => [new Negative(), (new ApiProperty())->withNativeType(Type::int()), false];
         yield 'native type: not supported property path' => [new LessThanOrEqual(propertyPath: 'greaterThanMe'), (new ApiProperty())->withNativeType(Type::int()), false];
-    }
-
-    #[IgnoreDeprecations]
-    public function testCreate(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        self::assertEquals(['maximum' => 10], $this->propertySchemaLessThanOrEqualRestriction->create(new LessThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
     }
 
     public function testCreateWithNativeType(): void

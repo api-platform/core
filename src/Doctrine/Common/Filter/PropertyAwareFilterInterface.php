@@ -14,11 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\Filter;
 
 /**
- * TODO: 5.x uncomment method.
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @method array<string>|null getProperties()
  */
 interface PropertyAwareFilterInterface
 {
@@ -27,8 +23,8 @@ interface PropertyAwareFilterInterface
      */
     public function setProperties(array $properties): void;
 
-    // /**
-    //  * @return string[]
-    //  */
-    // public function getProperties(): ?array;
+    /**
+     * @return string[]
+     */
+    public function getProperties(): ?array;
 }

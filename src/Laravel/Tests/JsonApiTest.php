@@ -45,6 +45,8 @@ class JsonApiTest extends TestCase
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
             $config->set('api-platform.pagination.items_per_page_parameter_name', 'limit');
+            // This suite asserts IRIs in "data.id", which is no longer the default since 5.0.
+            $config->set('api-platform.jsonapi.use_iri_as_id', true);
             $config->set('api-platform.defaults', [
                 'route_prefix' => '/api',
                 'parameters' => [
@@ -250,13 +252,13 @@ class JsonApiTest extends TestCase
                 [
                     'detail' => 'The prop field is required.',
                     'title' => 'Validation Error',
-                    'status' => 422,
+                    'status' => '422',
                     'code' => '58350900e0fc6b8e/prop',
                 ],
                 [
                     'detail' => 'The max field must be less than 2.',
                     'title' => 'Validation Error',
-                    'status' => 422,
+                    'status' => '422',
                     'code' => '58350900e0fc6b8e/max',
                 ],
             ],
@@ -294,7 +296,7 @@ class JsonApiTest extends TestCase
         $this->assertJsonContains([
             'links' => ['type' => '/errors/404'],
             'title' => 'An error occurred',
-            'status' => 404,
+            'status' => '404',
             'detail' => 'Not Found',
         ], $response->json()['errors'][0]);
     }
@@ -330,5 +332,17 @@ class JsonApiTest extends TestCase
         $included = $res['included'][0]['attributes'];
         $this->assertArrayNotHasKey('createdAt', $included);
         $this->assertArrayHasKey('name', $included);
+    }
+
+    public function testSparseFieldsetOnIncludedResourceUsesItsOwnAllowedProperties(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->create();
+
+        $r = $this->get('/api/books?include=author&fields[book]=name&fields[author]=created_at', headers: ['accept' => 'application/vnd.api+json']);
+        $res = $r->json();
+
+        $this->assertArrayHasKey('included', $res);
+        $attributes = $res['included'][0]['attributes'] ?? [];
+        $this->assertSame(['createdAt'], array_keys($attributes));
     }
 }

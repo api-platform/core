@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredBooleanParameter as FilteredBooleanParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredBooleanParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;

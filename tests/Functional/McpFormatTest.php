@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpFormatListTool;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpFormatTool;
 use ApiPlatform\Tests\RecreateSchemaTrait;

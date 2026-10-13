@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Security;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TypeConfusion\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TypeConfusion\Foo;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TypeConfusion\Target;

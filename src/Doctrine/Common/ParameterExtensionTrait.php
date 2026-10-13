@@ -51,11 +51,7 @@ trait ParameterExtensionTrait
         }
 
         if ($filter instanceof PropertyAwareFilterInterface) {
-            $properties = [];
-            // Check if the filter has getProperties method (e.g., if it's an AbstractFilter)
-            if (method_exists($filter, 'getProperties')) { // @phpstan-ignore-line todo 5.x remove this check @see interface
-                $properties = $filter->getProperties() ?? [];
-            }
+            $properties = $filter->getProperties() ?? [];
 
             $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
             foreach ($parameter->getProperties() ?? [$propertyKey] as $property) {

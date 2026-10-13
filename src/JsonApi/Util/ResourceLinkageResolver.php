@@ -16,7 +16,6 @@ namespace ApiPlatform\JsonApi\Util;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -47,25 +46,6 @@ final class ResourceLinkageResolver
     public function getRelationships(ApiProperty $propertyMetadata): array
     {
         $relationships = [];
-
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            foreach ($propertyMetadata->getBuiltinTypes() ?? [] as $type) {
-                if ($type->isCollection()) {
-                    $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
-                    if ($collectionValueType && ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
-                        $relationships[] = [$className, true];
-                    }
-
-                    continue;
-                }
-
-                if (($className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
-                    $relationships[] = [$className, false];
-                }
-            }
-
-            return $relationships;
-        }
 
         if (null === $type = $propertyMetadata->getNativeType()) {
             return $relationships;

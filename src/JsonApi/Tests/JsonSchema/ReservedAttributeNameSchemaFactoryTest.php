@@ -62,7 +62,7 @@ class ReservedAttributeNameSchemaFactoryTest extends TestCase
             );
         }
 
-        $definitionNameFactory = new DefinitionNameFactory(null);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),

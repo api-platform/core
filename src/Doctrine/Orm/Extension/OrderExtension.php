@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Doctrine\Orm\Util\BCHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -69,7 +70,7 @@ final class OrderExtension implements QueryCollectionExtensionInterface
                     $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $rootAlias, substr($field, 0, $pos));
                     $field = \sprintf('%s.%s', $alias, substr($field, $pos + 1));
                 }
-                $queryBuilder->addOrderBy($field, $order);
+                $queryBuilder->addOrderBy($field, BCHelper::sortDirection($order));
             }
 
             return;
@@ -82,7 +83,7 @@ final class OrderExtension implements QueryCollectionExtensionInterface
             }
 
             foreach ($identifiers as $identifier) {
-                $queryBuilder->addOrderBy("{$rootAlias}.{$identifier}", $this->order);
+                $queryBuilder->addOrderBy("{$rootAlias}.{$identifier}", BCHelper::sortDirection($this->order));
             }
         }
     }

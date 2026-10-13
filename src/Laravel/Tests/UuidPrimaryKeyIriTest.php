@@ -43,6 +43,7 @@ class UuidPrimaryKeyIriTest extends TestCase
             $config->set('api-platform.formats', [
                 'jsonapi' => ['application/vnd.api+json'],
             ]);
+            $config->set('api-platform.jsonapi.use_iri_as_id', true);
         });
     }
 

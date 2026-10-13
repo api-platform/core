@@ -15,7 +15,14 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\PropertyPlaceholderOpenApiParameterTrait;
+use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
@@ -24,6 +31,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -110,19 +118,43 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone filter (reading its value from the QueryParameter instead of the legacy `context['filters']` lookup) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
-final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class ExistsFilter implements ExistsFilterInterface, FilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface, OpenApiParameterFilterInterface, PropertyAwareFilterInterface
 {
     use ExistsFilterTrait;
+    use ManagerRegistryAwareTrait;
+    use MongoDbOdmPropertyHelperTrait;
+    use NameConverterAwareTrait;
+    use PropertyAwareFilterTrait;
     use PropertyPlaceholderOpenApiParameterTrait;
 
+    private LoggerInterface $logger;
+
+    /**
+     * @param array<string, mixed>|null $properties
+     */
     public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
-
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger ?? new NullLogger();
         $this->existsParameterName = $existsParameterName;
+        $this->properties = $properties;
+        $this->nameConverter = $nameConverter;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function isPropertyEnabled(string $property, string $resourceClass): bool
+    {
+        if (null === $this->properties) {
+            // to ensure sanity, nested properties must still be explicitly enabled
+            return !$this->isPropertyNested($property, $resourceClass);
+        }
+
+        return \array_key_exists($property, $this->properties);
     }
 
     /**
@@ -143,7 +175,9 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
      */
     protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
