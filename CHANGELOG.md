@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.4
+
+### Notes
+
+* Laravel: an optional `BelongsTo` or `MorphTo` relation (nullable foreign key column) is now typed as nullable, so it accepts `null` on write and clears the relation (#8664). This changes the generated docs for every nullable `BelongsTo`: JSON Schema and OpenAPI mark it nullable, and GraphQL drops the `!` on these fields, inputs included.
+
 ## v5.0.3
 
 API Platform 5.0.3 contains every change shipped in [v4.4.4](#v444) except the revert of #8600 ([#8637](https://github.com/api-platform/core/pull/8637)): 5.0 keeps documenting filterless array query parameters as both `key` and `key[]`, now guarded against `key[][]`, plus the changes below.
