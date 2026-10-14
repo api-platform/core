@@ -18,7 +18,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\ClassSchemaResolverInterface;
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionParent;
+use Symfony\Component\JsonSchema\SchemaDocument;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 
@@ -31,7 +32,7 @@ final class ResourceIriClassSchemaResolver implements ClassSchemaResolverInterfa
     ) {
     }
 
-    public function resolve(string $class, Configuration $config, ?DefinitionParent $parent = null): ?array
+    public function resolve(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): ?array
     {
         if (null === $parent || !$this->resourceClassResolver->isResourceClass($class)) {
             return null;

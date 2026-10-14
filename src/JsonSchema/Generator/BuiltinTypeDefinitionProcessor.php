@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Generator;
 
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
 use Symfony\Component\JsonSchema\NullSyntax;
+use Symfony\Component\JsonSchema\SchemaDocument;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
@@ -32,7 +33,7 @@ final class BuiltinTypeDefinitionProcessor implements DefinitionProcessorInterfa
     ) {
     }
 
-    public function process(array $definition, string $class, Configuration $config, ?DefinitionParent $parent): array
+    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
         if (!isset($definition['properties'])) {
             return $definition;

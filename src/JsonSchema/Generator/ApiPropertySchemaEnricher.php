@@ -18,8 +18,9 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\Enricher\PropertySchema;
-use Symfony\Component\JsonSchema\Enricher\PropertySchemaEnricherInterface;
+use Symfony\Component\JsonSchema\PropertySchemaEnricher\PropertySchema;
+use Symfony\Component\JsonSchema\PropertySchemaEnricher\PropertySchemaEnricherInterface;
+use Symfony\Component\JsonSchema\SchemaDocument;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 
@@ -35,7 +36,7 @@ final class ApiPropertySchemaEnricher implements PropertySchemaEnricherInterface
     ) {
     }
 
-    public function enrich(PropertySchema $property, Configuration $config): PropertySchema
+    public function enrich(PropertySchema $property, Configuration $config, SchemaDocument $document): PropertySchema
     {
         $metadata = $this->accessor->get($property->class, $property->property, PropertyMetadataAccessor::contextFromConfiguration($config));
         $required = true === $metadata->isRequired();

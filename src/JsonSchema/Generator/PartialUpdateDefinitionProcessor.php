@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Generator;
 
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
+use Symfony\Component\JsonSchema\SchemaDocument;
 
 final class PartialUpdateDefinitionProcessor implements DefinitionProcessorInterface
 {
@@ -23,7 +24,7 @@ final class PartialUpdateDefinitionProcessor implements DefinitionProcessorInter
     {
     }
 
-    public function process(array $definition, string $class, Configuration $config, ?DefinitionParent $parent): array
+    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
         if ($this->definitionPolicy->isPartial($class, $parent)) {
             unset($definition['required']);

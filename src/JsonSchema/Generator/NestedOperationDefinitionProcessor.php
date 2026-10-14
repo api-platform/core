@@ -15,8 +15,9 @@ namespace ApiPlatform\JsonSchema\Generator;
 
 use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
+use Symfony\Component\JsonSchema\SchemaDocument;
 
 final class NestedOperationDefinitionProcessor implements DefinitionProcessorInterface
 {
@@ -24,7 +25,7 @@ final class NestedOperationDefinitionProcessor implements DefinitionProcessorInt
     {
     }
 
-    public function process(array $definition, string $class, Configuration $config, ?DefinitionParent $parent): array
+    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
         if (null === $parent || null === $operation = $this->definitionPolicy->findNestedOperation($class)) {
             return $definition;

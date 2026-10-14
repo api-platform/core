@@ -16,7 +16,8 @@ namespace ApiPlatform\JsonSchema\Generator;
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\JsonSchema\Schema;
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\Enricher\PropertySchemaProviderInterface;
+use Symfony\Component\JsonSchema\PropertySchemaProvider\PropertySchemaProviderInterface;
+use Symfony\Component\JsonSchema\SchemaDocument;
 
 final class ApiPropertySchemaProvider implements PropertySchemaProviderInterface
 {
@@ -26,7 +27,7 @@ final class ApiPropertySchemaProvider implements PropertySchemaProviderInterface
     ) {
     }
 
-    public function provide(string $class, string $property, Configuration $config): ?array
+    public function provide(string $class, string $property, Configuration $config, SchemaDocument $document): ?array
     {
         $metadata = $this->accessor->get($class, $property, PropertyMetadataAccessor::contextFromConfiguration($config));
 

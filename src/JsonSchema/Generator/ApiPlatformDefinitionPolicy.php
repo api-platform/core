@@ -23,8 +23,9 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
+use Symfony\Component\JsonSchema\SchemaDocument;
 
 final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
 {
@@ -94,7 +95,7 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
         return $prefix;
     }
 
-    public function nameFor(string $class, Configuration $config, ?DefinitionParent $parent = null): string
+    public function nameFor(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string
     {
         $isPartialUpdate = $this->isPartial($class, $parent);
 

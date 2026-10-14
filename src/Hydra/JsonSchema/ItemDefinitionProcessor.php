@@ -17,8 +17,9 @@ use ApiPlatform\JsonSchema\Generator\ApiPlatformDefinitionPolicy;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\JsonSchema\Configuration;
-use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
+use Symfony\Component\JsonSchema\SchemaDocument;
 
 final class ItemDefinitionProcessor implements DefinitionProcessorInterface
 {
@@ -31,7 +32,7 @@ final class ItemDefinitionProcessor implements DefinitionProcessorInterface
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    public function process(array $definition, string $class, Configuration $config, ?DefinitionParent $parent): array
+    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
         if (null === $parent || 'jsonld' !== $config->format || !$this->isResourceClass($class)) {
             return $definition;
