@@ -44,24 +44,26 @@ final class GeneratorSchemaFactory implements SchemaFactoryInterface
     {
         $schema = $schema ? clone $schema : new Schema();
 
-        if (null === $request = $this->configurationFactory->create($className, $format, $type, $operation, $serializerContext, $schema->getVersion(), $forceCollection)) {
+        if (null === $created = $this->configurationFactory->create($className, $format, $type, $operation, $serializerContext, $schema->getVersion(), $forceCollection)) {
             return $schema;
         }
 
-        $policy = $this->definitionPolicy->forRequest($request);
-        $accessor = new PropertyMetadataAccessor($this->propertyNameCollectionFactory, $this->propertyMetadataFactory, $request->propertyOptions);
+        [$rootType, $configuration] = $created;
+        $context = $configuration->context;
+        $version = $context[ConfigurationFactory::CONTEXT_VERSION];
+        $accessor = new PropertyMetadataAccessor($this->propertyNameCollectionFactory, $this->propertyMetadataFactory, $context[ConfigurationFactory::CONTEXT_PROPERTY_OPTIONS]);
         $generator = new SchemaGenerator(
             new ApiPlatformPropertyInfoExtractor($accessor),
-            $policy,
+            $this->definitionPolicy,
             [new ResourceIriClassSchemaResolver($accessor, $this->resourceClassResolver, $type), new NativeClassSchemaResolver()],
-            [new ApiPropertySchemaProvider($accessor, $request->version)],
-            [new ApiPropertySchemaEnricher($accessor, $this->resourceClassResolver, $request->version)],
-            [new BuiltinTypeDefinitionProcessor($accessor, $this->nameConverter), new PartialUpdateDefinitionProcessor($policy), new NestedOperationDefinitionProcessor($policy), ...$this->definitionProcessors],
+            [new ApiPropertySchemaProvider($accessor, $version)],
+            [new ApiPropertySchemaEnricher($accessor, $this->resourceClassResolver, $version)],
+            [new BuiltinTypeDefinitionProcessor($accessor, $this->nameConverter), new PartialUpdateDefinitionProcessor($this->definitionPolicy), new NestedOperationDefinitionProcessor($this->definitionPolicy), ...$this->definitionProcessors],
             $this->nameConverter,
         );
 
-        $generated = $generator->generate($request->type, $request->configuration);
-        $refPath = $request->configuration->dialect->refPath;
+        $generated = $generator->generate($rootType, $configuration);
+        $refPath = $configuration->dialect->refPath;
 
         $root = $generated->getRoot();
         $rootName = $root['items']['$ref'] ?? $root['$ref'] ?? null;
@@ -75,9 +77,9 @@ final class GeneratorSchemaFactory implements SchemaFactoryInterface
         foreach ($generated->getDefinitions() as $name => $definition) {
             if ($name === $rootName) {
                 $definition += array_filter([
-                    'description' => $request->description,
-                    'deprecated' => $request->deprecated ?: null,
-                    'externalDocs' => $request->externalDocs ? ['url' => $request->externalDocs] : null,
+                    'description' => $context[ConfigurationFactory::CONTEXT_DESCRIPTION],
+                    'deprecated' => $context[ConfigurationFactory::CONTEXT_DEPRECATED] ?: null,
+                    'externalDocs' => $context[ConfigurationFactory::CONTEXT_EXTERNAL_DOCS] ? ['url' => $context[ConfigurationFactory::CONTEXT_EXTERNAL_DOCS]] : null,
                 ]);
             }
 

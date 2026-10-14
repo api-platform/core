@@ -27,7 +27,7 @@ final class NestedOperationDefinitionProcessor implements DefinitionProcessorInt
 
     public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
-        if (null === $parent || null === $operation = $this->definitionPolicy->findNestedOperation($class)) {
+        if (null === $parent || null === $operation = $this->definitionPolicy->findNestedOperation($class, $config)) {
             return $definition;
         }
 

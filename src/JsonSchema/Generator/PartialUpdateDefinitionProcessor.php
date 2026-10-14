@@ -26,7 +26,7 @@ final class PartialUpdateDefinitionProcessor implements DefinitionProcessorInter
 
     public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
-        if ($this->definitionPolicy->isPartial($class, $parent)) {
+        if ($this->definitionPolicy->isPartial($class, $config, $parent)) {
             unset($definition['required']);
         }
 

@@ -32,6 +32,16 @@ final class ConfigurationFactory
 {
     use ResourceMetadataTrait;
 
+    public const CONTEXT_SCHEMA_TYPE = 'api_platform.schema_type';
+    public const CONTEXT_FORMAT = 'api_platform.format';
+    public const CONTEXT_PARTIAL = 'api_platform.partial';
+    public const CONTEXT_VERSION = 'api_platform.version';
+    public const CONTEXT_PROPERTY_OPTIONS = 'api_platform.property_options';
+    public const CONTEXT_GROUPS = 'api_platform.groups';
+    public const CONTEXT_DESCRIPTION = 'api_platform.description';
+    public const CONTEXT_DEPRECATED = 'api_platform.deprecated';
+    public const CONTEXT_EXTERNAL_DOCS = 'api_platform.external_docs';
+
     private const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     public function __construct(
@@ -45,8 +55,10 @@ final class ConfigurationFactory
 
     /**
      * @param array<string, mixed>|null $serializerContext
+     *
+     * @return array{Type, Configuration}|null
      */
-    public function create(string $className, string $format, string $type, ?Operation $operation, ?array $serializerContext, string $version, bool $forceCollection = false): ?SchemaGenerationRequest
+    public function create(string $className, string $format, string $type, ?Operation $operation, ?array $serializerContext, string $version, bool $forceCollection = false): ?array
     {
         $operationWasProvided = null !== $operation;
 
@@ -82,6 +94,14 @@ final class ConfigurationFactory
 
         $groups = array_values((array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
 
+        $propertyOptions = ['schema_type' => $type, 'enable_getter_setter_extraction' => true];
+        if (null !== $validationGroups) {
+            $propertyOptions['validation_groups'] = \is_array($validationGroups) ? $validationGroups : [$validationGroups];
+        }
+        if ($ignoredAttributes = $serializerContext['ignored_attributes'] ?? null) {
+            $propertyOptions['ignored_attributes'] = $ignoredAttributes;
+        }
+
         $configuration = new Configuration(
             dialect: $this->createDialect($version),
             groups: $groups,
@@ -92,32 +112,23 @@ final class ConfigurationFactory
             definitionName: $serializerContext[self::OPENAPI_DEFINITION_NAME] ?? null,
             definitionPrefix: $this->definitionPolicy->createRootPrefix($operation, $className, $inputOrOutputClass),
             format: $isJsonMergePatch ? 'merge-patch+json' : $format,
+            context: [
+                self::CONTEXT_SCHEMA_TYPE => $type,
+                self::CONTEXT_FORMAT => $format,
+                self::CONTEXT_PARTIAL => $this->definitionPolicy->isPartialUpdate($operation, $type, $format),
+                self::CONTEXT_VERSION => $version,
+                self::CONTEXT_PROPERTY_OPTIONS => $propertyOptions,
+                self::CONTEXT_GROUPS => $groups,
+                self::CONTEXT_DESCRIPTION => $operation?->getDescription() ?: null,
+                self::CONTEXT_DEPRECATED => Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason() && ($operationWasProvided || !($serializerContext[SchemaFactoryInterface::FORCE_SUBSCHEMA] ?? false)),
+                self::CONTEXT_EXTERNAL_DOCS => $operation instanceof HttpOperation ? ($operation->getTypes()[0] ?? null) : null,
+            ],
         );
-
-        $propertyOptions = ['schema_type' => $type, 'enable_getter_setter_extraction' => true];
-        if (null !== $validationGroups) {
-            $propertyOptions['validation_groups'] = \is_array($validationGroups) ? $validationGroups : [$validationGroups];
-        }
-        if ($ignoredAttributes = $serializerContext['ignored_attributes'] ?? null) {
-            $propertyOptions['ignored_attributes'] = $ignoredAttributes;
-        }
 
         $objectType = Type::object($inputOrOutputClass);
         $isCollection = $forceCollection || (!\in_array($method, ['POST', 'QUERY'], true) && $operation instanceof CollectionOperationInterface);
 
-        return new SchemaGenerationRequest(
-            $isCollection ? Type::list($objectType) : $objectType,
-            $configuration,
-            $type,
-            $format,
-            $this->definitionPolicy->isPartialUpdate($operation, $type, $format),
-            $version,
-            $propertyOptions,
-            $operation?->getDescription() ?: null,
-            Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason() && ($operationWasProvided || !($serializerContext[SchemaFactoryInterface::FORCE_SUBSCHEMA] ?? false)),
-            $operation instanceof HttpOperation ? ($operation->getTypes()[0] ?? null) : null,
-            $groups,
-        );
+        return [$isCollection ? Type::list($objectType) : $objectType, $configuration];
     }
 
     private function createDialect(string $version): Dialect

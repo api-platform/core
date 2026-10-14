@@ -36,11 +36,9 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
     private const JSON_MERGE_PATCH_SCHEMA_POSTFIX = 'jsonMergePatch';
 
     /**
-     * @var \ArrayObject<string, string|null>
+     * @var array<string, string|null>
      */
-    private \ArrayObject $prefixCache;
-
-    private ?SchemaGenerationRequest $request = null;
+    private array $prefixCache = [];
 
     public function __construct(
         ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
@@ -49,15 +47,6 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
     ) {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->prefixCache = new \ArrayObject();
-    }
-
-    public function forRequest(SchemaGenerationRequest $request): self
-    {
-        $policy = clone $this;
-        $policy->request = $request;
-
-        return $policy;
     }
 
     public function isJsonMergePatch(?Operation $operation, string $type, string $format): bool
@@ -72,15 +61,15 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
         return $this->isJsonMergePatch($operation, $type, $format) || $isNonStandardPut;
     }
 
-    public function isPartial(string $class, ?DefinitionParent $parent): bool
+    public function isPartial(string $class, Configuration $config, ?DefinitionParent $parent): bool
     {
         if (null === $parent) {
-            return $this->request->partial ?? false;
+            return $config->context[ConfigurationFactory::CONTEXT_PARTIAL] ?? false;
         }
 
-        $operation = $this->findNestedOperation($class);
+        $operation = $this->findNestedOperation($class, $config);
 
-        return null !== $operation && $this->isPartialUpdate($operation, $this->request->schemaType ?? Schema::TYPE_OUTPUT, $this->request->format ?? 'json');
+        return null !== $operation && $this->isPartialUpdate($operation, $config->context[ConfigurationFactory::CONTEXT_SCHEMA_TYPE] ?? Schema::TYPE_OUTPUT, $config->context[ConfigurationFactory::CONTEXT_FORMAT] ?? 'json');
     }
 
     public function createRootPrefix(?Operation $operation, string $className, string $inputOrOutputClass): string
@@ -97,16 +86,16 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
 
     public function nameFor(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string
     {
-        $isPartialUpdate = $this->isPartial($class, $parent);
+        $isPartialUpdate = $this->isPartial($class, $config, $parent);
 
         if (null === $parent) {
             $prefix = $config->definitionPrefix ?? $this->createPrefixFromClass($class);
             $isJsonMergePatch = self::JSON_MERGE_PATCH_FORMAT === $config->format;
         } else {
-            $operation = $this->findNestedOperation($class);
+            $operation = $this->findNestedOperation($class, $config);
             $prefix = $this->createNestedPrefix($class, $operation);
-            $type = $this->request->schemaType ?? Schema::TYPE_OUTPUT;
-            $format = $this->request->format ?? 'json';
+            $type = $config->context[ConfigurationFactory::CONTEXT_SCHEMA_TYPE] ?? Schema::TYPE_OUTPUT;
+            $format = $config->context[ConfigurationFactory::CONTEXT_FORMAT] ?? 'json';
             $isJsonMergePatch = null !== $operation && $this->isJsonMergePatch($operation, $type, $format);
         }
 
@@ -121,7 +110,7 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
             $parts = [];
 
             if ($config->groups) {
-                $parts[] = implode('_', $this->orderGroups($config->groups));
+                $parts[] = implode('_', $this->orderGroups($config->groups, $config));
             }
 
             if ($config->attributes) {
@@ -167,13 +156,13 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
         return true;
     }
 
-    public function findNestedOperation(string $class): ?Operation
+    public function findNestedOperation(string $class, Configuration $config): ?Operation
     {
         if (!$this->isResourceClass($class)) {
             return null;
         }
 
-        return $this->findOperation($class, $this->request->schemaType ?? Schema::TYPE_OUTPUT, null, [SchemaFactoryInterface::FORCE_SUBSCHEMA => true]);
+        return $this->findOperation($class, $config->context[ConfigurationFactory::CONTEXT_SCHEMA_TYPE] ?? Schema::TYPE_OUTPUT, null, [SchemaFactoryInterface::FORCE_SUBSCHEMA => true]);
     }
 
     private function createNestedPrefix(string $class, ?Operation $operation): string
@@ -260,12 +249,10 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
      *
      * @return list<string>
      */
-    private function orderGroups(array $groups): array
+    private function orderGroups(array $groups, Configuration $config): array
     {
-        if (null === $this->request) {
-            return $groups;
-        }
+        $declared = $config->context[ConfigurationFactory::CONTEXT_GROUPS] ?? [];
 
-        return array_values([...array_intersect($this->request->groups, $groups), ...array_diff($groups, $this->request->groups)]);
+        return array_values([...array_intersect($declared, $groups), ...array_diff($groups, $declared)]);
     }
 }
