@@ -9,12 +9,7 @@
                         "null"
                     ]
                 },
-                "anything": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
-                },
+                "anything": [],
                 "id": {
                     "type": [
                         "integer",
@@ -22,12 +17,7 @@
                     ]
                 },
                 "untyped": {
-                    "items": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
+                    "items": [],
                     "type": "array"
                 }
             },

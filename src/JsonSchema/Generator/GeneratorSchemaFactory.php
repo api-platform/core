@@ -47,7 +47,7 @@ final class GeneratorSchemaFactory implements SchemaFactoryInterface
             [new ResourceIriClassSchemaResolver($accessor, $resourceClassResolver), new NativeClassSchemaResolver()],
             [new ApiPropertySchemaProvider($accessor)],
             [new ApiPropertySchemaEnricher($accessor, $resourceClassResolver)],
-            [new BuiltinTypeDefinitionProcessor($accessor, $nameConverter), new PartialUpdateDefinitionProcessor($definitionPolicy), new NestedOperationDefinitionProcessor($definitionPolicy), ...$definitionProcessors],
+            [new PartialUpdateDefinitionProcessor($definitionPolicy), new NestedOperationDefinitionProcessor($definitionPolicy), ...$definitionProcessors],
             $nameConverter,
         );
     }
@@ -102,7 +102,7 @@ final class GeneratorSchemaFactory implements SchemaFactoryInterface
     private static function toDefinitionObject(array $definition): \ArrayObject
     {
         foreach ($definition['properties'] ?? [] as $property => $propertySchema) {
-            $definition['properties'][$property] = new \ArrayObject($propertySchema);
+            $definition['properties'][$property] = $propertySchema instanceof \ArrayObject ? $propertySchema : new \ArrayObject($propertySchema);
         }
 
         return new \ArrayObject($definition);
