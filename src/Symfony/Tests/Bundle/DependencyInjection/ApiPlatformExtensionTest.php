@@ -18,6 +18,7 @@ use ApiPlatform\JsonSchema\Generator\ApiPlatformDefinitionPolicy;
 use ApiPlatform\JsonSchema\Generator\ConfigurationFactory;
 use ApiPlatform\JsonSchema\Generator\GeneratorSchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\Metadata\AsJsonSchemaDefinitionProcessor;
 use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -31,6 +32,9 @@ use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Action\NotFoundAction;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
+use ApiPlatform\Symfony\Tests\Fixtures\JsonSchemaProcessor\InvalidDefinitionProcessor;
+use ApiPlatform\Symfony\Tests\Fixtures\JsonSchemaProcessor\OptedInDefinitionProcessor;
+use ApiPlatform\Symfony\Tests\Fixtures\JsonSchemaProcessor\PlainDefinitionProcessor;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
@@ -41,6 +45,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
@@ -460,6 +465,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testJsonSchemaGeneratorIsDisabledByDefault(): void
     {
+        $this->skipWithoutJsonSchemaComponent();
         (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
 
         $this->assertSame(SchemaFactory::class, $this->container->getDefinition('api_platform.json_schema.schema_factory')->getClass());
@@ -471,6 +477,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testJsonSchemaGeneratorReplacesTheBaseSchemaFactory(): void
     {
+        $this->skipWithoutJsonSchemaComponent();
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['json_schema']['generator'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
@@ -493,13 +500,53 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertSame('api_platform.json_schema.schema_factory', $this->container->getDefinition('api_platform.json_schema.backward_compatible_schema_factory')->getDecoratedService()[0]);
     }
 
-    public function testJsonSchemaDefinitionProcessorsAreAutoconfigured(): void
+    public function testJsonSchemaDefinitionProcessorsAreNotAutoconfiguredFromTheInterface(): void
     {
+        $this->skipWithoutJsonSchemaComponent();
         (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
 
-        $instanceof = $this->container->getAutoconfiguredInstanceof();
-        $this->assertArrayHasKey(DefinitionProcessorInterface::class, $instanceof);
-        $this->assertArrayHasKey('api_platform.json_schema.definition_processor', $instanceof[DefinitionProcessorInterface::class]->getTags());
+        $this->assertArrayNotHasKey(DefinitionProcessorInterface::class, $this->container->getAutoconfiguredInstanceof());
+    }
+
+    public function testJsonSchemaDefinitionProcessorAttributeAddsTheTag(): void
+    {
+        $this->skipWithoutJsonSchemaComponent();
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $definition = new ChildDefinition('');
+        $this->applyAttributeAutoconfiguration($definition, OptedInDefinitionProcessor::class);
+        $this->assertArrayHasKey('api_platform.json_schema.definition_processor', $definition->getTags());
+
+        $plain = new ChildDefinition('');
+        $this->applyAttributeAutoconfiguration($plain, PlainDefinitionProcessor::class);
+        $this->assertSame([], $plain->getTags());
+    }
+
+    public function testJsonSchemaDefinitionProcessorAttributeRequiresTheInterface(): void
+    {
+        $this->skipWithoutJsonSchemaComponent();
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('should implement %s', DefinitionProcessorInterface::class));
+        $this->applyAttributeAutoconfiguration(new ChildDefinition(''), InvalidDefinitionProcessor::class);
+    }
+
+    private function skipWithoutJsonSchemaComponent(): void
+    {
+        if (!interface_exists(DefinitionProcessorInterface::class)) {
+            $this->markTestSkipped('symfony/json-schema is not installed.');
+        }
+    }
+
+    private function applyAttributeAutoconfiguration(ChildDefinition $definition, string $class): void
+    {
+        $reflector = new \ReflectionClass($class);
+        foreach ($reflector->getAttributes(AsJsonSchemaDefinitionProcessor::class) as $attribute) {
+            foreach ($this->container->getAttributeAutoconfigurators()[AsJsonSchemaDefinitionProcessor::class] ?? [] as $configurator) {
+                $configurator($definition, $attribute->newInstance(), $reflector);
+            }
+        }
     }
 
     public function testItRegistersMetadataConfiguration(): void

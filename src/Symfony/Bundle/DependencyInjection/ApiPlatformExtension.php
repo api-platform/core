@@ -33,6 +33,7 @@ use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\AsJsonSchemaDefinitionProcessor;
 use ApiPlatform\Metadata\AsOperationMutator;
 use ApiPlatform\Metadata\AsResourceMutator;
 use ApiPlatform\Metadata\Delete;
@@ -238,8 +239,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.parameter_provider');
 
         if (interface_exists(DefinitionProcessorInterface::class)) {
-            $container->registerForAutoconfiguration(DefinitionProcessorInterface::class)
-                ->addTag('api_platform.json_schema.definition_processor');
+            $container->registerAttributeForAutoconfiguration(
+                AsJsonSchemaDefinitionProcessor::class,
+                static function (ChildDefinition $definition, AsJsonSchemaDefinitionProcessor $attribute, \ReflectionClass $reflector): void { // @phpstan-ignore-line
+                    if (!is_a($reflector->name, DefinitionProcessorInterface::class, true)) {
+                        throw new RuntimeException(\sprintf('JSON Schema definition processor "%s" should implement %s', $reflector->name, DefinitionProcessorInterface::class));
+                    }
+
+                    $definition->addTag('api_platform.json_schema.definition_processor');
+                },
+            );
         }
 
         $container->registerAttributeForAutoconfiguration(
