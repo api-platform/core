@@ -23,7 +23,6 @@ final class ApiPropertySchemaProvider implements PropertySchemaProviderInterface
 {
     public function __construct(
         private readonly PropertyMetadataAccessor $accessor,
-        private readonly string $version,
     ) {
     }
 
@@ -35,7 +34,7 @@ final class ApiPropertySchemaProvider implements PropertySchemaProviderInterface
             return null;
         }
 
-        $contextSchema = Schema::VERSION_JSON_SCHEMA === $this->version ? $metadata->getJsonSchemaContext() : $metadata->getOpenapiContext();
+        $contextSchema = Schema::VERSION_JSON_SCHEMA === $config->context[ConfigurationFactory::CONTEXT_VERSION] ? $metadata->getJsonSchemaContext() : $metadata->getOpenapiContext();
 
         return array_merge($metadata->getSchema() ?? [], $contextSchema ?? []);
     }

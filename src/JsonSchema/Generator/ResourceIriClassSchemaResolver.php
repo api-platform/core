@@ -28,7 +28,6 @@ final class ResourceIriClassSchemaResolver implements ClassSchemaResolverInterfa
     public function __construct(
         private readonly PropertyMetadataAccessor $accessor,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        private readonly string $schemaType,
     ) {
     }
 
@@ -40,16 +39,16 @@ final class ResourceIriClassSchemaResolver implements ClassSchemaResolverInterfa
 
         $metadata = $this->accessor->get($parent->class, $parent->property, PropertyMetadataAccessor::contextFromConfiguration($parent->config));
 
-        if ($this->isLink($parent->class, $metadata)) {
+        if ($this->isLink($parent->class, $metadata, $config->context[ConfigurationFactory::CONTEXT_SCHEMA_TYPE])) {
             return null;
         }
 
         return ['type' => 'string', 'format' => 'iri-reference', 'example' => 'https://example.com/'];
     }
 
-    private function isLink(string $class, ApiProperty $metadata): bool
+    private function isLink(string $class, ApiProperty $metadata, string $schemaType): bool
     {
-        $isInput = Schema::TYPE_INPUT === $this->schemaType;
+        $isInput = Schema::TYPE_INPUT === $schemaType;
         $link = $isInput ? $metadata->isWritableLink() : ($metadata->isReadableLink() || false === $metadata->getGenId());
 
         if (!$isInput && !$this->resourceClassResolver->isResourceClass($class) && !$metadata->getNativeType()?->isSatisfiedBy($this->isResourceType(...))) {

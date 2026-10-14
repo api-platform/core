@@ -20,18 +20,9 @@ use Symfony\Component\JsonSchema\Configuration;
 
 final class PropertyMetadataAccessor
 {
-    /**
-     * @var array<string, ApiProperty>
-     */
-    private array $properties = [];
-
-    /**
-     * @param array<string, mixed> $baseOptions
-     */
     public function __construct(
         private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        private readonly array $baseOptions,
     ) {
     }
 
@@ -40,7 +31,7 @@ final class PropertyMetadataAccessor
      */
     public static function contextFromConfiguration(Configuration $configuration): array
     {
-        $context = [];
+        $context = [ConfigurationFactory::CONTEXT_PROPERTY_OPTIONS => $configuration->context[ConfigurationFactory::CONTEXT_PROPERTY_OPTIONS] ?? []];
         if ($configuration->groups) {
             $context['serializer_groups'] = $configuration->groups;
         }
@@ -59,7 +50,7 @@ final class PropertyMetadataAccessor
      */
     public function getNames(string $class, array $context): array
     {
-        return array_values(iterator_to_array($this->propertyNameCollectionFactory->create($class, $this->baseOptions + $context), false));
+        return array_values(iterator_to_array($this->propertyNameCollectionFactory->create($class, self::options($context)), false));
     }
 
     /**
@@ -68,6 +59,22 @@ final class PropertyMetadataAccessor
      */
     public function get(string $class, string $property, array $context): ApiProperty
     {
-        return $this->properties[$class.'::'.$property.'::'.json_encode($context, \JSON_THROW_ON_ERROR)] ??= $this->propertyMetadataFactory->create($class, $property, $this->baseOptions + $context);
+        return $this->propertyMetadataFactory->create($class, $property, self::options($context));
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private static function options(array $context): array
+    {
+        $options = $context[ConfigurationFactory::CONTEXT_PROPERTY_OPTIONS] ?? [];
+        $context = array_diff_key($context, array_flip(ConfigurationFactory::CONTEXT_KEYS));
+        if (null === ($context['serializer_groups'] ?? null)) {
+            unset($context['serializer_groups']);
+        }
+
+        return $options + $context;
     }
 }

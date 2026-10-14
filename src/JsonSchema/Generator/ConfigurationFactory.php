@@ -42,6 +42,18 @@ final class ConfigurationFactory
     public const CONTEXT_DEPRECATED = 'api_platform.deprecated';
     public const CONTEXT_EXTERNAL_DOCS = 'api_platform.external_docs';
 
+    public const CONTEXT_KEYS = [
+        self::CONTEXT_SCHEMA_TYPE,
+        self::CONTEXT_FORMAT,
+        self::CONTEXT_PARTIAL,
+        self::CONTEXT_VERSION,
+        self::CONTEXT_PROPERTY_OPTIONS,
+        self::CONTEXT_GROUPS,
+        self::CONTEXT_DESCRIPTION,
+        self::CONTEXT_DEPRECATED,
+        self::CONTEXT_EXTERNAL_DOCS,
+    ];
+
     private const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     public function __construct(

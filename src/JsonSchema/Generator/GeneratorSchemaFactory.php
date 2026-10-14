@@ -26,18 +26,30 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 final class GeneratorSchemaFactory implements SchemaFactoryInterface
 {
+    private readonly SchemaGenerator $generator;
+
     /**
      * @param iterable<DefinitionProcessorInterface> $definitionProcessors
      */
     public function __construct(
         private readonly ConfigurationFactory $configurationFactory,
-        private readonly ApiPlatformDefinitionPolicy $definitionPolicy,
-        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
-        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        private readonly ResourceClassResolverInterface $resourceClassResolver,
-        private readonly ?NameConverterInterface $nameConverter = null,
-        private readonly iterable $definitionProcessors = [],
+        ApiPlatformDefinitionPolicy $definitionPolicy,
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+        ?NameConverterInterface $nameConverter = null,
+        iterable $definitionProcessors = [],
     ) {
+        $accessor = new PropertyMetadataAccessor($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $this->generator = new SchemaGenerator(
+            new ApiPlatformPropertyInfoExtractor($accessor),
+            $definitionPolicy,
+            [new ResourceIriClassSchemaResolver($accessor, $resourceClassResolver), new NativeClassSchemaResolver()],
+            [new ApiPropertySchemaProvider($accessor)],
+            [new ApiPropertySchemaEnricher($accessor, $resourceClassResolver)],
+            [new BuiltinTypeDefinitionProcessor($accessor, $nameConverter), new PartialUpdateDefinitionProcessor($definitionPolicy), new NestedOperationDefinitionProcessor($definitionPolicy), ...$definitionProcessors],
+            $nameConverter,
+        );
     }
 
     public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
@@ -50,19 +62,8 @@ final class GeneratorSchemaFactory implements SchemaFactoryInterface
 
         [$rootType, $configuration] = $created;
         $context = $configuration->context;
-        $version = $context[ConfigurationFactory::CONTEXT_VERSION];
-        $accessor = new PropertyMetadataAccessor($this->propertyNameCollectionFactory, $this->propertyMetadataFactory, $context[ConfigurationFactory::CONTEXT_PROPERTY_OPTIONS]);
-        $generator = new SchemaGenerator(
-            new ApiPlatformPropertyInfoExtractor($accessor),
-            $this->definitionPolicy,
-            [new ResourceIriClassSchemaResolver($accessor, $this->resourceClassResolver, $type), new NativeClassSchemaResolver()],
-            [new ApiPropertySchemaProvider($accessor, $version)],
-            [new ApiPropertySchemaEnricher($accessor, $this->resourceClassResolver, $version)],
-            [new BuiltinTypeDefinitionProcessor($accessor, $this->nameConverter), new PartialUpdateDefinitionProcessor($this->definitionPolicy), new NestedOperationDefinitionProcessor($this->definitionPolicy), ...$this->definitionProcessors],
-            $this->nameConverter,
-        );
 
-        $generated = $generator->generate($rootType, $configuration);
+        $generated = $this->generator->generate($rootType, $configuration);
         $refPath = $configuration->dialect->refPath;
 
         $root = $generated->getRoot();

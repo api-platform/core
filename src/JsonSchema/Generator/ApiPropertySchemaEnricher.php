@@ -32,7 +32,6 @@ final class ApiPropertySchemaEnricher implements PropertySchemaEnricherInterface
     public function __construct(
         private readonly PropertyMetadataAccessor $accessor,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        private readonly string $version,
     ) {
     }
 
@@ -45,7 +44,7 @@ final class ApiPropertySchemaEnricher implements PropertySchemaEnricherInterface
             return $property->withRequired($required);
         }
 
-        $contextSchema = Schema::VERSION_JSON_SCHEMA === $this->version ? $metadata->getJsonSchemaContext() : $metadata->getOpenapiContext();
+        $contextSchema = Schema::VERSION_JSON_SCHEMA === $config->context[ConfigurationFactory::CONTEXT_VERSION] ? $metadata->getJsonSchemaContext() : $metadata->getOpenapiContext();
         $metadataSchema = $metadata->getSchema() ?? [];
         $schema = [...array_diff_key($property->schema, ['default' => true]), ...array_diff_key($metadataSchema, array_flip(self::OWNED_KEYWORDS)), ...$this->getDocumentation($metadata)];
         $schema = array_replace(array_intersect_key($metadataSchema, $schema), $schema);
