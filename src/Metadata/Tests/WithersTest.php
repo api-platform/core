@@ -98,7 +98,13 @@ final class WithersTest extends TestCase
         }
 
         foreach ($type instanceof \ReflectionUnionType ? $type->getTypes() : [$type] as $namedType) {
-            switch ($namedType instanceof \ReflectionNamedType ? $namedType->getName() : null) {
+            $name = $namedType instanceof \ReflectionNamedType ? $namedType->getName() : null;
+
+            if ('self' === $name || (null !== $name && is_a($metadata, $name))) {
+                return $metadata;
+            }
+
+            switch ($name) {
                 case 'bool':
                     return true;
                 case 'false':
@@ -109,8 +115,6 @@ final class WithersTest extends TestCase
                     return 'foo';
                 case 'array':
                     return [];
-                case 'self':
-                    return $metadata;
                 case Operations::class:
                     return new Operations();
                 case Type::class:
