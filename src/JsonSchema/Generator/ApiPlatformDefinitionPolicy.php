@@ -121,7 +121,7 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
             $parts = [];
 
             if ($config->groups) {
-                $parts[] = implode('_', $config->groups);
+                $parts[] = implode('_', $this->orderGroups($config->groups));
             }
 
             if ($config->attributes) {
@@ -253,5 +253,19 @@ final class ApiPlatformDefinitionPolicy implements DefinitionPolicyInterface
         }
 
         return implode('_', $parts);
+    }
+
+    /**
+     * @param list<string> $groups
+     *
+     * @return list<string>
+     */
+    private function orderGroups(array $groups): array
+    {
+        if (null === $this->request) {
+            return $groups;
+        }
+
+        return array_values([...array_intersect($this->request->groups, $groups), ...array_diff($groups, $this->request->groups)]);
     }
 }

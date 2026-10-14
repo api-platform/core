@@ -20,6 +20,7 @@ final readonly class SchemaGenerationRequest
 {
     /**
      * @param array<string, mixed> $propertyOptions
+     * @param list<string>         $groups
      */
     public function __construct(
         public Type $type,
@@ -32,6 +33,7 @@ final readonly class SchemaGenerationRequest
         public ?string $description = null,
         public bool $deprecated = false,
         public ?string $externalDocs = null,
+        public array $groups = [],
     ) {
     }
 }

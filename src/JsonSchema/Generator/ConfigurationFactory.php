@@ -80,9 +80,11 @@ final class ConfigurationFactory
         $validationGroups = $operation?->getValidationContext()['groups'] ?? null;
         $attributes = $serializerContext[AbstractNormalizer::ATTRIBUTES] ?? null;
 
+        $groups = array_values((array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
+
         $configuration = new Configuration(
             dialect: $this->createDialect($version),
-            groups: array_values((array) ($serializerContext[AbstractNormalizer::GROUPS] ?? [])),
+            groups: $groups,
             attributes: $attributes ? (array) $attributes : null,
             ignoredAttributes: array_values((array) ($serializerContext['ignored_attributes'] ?? [])),
             allowExtraAttributes: false !== ($serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] ?? true),
@@ -114,6 +116,7 @@ final class ConfigurationFactory
             $operation?->getDescription() ?: null,
             Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason() && ($operationWasProvided || !($serializerContext[SchemaFactoryInterface::FORCE_SUBSCHEMA] ?? false)),
             $operation instanceof HttpOperation ? ($operation->getTypes()[0] ?? null) : null,
+            $groups,
         );
     }
 
