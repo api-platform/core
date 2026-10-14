@@ -36,6 +36,9 @@
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0"
     },
+    "suggest": {
+        "symfony/json-schema": "To generate JSON Schemas with the Symfony JsonSchema component (opt-in, api_platform.json_schema.generator)."
+    },
     "autoload": {
         "psr-4": {
             "ApiPlatform\\JsonSchema\\": ""

@@ -55,6 +55,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\SearchDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\McpBook;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\JsonSchema\SchemaGenerator;
 
 class GoldenSchemaTest extends ApiTestCase
 {
@@ -152,6 +153,10 @@ class GoldenSchemaTest extends ApiTestCase
     #[DataProvider('provideCases')]
     public function testGenerateMatchesGolden(string $case, string $className, string $format, string $type, ?string $operationName, ?array $serializerContext, string $version, array $configuration): void
     {
+        if (!class_exists(SchemaGenerator::class)) {
+            $this->markTestSkipped('symfony/json-schema is not installed.');
+        }
+
         if ('jsonld_nested_output_dto' === $case) {
             $this->markTestSkipped('The Hydra decorator re-resolves the nested operation by format, so jsonld describes the output DTO of an embedded resource while json does not: pending decision.');
         }

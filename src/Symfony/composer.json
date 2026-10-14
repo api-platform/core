@@ -87,6 +87,7 @@
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
         "symfony/uid": "To support Symfony UUID/ULID identifiers.",
+        "symfony/json-schema": "To generate JSON Schemas with the Symfony JsonSchema component (opt-in, api_platform.json_schema.generator).",
         "symfony/messenger": "To support messenger integration and asynchronous Mercure updates.",
         "symfony/mercure-bundle": "To support mercure integration.",
         "symfony/web-profiler-bundle": "To use the data collector."
