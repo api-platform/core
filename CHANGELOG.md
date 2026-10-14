@@ -1,5 +1,24 @@
 # Changelog
 
+## v5.0.3
+
+API Platform 5.0.3 contains every change shipped in [v4.4.4](#v444) except the revert of #8600 ([#8637](https://github.com/api-platform/core/pull/8637)): 5.0 keeps documenting filterless array query parameters as both `key` and `key[]`, now guarded against `key[][]`, plus the changes below.
+
+### Bug fixes
+
+* [13a9c11db](https://github.com/api-platform/core/commit/13a9c11dbd7529bf792411ec002b45dca5c3c29b) fix(doctrine): avoid more deprecation from doctrine
+* [37798944c](https://github.com/api-platform/core/commit/37798944c6dee10cdc6c7e4d05f008b3adb71660) fix(hal): use spl_object_id() for circular reference counters (#8657)
+* [ff1bfbdde](https://github.com/api-platform/core/commit/ff1bfbddedc18fd582c855fc90da2c8660a24c68) fix(metadata): do not mutate parameters shared between operations (#8622)
+* [88fab3bab](https://github.com/api-platform/core/commit/88fab3babb64e7befd44045d71ef423e97b00f66) fix(openapi): don't suffix [] on bracketed array keys (#8636)
+* [ce647452b](https://github.com/api-platform/core/commit/ce647452bbc8e3ad340950f745e8c95f9fa1b75d) fix(serializer): catch MissingConstructorArgumentsException (#8659)
+* [b10e80f61](https://github.com/api-platform/core/commit/b10e80f611cb0c3a9e7164a0a2156e846e456a14) fix(symfony): check HttpClientTrait before loading the test client (#8613)
+* [c3eabbb9a](https://github.com/api-platform/core/commit/c3eabbb9a6bf63f7796759afd5db334b78c3d880) fix(symfony): hide the "Other API docs" label when there is only a single option (#8631)
+
+### Dependencies
+
+* [40711a61c](https://github.com/api-platform/core/commit/40711a61c99cee7db83256342bf6220c8925543c) chore(openapi): require json-schema ^5.0.2 (#8630)
+* [5fcc64d0b](https://github.com/api-platform/core/commit/5fcc64d0b719d5cf1f725e5550615817f28b9c8d) chore: suggest ext-deepclone (#8658)
+
 ## v5.0.2
 
 API Platform 5.0.2 contains every change shipped in [v4.4.3](#v443), plus the changes below.
@@ -73,6 +92,15 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
+
+## v4.4.4
+
+### Bug fixes
+
+* [1335871be](https://github.com/api-platform/core/commit/1335871beff7aa5d5505879732890f44b1ba2e8e) fix(hydra): handle string and null serialization groups in DocumentationNormalizer (#7890)
+* [b6555c846](https://github.com/api-platform/core/commit/b6555c846a472a82099e3d7fcf6f7ec6b71aaba8) fix(laravel): ignore invalid range filter values (#8632)
+* [56c0be24b](https://github.com/api-platform/core/commit/56c0be24b74366e88bdf16721b479b4cfb43877f) revert(openapi): array query params bracket notation (#8637)
+* [454262ba8](https://github.com/api-platform/core/commit/454262ba8a3614d2cced01e092dcc7e14d4bb778) fix(symfony): avoid deprecated translation command probe (#8627)
 
 ## v4.4.3
 

@@ -28,6 +28,7 @@ use Doctrine\ORM\QueryBuilder;
 final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -45,7 +46,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
         $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 
@@ -58,9 +59,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
 
-            $likeExpression = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpression = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
             $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
 
             return;
@@ -69,9 +68,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $likeExpressions = [];
         foreach ($values as $val) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $likeExpressions[] = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpressions[] = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
 
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($val));
         }
@@ -83,6 +80,6 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
     private function formatLikeValue(string $value): string
     {
-        return '%'.addcslashes($value, '\\%_').'%';
+        return '%'.$this->escapeLikeValue($value).'%';
     }
 }

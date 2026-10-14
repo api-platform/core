@@ -195,6 +195,7 @@
         "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
+        "ext-deepclone": "To speed up the PHP files metadata cache with symfony/var-exporter 8.1+ (install symfony/deepclone with PIE).",
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "opensearch-project/opensearch-php": "To support OpenSearch (^2.5).",

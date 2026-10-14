@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\Util\BCHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
@@ -74,32 +75,11 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
             if (null !== $nullsDirection) {
                 $nullRankHiddenField = \sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
                 $queryBuilder->addSelect(\sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
-                $queryBuilder->addOrderBy($nullRankHiddenField, self::bcSortDirection($nullsDirection));
+                $queryBuilder->addOrderBy($nullRankHiddenField, BCHelper::sortDirection($nullsDirection));
             }
         }
 
-        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), self::bcSortDirection($direction));
-    }
-
-    /**
-     * @param 'ASC'|'DESC' $direction
-     */
-    private static function bcSortDirection(string $direction): string|object
-    {
-        if (!interface_exists('Doctrine\ORM\Tools\Pagination\PaginatorInterface')) {
-            // doctrine/orm < 3.7
-            return $direction;
-        }
-
-        if (!enum_exists('SortDirection')) {
-            // PHP < 8.6 (Safety check because doctrine/orm already provides a polyfill)
-            return $direction;
-        }
-
-        return match ($direction) {
-            'ASC' => \SortDirection::Ascending,
-            'DESC' => \SortDirection::Descending,
-        };
+        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), BCHelper::sortDirection($direction));
     }
 
     /**
