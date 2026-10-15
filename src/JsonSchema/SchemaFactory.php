@@ -29,6 +29,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -361,7 +362,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             if (($c = \count($refs)) > 1) {
-                $propertySchema['anyOf'] = $refs;
+                $propertySchema[$type instanceof IntersectionType ? 'allOf' : 'anyOf'] = $refs;
             } elseif (1 === $c) {
                 $propertySchema['$ref'] = $refs[0]['$ref'];
             }
