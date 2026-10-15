@@ -18,8 +18,10 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 trait LinksHandlerTrait
 {
@@ -28,7 +30,7 @@ trait LinksHandlerTrait
     /**
      * @param array{linkClass?: string, linkProperty?: string}&array<string, mixed> $context
      *
-     * @return \ApiPlatform\Metadata\Link[]
+     * @return Link[]
      */
     private function getLinks(string $resourceClass, Operation $operation, array $context): array
     {
@@ -100,6 +102,49 @@ trait LinksHandlerTrait
 
     /**
      * @param array<int|string,mixed> $identifiers
+     *
+     * @return array<int|string,mixed>
+     */
+    private function resolveLinkIdentifiers(array $identifiers, Link $link, string $fromClass): array
+    {
+        $parameterName = $link->getParameterName();
+        if (null === $parameterName) {
+            return $identifiers;
+        }
+
+        $resolved = $identifiers[$parameterName] ?? null;
+        $linkClass = $link->getFromClass();
+        if (!($resolved instanceof $fromClass || (null !== $linkClass && $resolved instanceof $linkClass))) {
+            return $identifiers;
+        }
+
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $values = [];
+        foreach ($link->getIdentifiers() as $identifierProperty) {
+            $values[$identifierProperty] = $propertyAccessor->getValue($resolved, $identifierProperty);
+        }
+
+        if (1 === \count($values)) {
+            $identifiers[$parameterName] = current($values);
+
+            return $identifiers;
+        }
+
+        $result = [];
+        foreach ($identifiers as $key => $value) {
+            if ($key === $parameterName) {
+                $result += $values;
+                continue;
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<int|string,mixed> $identifiers
      */
     private function getIdentifierValue(array &$identifiers, ?string $name = null): mixed
     {
@@ -114,7 +159,7 @@ trait LinksHandlerTrait
     }
 
     /**
-     * @return \ApiPlatform\Metadata\Link[]|array
+     * @return Link[]|array
      */
     private function getOperationLinks(?Operation $operation = null): array
     {
