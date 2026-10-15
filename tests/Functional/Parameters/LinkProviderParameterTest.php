@@ -296,4 +296,31 @@ final class LinkProviderParameterTest extends ApiTestCase
         $r = self::createClient()->request('GET', '/issue_7469_test_resources/'.$issue7469Dummy->id, ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseIsSuccessful();
     }
+
+    public function testResolvedUriVariableQueriesDoctrineLink(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        $employee = new Employee();
+        $employee->setName('me');
+        $company = new Company();
+        $company->setName('Test');
+        $employee->setCompany($company);
+        $manager->persist($employee);
+        $manager->persist($company);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/companies-by-resolved-name/Test/employees');
+        self::assertResponseStatusCodeSame(200);
+        self::assertJsonContains([
+            'hydra:totalItems' => 1,
+            'hydra:member' => [
+                ['name' => 'me'],
+            ],
+        ]);
+    }
 }
