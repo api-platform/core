@@ -210,6 +210,21 @@ final class DenormalizationViolationFactoryTest extends TestCase
         }
     }
 
+    public function testStringValidationGroupIsASingleGroup(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType('Type error.', null, ['string'], 'adminOnly');
+
+        $operation = (new Post(class: DenormHandlerFixture::class))
+            ->withValidationContext(['groups' => 'admin']);
+
+        try {
+            $this->factory->handle($exception, $operation);
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertSame((string) NotBlank::IS_BLANK_ERROR, $e->getConstraintViolationList()[0]->getCode());
+        }
+    }
+
     public function testHandlePartialAggregatesAllErrors(): void
     {
         $errors = [
