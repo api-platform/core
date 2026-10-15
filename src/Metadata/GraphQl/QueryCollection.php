@@ -78,6 +78,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         array $extraProperties = [],
 
         ?bool $nested = null,
+        ?bool $map = null,
     ) {
         parent::__construct(
             resolver: $resolver,
@@ -135,6 +136,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
             rules: $rules,
             extraProperties: $extraProperties,
             nested: $nested,
+            map: $map,
         );
     }
 }
