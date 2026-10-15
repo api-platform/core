@@ -237,9 +237,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority, array $declaredOperationClasses): Parameters
     {
         $propertyNames = $properties = [];
-        $parameters = $operation->getParameters() ?? new Parameters();
+        $existingParameters = $operation->getParameters();
+        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
 
         foreach ($this->createParametersFromAttributes($operation, $declaredOperationClasses) as $key => $parameter) {
+            if (!str_contains($key, ':property') && $parameters->has($key, $parameter::class)) {
+                continue;
+            }
+
             $parameters->add($key, $parameter);
         }
 
@@ -532,7 +537,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $propertyName = $reflectionProperty->getName();
 
                 if (null !== ($parameterOperations = $parameter->getOperations())) {
-                    $parameterOperationClasses = array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations);
+                    $parameterOperationClasses = array_map(static fn (Operation|string $parameterOperation): string => \is_string($parameterOperation) ? $parameterOperation : $parameterOperation::class, $parameterOperations);
 
                     foreach ($parameterOperationClasses as $parameterOperationClass) {
                         if (!\in_array($parameterOperationClass, $declaredOperationClasses, true)) {
@@ -574,6 +579,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $operationClasses = [];
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() ?? [] as $operation) {
+                $operationClasses[] = $operation::class;
+            }
+
+            foreach ($resource->getGraphQlOperations() ?? [] as $operation) {
                 $operationClasses[] = $operation::class;
             }
         }

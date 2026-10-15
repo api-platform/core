@@ -580,6 +580,22 @@ class SchemaFactoryTest extends TestCase
 
         $this->assertSame([
             'description' => 'The child.',
+            'allOf' => [
+                ['$ref' => '#/definitions/GenericChild'],
+                ['$ref' => '#/definitions/Serializable'],
+            ],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    public function testBuildSchemaUsesAnyOfForAUnionOfReferences(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::union(Type::object(GenericChild::class), Type::object(Serializable::class)))
+            ->withDescription('The child.')
+            ->withSchema(['description' => 'The child.', 'anyOf' => [['type' => Schema::UNKNOWN_TYPE], ['type' => Schema::UNKNOWN_TYPE]]]));
+
+        $this->assertSame([
+            'description' => 'The child.',
             'anyOf' => [
                 ['$ref' => '#/definitions/GenericChild'],
                 ['$ref' => '#/definitions/Serializable'],

@@ -29,6 +29,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -74,7 +75,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         } else {
             $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
             $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
-            $serializerContext ??= $this->getSerializerContext($operation, $type);
+            if ($operationWasProvided || !($serializerContext[self::FORCE_SUBSCHEMA] ?? false)) {
+                $serializerContext = ($serializerContext ?? []) + $this->getSerializerContext($operation, $type);
+            }
         }
 
         if (null === $inputOrOutputClass) {
@@ -151,7 +154,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
-        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
+        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
 
@@ -311,7 +314,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     continue;
                 }
 
-                $childSerializerContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true];
+                $childSerializerContext = [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? ($serializerContext['gen_id'] ?? true)] + $serializerContext;
                 if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
                     $attributes = $serializerContext[AbstractNormalizer::ATTRIBUTES];
                     if (\is_array($attributes) && \array_key_exists($normalizedPropertyName, $attributes) && \is_array($attributes[$normalizedPropertyName])) {
@@ -361,7 +364,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             if (($c = \count($refs)) > 1) {
-                $propertySchema['anyOf'] = $refs;
+                $propertySchema[$type instanceof IntersectionType ? 'allOf' : 'anyOf'] = $refs;
             } elseif (1 === $c) {
                 $propertySchema['$ref'] = $refs[0]['$ref'];
             }
@@ -384,7 +387,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     /**
      * Gets the options for the property name collection / property metadata factories.
      */
-    private function getFactoryOptions(array $serializerContext, array $validationGroups, ?HttpOperation $operation = null): array
+    private function getFactoryOptions(array $serializerContext, array $validationGroups): array
     {
         $options = [
             /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
@@ -396,31 +399,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $options['serializer_groups'] = (array) $serializerContext[AbstractNormalizer::GROUPS];
         }
 
-        if ($operation && ($normalizationGroups = $operation->getNormalizationContext()['groups'] ?? null)) {
-            $options['normalization_groups'] = $normalizationGroups;
-        }
-
-        if ($operation && ($denormalizationGroups = $operation->getDenormalizationContext()['groups'] ?? null)) {
-            $options['denormalization_groups'] = $denormalizationGroups;
-        }
-
         if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
             $options['serializer_attributes'] = (array) $serializerContext[AbstractNormalizer::ATTRIBUTES];
-        }
-
-        if ($operation && ($normalizationAttributes = $operation->getNormalizationContext()['attributes'] ?? null)) {
-            $options['normalization_attributes'] = $normalizationAttributes;
-        }
-
-        if ($operation && ($denormalizationAttributes = $operation->getDenormalizationContext()['attributes'] ?? null)) {
-            $options['denormalization_attributes'] = $denormalizationAttributes;
         }
 
         if ($validationGroups) {
             $options['validation_groups'] = $validationGroups;
         }
 
-        if ($operation && ($ignoredAttributes = $operation->getNormalizationContext()['ignored_attributes'] ?? null)) {
+        if ($ignoredAttributes = $serializerContext['ignored_attributes'] ?? null) {
             $options['ignored_attributes'] = $ignoredAttributes;
         }
 
