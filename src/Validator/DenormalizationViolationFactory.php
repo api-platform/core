@@ -168,12 +168,6 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
     }
 
     /**
-     * Normalizes the operation's validation groups into a flat list of group names.
-     *
-     * The `groups` entry of the validation context may be a plain list, a {@see GroupSequence},
-     * or a list mixing nested arrays and GroupSequence instances. A callable (resolved at
-     * validation time against the object) cannot be evaluated here and is treated as absent.
-     *
      * @return array<string>|null
      */
     private function normalizeValidationGroups(mixed $validationGroups): ?array
@@ -186,11 +180,19 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
             return $this->flattenValidationGroups($validationGroups->groups);
         }
 
-        if (!\is_array($validationGroups) || \is_callable($validationGroups)) {
+        if (\is_callable($validationGroups)) {
             return null;
         }
 
-        return $this->flattenValidationGroups($validationGroups);
+        if (\is_string($validationGroups)) {
+            return [$validationGroups];
+        }
+
+        if (\is_array($validationGroups)) {
+            return $this->flattenValidationGroups($validationGroups);
+        }
+
+        return null;
     }
 
     /**
