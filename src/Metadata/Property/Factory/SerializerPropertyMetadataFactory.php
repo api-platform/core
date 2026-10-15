@@ -67,7 +67,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         $type = $propertyMetadata->getNativeType();
         if (null !== $type && !$this->isResourceClass($resourceClass) && $type->isSatisfiedBy(static fn (Type $t): bool => $t instanceof CollectionType)) {
-            return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
+            return $propertyMetadata->withReadableLink($propertyMetadata->isReadableLink() ?? true)->withWritableLink($propertyMetadata->isWritableLink() ?? true);
         }
 
         return $this->transformLinkStatus($propertyMetadata, $property, $normalizationGroups, $denormalizationGroups, $normalizationAttributes, $denormalizationAttributes, $type);
