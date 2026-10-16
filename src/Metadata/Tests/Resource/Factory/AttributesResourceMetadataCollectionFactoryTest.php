@@ -247,6 +247,27 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
     }
 
+    public function testCreateWithDefaultsHavingCanGetters(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'read' => false,
+            'deserialize' => false,
+            'validate' => false,
+            'write' => false,
+            'serialize' => false,
+            'map' => true,
+        ]);
+
+        $operation = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)->getOperation('_api_AttributeResource_put');
+
+        $this->assertFalse($operation->canRead());
+        $this->assertFalse($operation->canDeserialize());
+        $this->assertFalse($operation->canValidate());
+        $this->assertFalse($operation->canWrite());
+        $this->assertFalse($operation->canSerialize());
+        $this->assertTrue($operation->canMap());
+    }
+
     public function testExtraProperties(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
