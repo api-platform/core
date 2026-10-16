@@ -68,6 +68,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
@@ -144,6 +146,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
@@ -218,6 +222,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => ['someirischema'],
@@ -475,6 +481,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
@@ -562,6 +570,17 @@ class YamlExtractorTest extends TestCase
 
         $this->assertArrayHasKey('output', $resources[Program::class][0]['operations'][0]);
         $this->assertFalse($resources[Program::class][0]['operations'][0]['output']);
+    }
+
+    public function testHideHydraOperationAndStrictQueryParameterValidation(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/hide-hydra-operation.yaml']))->getResources()[Program::class];
+
+        $this->assertTrue($resources[0]['hideHydraOperation']);
+        $this->assertTrue($resources[0]['strictQueryParameterValidation']);
+        $this->assertTrue($resources[0]['operations'][0]['hideHydraOperation']);
+        $this->assertTrue($resources[0]['operations'][0]['strictQueryParameterValidation']);
+        $this->assertTrue($resources[1]['operations'][0]['hideHydraOperation']);
     }
 
     public function testInputAndOutputAreStrings(): void
