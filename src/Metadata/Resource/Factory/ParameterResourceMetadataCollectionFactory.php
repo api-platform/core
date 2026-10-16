@@ -380,7 +380,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameter;
         }
 
-        if ($filter instanceof ParameterProviderFilterInterface) {
+        if (null === $parameter->getProvider() && $filter instanceof ParameterProviderFilterInterface) {
             $parameter = $parameter->withProvider($filter::getParameterProvider());
         }
 

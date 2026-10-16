@@ -210,6 +210,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]), $attributesResourceMetadataCollectionFactory->create(AttributeConfigOperations::class));
     }
 
+    public function testCreateWithAllowCreateDefault(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: ['allow_create' => true]);
+
+        $operation = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)->getOperation('_api_AttributeResource_put');
+
+        $this->assertInstanceOf(Put::class, $operation);
+        $this->assertTrue($operation->getAllowCreate());
+    }
+
     public function testCreateShouldNotOverrideWithDefault(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(
@@ -235,6 +245,27 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 paginationItemsPerPage: 10
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+    }
+
+    public function testCreateWithDefaultsHavingCanGetters(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'read' => false,
+            'deserialize' => false,
+            'validate' => false,
+            'write' => false,
+            'serialize' => false,
+            'map' => true,
+        ]);
+
+        $operation = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)->getOperation('_api_AttributeResource_put');
+
+        $this->assertFalse($operation->canRead());
+        $this->assertFalse($operation->canDeserialize());
+        $this->assertFalse($operation->canValidate());
+        $this->assertFalse($operation->canWrite());
+        $this->assertFalse($operation->canSerialize());
+        $this->assertTrue($operation->canMap());
     }
 
     public function testExtraProperties(): void

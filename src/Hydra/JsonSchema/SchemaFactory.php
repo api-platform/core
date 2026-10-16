@@ -117,6 +117,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
 
+        $providedOperation = $operation;
         $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
         $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
         $serializerContext ??= $this->getSerializerContext($operation, $type);
@@ -126,7 +127,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
 
-        $schema = $this->schemaFactory->buildSchema($className, 'jsonld', $type, $operation, $schema, $serializerContext, $forceCollection);
+        $schema = $this->schemaFactory->buildSchema($className, 'jsonld', $type, $providedOperation, $schema, $serializerContext, $forceCollection);
         $definitions = $schema->getDefinitions();
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $collectionKey = $schema->getItemsDefinitionKey();

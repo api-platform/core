@@ -172,6 +172,59 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals([null, null, null, null, null, 10, null], $retry);
     }
 
+    public function testResetDropsTheUpdatesCollectedByAFailedFlush(): void
+    {
+        $failed = new Dummy();
+        $failed->setId(1);
+        $published = new Dummy();
+        $published->setId(2);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($failed, Argument::cetera())->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($published, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withShortName('Dummy')->withMercure(['hub' => 'managed', 'enable_async_update' => false]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($published, 'jsonld', [])->willReturn('2');
+
+        $topics = [];
+        $managedHub = $this->createMockHub(static function (Update $update) use (&$topics): string {
+            $topics = array_merge($topics, $update->getTopics());
+
+            return 'id';
+        });
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            ['jsonld' => ['application/ld+json']],
+            null,
+            new HubRegistry($this->createStub(HubInterface::class), [
+                'managed' => $managedHub,
+            ]),
+        );
+
+        // the commit of the first flush fails: Doctrine dispatches onFlush, but never postFlush
+        $listener->onFlush($this->createOnFlushEventArgs([$failed]));
+        // between two requests (or two messages), the services resetter resets the listener
+        $listener->reset();
+
+        $listener->onFlush($this->createOnFlushEventArgs([$published]));
+        $listener->postFlush();
+
+        $this->assertSame(['http://example.com/dummies/2'], $topics);
+    }
+
     public function testPublishUpdateMultipleTopicsUsingExpressionLanguage(): void
     {
         $mercure = [
@@ -442,6 +495,19 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertCount(4, $data, 'Expected 4 updates: 2 inserts (admin + public) + 2 deletes (admin + public)');
         $this->assertEquals('{"admin":1}', $data[0]);
         $this->assertEquals('{"public":1}', $data[1]);
+    }
+
+    private function createOnFlushEventArgs(array $insertions): OnFlushEventArgs
+    {
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn($insertions);
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([]);
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([]);
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal());
+
+        return new OnFlushEventArgs($emProphecy->reveal());
     }
 
     private function createMockHub(callable $callable): HubInterface

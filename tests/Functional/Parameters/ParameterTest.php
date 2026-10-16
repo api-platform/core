@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TranslateValidationError;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithDisabledParameterValidationOnResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,7 +32,7 @@ final class ParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, TranslateValidationError::class];
+        return [WithParameter::class, TranslateValidationError::class, WithDisabledParameterValidationOnResource::class];
     }
 
     public function testWithGroupFilter(): void
@@ -76,6 +77,12 @@ final class ParameterTest extends ApiTestCase
     public function testDisabled(): void
     {
         self::createClient()->request('GET', 'with_disabled_parameter_validation');
+        $this->assertResponseStatusCodeSame(200);
+    }
+
+    public function testDisabledOnResource(): void
+    {
+        self::createClient()->request('GET', 'with_disabled_parameter_validation_on_resource');
         $this->assertResponseStatusCodeSame(200);
     }
 
