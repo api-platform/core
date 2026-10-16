@@ -470,6 +470,16 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHasService('api_platform.mcp.state_provider.parameter_validator');
     }
 
+    public function testMercurePublisherIsReset(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['mercure']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('kernel.reset'));
+    }
+
     public function testItRegistersMetadataConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
