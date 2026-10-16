@@ -251,6 +251,8 @@ class YamlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => GetCollection::class,
+                            'method' => null,
+                            'routeName' => null,
                             'uriTemplate' => '/users/{author}/programs{._format}',
                             'shortName' => null,
                             'description' => 'User programs',
@@ -337,6 +339,8 @@ class YamlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => Get::class,
+                            'method' => null,
+                            'routeName' => null,
                             'uriTemplate' => '/users/{userId}/programs/{id}{._format}',
                             'shortName' => null,
                             'description' => 'User programs',
@@ -602,6 +606,14 @@ class YamlExtractorTest extends TestCase
         $this->assertSame('is_granted("ROLE_ADMIN")', $resources[User::class][1]['security']);
         $this->assertArrayHasKey('operations', $resources[User::class][1]);
         $this->assertCount(1, $resources[User::class][1]['operations']);
+    }
+
+    public function testOperationMethodAndRouteName(): void
+    {
+        $operations = (new YamlResourceExtractor([__DIR__.'/yaml/operation-method-route-name.yaml']))->getResources()[Program::class][0]['operations'];
+
+        $this->assertSame('PATCH', $operations[0]['method']);
+        $this->assertSame('program_post_publication', $operations[1]['routeName']);
     }
 
     public function testContainerParametersAreResolved(): void
