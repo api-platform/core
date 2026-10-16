@@ -21,8 +21,10 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939FooResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Company as DocumentCompany;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompanyBadge as DocumentCompanyBadge;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Employee as DocumentEmployee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompanyBadge;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7469Dummy;
@@ -45,7 +47,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class, Pairing::class, Plan::class, Issue7939FooResource::class, Issue7939BarResource::class, Issue7939BazResource::class];
+        return [WithParameter::class, Dummy::class, Employee::class, Company::class, CompanyBadge::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class, Pairing::class, Plan::class, Issue7939FooResource::class, Issue7939BarResource::class, Issue7939BazResource::class];
     }
 
     /**
@@ -53,7 +55,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class, Issue7469Dummy::class, Plan::class, Pairing::class]);
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class, CompanyBadge::class, Issue7469Dummy::class, Plan::class, Pairing::class]);
     }
 
     public function testReadDummyProviderFromQueryParameter(): void
@@ -147,6 +149,30 @@ final class LinkProviderParameterTest extends ApiTestCase
             ],
         ]);
         self::assertResponseStatusCodeSame(200);
+    }
+
+    public function testPutCreateUnderSlugParentLink(): void
+    {
+        $companyClass = $this->isMongoDB() ? DocumentCompany::class : Company::class;
+        $badgeClass = $this->isMongoDB() ? DocumentCompanyBadge::class : CompanyBadge::class;
+
+        $manager = $this->getManager();
+        $company = new $companyClass();
+        $company->setName('Test');
+        $manager->persist($company);
+        $manager->flush();
+        $companyId = $company->getId();
+
+        self::createClient()->request('PUT', '/companies-by-name/Test/badges/gold', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['label' => 'Gold'],
+        ]);
+        self::assertResponseStatusCodeSame(201);
+
+        $manager->clear();
+        $badge = $manager->getRepository($badgeClass)->find('gold');
+        self::assertNotNull($badge);
+        self::assertSame($companyId, $badge->company->getId());
     }
 
     /**
