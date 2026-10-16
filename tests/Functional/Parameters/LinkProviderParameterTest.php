@@ -20,6 +20,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939BazResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939FooResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Company as DocumentCompany;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompanyBadge as DocumentCompanyBadge;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompanyBadge;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -150,13 +152,11 @@ final class LinkProviderParameterTest extends ApiTestCase
 
     public function testPutCreateUnderSlugParentLink(): void
     {
-        $container = static::getContainer();
-        if ('mongodb' === $container->getParameter('kernel.environment')) {
-            $this->markTestSkipped();
-        }
+        $companyClass = $this->isMongoDB() ? DocumentCompany::class : Company::class;
+        $badgeClass = $this->isMongoDB() ? DocumentCompanyBadge::class : CompanyBadge::class;
 
         $manager = $this->getManager();
-        $company = new Company();
+        $company = new $companyClass();
         $company->setName('Test');
         $manager->persist($company);
         $manager->flush();
@@ -169,7 +169,7 @@ final class LinkProviderParameterTest extends ApiTestCase
         self::assertResponseStatusCodeSame(201);
 
         $manager->clear();
-        $badge = $manager->getRepository(CompanyBadge::class)->find('gold');
+        $badge = $manager->getRepository($badgeClass)->find('gold');
         self::assertNotNull($badge);
         self::assertSame($companyId, $badge->company->getId());
     }
