@@ -37,6 +37,8 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithSh
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\InvalidExceptionToStatusOperation;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\InvalidStatusOperation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
@@ -377,6 +379,26 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         foreach ($collection[1]->getOperations() as $operation) {
             $this->assertSame('AttributeResource2', $operation->getShortName());
         }
+    }
+
+    public function testInvalidStatusThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory();
+
+        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The HTTP status code "999" of operation "_api_InvalidStatusOperation_post" of resource "%s" is not valid.', InvalidStatusOperation::class));
+
+        $factory->create(InvalidStatusOperation::class);
+    }
+
+    public function testInvalidExceptionToStatusThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory();
+
+        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The HTTP status code "999" of operation "_api_InvalidExceptionToStatusOperation_get" of resource "%s" is not valid.', InvalidExceptionToStatusOperation::class));
+
+        $factory->create(InvalidExceptionToStatusOperation::class);
     }
 
     public function testWithParameters(): void
