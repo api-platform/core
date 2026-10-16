@@ -1,0 +1,24 @@
+{
+    "definitions": {
+        "GoldenStrictInput": {
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "default": "",
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenStrictInput",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

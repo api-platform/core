@@ -1,0 +1,174 @@
+{
+    "definitions": {
+        "GoldenBook-golden.read": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "isbn": {
+                    "deprecated": true,
+                    "description": "International standard book number.",
+                    "example": "9780000000000",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenBook.jsonhal-golden.read": {
+            "allOf": [
+                {
+                    "properties": {
+                        "_links": {
+                            "properties": {
+                                "self": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                {
+                    "$ref": "#/definitions/GoldenBook-golden.read"
+                }
+            ]
+        },
+        "HalCollectionBaseSchema": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HalCollectionBaseSchemaNoPagination"
+                },
+                {
+                    "properties": {
+                        "_links": {
+                            "properties": {
+                                "first": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "last": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "next": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "previous": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "itemsPerPage": {
+                            "minimum": 0,
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "HalCollectionBaseSchemaNoPagination": {
+            "properties": {
+                "_embedded": {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "item": {
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        {
+                            "type": "object"
+                        }
+                    ]
+                },
+                "_links": {
+                    "properties": {
+                        "self": {
+                            "properties": {
+                                "href": {
+                                    "format": "iri-reference",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "totalItems": {
+                    "minimum": 0,
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "_links",
+                "_embedded"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "allOf": [
+            {
+                "$ref": "#/definitions/HalCollectionBaseSchema"
+            },
+            {
+                "properties": {
+                    "_embedded": {
+                        "additionalProperties": {
+                            "items": {
+                                "$ref": "#/definitions/GoldenBook.jsonhal-golden.read"
+                            },
+                            "type": "array"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        ],
+        "description": "GoldenBook.jsonhal-golden.read collection."
+    }
+}

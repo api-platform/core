@@ -1,0 +1,206 @@
+{
+    "definitions": {
+        "GoldenBook.jsonld-golden.read": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "isbn": {
+                            "deprecated": true,
+                            "description": "International standard book number.",
+                            "example": "9780000000000",
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "title": {
+                            "default": "",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "HydraCollectionBaseSchema": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraCollectionBaseSchemaNoPagination"
+                },
+                {
+                    "properties": {
+                        "hydra:view": {
+                            "example": {
+                                "@id": "string",
+                                "@type": "string",
+                                "hydra:first": "string",
+                                "hydra:last": "string",
+                                "hydra:next": "string",
+                                "hydra:previous": "string"
+                            },
+                            "properties": {
+                                "@id": {
+                                    "format": "iri-reference",
+                                    "type": "string"
+                                },
+                                "@type": {
+                                    "type": "string"
+                                },
+                                "hydra:first": {
+                                    "format": "iri-reference",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "hydra:last": {
+                                    "format": "iri-reference",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "hydra:next": {
+                                    "format": "iri-reference",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "hydra:previous": {
+                                    "format": "iri-reference",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "HydraCollectionBaseSchemaNoPagination": {
+            "properties": {
+                "hydra:search": {
+                    "properties": {
+                        "@type": {
+                            "type": "string"
+                        },
+                        "hydra:mapping": {
+                            "items": {
+                                "properties": {
+                                    "@type": {
+                                        "type": "string"
+                                    },
+                                    "property": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "required": {
+                                        "type": "boolean"
+                                    },
+                                    "variable": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "type": "array"
+                        },
+                        "hydra:template": {
+                            "type": "string"
+                        },
+                        "hydra:variableRepresentation": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "hydra:totalItems": {
+                    "minimum": 0,
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "HydraItemBaseSchema": {
+            "properties": {
+                "@context": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": true,
+                            "properties": {
+                                "@vocab": {
+                                    "type": "string"
+                                },
+                                "hydra": {
+                                    "enum": [
+                                        "http://www.w3.org/ns/hydra/core#"
+                                    ],
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "@vocab",
+                                "hydra"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "@id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@id",
+                "@type"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "allOf": [
+            {
+                "$ref": "#/definitions/HydraCollectionBaseSchema"
+            },
+            {
+                "properties": {
+                    "hydra:member": {
+                        "items": {
+                            "$ref": "#/definitions/GoldenBook.jsonld-golden.read"
+                        },
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "hydra:member"
+                ],
+                "type": "object"
+            }
+        ],
+        "description": "GoldenBook.jsonld-golden.read collection.",
+        "type": "object"
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "definitions": {
+        "BuiltinTypeQuirks": {
+            "properties": {
+                "amount": {
+                    "format": "string",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "anything": [],
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "untyped": {
+                    "items": [],
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/BuiltinTypeQuirks",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

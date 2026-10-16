@@ -1,0 +1,63 @@
+{
+    "definitions": [],
+    "schema": {
+        "properties": {
+            "@context": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "additionalProperties": true,
+                        "properties": {
+                            "@vocab": {
+                                "type": "string"
+                            },
+                            "hydra": {
+                                "enum": [
+                                    "http://www.w3.org/ns/hydra/core#"
+                                ],
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "@vocab",
+                            "hydra"
+                        ],
+                        "type": "object"
+                    }
+                ]
+            },
+            "@id": {
+                "type": "string"
+            },
+            "@type": {
+                "type": "string"
+            },
+            "id": {
+                "readOnly": true,
+                "type": "integer"
+            },
+            "isbn": {
+                "type": "string"
+            },
+            "status": {
+                "anyOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "title": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "@type"
+        ],
+        "type": "object"
+    }
+}

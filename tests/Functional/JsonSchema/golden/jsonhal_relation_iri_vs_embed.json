@@ -1,0 +1,78 @@
+{
+    "definitions": {
+        "GoldenRelated-golden.read_golden.embed": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelation-golden.read_golden.embed": {
+            "properties": {
+                "embedded": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenRelated-golden.read_golden.embed"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "linked": {
+                    "example": "https://example.com/",
+                    "format": "iri-reference",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelation.jsonhal-golden.read_golden.embed": {
+            "allOf": [
+                {
+                    "properties": {
+                        "_links": {
+                            "properties": {
+                                "self": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                {
+                    "$ref": "#/definitions/GoldenRelation-golden.read_golden.embed"
+                }
+            ]
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenRelation.jsonhal-golden.read_golden.embed",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

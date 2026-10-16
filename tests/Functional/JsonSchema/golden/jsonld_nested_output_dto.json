@@ -1,0 +1,96 @@
+{
+    "definitions": {
+        "GoldenOutputDtoOwner.jsonld": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "properties": {
+                        "dto": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/GoldenOutputDtoResource.GoldenOutputDto.jsonld"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "id": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "GoldenOutputDtoResource.GoldenOutputDto.jsonld": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "properties": {
+                        "label": {
+                            "default": "",
+                            "type": "string"
+                        },
+                        "total": {
+                            "default": 0,
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "HydraItemBaseSchema": {
+            "properties": {
+                "@context": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": true,
+                            "properties": {
+                                "@vocab": {
+                                    "type": "string"
+                                },
+                                "hydra": {
+                                    "enum": [
+                                        "http://www.w3.org/ns/hydra/core#"
+                                    ],
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "@vocab",
+                                "hydra"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "@id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@id",
+                "@type"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenOutputDtoOwner.jsonld"
+    }
+}

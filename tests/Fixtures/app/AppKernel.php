@@ -262,6 +262,9 @@ class AppKernel extends Kernel
                 'max_query_depth' => 200,
             ],
             'use_symfony_listeners' => $useSymfonyListeners,
+            'json_schema' => [
+                'generator' => (bool) ($_SERVER['JSON_SCHEMA_GENERATOR'] ?? false),
+            ],
             'defaults' => [
                 'pagination_client_enabled' => true,
                 'pagination_client_items_per_page' => true,

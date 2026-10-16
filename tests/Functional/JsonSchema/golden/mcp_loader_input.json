@@ -1,0 +1,11 @@
+{
+    "definitions": [],
+    "schema": {
+        "properties": {
+            "search": {
+                "type": "string"
+            }
+        },
+        "type": "object"
+    }
+}

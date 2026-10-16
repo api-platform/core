@@ -1,0 +1,88 @@
+{
+    "definitions": {
+        "GoldenBook": {
+            "deprecated": true,
+            "description": "Retrieves a golden book.",
+            "externalDocs": {
+                "url": "https://schema.org/Book"
+            },
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "internalNote": {
+                    "default": "",
+                    "type": "string"
+                },
+                "isbn": {
+                    "deprecated": true,
+                    "description": "International standard book number.",
+                    "example": "9780000000000",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenBook.jsonapi": {
+            "properties": {
+                "data": {
+                    "properties": {
+                        "attributes": {
+                            "properties": {
+                                "_id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "internalNote": {
+                                    "default": "",
+                                    "type": "string"
+                                },
+                                "isbn": {
+                                    "deprecated": true,
+                                    "description": "International standard book number.",
+                                    "example": "9780000000000",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "title": {
+                                    "default": "",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "id"
+                    ],
+                    "type": "object"
+                }
+            }
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenBook.jsonapi",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

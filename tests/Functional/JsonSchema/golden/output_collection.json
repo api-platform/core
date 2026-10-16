@@ -1,0 +1,35 @@
+{
+    "definitions": {
+        "GoldenBook-golden.read": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "isbn": {
+                    "deprecated": true,
+                    "description": "International standard book number.",
+                    "example": "9780000000000",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "items": {
+            "$ref": "#/definitions/GoldenBook-golden.read"
+        },
+        "type": "array"
+    }
+}

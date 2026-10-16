@@ -1,0 +1,12 @@
+{
+    "definitions": [],
+    "schema": {
+        "description": "Echo a message, serialized with the format declared on the operation",
+        "properties": {
+            "message": {
+                "type": "string"
+            }
+        },
+        "type": "object"
+    }
+}

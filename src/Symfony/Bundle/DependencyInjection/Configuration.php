@@ -215,6 +215,12 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([])
                     ->info('The JSON formats to compute the JSON Schemas for.')
                 ->end()
+                ->arrayNode('json_schema')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('generator')->defaultFalse()->info('Build JSON Schemas with the Symfony JsonSchema component (experimental, requires symfony/json-schema).')->end()
+                    ->end()
+                ->end()
             ->end();
 
         $this->addDefaultsSection($rootNode);

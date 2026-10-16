@@ -1,0 +1,34 @@
+{
+    "definitions": {
+        "GoldenInput-golden.write": {
+            "properties": {
+                "computedLabel": {
+                    "readOnly": true,
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "password": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "writeOnly": true
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "title"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenInput-golden.write",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

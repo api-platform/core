@@ -33,6 +33,7 @@ use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\AsJsonSchemaDefinitionProcessor;
 use ApiPlatform\Metadata\AsOperationMutator;
 use ApiPlatform\Metadata\AsResourceMutator;
 use ApiPlatform\Metadata\Delete;
@@ -85,6 +86,8 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
+use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -236,6 +239,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.uri_variables.transformer');
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
+
+        if (interface_exists(DefinitionProcessorInterface::class)) {
+            $container->registerAttributeForAutoconfiguration(
+                AsJsonSchemaDefinitionProcessor::class,
+                static function (ChildDefinition $definition, AsJsonSchemaDefinitionProcessor $attribute, \ReflectionClass $reflector): void { // @phpstan-ignore-line
+                    if (!is_a($reflector->name, DefinitionProcessorInterface::class, true)) {
+                        throw new RuntimeException(\sprintf('JSON Schema definition processor "%s" should implement %s', $reflector->name, DefinitionProcessorInterface::class));
+                    }
+
+                    $definition->addTag('api_platform.json_schema.definition_processor');
+                },
+            );
+        }
 
         $container->registerAttributeForAutoconfiguration(
             AsResourceMutator::class,
@@ -749,6 +765,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
         }
+
+        if (!$config['json_schema']['generator']) {
+            $container->removeDefinition('api_platform.hydra.json_schema.item_definition_processor');
+        }
     }
 
     private function registerJsonHalConfiguration(array $formats, PhpFileLoader $loader): void
@@ -1114,6 +1134,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.validationErrorResourceClass', $config['openapi']['validation_error_resource_class'] ?? null);
 
         $loader->load('json_schema.php');
+
+        if (!$config['json_schema']['generator']) {
+            return;
+        }
+
+        if (!class_exists(SchemaGenerator::class)) {
+            throw new \LogicException('The "api_platform.json_schema.generator" option requires the Symfony JsonSchema component. Try running "composer require symfony/json-schema".');
+        }
+
+        $loader->load('json_schema_generator.php');
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void

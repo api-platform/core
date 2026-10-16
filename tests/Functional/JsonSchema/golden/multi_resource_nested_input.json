@@ -1,0 +1,32 @@
+{
+    "definitions": {
+        "GoldenMultiResource-golden.write": {
+            "properties": {
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenMultiResourceOwner-golden.write": {
+            "properties": {
+                "entity": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenMultiResource-golden.write"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenMultiResourceOwner-golden.write",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

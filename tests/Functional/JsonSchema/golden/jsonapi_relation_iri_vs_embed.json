@@ -1,0 +1,242 @@
+{
+    "definitions": {
+        "GoldenRelated": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelated.jsonapi": {
+            "properties": {
+                "data": {
+                    "properties": {
+                        "attributes": {
+                            "properties": {
+                                "_id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "label": {
+                                    "default": "",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "id"
+                    ],
+                    "type": "object"
+                }
+            }
+        },
+        "GoldenRelated_noid": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelation": {
+            "properties": {
+                "embedded": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenRelated"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "embeddedWithoutId": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenRelated_noid"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "linked": {
+                    "example": "https://example.com/",
+                    "format": "iri-reference",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelation.jsonapi": {
+            "properties": {
+                "data": {
+                    "properties": {
+                        "attributes": {
+                            "properties": {
+                                "_id": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "relationships": {
+                            "properties": {
+                                "embedded": {
+                                    "properties": {
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "null"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "id": {
+                                                            "format": "iri-reference",
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "id"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "embeddedWithoutId": {
+                                    "properties": {
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "null"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "id": {
+                                                            "format": "iri-reference",
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "id"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "linked": {
+                                    "properties": {
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "null"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "id": {
+                                                            "format": "iri-reference",
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "id"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "id"
+                    ],
+                    "type": "object"
+                },
+                "included": {
+                    "description": "Related resources requested via the \"include\" query parameter.",
+                    "externalDocs": {
+                        "url": "https://jsonapi.org/format/#fetching-includes"
+                    },
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/GoldenRelated.jsonapi"
+                            }
+                        ]
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                }
+            }
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenRelation.jsonapi",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

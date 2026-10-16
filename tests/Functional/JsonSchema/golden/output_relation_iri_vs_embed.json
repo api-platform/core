@@ -1,0 +1,52 @@
+{
+    "definitions": {
+        "GoldenRelated-golden.read_golden.embed": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelation-golden.read_golden.embed": {
+            "properties": {
+                "embedded": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenRelated-golden.read_golden.embed"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "linked": {
+                    "example": "https://example.com/",
+                    "format": "iri-reference",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenRelation-golden.read_golden.embed",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

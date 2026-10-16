@@ -1,0 +1,84 @@
+{
+    "definitions": {
+        "GoldenBook.jsonld-golden.read": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "deprecated": true,
+                    "externalDocs": {
+                        "url": "https://schema.org/Book"
+                    },
+                    "properties": {
+                        "id": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "isbn": {
+                            "deprecated": true,
+                            "description": "International standard book number.",
+                            "example": "9780000000000",
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "title": {
+                            "default": "",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ],
+            "description": "Retrieves a golden book."
+        },
+        "HydraItemBaseSchema": {
+            "properties": {
+                "@context": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": true,
+                            "properties": {
+                                "@vocab": {
+                                    "type": "string"
+                                },
+                                "hydra": {
+                                    "enum": [
+                                        "http://www.w3.org/ns/hydra/core#"
+                                    ],
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "@vocab",
+                                "hydra"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "@id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@id",
+                "@type"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenBook.jsonld-golden.read"
+    }
+}

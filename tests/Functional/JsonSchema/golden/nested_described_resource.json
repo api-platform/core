@@ -1,0 +1,48 @@
+{
+    "definitions": {
+        "GoldenDescribedAlias": {
+            "description": "A described related resource.",
+            "externalDocs": {
+                "url": "https://schema.org/Thing"
+            },
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenDescribedOwner": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "related": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenDescribedAlias"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenDescribedOwner",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

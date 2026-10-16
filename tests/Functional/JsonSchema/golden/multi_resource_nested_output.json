@@ -1,0 +1,44 @@
+{
+    "definitions": {
+        "GoldenAdminMultiResource-golden.read": {
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenMultiResourceOwner-golden.read": {
+            "properties": {
+                "entity": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenAdminMultiResource-golden.read"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenMultiResourceOwner-golden.read",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

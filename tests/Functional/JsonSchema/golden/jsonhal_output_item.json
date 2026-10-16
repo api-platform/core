@@ -1,0 +1,64 @@
+{
+    "definitions": {
+        "GoldenBook-golden.read": {
+            "deprecated": true,
+            "description": "Retrieves a golden book.",
+            "externalDocs": {
+                "url": "https://schema.org/Book"
+            },
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "isbn": {
+                    "deprecated": true,
+                    "description": "International standard book number.",
+                    "example": "9780000000000",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenBook.jsonhal-golden.read": {
+            "allOf": [
+                {
+                    "properties": {
+                        "_links": {
+                            "properties": {
+                                "self": {
+                                    "properties": {
+                                        "href": {
+                                            "format": "iri-reference",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                {
+                    "$ref": "#/definitions/GoldenBook-golden.read"
+                }
+            ],
+            "description": "Retrieves a golden book."
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenBook.jsonhal-golden.read",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

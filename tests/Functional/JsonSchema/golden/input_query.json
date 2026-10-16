@@ -1,0 +1,26 @@
+{
+    "definitions": {
+        "GoldenQuery.GoldenQueryCriteria": {
+            "properties": {
+                "limit": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "term": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "term"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenQuery.GoldenQueryCriteria",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

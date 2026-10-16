@@ -1,0 +1,31 @@
+{
+    "definitions": {
+        "GoldenInput-golden.write.partial": {
+            "properties": {
+                "computedLabel": {
+                    "readOnly": true,
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "password": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "writeOnly": true
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenInput-golden.write.partial",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

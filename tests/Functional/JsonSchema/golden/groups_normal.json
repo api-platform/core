@@ -1,0 +1,29 @@
+{
+    "definitions": {
+        "GoldenGroupedItem-golden.read": {
+            "properties": {
+                "createdAt": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenGroupedItem-golden.read",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "definitions": {
+        "GoldenNonStandardPutChild-golden.write.partial": {
+            "properties": {
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenPartialChildrenOwner-golden.write": {
+            "properties": {
+                "name": {
+                    "default": "",
+                    "type": "string"
+                },
+                "patchChild": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenPatchOnlyChild-golden.write.jsonMergePatch"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "putChild": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenNonStandardPutChild-golden.write.partial"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "type": "object"
+        },
+        "GoldenPatchOnlyChild-golden.write.jsonMergePatch": {
+            "properties": {
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenPartialChildrenOwner-golden.write",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

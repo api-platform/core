@@ -36,8 +36,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use ResourceMetadataTrait;
     use SchemaUriPrefixTrait;
 
-    private const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
-    private const ITEM_WITHOUT_ID_BASE_SCHEMA_NAME = 'HydraItemBaseSchemaWithoutId';
+    public const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
+    public const ITEM_WITHOUT_ID_BASE_SCHEMA_NAME = 'HydraItemBaseSchemaWithoutId';
     private const COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION = 'HydraCollectionBaseSchemaNoPagination';
     private const COLLECTION_BASE_SCHEMA_NAME = 'HydraCollectionBaseSchema';
 
@@ -130,6 +130,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $definitions = $schema->getDefinitions();
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $collectionKey = $schema->getItemsDefinitionKey();
+        $this->addReferencedItemBaseSchemas($definitions, $prefix);
 
         if (!$collectionKey) {
             $definitionName = $schema->getRootDefinitionKey() ?? $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
@@ -232,9 +233,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ];
         }
 
-        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext + ['schema_type' => $type]);
         $schema['type'] = 'object';
-        $schema['description'] = "$definitionName collection.";
+        $schema['description'] = "$collectionKey collection.";
         $schema['allOf'] = [
             ['$ref' => $prefix.(false === $operation->getPaginationEnabled() ? self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION : self::COLLECTION_BASE_SCHEMA_NAME)],
             [
@@ -264,6 +264,20 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     {
         if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
             $this->schemaFactory->setSchemaFactory($schemaFactory);
+        }
+    }
+
+    private function addReferencedItemBaseSchemas(\ArrayObject $definitions, string $prefix): void
+    {
+        $references = [];
+        foreach ($definitions as $definition) {
+            $references[$definition['allOf'][0]['$ref'] ?? ''] = true;
+        }
+
+        foreach ([self::ITEM_BASE_SCHEMA_NAME => self::ITEM_BASE_SCHEMA_WITH_ID, self::ITEM_WITHOUT_ID_BASE_SCHEMA_NAME => self::ITEM_BASE_SCHEMA_WITHOUT_ID] as $name => $baseSchema) {
+            if (isset($references[$prefix.$name]) && !isset($definitions[$name])) {
+                $definitions[$name] = $baseSchema;
+            }
         }
     }
 

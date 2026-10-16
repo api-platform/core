@@ -1,0 +1,25 @@
+{
+    "definitions": {
+        "GoldenValidated-golden.write_validation.golden.create": {
+            "properties": {
+                "name": {
+                    "default": "",
+                    "maxLength": 20,
+                    "type": "string"
+                },
+                "reference": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenValidated-golden.write_validation.golden.create",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

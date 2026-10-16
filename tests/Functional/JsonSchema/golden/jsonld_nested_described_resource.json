@@ -1,0 +1,102 @@
+{
+    "definitions": {
+        "GoldenDescribedAlias.jsonld": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "externalDocs": {
+                        "url": "https://schema.org/Thing"
+                    },
+                    "properties": {
+                        "id": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "label": {
+                            "default": "",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ],
+            "description": "A described related resource."
+        },
+        "GoldenDescribedOwner.jsonld": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "related": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/GoldenDescribedAlias.jsonld"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "HydraItemBaseSchema": {
+            "properties": {
+                "@context": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": true,
+                            "properties": {
+                                "@vocab": {
+                                    "type": "string"
+                                },
+                                "hydra": {
+                                    "enum": [
+                                        "http://www.w3.org/ns/hydra/core#"
+                                    ],
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "@vocab",
+                                "hydra"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "@id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@id",
+                "@type"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenDescribedOwner.jsonld"
+    }
+}

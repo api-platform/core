@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Hydra\JsonSchema\ItemDefinitionProcessor;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
@@ -34,6 +35,13 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
         ]);
+
+    $services->set('api_platform.hydra.json_schema.item_definition_processor', ItemDefinitionProcessor::class)
+        ->args([
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.json_schema.generator.definition_policy'),
+        ])
+        ->tag('api_platform.json_schema.definition_processor');
 
     $services->set('api_platform.hydra.normalizer.documentation', DocumentationNormalizer::class)
         ->args([

@@ -1,0 +1,35 @@
+{
+    "definitions": {
+        "GoldenBook-golden.read": {
+            "description": "Retrieves a golden book.",
+            "externalDocs": {
+                "url": "https://schema.org/Book"
+            },
+            "properties": {
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "isbn": {
+                    "deprecated": true,
+                    "description": "International standard book number.",
+                    "example": "9780000000000",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenBook-golden.read"
+    }
+}

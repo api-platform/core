@@ -1,0 +1,132 @@
+{
+    "definitions": {
+        "GoldenRelated.jsonld-golden.noid_noid": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchemaWithoutId"
+                },
+                {
+                    "properties": {
+                        "label": {
+                            "default": "",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "GoldenRelation.jsonld-golden.noid": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/HydraItemBaseSchema"
+                },
+                {
+                    "properties": {
+                        "embeddedWithoutId": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/GoldenRelated.jsonld-golden.noid_noid"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "id": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "HydraItemBaseSchema": {
+            "properties": {
+                "@context": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": true,
+                            "properties": {
+                                "@vocab": {
+                                    "type": "string"
+                                },
+                                "hydra": {
+                                    "enum": [
+                                        "http://www.w3.org/ns/hydra/core#"
+                                    ],
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "@vocab",
+                                "hydra"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "@id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@id",
+                "@type"
+            ],
+            "type": "object"
+        },
+        "HydraItemBaseSchemaWithoutId": {
+            "properties": {
+                "@context": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": true,
+                            "properties": {
+                                "@vocab": {
+                                    "type": "string"
+                                },
+                                "hydra": {
+                                    "enum": [
+                                        "http://www.w3.org/ns/hydra/core#"
+                                    ],
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "@vocab",
+                                "hydra"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "@id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@type"
+            ],
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenRelation.jsonld-golden.noid"
+    }
+}

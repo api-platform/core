@@ -1,0 +1,38 @@
+{
+    "definitions": {
+        "GoldenRelated-golden.noid_noid": {
+            "properties": {
+                "label": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenRelation-golden.noid": {
+            "properties": {
+                "embeddedWithoutId": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenRelated-golden.noid_noid"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenRelation-golden.noid",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

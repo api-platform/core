@@ -1,0 +1,38 @@
+{
+    "definitions": {
+        "GoldenGroupedItem": {
+            "properties": {
+                "createdAt": {
+                    "readOnly": true,
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "readOnly": true,
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "secretToken": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "writeOnly": true
+                },
+                "title": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenGroupedItem",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

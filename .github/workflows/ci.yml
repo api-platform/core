@@ -212,6 +212,7 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
           composer require --dev doctrine/mongodb-odm-bundle
+          composer require --dev --no-interaction "symfony/json-schema:8.2.x-dev"
       - name: Cache PHPStan results
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
@@ -989,6 +990,57 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
+
+  phpunit-json-schema-generator:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony JsonSchema generator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.5'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer:2.9.8
+          extensions: intl, bcmath, curl, openssl, mbstring
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-json-schema-generator-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-json-schema-generator-
+      - name: Update project dependencies
+        run: |
+          composer global require "soyuka/pmu:$PMU_VERSION"
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+          composer require --dev --no-interaction "symfony/json-schema:8.2.x-dev"
+      - name: Remove cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Run golden schema tests (generator disabled)
+        run: vendor/bin/phpunit tests/Functional/JsonSchema/GoldenSchemaTest.php
+      - name: Clear test app cache
+        run: rm -Rf tests/Fixtures/app/var/cache/test
+      - name: Run JSON Schema tests (generator enabled)
+        env:
+          JSON_SCHEMA_GENERATOR: '1'
+        run: |
+          vendor/bin/phpunit tests/Functional/JsonSchema/JsonSchemaTest.php
+          vendor/bin/phpunit tests/Functional/JsonSchema/JsonLdJsonSchemaTest.php
+          vendor/bin/phpunit tests/Functional/OpenApiTest.php
+      - name: Run container extension tests
+        run: vendor/bin/phpunit src/Symfony/Tests/Bundle/DependencyInjection/ApiPlatformExtensionTest.php --filter JsonSchema
 
   phpunit-symfony-lowest:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony lowest)

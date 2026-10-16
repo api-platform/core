@@ -1,0 +1,46 @@
+{
+    "definitions": {
+        "GoldenAuthor": {
+            "properties": {
+                "email": {
+                    "default": "",
+                    "type": "string"
+                },
+                "name": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoldenNested": {
+            "properties": {
+                "author": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/GoldenAuthor"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "name": {
+                    "default": "",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "schema": {
+        "$ref": "#/definitions/GoldenNested",
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}

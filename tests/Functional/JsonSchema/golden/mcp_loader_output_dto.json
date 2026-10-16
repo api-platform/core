@@ -1,0 +1,17 @@
+{
+    "definitions": [],
+    "schema": {
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "isbn": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string"
+            }
+        },
+        "type": "object"
+    }
+}
