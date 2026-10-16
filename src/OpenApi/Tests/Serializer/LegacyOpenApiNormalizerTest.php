@@ -346,6 +346,21 @@ final class LegacyOpenApiNormalizerTest extends TestCase
         $this->assertSame(['type' => 'string', 'nullable' => true], $schema['properties']['name']);
     }
 
+    public function testRemovesKeysNotDefinedIn30(): void
+    {
+        $document = [
+            'openapi' => '3.1.0',
+            'jsonSchemaDialect' => 'https://spec.openapis.org/oas/3.1/dialect/base',
+            'components' => ['schemas' => []],
+            'webhooks' => new \ArrayObject(),
+        ];
+
+        $normalizer = $this->buildNormalizer($document);
+        $result = $normalizer->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']);
+
+        $this->assertSame(['openapi' => '3.0.0', 'components' => ['schemas' => []]], $result);
+    }
+
     private function buildNormalizer(array $document): LegacyOpenApiNormalizer
     {
         $decorated = $this->prophesize(NormalizerInterface::class);

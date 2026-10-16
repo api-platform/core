@@ -41,6 +41,7 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         }
 
         $openapi['openapi'] = '3.0.0';
+        unset($openapi['jsonSchemaDialect'], $openapi['webhooks']);
 
         foreach ($openapi['components']['schemas'] ?? [] as $name => $component) {
             $openapi['components']['schemas'][$name] = $this->downgradeSchema($component);
