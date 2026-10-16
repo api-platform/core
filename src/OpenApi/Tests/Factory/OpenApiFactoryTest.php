@@ -787,7 +787,7 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves a Dummy resource.',
             'Retrieves a Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
         ), $dummyPath->getGet());
 
         $this->assertEquals(new Operation(
@@ -821,7 +821,7 @@ class OpenApiFactoryTest extends TestCase
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])],
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
@@ -845,7 +845,7 @@ class OpenApiFactoryTest extends TestCase
             'Removes the Dummy resource.',
             'Removes the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
         ), $dummyPath->getDelete());
 
         $customPath = $paths->getPath('/foo/{id}');
@@ -929,7 +929,7 @@ class OpenApiFactoryTest extends TestCase
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])],
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
@@ -1995,28 +1995,28 @@ class OpenApiFactoryTest extends TestCase
                     ->withShortName('Dummy')
                     ->withUriTemplate('/dummies/{id}')
                     ->withUriVariables([
-                        'id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id']),
+                        'id' => (new Link())->withFromClass(Dummy::class)->withFromProperty('id')->withIdentifiers(['id']),
                     ]),
                 (new Get())
                     ->withClass(Dummy::class)
                     ->withShortName('Dummy')
                     ->withUriTemplate('/dummies/uuid/{uuid}')
                     ->withUriVariables([
-                        'uuid' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['uuid']),
+                        'uuid' => (new Link())->withFromClass(Dummy::class)->withFromProperty('uuid')->withIdentifiers(['uuid']),
                     ]),
                 (new Get())
                     ->withClass(Dummy::class)
                     ->withShortName('Dummy')
                     ->withUriTemplate('/dummies/composite/{id}')
                     ->withUriVariables([
-                        'id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id', 'other'])->withCompositeIdentifier(true),
+                        'id' => (new Link())->withFromClass(Dummy::class)->withFromProperty('id')->withIdentifiers(['id', 'other'])->withCompositeIdentifier(true),
                     ]),
                 (new Get())
                     ->withClass(Dummy::class)
                     ->withShortName('Dummy')
                     ->withUriTemplate('/dummies/custom/{id}')
                     ->withUriVariables([
-                        'id' => (new Link(schema: ['type' => 'number']))->withFromClass(Dummy::class)->withIdentifiers(['id']),
+                        'id' => (new Link(schema: ['type' => 'number']))->withFromClass(Dummy::class)->withFromProperty('id')->withIdentifiers(['id']),
                     ]),
             ]))->withClass(Dummy::class),
         ]);
