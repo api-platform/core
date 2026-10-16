@@ -100,6 +100,7 @@ final class Error extends HttpOperation
         ?bool $jsonStream = null,
         ?bool $map = null,
         array $extraProperties = [],
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -180,6 +181,7 @@ final class Error extends HttpOperation
             jsonStream: $jsonStream,
             map: $map,
             extraProperties: $extraProperties,
+            canonicalUriTemplate: $canonicalUriTemplate,
         );
     }
 }

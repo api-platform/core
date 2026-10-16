@@ -63,6 +63,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         null,
         [
             'uriTemplate' => '/users/{userId}/comments',
+            'canonicalUriTemplate' => '/users/{userId}/comments/{commentId}{._format}',
             'shortName' => self::SHORT_NAME,
             'description' => 'A list of Comments from User',
             'routePrefix' => '/api',
@@ -487,6 +488,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     ];
     private const EXTENDED_BASE = [
         'uriTemplate',
+        'canonicalUriTemplate',
         'routePrefix',
         'stateless',
         'sunset',
