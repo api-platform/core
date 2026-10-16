@@ -22,7 +22,7 @@ class ErrorResource extends ApiResource
     public function __construct(
         ?string $uriTemplate = null,
         ?string $shortName = null,
-        ?string $description = null,
+        string|\Stringable|null $description = null,
         array|string|null $types = null,
         $operations = null,
         array|string|null $formats = null,
