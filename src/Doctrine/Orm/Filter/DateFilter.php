@@ -47,7 +47,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
  *
- * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
+ * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php), or, when the `format` argument is set, the format given to `DateTimeImmutable::createFromFormat()`.
  *
  * The `after` and `before` filters will filter including the value whereas `strictly_after` and `strictly_before` will filter excluding the value.
  *
