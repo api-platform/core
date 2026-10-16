@@ -69,8 +69,7 @@ final class NullableBelongsToTest extends TestCase
 
     public function testPatchWithExplicitNullClearsMorphTo(): void
     {
-        $slot = TimeSlotFactory::new()->create();
-        $note = NullableMorphNoteFactory::new()->for($slot, 'noteable')->create();
+        $note = NullableMorphNoteFactory::new()->for(TimeSlotFactory::new(), 'noteable')->create();
         $this->assertNotNull(NullableMorphNote::query()->sole()->noteable_id); // @phpstan-ignore-line
 
         $response = $this->patchJson('/api/nullable_morph_notes/'.$note->id, [ // @phpstan-ignore-line
