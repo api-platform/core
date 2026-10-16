@@ -674,6 +674,18 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('parameters')
                     ->info('Global parameters applied to all resources and operations.')
                     ->useAttributeAsKey('parameter_class')
+                    ->validate()
+                        ->always(static function (array $parameters): array {
+                            foreach ($parameters as $name => $parameter) {
+                                $class = $parameter['class'] ?? $name;
+                                if ((isset($parameter['class']) || str_contains((string) $name, '\\')) && !is_subclass_of($class, Parameter::class)) {
+                                    throw new InvalidConfigurationException(\sprintf('The default parameter "%s" must reference a class extending "%s", "%s" given.', $name, Parameter::class, $class));
+                                }
+                            }
+
+                            return $parameters;
+                        })
+                    ->end()
                     ->prototype('array')
                         ->ignoreExtraKeys(false)
                         ->children()
