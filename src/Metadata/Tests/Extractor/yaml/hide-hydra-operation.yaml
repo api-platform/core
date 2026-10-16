@@ -1,0 +1,10 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   hideHydraOperation: true
+            strictQueryParameterValidation: true
+            operations:
+                ApiPlatform\Metadata\Get: ~
+        -   uriTemplate: /programs
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    hideHydraOperation: true
