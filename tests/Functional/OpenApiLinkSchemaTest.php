@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkSchema\LinkSchemaArrayIdentifier;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkSchema\LinkSchemaChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkSchema\LinkSchemaParent;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -32,6 +33,7 @@ final class OpenApiLinkSchemaTest extends ApiTestCase
         return [
             LinkSchemaParent::class,
             LinkSchemaChild::class,
+            LinkSchemaArrayIdentifier::class,
         ];
     }
 
@@ -66,6 +68,25 @@ final class OpenApiLinkSchemaTest extends ApiTestCase
         $this->assertSame(['type' => 'integer'], $idParam['schema']);
     }
 
+    public function testLinkSchemaFallsBackToStringForArrayType(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('/link_schema_array_identifiers/{id}', $json['paths']);
+        $parameters = $json['paths']['/link_schema_array_identifiers/{id}']['get']['parameters'];
+
+        $this->assertCount(1, $parameters);
+        $this->assertSame('id', $parameters[0]['name']);
+        $this->assertSame('path', $parameters[0]['in']);
+        $this->assertTrue($parameters[0]['required']);
+        $this->assertSame(['type' => 'string'], $parameters[0]['schema']);
+    }
+
     public function testLinkSchemaIsInferredFromLinkedNonIdentifierProperty(): void
     {
         $response = self::createClient()->request('GET', '/docs', [
@@ -85,5 +106,13 @@ final class OpenApiLinkSchemaTest extends ApiTestCase
         $this->assertSame('path', $parentCodeParam['in']);
         $this->assertTrue($parentCodeParam['required']);
         $this->assertSame(['type' => 'integer'], $parentCodeParam['schema']);
+
+        $this->assertSame($byCodeParameters[1]['name'], 'id');
+        $parentId = $byCodeParameters[1];
+
+        $this->assertNotNull($parentId);
+        $this->assertSame('path', $parentId['in']);
+        $this->assertTrue($parentId['required']);
+        $this->assertSame(['type' => 'integer'], $parentId['schema']);
     }
 }

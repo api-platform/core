@@ -787,7 +787,7 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves a Dummy resource.',
             'Retrieves a Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])]
         ), $dummyPath->getGet());
 
         $this->assertEquals(new Operation(
@@ -821,7 +821,7 @@ class OpenApiFactoryTest extends TestCase
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])],
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
@@ -845,7 +845,7 @@ class OpenApiFactoryTest extends TestCase
             'Removes the Dummy resource.',
             'Removes the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])]
         ), $dummyPath->getDelete());
 
         $customPath = $paths->getPath('/foo/{id}');
@@ -929,7 +929,7 @@ class OpenApiFactoryTest extends TestCase
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])],
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
@@ -1978,5 +1978,108 @@ class OpenApiFactoryTest extends TestCase
         $openApi = $factory->__invoke();
 
         return $openApi->getPaths()->getPath('/dummies')->getGet()->getParameters() ?? [];
+    }
+
+    public function testInferUriVariableSchema(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                (new Get())
+                    ->withClass(Dummy::class)
+                    ->withShortName('Dummy')
+                    ->withUriTemplate('/dummies/{id}')
+                    ->withUriVariables([
+                        'id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id']),
+                    ]),
+                (new Get())
+                    ->withClass(Dummy::class)
+                    ->withShortName('Dummy')
+                    ->withUriTemplate('/dummies/uuid/{uuid}')
+                    ->withUriVariables([
+                        'uuid' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['uuid']),
+                    ]),
+                (new Get())
+                    ->withClass(Dummy::class)
+                    ->withShortName('Dummy')
+                    ->withUriTemplate('/dummies/composite/{id}')
+                    ->withUriVariables([
+                        'id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id', 'other'])->withCompositeIdentifier(true),
+                    ]),
+                (new Get())
+                    ->withClass(Dummy::class)
+                    ->withShortName('Dummy')
+                    ->withUriTemplate('/dummies/custom/{id}')
+                    ->withUriVariables([
+                        'id' => (new Link(schema: ['type' => 'number']))->withFromClass(Dummy::class)->withIdentifiers(['id']),
+                    ]),
+            ]))->withClass(Dummy::class),
+        ]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory
+            ->method('create')
+            ->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['id', 'uuid']));
+
+        $propertyMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass, string $property): ApiProperty => match ($property) {
+                'id' => (new ApiProperty())->withIdentifier(true)->withSchema(['type' => 'integer', 'description' => 'Dummy ID', 'readOnly' => true]),
+                'uuid' => (new ApiProperty())->withIdentifier(true)->withSchema(['type' => 'string', 'format' => 'uuid', 'description' => 'UUID']),
+                default => new ApiProperty(),
+            });
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        // Single integer identifier -> schema type: integer (type/format only)
+        $idParam = $openApi->getPaths()->getPath('/dummies/{id}')->getGet()->getParameters()[0];
+        $this->assertSame(['type' => 'integer'], $idParam->getSchema());
+
+        // Single uuid identifier -> schema type: string, format: uuid
+        $uuidParam = $openApi->getPaths()->getPath('/dummies/uuid/{uuid}')->getGet()->getParameters()[0];
+        $this->assertSame(['type' => 'string', 'format' => 'uuid'], $uuidParam->getSchema());
+
+        // Composite identifier -> schema type: string
+        $compositeParam = $openApi->getPaths()->getPath('/dummies/composite/{id}')->getGet()->getParameters()[0];
+        $this->assertSame(['type' => 'string'], $compositeParam->getSchema());
+
+        // Custom schema on Link -> schema preserved
+        $customParam = $openApi->getPaths()->getPath('/dummies/custom/{id}')->getGet()->getParameters()[0];
+        $this->assertSame(['type' => 'number'], $customParam->getSchema());
     }
 }
