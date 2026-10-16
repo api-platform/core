@@ -122,6 +122,16 @@ final class ParameterTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
+    public function testScalarHeaderParameterNotBlank(): void
+    {
+        self::createClient()->request('GET', 'header_scalar_not_blank', ['headers' => ['Foo' => '']]);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonContains(['detail' => 'Foo: This value should not be blank.']);
+
+        self::createClient()->request('GET', 'header_scalar_not_blank', ['headers' => ['Foo' => 'bar']]);
+        $this->assertResponseStatusCodeSame(200);
+    }
+
     #[DataProvider('provideHeaderValues')]
     public function testHeaderParameter(string $url, array $headers, int $expectedStatusCode): void
     {

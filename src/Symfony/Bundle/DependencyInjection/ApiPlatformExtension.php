@@ -54,6 +54,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ResourceMutatorInterface;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
@@ -276,6 +277,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             QueryCollection::class,
             NotExposed::class,
             HeaderParameter::class,
+            ScalarHeaderParameter::class,
             Post::class,
             GetCollection::class,
             Put::class,
