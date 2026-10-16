@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Link as MetadataLink;
 use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -331,7 +332,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $uriVariable->getRequired() ?? true,
                     false,
                     null,
-                    $uriVariable->getSchema() ?? ['type' => 'string'],
+                    $this->getIdentifierSchema($uriVariable),
                 );
 
                 if ($linkParameter = $uriVariable->getOpenApi()) {
@@ -1257,5 +1258,49 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $this->localErrorResourceCache[$error] = $errorResource;
+    }
+
+    private function getIdentifierSchema(MetadataLink $link): array
+    {
+        $defaultSchema = ['type' => 'string'];
+        if (null !== ($schema = $link->getSchema())) {
+            return $schema;
+        }
+
+        $identifiers = $link->getIdentifiers();
+        if (true === $link->getCompositeIdentifier() || (null !== $identifiers && 1 !== \count($identifiers))) {
+            return $defaultSchema;
+        }
+
+        $class = $link->getFromClass() ?? $link->getToClass();
+        $property = $link->getFromProperty() ?? $link->getToProperty() ?? $link->getParameterName();
+
+        try {
+            $schema = $this->propertyMetadataFactory->create($class, $property)->getSchema();
+        } catch (\Throwable) {
+            return $defaultSchema;
+        }
+
+        if (null === $schema || !isset($schema['type'])) {
+            return $defaultSchema;
+        }
+
+        if (!\is_array($schema['type'])) {
+            $schema['type'] = [$schema['type']];
+        }
+
+        // Remove possible null type, as this is not possible in the uriVariable context
+        $schema['type'] = array_diff($schema['type'], ['null']);
+
+        // Link types are limited to primitive types
+        $schema['type'] = array_values(array_filter($schema['type'], static fn ($type) => \in_array($type, ['string', 'number', 'integer', 'boolean'], true)));
+        if (!$schema['type']) {
+            return $defaultSchema;
+        }
+
+        $schema['type'] = 1 === \count($schema['type']) ? $schema['type'][0] : $schema['type'];
+
+        // only allow the type/format fields
+        return array_intersect_key($schema, array_flip(['type', 'format'])) ?: $defaultSchema;
     }
 }
