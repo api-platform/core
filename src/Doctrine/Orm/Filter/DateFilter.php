@@ -47,7 +47,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
  *
- * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
+ * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php), or, when the `format` argument is set, the format given to `DateTimeImmutable::createFromFormat()`.
  *
  * The `after` and `before` filters will filter including the value whereas `strictly_after` and `strictly_before` will filter excluding the value.
  *
@@ -169,7 +169,7 @@ final class DateFilter implements DateFilterInterface, FilterInterface, JsonSche
     /**
      * @param array<string, mixed>|null $properties
      */
-    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null)
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, private readonly ?string $format = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->logger = $logger ?? new NullLogger();
@@ -330,12 +330,11 @@ final class DateFilter implements DateFilterInterface, FilterInterface, JsonSche
             return;
         }
 
-        try {
-            $value = !str_contains($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
-        } catch (\Exception) {
-            // Silently ignore this filter if it can not be transformed to a \DateTime
+        $value = $this->createDateFromValue($value, str_contains($type, '_immutable'), $this->format);
+
+        if (null === $value) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(\sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
+                'exception' => new InvalidArgumentException($this->getInvalidDateMessage($field, $this->format)),
             ]);
 
             return;
@@ -376,7 +375,7 @@ final class DateFilter implements DateFilterInterface, FilterInterface, JsonSche
      */
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'string', 'format' => 'date'];
+        return null === $this->format ? ['type' => 'string', 'format' => 'date'] : ['type' => 'string'];
     }
 
     public function getOpenApiParameters(Parameter $parameter): array
