@@ -1189,8 +1189,8 @@ class DocumentationNormalizerTest extends TestCase
                 ->withDenormalizationContext(['groups' => 'write']),
         ]));
 
-        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolver->method('isResourceClass')->with($this->isString())->willReturn(false);
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
 
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->method('generate')->willReturnMap([

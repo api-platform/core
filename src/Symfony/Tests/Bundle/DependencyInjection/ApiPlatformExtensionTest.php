@@ -269,6 +269,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertServiceHasTags('api_platform.cache.route_name_resolver', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.symfony.iri_converter.skolem', ['kernel.reset']);
         $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
@@ -467,6 +468,16 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHasService('api_platform.mcp.state_provider.validate');
         $this->assertContainerHasService('api_platform.mcp.state_provider.parameter_validator');
+    }
+
+    public function testMercurePublisherIsReset(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['mercure']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('kernel.reset'));
     }
 
     public function testItRegistersMetadataConfiguration(): void
