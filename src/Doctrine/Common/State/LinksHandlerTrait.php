@@ -22,10 +22,12 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 trait LinksHandlerTrait
 {
     private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ?PropertyAccessorInterface $linksPropertyAccessor = null;
 
     /**
      * @param array{linkClass?: string, linkProperty?: string}&array<string, mixed> $context
@@ -118,7 +120,7 @@ trait LinksHandlerTrait
             return $identifiers;
         }
 
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor = $this->linksPropertyAccessor ??= PropertyAccess::createPropertyAccessor();
         $values = [];
         foreach ($link->getIdentifiers() as $identifierProperty) {
             $values[$identifierProperty] = $propertyAccessor->getValue($resolved, $identifierProperty);

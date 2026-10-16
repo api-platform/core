@@ -20,6 +20,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939BazResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939FooResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Company as DocumentCompany;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Employee as DocumentEmployee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
@@ -299,19 +301,16 @@ final class LinkProviderParameterTest extends ApiTestCase
 
     public function testResolvedUriVariableQueriesDoctrineLink(): void
     {
-        $container = static::getContainer();
-        if ('mongodb' === $container->getParameter('kernel.environment')) {
-            $this->markTestSkipped();
-        }
-
         $manager = $this->getManager();
-        $employee = new Employee();
+        $employeeClass = $this->isMongoDB() ? DocumentEmployee::class : Employee::class;
+        $companyClass = $this->isMongoDB() ? DocumentCompany::class : Company::class;
+        $employee = new $employeeClass();
         $employee->setName('me');
-        $company = new Company();
+        $company = new $companyClass();
         $company->setName('Test');
         $employee->setCompany($company);
-        $manager->persist($employee);
         $manager->persist($company);
+        $manager->persist($employee);
         $manager->flush();
 
         self::createClient()->request('GET', '/companies-by-resolved-name/Test/employees');
