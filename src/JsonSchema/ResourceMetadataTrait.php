@@ -51,7 +51,10 @@ trait ResourceMetadataTrait
             }
             $forceSubschema = $serializerContext[SchemaFactory::FORCE_SUBSCHEMA] ?? false;
             if ($operation->getShortName() === $this->getShortClassName($className) && $forceSubschema) {
-                $operation = new HttpOperation();
+                // the description and types describe the resource itself, keep them on the sub-schema
+                $operation = (new HttpOperation())
+                    ->withDescription($operation->getDescription())
+                    ->withTypes($operation instanceof HttpOperation ? $operation->getTypes() : null);
             }
 
             $operation = $this->findOperationForType($resourceMetadataCollection, $type, $operation, $forceSubschema ? null : $format);
