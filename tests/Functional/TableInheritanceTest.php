@@ -123,6 +123,9 @@ final class TableInheritanceTest extends ApiTestCase
         $this->assertSame('DummyTableInheritanceChild', $data['hydra:member'][0]['@type']);
         $this->assertSame('DummyTableInheritance', $data['hydra:member'][1]['@type']);
         $this->assertSame('/dummy_table_inheritances/2', $data['hydra:member'][1]['@id']);
+        // The Doctrine discriminator map exposes the subtype of non-resource children
+        $this->assertSame('dummyTableInheritanceNotApiResourceChild', $data['hydra:member'][1]['discr']);
+        $this->assertTrue($data['hydra:member'][1]['swaggerThanParent']);
         $this->assertSame(2, $data['hydra:totalItems']);
     }
 
