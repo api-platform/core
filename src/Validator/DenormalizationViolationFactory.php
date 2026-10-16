@@ -19,6 +19,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
@@ -44,6 +45,10 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  * | any wrong type           | Type                 | Type::INVALID_TYPE_ERROR + constraint message     |
  * | any wrong type           | any other constraint | generic Type violation @ 422                      |
  * | any wrong type           | (no constraint)      | none — single-error path rethrows → 400           |
+ *
+ * A backed enum is the exception to the last row: its type already restricts the accepted
+ * values, so a denormalization error on such a property emits a generic Type violation (422)
+ * even without a declared constraint. See #8183 and #8641.
  *
  * In collect mode (PartialDenormalizationException), unconstrained errors still emit
  * a generic Type violation so the response stays consistent with prior behavior.
@@ -97,8 +102,9 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
      * Returns a violation for the given error.
      *
      * When `$generic` is true, emits a Type-based fallback regardless of property metadata
-     * (used in collect mode to keep one violation per error). When false, returns null if
-     * no matching constraint is declared on the property — caller rethrows.
+     * (used in collect mode to keep one violation per error). When false, a declared constraint
+     * yields the most specific violation; failing that, a backed enum property still yields a
+     * generic 422 and anything else returns null so the caller rethrows (→ 400).
      */
     private function buildViolation(NotNormalizableValueException $exception, Operation $operation, bool $generic = false): ?ConstraintViolationInterface
     {
@@ -111,6 +117,16 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
             return $this->emitViolation($exception, null, (string) Type::INVALID_TYPE_ERROR);
         }
 
+        return $this->buildConstraintViolation($exception, $operation, $path)
+            ?? $this->backedEnumFallback($exception);
+    }
+
+    /**
+     * Builds a violation from the constraints declared on the property, or null when none applies
+     * (unknown class, missing metadata, or no constraint matching the error).
+     */
+    private function buildConstraintViolation(NotNormalizableValueException $exception, Operation $operation, string $path): ?ConstraintViolationInterface
+    {
         $class = $operation->getClass();
         if (null === $class || (!class_exists($class) && !interface_exists($class))) {
             return null;
@@ -126,7 +142,7 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
             return null;
         }
 
-        $validationGroups = ($operation->getValidationContext() ?? [])['groups'] ?? null;
+        $validationGroups = $this->normalizeValidationGroups(($operation->getValidationContext() ?? [])['groups'] ?? null);
         $constraints = $this->collectConstraints($classMetadata, $path, $validationGroups);
         if (!$constraints) {
             return null;
@@ -149,6 +165,86 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
 
         // Property has constraints but none match by class → still 422 with a generic Type message.
         return $this->emitViolation($exception, new Type([]), (string) Type::INVALID_TYPE_ERROR);
+    }
+
+    /**
+     * @return array<string>|null
+     */
+    private function normalizeValidationGroups(mixed $validationGroups): ?array
+    {
+        if (null === $validationGroups) {
+            return null;
+        }
+
+        if ($validationGroups instanceof GroupSequence) {
+            return $this->flattenValidationGroups($validationGroups->groups);
+        }
+
+        if (\is_callable($validationGroups)) {
+            return null;
+        }
+
+        if (\is_string($validationGroups)) {
+            return [$validationGroups];
+        }
+
+        if (\is_array($validationGroups)) {
+            return $this->flattenValidationGroups($validationGroups);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string|array<mixed>|GroupSequence> $groups
+     *
+     * @return array<string>
+     */
+    private function flattenValidationGroups(array $groups): array
+    {
+        $flattenGroups = [];
+        foreach ($groups as $group) {
+            if (\is_array($group)) {
+                $flattenGroups[] = $this->flattenValidationGroups($group);
+            } elseif ($group instanceof GroupSequence) {
+                $flattenGroups[] = $this->flattenValidationGroups($group->groups);
+            } else {
+                $flattenGroups[] = [$group];
+            }
+        }
+
+        return array_merge([], ...$flattenGroups);
+    }
+
+    /**
+     * A backed enum restricts its accepted values by itself, so a denormalization error on such a
+     * property surfaces as a 422 constraint violation even when no constraint is declared — otherwise
+     * the single-error path would rethrow and answer 400. See #8183 and #8641.
+     */
+    private function backedEnumFallback(NotNormalizableValueException $exception): ?ConstraintViolationInterface
+    {
+        if (!$this->isBackedEnumException($exception)) {
+            return null;
+        }
+
+        return $this->emitViolation($exception, null, (string) Type::INVALID_TYPE_ERROR);
+    }
+
+    private function isBackedEnumException(NotNormalizableValueException $exception): bool
+    {
+        for ($e = $exception; $e instanceof \Throwable; $e = $e->getPrevious()) {
+            if (!$e instanceof NotNormalizableValueException) {
+                continue;
+            }
+
+            foreach ($e->getExpectedTypes() ?? [] as $expectedType) {
+                if (\is_string($expectedType) && (class_exists($expectedType) || interface_exists($expectedType)) && is_subclass_of($expectedType, \BackedEnum::class)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

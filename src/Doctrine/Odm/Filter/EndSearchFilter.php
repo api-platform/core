@@ -50,7 +50,7 @@ final class EndSearchFilter implements FilterInterface, OpenApiParameterFilterIn
             ->matchExpr();
         $operator = $context['operator'] ?? 'addAnd';
 
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         if (!is_iterable($values)) {
             $escapedValue = preg_quote($values, '/');

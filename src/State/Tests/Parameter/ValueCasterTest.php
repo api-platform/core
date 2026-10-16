@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Tests\Parameter;
 
-use ApiPlatform\Metadata\Exception\BadRequestException;
 use ApiPlatform\State\Parameter\ValueCaster;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -67,15 +66,10 @@ class ValueCasterTest extends TestCase
         yield 'float passthrough' => [1.5, 1.5];
     }
 
-    /**
-     * An empty string cannot represent a scalar native type, so the caster rejects it with a
-     * Bad Request rather than leaving a raw value for the filter.
-     */
     #[DataProvider('emptyCasterProvider')]
-    public function testEmptyValueThrowsBadRequest(callable $caster): void
+    public function testEmptyValueIsReturnedUnchanged(callable $caster): void
     {
-        $this->expectException(BadRequestException::class);
-        $caster('');
+        $this->assertSame('', $caster(''));
     }
 
     public static function emptyCasterProvider(): \Generator

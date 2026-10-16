@@ -50,7 +50,8 @@
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev",
             "dev-4.2": "4.2.x-dev",
-            "dev-main": "5.0.x-dev"
+            "dev-5.0": "5.0.x-dev",
+            "dev-main": "5.1.x-dev"
         },
         "symfony": {
             "require": "^7.4 || ^8.0"
@@ -195,6 +196,7 @@
         "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
+        "ext-deepclone": "To speed up the PHP files metadata cache with symfony/var-exporter 8.1+ (install symfony/deepclone with PIE).",
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "opensearch-project/opensearch-php": "To support OpenSearch (^2.5).",

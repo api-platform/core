@@ -29,8 +29,11 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\AI\McpBundle\McpBundle;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -38,6 +41,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Translation\Command\TranslationExtractCommand;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -184,6 +188,20 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testObjectMapperDoesNotLoadDeprecatedTranslationCommand(): void
+    {
+        if (!class_exists(TranslationExtractCommand::class)) {
+            self::markTestSkipped('Requires the Symfony 8.2 translation command.');
+        }
+
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('api_platform.object_mapper.metadata_factory'));
+        self::assertFalse(class_exists(FrameworkTranslationExtractCommand::class, false));
+    }
+
     public function testCommonConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
@@ -251,6 +269,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertServiceHasTags('api_platform.cache.route_name_resolver', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.symfony.iri_converter.skolem', ['kernel.reset']);
         $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
@@ -449,6 +468,16 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHasService('api_platform.mcp.state_provider.validate');
         $this->assertContainerHasService('api_platform.mcp.state_provider.parameter_validator');
+    }
+
+    public function testMercurePublisherIsReset(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['mercure']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('kernel.reset'));
     }
 
     public function testItRegistersMetadataConfiguration(): void

@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Query;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
@@ -237,9 +238,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority, array $declaredOperationClasses): Parameters
     {
         $propertyNames = $properties = [];
-        $parameters = $operation->getParameters() ?? new Parameters();
+        $existingParameters = $operation->getParameters();
+        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
 
         foreach ($this->createParametersFromAttributes($operation, $declaredOperationClasses) as $key => $parameter) {
+            if (!str_contains($key, ':property') && $parameters->has($key, $parameter::class)) {
+                continue;
+            }
+
             $parameters->add($key, $parameter);
         }
 
@@ -332,6 +338,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     $parameter = $parameter->withNativeType(Type::int());
                 } elseif ('number' === ($parameter->getSchema()['type'] ?? null)) {
                     $parameter = $parameter->withNativeType(Type::float());
+                } elseif ($parameter instanceof ScalarHeaderParameter) {
+                    $parameter = $parameter->withNativeType(Type::string());
                 } else {
                     $parameter = $parameter->withNativeType(Type::union(Type::string(), Type::list(Type::string())));
                 }
@@ -372,7 +380,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameter;
         }
 
-        if ($filter instanceof ParameterProviderFilterInterface) {
+        if (null === $parameter->getProvider() && $filter instanceof ParameterProviderFilterInterface) {
             $parameter = $parameter->withProvider($filter::getParameterProvider());
         }
 
@@ -532,7 +540,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $propertyName = $reflectionProperty->getName();
 
                 if (null !== ($parameterOperations = $parameter->getOperations())) {
-                    $parameterOperationClasses = array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations);
+                    $parameterOperationClasses = array_map(static fn (Operation|string $parameterOperation): string => \is_string($parameterOperation) ? $parameterOperation : $parameterOperation::class, $parameterOperations);
 
                     foreach ($parameterOperationClasses as $parameterOperationClass) {
                         if (!\in_array($parameterOperationClass, $declaredOperationClasses, true)) {
@@ -574,6 +582,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $operationClasses = [];
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() ?? [] as $operation) {
+                $operationClasses[] = $operation::class;
+            }
+
+            foreach ($resource->getGraphQlOperations() ?? [] as $operation) {
                 $operationClasses[] = $operation::class;
             }
         }

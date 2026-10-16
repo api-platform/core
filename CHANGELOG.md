@@ -1,5 +1,63 @@
 # Changelog
 
+## v5.0.4
+
+API Platform 5.0.4 contains every change shipped in [v4.4.5](#v445), plus the changes below.
+
+### Notes
+
+* Laravel: an optional `BelongsTo` or `MorphTo` relation (nullable foreign key column) is now typed as nullable, so it accepts `null` on write and clears the relation (#8664). This changes the generated docs for every nullable `BelongsTo`: JSON Schema and OpenAPI mark it nullable, and GraphQL drops the `!` on these fields, inputs included.
+
+### Features
+
+* [5bd3b330b](https://github.com/api-platform/core/commit/5bd3b330bd4f67befbb271391c16204f6e1d95e2) feat(metadata): accept operation class names in parameter operations (#8624)
+
+### Bug fixes
+
+* [52ae551a7](https://github.com/api-platform/core/commit/52ae551a7235f57fbaba809dab05d41426bbbf62) fix(doctrine): accept resolved resources in links (#8687)
+* [34c6f0081](https://github.com/api-platform/core/commit/34c6f00814d6526b2d905d7dac8c52272f65b4f1) fix(doctrine): put-create under a slug parent link (#8688)
+* [c33a56674](https://github.com/api-platform/core/commit/c33a5667470b38b3c1f2c79b6c332f251387f203) fix(laravel): accept null on an optional belongsTo (#8666)
+* [942d712d9](https://github.com/api-platform/core/commit/942d712d9aa30645b989b16b839029262d51cad9) fix(validator): returns 422 for backed enum errors (#8656)
+* [be1cc582f](https://github.com/api-platform/core/commit/be1cc582fe0de49e42b8b003f8786f0f35d6171c) fix(validator): support GroupSequence validation groups (#8645)
+* [48f0d3988](https://github.com/api-platform/core/commit/48f0d3988981ea41fe43fcde3bb5cbafa33dd019) fix(metadata): operation parameters take precedence over parameter attributes on properties (#8623)
+* [ea207ab00](https://github.com/api-platform/core/commit/ea207ab009b91347602b678f8c73542462d76250) fix(metadata): allow GraphQL operations in parameter attributes on properties (#8621)
+* [d4a7660b9](https://github.com/api-platform/core/commit/d4a7660b9e699c1f9ef661bc7a15182de3b839f4) fix(metadata): do not override the parameter provider with the filter provider (#8689)
+* [f4f60aa80](https://github.com/api-platform/core/commit/f4f60aa804994e6d34342112bafb8f6844fb70d4) fix(metadata): apply defaults that use a can* getter (#8691)
+* [a26acbe5a](https://github.com/api-platform/core/commit/a26acbe5ab38ea37a3f8526cdd8a5e76da3c2192) fix(metadata): keep queryParameterValidationEnabled on ApiResource (#8692)
+* [2b44e5ea0](https://github.com/api-platform/core/commit/2b44e5ea0c0c617a060384189339f3e605adc6a8) fix(metadata): pass stateOptions and map to the GraphQL QueryCollection parent constructor (#8693)
+* [82188af79](https://github.com/api-platform/core/commit/82188af791aae1fc7af390f0202c27749481b410) fix(metadata): copy contentNegotiation in withOperation() (#8694)
+* [431ab66d5](https://github.com/api-platform/core/commit/431ab66d535d19adec293a111e96859d12ed334b) fix(metadata): Put::withAllowCreate() and Link::withFromProperty() return a new instance (#8685)
+* [996c37a5c](https://github.com/api-platform/core/commit/996c37a5c31fa625b8d759c31ce79140fff35258) fix(metadata): keep explicit readableLink and writableLink on collections of non-resource classes (#8706)
+* [0aa5088bc](https://github.com/api-platform/core/commit/0aa5088bc815c2a794392fd69e57a76bba3fcf30) fix(doctrine): read the column default option with doctrine/orm 3 (#8705)
+* [e0ea3b09c](https://github.com/api-platform/core/commit/e0ea3b09c8a891d559610b4edfa13a9855db950d) fix(doctrine): accept SortDirection enum in ordering (#8662)
+* [dab2e7cbe](https://github.com/api-platform/core/commit/dab2e7cbea8b583f98b140924a08af64fbb62965) fix(jsonschema): keep operation groups in context (#8643)
+* [07babd80e](https://github.com/api-platform/core/commit/07babd80e59e67ba80cf837f51bf425f6efa692c) fix(jsonschema): nested gen_id follows the property (#8644)
+* [0d00de4a5](https://github.com/api-platform/core/commit/0d00de4a50507e632d617f2ab78e7bfab8c3b636) fix(jsonschema): nested resource ignores output DTO (#8652)
+* [c33594aa2](https://github.com/api-platform/core/commit/c33594aa2154aec04d327d59430bb1108899cf1e) fix(jsonschema): use allOf for intersection types (#8653)
+
+### Dependencies
+
+* `api-platform/doctrine-common` now requires `symfony/property-access` ([#8687](https://github.com/api-platform/core/pull/8687)).
+
+## v5.0.3
+
+API Platform 5.0.3 contains every change shipped in [v4.4.4](#v444) except the revert of #8600 ([#8637](https://github.com/api-platform/core/pull/8637)): 5.0 keeps documenting filterless array query parameters as both `key` and `key[]`, now guarded against `key[][]`, plus the changes below.
+
+### Bug fixes
+
+* [13a9c11db](https://github.com/api-platform/core/commit/13a9c11dbd7529bf792411ec002b45dca5c3c29b) fix(doctrine): avoid more deprecation from doctrine
+* [37798944c](https://github.com/api-platform/core/commit/37798944c6dee10cdc6c7e4d05f008b3adb71660) fix(hal): use spl_object_id() for circular reference counters (#8657)
+* [ff1bfbdde](https://github.com/api-platform/core/commit/ff1bfbddedc18fd582c855fc90da2c8660a24c68) fix(metadata): do not mutate parameters shared between operations (#8622)
+* [88fab3bab](https://github.com/api-platform/core/commit/88fab3babb64e7befd44045d71ef423e97b00f66) fix(openapi): don't suffix [] on bracketed array keys (#8636)
+* [ce647452b](https://github.com/api-platform/core/commit/ce647452bbc8e3ad340950f745e8c95f9fa1b75d) fix(serializer): catch MissingConstructorArgumentsException (#8659)
+* [b10e80f61](https://github.com/api-platform/core/commit/b10e80f611cb0c3a9e7164a0a2156e846e456a14) fix(symfony): check HttpClientTrait before loading the test client (#8613)
+* [c3eabbb9a](https://github.com/api-platform/core/commit/c3eabbb9a6bf63f7796759afd5db334b78c3d880) fix(symfony): hide the "Other API docs" label when there is only a single option (#8631)
+
+### Dependencies
+
+* [40711a61c](https://github.com/api-platform/core/commit/40711a61c99cee7db83256342bf6220c8925543c) chore(openapi): require json-schema ^5.0.2 (#8630)
+* [5fcc64d0b](https://github.com/api-platform/core/commit/5fcc64d0b719d5cf1f725e5550615817f28b9c8d) chore: suggest ext-deepclone (#8658)
+
 ## v5.0.2
 
 API Platform 5.0.2 contains every change shipped in [v4.4.3](#v443), plus the changes below.
@@ -73,6 +131,28 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
+
+## v4.4.5
+
+### Bug fixes
+
+* [93383c416](https://github.com/api-platform/core/commit/93383c41695cda67292b367fa0c748bacf958e7b) fix(symfony): reset the Mercure publisher between requests (#8684)
+* [359c13bd2](https://github.com/api-platform/core/commit/359c13bd2c4423b4e310386ae8723dbad289bc0a) fix(symfony): reset the skolem IRI converter between requests (#8681)
+* [5a953cb1a](https://github.com/api-platform/core/commit/5a953cb1ad728cc87362bf66eaf570d4ad1920b5) fix(state): restore 422 for empty scalar params (#8675)
+* [4e8310224](https://github.com/api-platform/core/commit/4e83102243b1fcdbd54d0005a96e85b53031414d) fix(state): avoid deprecated PartialDenormalizationException::getErrors() (#8663)
+* [3e04ee396](https://github.com/api-platform/core/commit/3e04ee396f0cfed1ecf72be3c3681dd0fd1288ed) fix(doctrine): left join nested props in OrFilter (#8674)
+* [53225aa9e](https://github.com/api-platform/core/commit/53225aa9e27568843faadb6b3a73ae5992384d6f) fix(doctrine): use ON for arbitrary join in links (#8672)
+* [02a04450c](https://github.com/api-platform/core/commit/02a04450c610b4b0401ac747474521cdc3b74b65) fix(doctrine): use a portable LIKE escape char (#8671)
+* [a71b68357](https://github.com/api-platform/core/commit/a71b683571dc315842a8fb454e2cc866a0eca7e1) fix(jsonschema): emit an empty schema for mixed (#8670)
+
+## v4.4.4
+
+### Bug fixes
+
+* [1335871be](https://github.com/api-platform/core/commit/1335871beff7aa5d5505879732890f44b1ba2e8e) fix(hydra): handle string and null serialization groups in DocumentationNormalizer (#7890)
+* [b6555c846](https://github.com/api-platform/core/commit/b6555c846a472a82099e3d7fcf6f7ec6b71aaba8) fix(laravel): ignore invalid range filter values (#8632)
+* [56c0be24b](https://github.com/api-platform/core/commit/56c0be24b74366e88bdf16721b479b4cfb43877f) revert(openapi): array query params bracket notation (#8637)
+* [454262ba8](https://github.com/api-platform/core/commit/454262ba8a3614d2cced01e092dcc7e14d4bb778) fix(symfony): avoid deprecated translation command probe (#8627)
 
 ## v4.4.3
 

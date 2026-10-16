@@ -123,7 +123,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // That is done by query parameter. @see https://jsonapi.org/format/#fetching-includes
         $jsonApiSerializerContext = $serializerContext;
         if (true === ($serializerContext[self::DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS] ?? true) && $inputOrOutputClass === $className) {
-            unset($jsonApiSerializerContext['groups']);
+            $jsonApiSerializerContext['groups'] = null;
         }
 
         $schema = $this->schemaFactory->buildSchema($className, 'json', $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
