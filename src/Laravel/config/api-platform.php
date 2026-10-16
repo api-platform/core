@@ -178,6 +178,7 @@ return [
 
     'serializer' => [
         'hydra_prefix' => false,
+        'hydra_operations' => true,
         // 'datetime_format' => \DateTimeInterface::RFC3339,
     ],
 

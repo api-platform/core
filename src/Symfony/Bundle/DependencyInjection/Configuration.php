@@ -165,6 +165,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hydra_prefix')->defaultFalse()->info('Use the "hydra:" prefix.')->end()
+                        ->booleanNode('hydra_operations')->defaultTrue()->info('Expose the operations sharing the IRI of a resource in the "hydra:operation" property of its JSON-LD representations, filtered by their security, unless the operation sets "hydraOperations".')->end()
                     ->end()
                 ->end()
             ->end();
