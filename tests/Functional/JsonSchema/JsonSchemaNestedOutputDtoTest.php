@@ -20,8 +20,10 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\AliasedRelatedWithOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\DeprecatedRelated;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\DocumentedRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\OwnerOfAliasedRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\OwnerOfDeprecatedRelated;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\OwnerOfDocumentedRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\OwnerOfRelatedWithOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonSchemaNestedOutputDto\RelatedWithOutput;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -52,6 +54,8 @@ final class JsonSchemaNestedOutputDtoTest extends ApiTestCase
             AliasedRelatedWithOutput::class,
             OwnerOfDeprecatedRelated::class,
             DeprecatedRelated::class,
+            OwnerOfDocumentedRelated::class,
+            DocumentedRelated::class,
         ];
     }
 
@@ -74,6 +78,24 @@ final class JsonSchemaNestedOutputDtoTest extends ApiTestCase
         $schema = $this->schemaFactory->buildSchema(OwnerOfDeprecatedRelated::class, 'jsonld');
 
         $this->assertArrayNotHasKey('deprecated', $this->objectPart($this->relatedDefinition($schema)));
+    }
+
+    public function testJsonLdNestedRelatedKeepsDescriptionAndExternalDocs(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(OwnerOfDocumentedRelated::class, 'jsonld');
+        $related = $this->relatedDefinition($schema);
+
+        $this->assertSame('A schema type', $related['description'] ?? null);
+        $this->assertSame(['url' => 'https://schema.org/Thing'], $this->objectPart($related)['externalDocs'] ?? null);
+    }
+
+    public function testJsonNestedRelatedKeepsDescriptionAndExternalDocs(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(OwnerOfDocumentedRelated::class, 'json');
+        $related = $this->relatedDefinition($schema);
+
+        $this->assertSame('A schema type', $related['description'] ?? null);
+        $this->assertSame(['url' => 'https://schema.org/Thing'], $this->objectPart($related)['externalDocs'] ?? null);
     }
 
     public function testExplicitOperationWithForceSubschemaDescribesOutputDto(): void
