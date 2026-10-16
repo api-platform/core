@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyCar;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\DummyIgnoreProperty;
+use ApiPlatform\Metadata\Tests\Fixtures\RelatedDummiesOutput;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -292,5 +293,31 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         // This is the root cause of the Laravel test failures
         $this->assertNull($actual->isReadableLink(), 'readableLink is null when resourceClassResolver is missing');
         $this->assertNull($actual->isWritableLink(), 'writeableLink is null when resourceClassResolver is missing');
+    }
+
+    #[DataProvider('provideCollectionOnNonResourceClass')]
+    public function testCollectionOnNonResourceClass(ApiProperty $propertyMetadata, bool $expectedLink): void
+    {
+        $serializerClassMetadataFactory = $this->createStub(SerializerClassMetadataFactoryInterface::class);
+        $serializerClassMetadataFactory->method('getMetadataFor')->willReturn(new SerializerClassMetadata(RelatedDummiesOutput::class));
+
+        $decorated = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $decorated->method('create')->willReturn($propertyMetadata->withNativeType(Type::list(Type::object(RelatedDummy::class))));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn (string $class): bool => RelatedDummy::class === $class);
+
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory($serializerClassMetadataFactory, $decorated, $resourceClassResolver);
+
+        $actual = $serializerPropertyMetadataFactory->create(RelatedDummiesOutput::class, 'relatedDummies');
+
+        $this->assertSame($expectedLink, $actual->isReadableLink());
+        $this->assertSame($expectedLink, $actual->isWritableLink());
+    }
+
+    public static function provideCollectionOnNonResourceClass(): iterable
+    {
+        yield 'embedded by default' => [new ApiProperty(), true];
+        yield 'explicit links are kept' => [new ApiProperty(readableLink: false, writableLink: false), false];
     }
 }
