@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.4.5
+
+### Bug fixes
+
+* [93383c416](https://github.com/api-platform/core/commit/93383c41695cda67292b367fa0c748bacf958e7b) fix(symfony): reset the Mercure publisher between requests (#8684)
+* [359c13bd2](https://github.com/api-platform/core/commit/359c13bd2c4423b4e310386ae8723dbad289bc0a) fix(symfony): reset the skolem IRI converter between requests (#8681)
+* [5a953cb1a](https://github.com/api-platform/core/commit/5a953cb1ad728cc87362bf66eaf570d4ad1920b5) fix(state): restore 422 for empty scalar params (#8675)
+* [4e8310224](https://github.com/api-platform/core/commit/4e83102243b1fcdbd54d0005a96e85b53031414d) fix(state): avoid deprecated PartialDenormalizationException::getErrors() (#8663)
+* [3e04ee396](https://github.com/api-platform/core/commit/3e04ee396f0cfed1ecf72be3c3681dd0fd1288ed) fix(doctrine): left join nested props in OrFilter (#8674)
+* [53225aa9e](https://github.com/api-platform/core/commit/53225aa9e27568843faadb6b3a73ae5992384d6f) fix(doctrine): use ON for arbitrary join in links (#8672)
+* [02a04450c](https://github.com/api-platform/core/commit/02a04450c610b4b0401ac747474521cdc3b74b65) fix(doctrine): use a portable LIKE escape char (#8671)
+* [a71b68357](https://github.com/api-platform/core/commit/a71b683571dc315842a8fb454e2cc866a0eca7e1) fix(jsonschema): emit an empty schema for mixed (#8670)
+
 ## v4.4.4
 
 ### Bug fixes
