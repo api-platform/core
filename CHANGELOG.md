@@ -2,9 +2,42 @@
 
 ## v5.0.4
 
+API Platform 5.0.4 contains every change shipped in [v4.4.5](#v445), plus the changes below.
+
 ### Notes
 
 * Laravel: an optional `BelongsTo` or `MorphTo` relation (nullable foreign key column) is now typed as nullable, so it accepts `null` on write and clears the relation (#8664). This changes the generated docs for every nullable `BelongsTo`: JSON Schema and OpenAPI mark it nullable, and GraphQL drops the `!` on these fields, inputs included.
+
+### Features
+
+* [5bd3b330b](https://github.com/api-platform/core/commit/5bd3b330bd4f67befbb271391c16204f6e1d95e2) feat(metadata): accept operation class names in parameter operations (#8624)
+
+### Bug fixes
+
+* [52ae551a7](https://github.com/api-platform/core/commit/52ae551a7235f57fbaba809dab05d41426bbbf62) fix(doctrine): accept resolved resources in links (#8687)
+* [34c6f0081](https://github.com/api-platform/core/commit/34c6f00814d6526b2d905d7dac8c52272f65b4f1) fix(doctrine): put-create under a slug parent link (#8688)
+* [c33a56674](https://github.com/api-platform/core/commit/c33a5667470b38b3c1f2c79b6c332f251387f203) fix(laravel): accept null on an optional belongsTo (#8666)
+* [942d712d9](https://github.com/api-platform/core/commit/942d712d9aa30645b989b16b839029262d51cad9) fix(validator): returns 422 for backed enum errors (#8656)
+* [be1cc582f](https://github.com/api-platform/core/commit/be1cc582fe0de49e42b8b003f8786f0f35d6171c) fix(validator): support GroupSequence validation groups (#8645)
+* [48f0d3988](https://github.com/api-platform/core/commit/48f0d3988981ea41fe43fcde3bb5cbafa33dd019) fix(metadata): operation parameters take precedence over parameter attributes on properties (#8623)
+* [ea207ab00](https://github.com/api-platform/core/commit/ea207ab009b91347602b678f8c73542462d76250) fix(metadata): allow GraphQL operations in parameter attributes on properties (#8621)
+* [d4a7660b9](https://github.com/api-platform/core/commit/d4a7660b9e699c1f9ef661bc7a15182de3b839f4) fix(metadata): do not override the parameter provider with the filter provider (#8689)
+* [f4f60aa80](https://github.com/api-platform/core/commit/f4f60aa804994e6d34342112bafb8f6844fb70d4) fix(metadata): apply defaults that use a can* getter (#8691)
+* [a26acbe5a](https://github.com/api-platform/core/commit/a26acbe5ab38ea37a3f8526cdd8a5e76da3c2192) fix(metadata): keep queryParameterValidationEnabled on ApiResource (#8692)
+* [2b44e5ea0](https://github.com/api-platform/core/commit/2b44e5ea0c0c617a060384189339f3e605adc6a8) fix(metadata): pass stateOptions and map to the GraphQL QueryCollection parent constructor (#8693)
+* [82188af79](https://github.com/api-platform/core/commit/82188af791aae1fc7af390f0202c27749481b410) fix(metadata): copy contentNegotiation in withOperation() (#8694)
+* [431ab66d5](https://github.com/api-platform/core/commit/431ab66d535d19adec293a111e96859d12ed334b) fix(metadata): Put::withAllowCreate() and Link::withFromProperty() return a new instance (#8685)
+* [996c37a5c](https://github.com/api-platform/core/commit/996c37a5c31fa625b8d759c31ce79140fff35258) fix(metadata): keep explicit readableLink and writableLink on collections of non-resource classes (#8706)
+* [0aa5088bc](https://github.com/api-platform/core/commit/0aa5088bc815c2a794392fd69e57a76bba3fcf30) fix(doctrine): read the column default option with doctrine/orm 3 (#8705)
+* [e0ea3b09c](https://github.com/api-platform/core/commit/e0ea3b09c8a891d559610b4edfa13a9855db950d) fix(doctrine): accept SortDirection enum in ordering (#8662)
+* [dab2e7cbe](https://github.com/api-platform/core/commit/dab2e7cbea8b583f98b140924a08af64fbb62965) fix(jsonschema): keep operation groups in context (#8643)
+* [07babd80e](https://github.com/api-platform/core/commit/07babd80e59e67ba80cf837f51bf425f6efa692c) fix(jsonschema): nested gen_id follows the property (#8644)
+* [0d00de4a5](https://github.com/api-platform/core/commit/0d00de4a50507e632d617f2ab78e7bfab8c3b636) fix(jsonschema): nested resource ignores output DTO (#8652)
+* [c33594aa2](https://github.com/api-platform/core/commit/c33594aa2154aec04d327d59430bb1108899cf1e) fix(jsonschema): use allOf for intersection types (#8653)
+
+### Dependencies
+
+* `api-platform/doctrine-common` now requires `symfony/property-access` ([#8687](https://github.com/api-platform/core/pull/8687)).
 
 ## v5.0.3
 
