@@ -493,6 +493,17 @@ class XmlExtractorTest extends TestCase
         $factory->create(Comment::class);
     }
 
+    public function testDuplicateGraphQlOperationNameFromXmlThrows(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_graphql_operation_name.xml']);
+        $factory = new ExtractorResourceMetadataCollectionFactory($extractor, graphQlEnabled: true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', Comment::class));
+
+        $factory->create(Comment::class);
+    }
+
     public function testOpenApiParametersAreAList(): void
     {
         $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_parameters.xml']);
