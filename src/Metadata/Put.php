@@ -197,9 +197,12 @@ final class Put extends HttpOperation
         );
     }
 
-    public function withAllowCreate(bool $allowCreate): void
+    public function withAllowCreate(bool $allowCreate): static
     {
-        $this->allowCreate = $allowCreate;
+        $self = clone $this;
+        $self->allowCreate = $allowCreate;
+
+        return $self;
     }
 
     public function getAllowCreate(): ?bool

@@ -210,6 +210,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]), $attributesResourceMetadataCollectionFactory->create(AttributeConfigOperations::class));
     }
 
+    public function testCreateWithAllowCreateDefault(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: ['allow_create' => true]);
+
+        $operation = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)->getOperation('_api_AttributeResource_put');
+
+        $this->assertInstanceOf(Put::class, $operation);
+        $this->assertTrue($operation->getAllowCreate());
+    }
+
     public function testCreateShouldNotOverrideWithDefault(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(
