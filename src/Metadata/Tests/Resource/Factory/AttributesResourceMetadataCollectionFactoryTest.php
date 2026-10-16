@@ -42,6 +42,8 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagationTarget;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameDifferentMethodOperations;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameGraphQlOperationAttributes;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameGraphQlOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
@@ -439,5 +441,25 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(SameNameDifferentMethodOperations::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperations::class));
+
+        $factory->create(SameNameGraphQlOperations::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameOnAttributesThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperationAttributes::class));
+
+        $factory->create(SameNameGraphQlOperationAttributes::class);
     }
 }
