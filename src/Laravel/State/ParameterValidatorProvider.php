@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\State;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
@@ -49,7 +50,9 @@ final class ParameterValidatorProvider implements ProviderInterface
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
-        $allConstraints = [];
+        $queryConstraints = [];
+        $headerConstraints = [];
+        $headerData = [];
 
         foreach ($operation->getParameters() ?? [] as $parameter) {
             if (!$constraints = $parameter->getConstraints()) {
@@ -61,22 +64,30 @@ final class ParameterValidatorProvider implements ProviderInterface
                 throw new RuntimeException('A parameter must have a defined key.');
             }
 
-            $value = $parameter->getValue();
-            if ($value instanceof ParameterNotFound) {
-                $value = null;
+            if ($parameter instanceof HeaderParameterInterface) {
+                $value = $parameter->getValue();
+                $headerData[$key] = $value instanceof ParameterNotFound ? null : $value;
+                $headerConstraints[$key] = $constraints;
+                continue;
             }
 
             // Laravel Validator requires dot notation for nested rules (e.g., "sort.isActive"),
             // not nested arrays. We convert HTTP bracket syntax "sort[isActive]" to "sort.isActive".
             $ruleKey = str_replace(['[', ']'], ['.', ''], $key);
 
-            $allConstraints[$ruleKey] = $constraints;
+            $queryConstraints[$ruleKey] = $constraints;
         }
 
-        $validator = Validator::make($request->query->all(), $allConstraints);
+        foreach ([[$request->query->all(), $queryConstraints], [$headerData, $headerConstraints]] as [$data, $constraints]) {
+            if (!$constraints) {
+                continue;
+            }
 
-        if ($validator->fails()) {
-            throw $this->getValidationError($validator, new ValidationException($validator));
+            $validator = Validator::make($data, $constraints);
+
+            if ($validator->fails()) {
+                throw $this->getValidationError($validator, new ValidationException($validator));
+            }
         }
 
         return $this->decorated->provide($operation, $uriVariables, $context);
