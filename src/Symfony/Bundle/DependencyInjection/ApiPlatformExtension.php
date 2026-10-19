@@ -904,6 +904,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('doctrine_orm_http_cache_purger.php');
         }
 
+        if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
+            $loader->load('doctrine_odm_http_cache_purger.php');
+        }
+
         $loader->load('state/http_cache_purger.php');
 
         foreach ($config['http_cache']['invalidation']['scoped_clients'] as $client) {
