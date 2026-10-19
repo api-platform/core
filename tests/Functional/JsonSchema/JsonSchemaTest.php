@@ -140,6 +140,16 @@ class JsonSchemaTest extends ApiTestCase
         $this->assertArrayHasKey('Related.jsonld-location.read_collection', $schema['definitions']);
     }
 
+    public function testJsonApiIncludedReferencesNotExposedResource(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonapi', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products/{code}_get'));
+
+        $included = $schema['definitions'][$schema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertSame([['$ref' => '#/definitions/AggregateRating.jsonapi']], $included['items']['anyOf']);
+        $this->assertArrayHasKey('AggregateRating.jsonapi', $schema['definitions']);
+    }
+
     public function testArraySchemaWithReference(): void
     {
         if ('mongodb' === self::getContainer()->getParameter('kernel.environment')) {
