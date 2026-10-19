@@ -507,4 +507,16 @@ class XmlExtractorTest extends TestCase
         $this->assertEquals('john-doe', $parameters[0]->getExample());
         $this->assertEquals('format', $parameters[1]->getName());
     }
+
+    public function testOpenApiExternalDocsAndOptionalAttributes(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_optional_attributes.xml']);
+        $openapi = $extractor->getResources()[Program::class][0]['operations'][0]['openapi'];
+
+        $this->assertSame('More about programs', $openapi->getExternalDocs()->getDescription());
+        $this->assertSame('https://example.com/programs', $openapi->getExternalDocs()->getUrl());
+        $this->assertSame('', $openapi->getParameters()[0]->getDescription());
+        $this->assertFalse($openapi->getParameters()[0]->getRequired());
+        $this->assertFalse($openapi->getRequestBody()->getRequired());
+    }
 }
