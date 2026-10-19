@@ -39,6 +39,7 @@ final class ErrorNormalizer implements NormalizerInterface
         $error['id'] = $jsonApiObject['data']['id'];
         if (isset($error['type'])) {
             $error['links'] = ['type' => $error['type']];
+            unset($error['type']);
         }
 
         if (!isset($error['code']) && method_exists($data, 'getId')) {
