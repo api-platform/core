@@ -91,7 +91,7 @@ class InputDtoSchemaFactoryTest extends TestCase
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn (string $class): bool => \in_array($class, [Order::class, RelatedDummy::class], true));
 
-        $definitionNameFactory = new DefinitionNameFactory(null);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory,
