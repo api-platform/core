@@ -46,6 +46,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     public const DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS = 'disable_json_schema_serializer_groups';
 
+    private const INPUT_SCHEMA_POSTFIX = 'input';
     private const COLLECTION_BASE_SCHEMA_NAME = 'JsonApiCollectionBaseSchema';
     private const COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION = 'JsonApiCollectionBaseSchemaNoPagination';
 
@@ -127,7 +128,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $schema = $this->schemaFactory->buildSchema($className, 'json', $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
-        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $jsonApiSerializerContext + ['schema_type' => $type]);
+        $definitionName = $this->createDefinitionName($className, $format, $inputOrOutputClass, $operation, $jsonApiSerializerContext, $type);
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $definitions = $schema->getDefinitions();
         $collectionKey = $schema->getItemsDefinitionKey();
@@ -296,7 +297,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             if ($relation = $this->getRelationship($propertyClass, $propertyName, $serializerContext)) {
                 [$isOne, $relatedClasses] = $relation;
                 $refs = [];
-                foreach ($relatedClasses as $relatedClassName) {
+                foreach (Schema::TYPE_OUTPUT === $type ? $relatedClasses : [] as $relatedClassName) {
                     $operation = $this->findOperation($relatedClassName, $type, null, $serializerContext);
                     $inputOrOutputClass = $this->findOutputClass($relatedClassName, $type, $operation, $serializerContext);
                     $serializerContext ??= $this->getSerializerContext($operation, $type);
@@ -355,6 +356,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 'type' => 'object',
                 'properties' => $relationships,
             ];
+        }
+
+        if (Schema::TYPE_OUTPUT === $type && \count($relationships) > 0) {
             $included = [
                 'included' => [
                     'description' => 'Related resources requested via the "include" query parameter.',
@@ -384,6 +388,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         return [
             'data' => ['$ref' => $this->getSchemaUriPrefix($schema->getVersion()).$resourceDefinitionName],
         ] + $included;
+    }
+
+    private function createDefinitionName(string $className, string $format, ?string $inputOrOutputClass, ?Operation $operation, ?array $serializerContext, string $type): string
+    {
+        $name = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, ($serializerContext ?? []) + ['schema_type' => $type]);
+
+        return Schema::TYPE_INPUT === $type ? $name.'.'.self::INPUT_SCHEMA_POSTFIX : $name;
     }
 
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
