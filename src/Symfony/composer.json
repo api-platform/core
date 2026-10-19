@@ -67,6 +67,9 @@
         "symfony/validator": "^7.4 || ^8.0",
         "webonyx/graphql-php": "^15.0"
     },
+    "conflict": {
+        "symfony/framework-bundle": "<7.4"
+    },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
         "api-platform/doctrine-odm": "To support MongoDB. Only versions 4.0 and later are supported.",
