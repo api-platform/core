@@ -459,6 +459,17 @@ class XmlExtractorTest extends TestCase
         $this->assertSame('is_granted("ROLE_USER")', $resources[User::class][0]['operations'][0]['security']);
     }
 
+    public function testParameterOpenApiAndPriority(): void
+    {
+        $parameter = (new XmlResourceExtractor([__DIR__.'/xml/parameter_openapi.xml']))->getResources()[Comment::class][0]['parameters']['q'];
+
+        $this->assertSame(10, $parameter->getPriority());
+        $this->assertSame('q', $parameter->getOpenApi()->getName());
+        $this->assertSame('query', $parameter->getOpenApi()->getIn());
+        $this->assertSame('Search', $parameter->getOpenApi()->getDescription());
+        $this->assertTrue($parameter->getOpenApi()->getAllowReserved());
+    }
+
     #[DataProvider('getInvalidPaths')]
     public function testInvalidXML(string $path, string $error): void
     {
