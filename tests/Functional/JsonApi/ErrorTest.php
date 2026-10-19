@@ -125,7 +125,7 @@ class ErrorTest extends ApiTestCase
         $this->assertSame('/errors/404', $error['id']);
         $this->assertSame('An error occurred', $error['title']);
         $this->assertStringContainsString('No route found', $error['detail']);
-        $this->assertSame(404, $error['status']);
+        $this->assertSame('404', $error['status']);
         $this->assertSame('404', $error['code']);
         $this->assertSame('/errors/404', $error['type']);
         $this->assertSame(['type' => '/errors/404'], $error['links']);
@@ -141,7 +141,7 @@ class ErrorTest extends ApiTestCase
         $this->assertSame('/errors/405', $error['id']);
         $this->assertSame('An error occurred', $error['title']);
         $this->assertStringContainsString('Method Not Allowed', $error['detail']);
-        $this->assertSame(405, $error['status']);
+        $this->assertSame('405', $error['status']);
         $this->assertSame('405', $error['code']);
         $this->assertSame('/errors/405', $error['type']);
         $this->assertSame(['type' => '/errors/405'], $error['links']);

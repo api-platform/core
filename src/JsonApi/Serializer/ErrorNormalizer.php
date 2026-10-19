@@ -35,7 +35,17 @@ final class ErrorNormalizer implements NormalizerInterface
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         if ($data instanceof FlattenException) {
-            $error = $this->flattenExceptionToError($data, $format, $context);
+            $type = \sprintf('/errors/%d', $data->getStatusCode());
+            unset($context['exception']);
+            $problem = $this->problemNormalizer->normalize($data, $format, ['type' => $type] + $context);
+            $error = [
+                'id' => $problem['type'],
+                'title' => $problem['title'],
+                'detail' => $problem['detail'],
+                'status' => $problem['status'],
+                'type' => $problem['type'],
+                'code' => (string) $problem['status'],
+            ];
         } else {
             $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
             $error = $jsonApiObject['data']['attributes'] ?? [];
@@ -74,22 +84,6 @@ final class ErrorNormalizer implements NormalizerInterface
         }
 
         return ['errors' => $errors];
-    }
-
-    private function flattenExceptionToError(FlattenException $exception, ?string $format, array $context): array
-    {
-        $type = \sprintf('/errors/%d', $exception->getStatusCode());
-        unset($context['exception']);
-        $problem = $this->problemNormalizer->normalize($exception, $format, ['type' => $type] + $context);
-
-        return [
-            'id' => $problem['type'],
-            'title' => $problem['title'],
-            'detail' => $problem['detail'],
-            'status' => $problem['status'],
-            'type' => $problem['type'],
-            'code' => (string) $problem['status'],
-        ];
     }
 
     /**
