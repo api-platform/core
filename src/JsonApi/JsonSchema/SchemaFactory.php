@@ -161,7 +161,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (!$collectionKey) {
-            $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
+            $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $inputOrOutputClass, $format, $type, $operation, $schema, []);
             $schema['$ref'] = $prefix.$definitionName;
 
             return $schema;
@@ -259,7 +259,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['items']);
         unset($schema['type']);
 
-        $properties = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
+        $properties = $this->buildDefinitionPropertiesSchema($key, $inputOrOutputClass, $format, $type, $operation, $schema, []);
 
         $properties['data'] = [
             'type' => 'array',
@@ -282,7 +282,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
     }
 
-    private function buildDefinitionPropertiesSchema(string $key, string $className, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
+    private function buildDefinitionPropertiesSchema(string $key, string $propertyClass, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
     {
         // Capture the resource's operation up front; the relationship loop below reassigns $operation.
         $resourceOperation = $operation;
@@ -293,7 +293,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $relationships = [];
         $relatedDefinitions = [];
         foreach ($properties as $propertyName => $property) {
-            if ($relation = $this->getRelationship($className, $propertyName, $serializerContext)) {
+            if ($relation = $this->getRelationship($propertyClass, $propertyName, $serializerContext)) {
                 [$isOne, $relatedClasses] = $relation;
                 $refs = [];
                 foreach ($relatedClasses as $relatedClassName) {
