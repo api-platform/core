@@ -15,6 +15,7 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\BadRequestException;
+use ApiPlatform\Metadata\Exception\ConflictException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
@@ -53,9 +54,9 @@ trait ItemNormalizerTrait
             return parent::denormalize($data, $type, $format, $context);
         }
 
-        $this->assertValidRequestDocument($data);
-
         $operation = $context['operation'] ?? null;
+        $this->assertValidRequestDocument($data, $operation, $type, $context);
+
         $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
         $allowClientGeneratedId = true === ($context[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? $this->defaultContext[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? false);
 
@@ -92,7 +93,7 @@ trait ItemNormalizerTrait
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
     }
 
-    private function assertValidRequestDocument(mixed $data): void
+    private function assertValidRequestDocument(mixed $data, mixed $operation, string $resourceClass, array $context): void
     {
         if (!\is_array($data) || !isset($data['data']) || !$this->isJsonObject($data['data'])) {
             throw new BadRequestException('The request document must be an object with a "data" member holding a resource object.');
@@ -103,6 +104,34 @@ trait ItemNormalizerTrait
                 throw new BadRequestException(\sprintf('The "%s" member of the resource object must be an object.', $member));
             }
         }
+
+        if (true !== ($context[ItemNormalizer::STRICT_RESOURCE_TYPE] ?? $this->defaultContext[ItemNormalizer::STRICT_RESOURCE_TYPE] ?? false)) {
+            return;
+        }
+
+        if (!isset($data['data']['type']) || !\is_string($data['data']['type'])) {
+            throw new BadRequestException('The resource object must have a "type" member.');
+        }
+
+        if (!$operation instanceof HttpOperation || 'POST' !== $operation->getMethod()) {
+            return;
+        }
+
+        $acceptedTypes = array_filter([$operation->getShortName(), $this->getResourceShortName($resourceClass)]);
+        if (!\in_array($data['data']['type'], $acceptedTypes, true)) {
+            throw new ConflictException(\sprintf('The resource object type "%s" does not match the type of this endpoint, expected one of "%s".', $data['data']['type'], implode('", "', array_unique($acceptedTypes))));
+        }
+    }
+
+    private function getResourceShortName(string $resourceClass): string
+    {
+        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+
+            return $resourceMetadata->getOperation()->getShortName();
+        }
+
+        return (new \ReflectionClass($resourceClass))->getShortName();
     }
 
     private function isJsonObject(mixed $value): bool

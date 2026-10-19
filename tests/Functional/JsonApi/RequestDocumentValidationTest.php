@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\JsonApi;
 
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\ClientGeneratedId;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\StrictTypeResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -29,7 +30,7 @@ final class RequestDocumentValidationTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [ClientGeneratedId::class];
+        return [ClientGeneratedId::class, StrictTypeResource::class];
     }
 
     /**
@@ -87,5 +88,38 @@ final class RequestDocumentValidationTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(201);
         $this->assertSame('A', $response->toArray()['data']['attributes']['name']);
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     */
+    #[DataProvider('strictTypeDocuments')]
+    public function testStrictResourceType(string $uri, array $document, int $expectedStatus): void
+    {
+        self::createClient()->request('POST', $uri, [
+            'headers' => [
+                'Accept' => 'application/vnd.api+json',
+                'Content-Type' => 'application/vnd.api+json',
+            ],
+            'json' => $document,
+        ]);
+
+        $this->assertResponseStatusCodeSame($expectedStatus);
+    }
+
+    /**
+     * @return iterable<string, array{string, array<string, mixed>, int}>
+     */
+    public static function strictTypeDocuments(): iterable
+    {
+        yield 'strict, missing type' => ['/jsonapi_strict_types', ['data' => ['attributes' => ['name' => 'A']]], 400];
+        yield 'strict, non-string type' => ['/jsonapi_strict_types', ['data' => ['type' => 1]], 400];
+        yield 'strict, wrong type' => ['/jsonapi_strict_types', ['data' => ['type' => 'Author']], 409];
+        yield 'strict, correct type' => ['/jsonapi_strict_types', ['data' => ['type' => 'JsonApiStrictType']], 201];
+        yield 'strict, operation shortName' => ['/jsonapi_strict_type_aliases', ['data' => ['type' => 'JsonApiStrictTypeAlias']], 201];
+        yield 'strict, emitted type' => ['/jsonapi_strict_type_aliases', ['data' => ['type' => 'JsonApiStrictType']], 201];
+        yield 'strict, neither' => ['/jsonapi_strict_type_aliases', ['data' => ['type' => 'Author']], 409];
+        yield 'lenient, missing type' => ['/jsonapi_lenient_types', ['data' => ['attributes' => ['name' => 'A']]], 201];
+        yield 'lenient, wrong type' => ['/jsonapi_lenient_types', ['data' => ['type' => 'Author']], 201];
     }
 }

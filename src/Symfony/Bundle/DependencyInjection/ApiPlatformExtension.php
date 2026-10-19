@@ -721,12 +721,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $useIriAsId = $config['jsonapi']['use_iri_as_id'];
 
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
-        $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemNormalizer->replaceArgument(7, [
+            JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
+            JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
+        ]);
         $itemNormalizer->addArgument($useIriAsId);
         $itemNormalizer->addArgument(new Reference('api_platform.jsonapi.resource_linkage_resolver'));
 
         $itemDenormalizer = $container->getDefinition('api_platform.jsonapi.denormalizer.item');
-        $itemDenormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemDenormalizer->replaceArgument(7, [
+            JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
+            JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
+        ]);
         $itemDenormalizer->addArgument($useIriAsId);
     }
 
