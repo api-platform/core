@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\BadRequestException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
@@ -52,6 +53,8 @@ trait ItemNormalizerTrait
             return parent::denormalize($data, $type, $format, $context);
         }
 
+        $this->assertValidRequestDocument($data);
+
         $operation = $context['operation'] ?? null;
         $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
         $allowClientGeneratedId = true === ($context[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? $this->defaultContext[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? false);
@@ -87,6 +90,24 @@ trait ItemNormalizerTrait
         }
 
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
+    }
+
+    private function assertValidRequestDocument(mixed $data): void
+    {
+        if (!\is_array($data) || !isset($data['data']) || !$this->isJsonObject($data['data'])) {
+            throw new BadRequestException('The request document must be an object with a "data" member holding a resource object.');
+        }
+
+        foreach (['attributes', 'relationships'] as $member) {
+            if (\array_key_exists($member, $data['data']) && !$this->isJsonObject($data['data'][$member])) {
+                throw new BadRequestException(\sprintf('The "%s" member of the resource object must be an object.', $member));
+            }
+        }
+    }
+
+    private function isJsonObject(mixed $value): bool
+    {
+        return \is_array($value) && ([] === $value || !array_is_list($value));
     }
 
     protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool
