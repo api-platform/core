@@ -34,9 +34,14 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
-        $error = $jsonApiObject['data']['attributes'] ?? [];
-        $error['id'] = $jsonApiObject['data']['id'];
+        if ($data instanceof FlattenException) {
+            $error = $this->flattenExceptionToError($data, $context);
+        } else {
+            $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
+            $error = $jsonApiObject['data']['attributes'] ?? [];
+            $error['id'] = $jsonApiObject['data']['id'];
+        }
+
         if (isset($error['type'])) {
             $error['links'] = ['type' => $error['type']];
         }
@@ -69,6 +74,20 @@ final class ErrorNormalizer implements NormalizerInterface
         }
 
         return ['errors' => $errors];
+    }
+
+    private function flattenExceptionToError(FlattenException $exception, array $context): array
+    {
+        $status = $exception->getStatusCode();
+
+        return [
+            'id' => "/errors/$status",
+            'title' => 'An error occurred',
+            'detail' => ($context['debug'] ?? false) ? $exception->getMessage() : $exception->getStatusText(),
+            'status' => $status,
+            'type' => "/errors/$status",
+            'code' => (string) $status,
+        ];
     }
 
     /**
