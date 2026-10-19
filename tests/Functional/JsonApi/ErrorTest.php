@@ -92,7 +92,8 @@ class ErrorTest extends ApiTestCase
         $this->assertSame('An error occurred', $body['errors'][0]['title']);
         $this->assertSame('400', $body['errors'][0]['status']);
         $this->assertArrayHasKey('detail', $body['errors'][0]);
-        $this->assertArrayHasKey('type', $body['errors'][0]);
+        $this->assertArrayNotHasKey('type', $body['errors'][0]);
+        $this->assertArrayHasKey('type', $body['errors'][0]['links']);
     }
 
     public function testNotFoundRouteRendersJsonApiFormat(): void
@@ -111,6 +112,7 @@ class ErrorTest extends ApiTestCase
         $this->assertSame('An error occurred', $body['errors'][0]['title']);
         $this->assertSame('404', $body['errors'][0]['status']);
         $this->assertArrayHasKey('detail', $body['errors'][0]);
-        $this->assertArrayHasKey('type', $body['errors'][0]);
+        $this->assertArrayNotHasKey('type', $body['errors'][0]);
+        $this->assertArrayHasKey('type', $body['errors'][0]['links']);
     }
 }

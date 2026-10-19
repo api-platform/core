@@ -266,6 +266,7 @@ class JsonApiTest extends TestCase
 
         $this->assertArrayHasKey('id', $json['errors'][0]);
         $this->assertArrayHasKey('links', $json['errors'][0]);
+        $this->assertArrayNotHasKey('type', $json['errors'][0]);
         $this->assertArrayHasKey('type', $json['errors'][0]['links']);
 
         $response = $this->postJson(
