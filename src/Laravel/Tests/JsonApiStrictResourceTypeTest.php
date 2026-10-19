@@ -20,6 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 use Workbench\App\Models\Author;
 use Workbench\Database\Factories\AuthorFactory;
 
@@ -67,6 +68,8 @@ class JsonApiStrictResourceTypeTest extends TestCase
 
     /**
      * @param array<string, mixed> $resource
+     *
+     * @return TestResponse<Response>
      */
     private function postBook(array $resource): TestResponse
     {
