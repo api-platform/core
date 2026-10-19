@@ -40,6 +40,8 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 class ApiPlatformExtensionTest extends TestCase
@@ -199,7 +201,10 @@ class ApiPlatformExtensionTest extends TestCase
 
         (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
 
-        self::assertTrue($this->container->hasDefinition('api_platform.object_mapper.metadata_factory'));
+        self::assertSame(
+            class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle']),
+            $this->container->hasDefinition('api_platform.object_mapper.metadata_factory')
+        );
     }
 
     public function testCommonConfiguration(): void
