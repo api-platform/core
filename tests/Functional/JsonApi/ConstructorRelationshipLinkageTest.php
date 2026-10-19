@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8702\Issue8702Author;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8702\Issue8702Book;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
