@@ -24,6 +24,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -271,10 +273,36 @@ class SchemaFactoryTest extends TestCase
         $this->assertContains('#/definitions/OtherRelatedDummy.jsonapi', $refs, 'every target of a polymorphic relation must be listed in included');
     }
 
-    private function buildSchemaFactoryWithPolymorphicRelation(): SchemaFactory
+    public function testIncludedReferencesNotExposedRelatedResource(): void
+    {
+        $schemaFactory = $this->buildSchemaFactoryWithRelation((new NotExposed())->withClass(RelatedDummy::class)->withShortName('RelatedDummy'));
+        $resultSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonapi');
+
+        $definitions = $resultSchema->getDefinitions();
+        $included = $definitions[$resultSchema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertSame([['$ref' => '#/definitions/RelatedDummy.jsonapi']], $included['items']['anyOf']);
+        $this->assertArrayHasKey('RelatedDummy.jsonapi', $definitions);
+    }
+
+    public function testIncludedListsExposedAndNotExposedTargets(): void
+    {
+        $schemaFactory = $this->buildSchemaFactoryWithPolymorphicRelation((new NotExposed())->withClass(RelatedDummy::class)->withShortName('RelatedDummy'));
+        $resultSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonapi');
+
+        $definitions = $resultSchema->getDefinitions();
+        $included = $definitions[$resultSchema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertEqualsCanonicalizing(
+            [['$ref' => '#/definitions/RelatedDummy.jsonapi'], ['$ref' => '#/definitions/OtherRelatedDummy.jsonapi']],
+            $included['items']['anyOf']
+        );
+    }
+
+    private function buildSchemaFactoryWithPolymorphicRelation(?Operation $relatedOperation = null): SchemaFactory
     {
         $dummyOperation = (new Get())->withName('get')->withShortName('Dummy');
-        $relatedOperation = (new Get())->withName('get')->withShortName('RelatedDummy');
+        $relatedOperation ??= (new Get())->withName('get')->withShortName('RelatedDummy');
         $otherRelatedOperation = (new Get())->withName('get')->withShortName('OtherRelatedDummy');
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -346,10 +374,10 @@ class SchemaFactoryTest extends TestCase
         );
     }
 
-    private function buildSchemaFactoryWithRelation(): SchemaFactory
+    private function buildSchemaFactoryWithRelation(?Operation $relatedOperation = null): SchemaFactory
     {
         $dummyOperation = (new Get())->withName('get')->withShortName('Dummy');
-        $relatedOperation = (new Get())->withName('get')->withShortName('RelatedDummy');
+        $relatedOperation ??= (new Get())->withName('get')->withShortName('RelatedDummy');
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(Dummy::class)->willReturn(

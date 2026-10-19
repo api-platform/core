@@ -296,11 +296,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             if ($relation = $this->getRelationship($className, $propertyName, $serializerContext)) {
                 [$isOne, $relatedClasses] = $relation;
                 $refs = [];
-                foreach ($relatedClasses as $relatedClassName => $hasOperations) {
-                    if (false === $hasOperations) {
-                        continue;
-                    }
-
+                foreach ($relatedClasses as $relatedClassName) {
                     $operation = $this->findOperation($relatedClassName, $type, null, $serializerContext);
                     $inputOrOutputClass = $this->findOutputClass($relatedClassName, $type, $operation, $serializerContext);
                     $serializerContext ??= $this->getSerializerContext($operation, $type);
@@ -401,9 +397,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $relatedClasses = [];
         foreach ($relationships as [$className, $isCollection]) {
             $isOne = $isOne || !$isCollection;
-            // @see https://github.com/api-platform/core/issues/5501
-            // @see https://github.com/api-platform/core/pull/5722
-            $relatedClasses[$className] = $this->resourceMetadataFactory->create($className)->getOperation()->canRead();
+            $relatedClasses[$className] = $className;
         }
 
         return [$isOne, $relatedClasses];
