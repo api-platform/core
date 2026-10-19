@@ -198,6 +198,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     ],
                     'data' => [
                         'type' => 'array',
+                        'items' => ['type' => 'object'],
                     ],
                 ],
                 'required' => ['data'],

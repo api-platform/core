@@ -175,6 +175,17 @@ class SchemaFactoryTest extends TestCase
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
     }
 
+    public function testCollectionBaseSchemaNoPaginationDeclaresDataItems(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, new GetCollection(paginationEnabled: false));
+
+        $this->assertSame('#/definitions/JsonApiCollectionBaseSchemaNoPagination', $resultSchema['allOf'][0]['$ref']);
+
+        $data = $resultSchema['definitions']['JsonApiCollectionBaseSchemaNoPagination']['properties']['data'];
+        $this->assertSame('array', $data['type']);
+        $this->assertSame(['type' => 'object'], $data['items']);
+    }
+
     public function testPostInputSchemaDoesNotRequireId(): void
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_INPUT, new Post());
