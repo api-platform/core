@@ -1086,6 +1086,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
             $defaultContext[JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID] = (bool) $config->get('api-platform.jsonapi.allow_client_generated_id', false);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
             $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', false);
 
             return new JsonApiItemNormalizer(
@@ -1109,6 +1110,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(JsonApiItemDenormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
 
             return new JsonApiItemDenormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
