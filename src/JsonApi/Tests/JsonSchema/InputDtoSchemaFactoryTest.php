@@ -43,7 +43,8 @@ class InputDtoSchemaFactoryTest extends TestCase
         $schemaFactory = $this->buildSchemaFactory($operation);
 
         $schema = $schemaFactory->buildSchema(Order::class, 'jsonapi', Schema::TYPE_INPUT, $operation);
-        $data = $schema->getDefinitions()[$schema->getRootDefinitionKey()]['properties']['data'];
+        $this->assertSame(['$ref' => '#/definitions/'.$schema->getRootDefinitionKey().'.resource'], $schema->getDefinitions()[$schema->getRootDefinitionKey()]['properties']['data']);
+        $data = $schema->getDefinitions()[$schema->getRootDefinitionKey().'.resource'];
 
         $this->assertArrayNotHasKey('relationships', $data['properties']);
         $this->assertEqualsCanonicalizing(['reference', 'lines'], array_keys($data['properties']['attributes']['properties']));
@@ -55,7 +56,8 @@ class InputDtoSchemaFactoryTest extends TestCase
         $schemaFactory = $this->buildSchemaFactory($operation);
 
         $schema = $schemaFactory->buildSchema(Order::class, 'jsonapi', Schema::TYPE_OUTPUT, $operation);
-        $data = $schema->getDefinitions()[$schema->getRootDefinitionKey()]['properties']['data'];
+        $this->assertSame(['$ref' => '#/definitions/'.$schema->getRootDefinitionKey().'.resource'], $schema->getDefinitions()[$schema->getRootDefinitionKey()]['properties']['data']);
+        $data = $schema->getDefinitions()[$schema->getRootDefinitionKey().'.resource'];
 
         $this->assertArrayHasKey('lines', $data['properties']['relationships']['properties']);
         $this->assertArrayNotHasKey('lines', $data['properties']['attributes']['properties']);

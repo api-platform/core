@@ -161,7 +161,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (!$collectionKey) {
-            $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $inputOrOutputClass, $format, $type, $operation, $schema, []);
+            $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, []);
             $schema['$ref'] = $prefix.$definitionName;
 
             return $schema;
@@ -259,7 +259,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['items']);
         unset($schema['type']);
 
-        $properties = $this->buildDefinitionPropertiesSchema($key, $inputOrOutputClass, $format, $type, $operation, $schema, []);
+        $properties = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, []);
 
         $properties['data'] = [
             'type' => 'array',
@@ -282,7 +282,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
     }
 
-    private function buildDefinitionPropertiesSchema(string $key, string $propertyClass, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
+    private function buildDefinitionPropertiesSchema(string $key, string $documentDefinitionName, string $propertyClass, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
     {
         // Capture the resource's operation up front; the relationship loop below reassigns $operation.
         $resourceOperation = $operation;
@@ -321,7 +321,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 }
                 // keep one entry per related definition: a polymorphic relation targets several resource classes, all of which may appear in "included"
                 foreach (array_keys($refs) as $ref) {
-                    $relatedDefinitions[$ref] = ['$ref' => $ref];
+                    $relatedDefinitions[$ref.'.resource'] = ['$ref' => $ref.'.resource'];
                 }
                 // A relationship literally named "relationships"/"included" is prefixed at runtime too.
                 $relationshipName = ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES[$propertyName] ?? $propertyName;
@@ -374,12 +374,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Only relax the requirement on the input schema; responses still always carry an `id`.
         $required = Schema::TYPE_INPUT === $type && $resourceOperation instanceof HttpOperation && 'POST' === $resourceOperation->getMethod() ? ['type'] : ['type', 'id'];
 
+        $resourceDefinitionName = $documentDefinitionName.'.resource';
+        $definitions[$resourceDefinitionName] = [
+            'type' => 'object',
+            'properties' => $replacement,
+            'required' => $required,
+        ];
+
         return [
-            'data' => [
-                'type' => 'object',
-                'properties' => $replacement,
-                'required' => $required,
-            ],
+            'data' => ['$ref' => $this->getSchemaUriPrefix($schema->getVersion()).$resourceDefinitionName],
         ] + $included;
     }
 
