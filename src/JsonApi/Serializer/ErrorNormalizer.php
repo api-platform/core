@@ -25,7 +25,7 @@ final class ErrorNormalizer implements NormalizerInterface
 {
     public const FORMAT = 'jsonapi';
 
-    public function __construct(private ?NormalizerInterface $itemNormalizer = null)
+    public function __construct(private ?NormalizerInterface $itemNormalizer = null, private ?NormalizerInterface $problemNormalizer = null)
     {
     }
 
@@ -35,7 +35,7 @@ final class ErrorNormalizer implements NormalizerInterface
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         if ($data instanceof FlattenException) {
-            $error = $this->flattenExceptionToError($data, $context);
+            $error = $this->flattenExceptionToError($data, $format, $context);
         } else {
             $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
             $error = $jsonApiObject['data']['attributes'] ?? [];
@@ -76,17 +76,19 @@ final class ErrorNormalizer implements NormalizerInterface
         return ['errors' => $errors];
     }
 
-    private function flattenExceptionToError(FlattenException $exception, array $context): array
+    private function flattenExceptionToError(FlattenException $exception, ?string $format, array $context): array
     {
-        $status = $exception->getStatusCode();
+        $type = \sprintf('/errors/%d', $exception->getStatusCode());
+        unset($context['exception']);
+        $problem = $this->problemNormalizer->normalize($exception, $format, ['type' => $type] + $context);
 
         return [
-            'id' => "/errors/$status",
-            'title' => 'An error occurred',
-            'detail' => ($context['debug'] ?? false) ? $exception->getMessage() : $exception->getStatusText(),
-            'status' => $status,
-            'type' => "/errors/$status",
-            'code' => (string) $status,
+            'id' => $problem['type'],
+            'title' => $problem['title'],
+            'detail' => $problem['detail'],
+            'status' => $problem['status'],
+            'type' => $problem['type'],
+            'code' => (string) $problem['status'],
         ];
     }
 
@@ -95,7 +97,7 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
+        return self::FORMAT === $format && ($data instanceof \Exception || ($data instanceof FlattenException && null !== $this->problemNormalizer));
     }
 
     /**
@@ -106,7 +108,7 @@ final class ErrorNormalizer implements NormalizerInterface
         if (self::FORMAT === $format) {
             return [
                 \Exception::class => true,
-                FlattenException::class => true,
+                FlattenException::class => null !== $this->problemNormalizer,
             ];
         }
 
