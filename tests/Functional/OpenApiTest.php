@@ -164,11 +164,13 @@ class OpenApiTest extends ApiTestCase
         $this->assertNotSame($outputName, $inputName);
 
         $input = $schemas[$inputName];
-        $this->assertSame(['type'], $input['properties']['data']['required']);
-        $this->assertArrayHasKey('attributes', $input['properties']['data']['properties']);
+        $this->assertSame(['$ref' => '#/components/schemas/'.$inputName.'.resource'], $input['properties']['data']);
+        $this->assertSame(['type'], $schemas[$inputName.'.resource']['required']);
+        $this->assertArrayHasKey('attributes', $schemas[$inputName.'.resource']['properties']);
         $this->assertArrayNotHasKey('included', $input['properties']);
 
-        $this->assertSame(['type', 'id'], $schemas[$outputName]['properties']['data']['required']);
+        $this->assertSame(['$ref' => '#/components/schemas/'.$outputName.'.resource'], $schemas[$outputName]['properties']['data']);
+        $this->assertSame(['type', 'id'], $schemas[$outputName.'.resource']['required']);
     }
 
     private function definitionName(string $ref): string

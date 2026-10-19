@@ -46,7 +46,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     public const DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS = 'disable_json_schema_serializer_groups';
 
-    private const INPUT_SCHEMA_POSTFIX = 'input';
     private const COLLECTION_BASE_SCHEMA_NAME = 'JsonApiCollectionBaseSchema';
     private const COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION = 'JsonApiCollectionBaseSchemaNoPagination';
 
@@ -128,7 +127,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $schema = $this->schemaFactory->buildSchema($className, 'json', $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
-        $definitionName = $this->createDefinitionName($className, $format, $inputOrOutputClass, $operation, $jsonApiSerializerContext, $type);
+        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $jsonApiSerializerContext + ['schema_type' => $type]);
+        if (Schema::TYPE_INPUT === $type) {
+            $definitionName .= '.input';
+        }
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $definitions = $schema->getDefinitions();
         $collectionKey = $schema->getItemsDefinitionKey();
@@ -388,13 +390,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         return [
             'data' => ['$ref' => $this->getSchemaUriPrefix($schema->getVersion()).$resourceDefinitionName],
         ] + $included;
-    }
-
-    private function createDefinitionName(string $className, string $format, ?string $inputOrOutputClass, ?Operation $operation, ?array $serializerContext, string $type): string
-    {
-        $name = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, ($serializerContext ?? []) + ['schema_type' => $type]);
-
-        return Schema::TYPE_INPUT === $type ? $name.'.'.self::INPUT_SCHEMA_POSTFIX : $name;
     }
 
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
