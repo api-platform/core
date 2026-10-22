@@ -58,6 +58,11 @@ trait ItemNormalizerTrait
         $this->assertValidRequestDocument($data, $operation, $type, $context);
 
         $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
+        if (!$isPostOperation && $operation instanceof HttpOperation && \is_object($context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? null)) {
+            if (isset($data['data']['id'])) {
+                $this->assertIdMatchesEndpoint((string) $data['data']['id'], $context[AbstractItemNormalizer::OBJECT_TO_POPULATE], $operation, $type);
+            }
+        }
         $allowClientGeneratedId = true === ($context[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? $this->defaultContext[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? false);
 
         // Avoid issues with proxies if we populated the object
@@ -87,7 +92,7 @@ trait ItemNormalizerTrait
 
         // Surface the client-generated id so the entity setter receives it.
         if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
-            $dataToDenormalize[ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES['id']] = $data['data']['id'];
+            $dataToDenormalize[$this->nameConverter?->normalize('id', $type, self::FORMAT) ?? 'id'] = $data['data']['id'];
         }
 
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
@@ -113,13 +118,30 @@ trait ItemNormalizerTrait
             throw new BadRequestException('The resource object must have a "type" member.');
         }
 
-        if (!$operation instanceof HttpOperation || 'POST' !== $operation->getMethod()) {
+        if (!$operation instanceof HttpOperation) {
             return;
         }
 
         $acceptedTypes = array_filter([$operation->getShortName(), $this->getResourceShortName($resourceClass)]);
         if (!\in_array($data['data']['type'], $acceptedTypes, true)) {
             throw new ConflictException(\sprintf('The resource object type "%s" does not match the type of this endpoint, expected one of "%s".', $data['data']['type'], implode('", "', array_unique($acceptedTypes))));
+        }
+    }
+
+    private function assertIdMatchesEndpoint(string $id, object $object, HttpOperation $operation, string $resourceClass): void
+    {
+        if ($this->useIriAsId) {
+            $requested = $id;
+            $actual = $this->iriConverter->getIriFromResource($object);
+        } elseif (\count($operation->getUriVariables() ?? []) > 1) {
+            return;
+        } else {
+            $requested = $this->reconstructIri($resourceClass, $id, $operation);
+            $actual = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation);
+        }
+
+        if (parse_url($requested, \PHP_URL_PATH) !== parse_url($actual, \PHP_URL_PATH)) {
+            throw new ConflictException(\sprintf('The resource object id "%s" does not match the id of this endpoint.', $id));
         }
     }
 

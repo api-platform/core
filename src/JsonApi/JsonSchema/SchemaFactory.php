@@ -82,7 +82,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private readonly ResourceLinkageResolver $resourceLinkageResolver;
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, ?ResourceLinkageResolver $resourceLinkageResolver = null)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, ?ResourceLinkageResolver $resourceLinkageResolver = null, private readonly bool $strictMemberNames = false)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -327,7 +327,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $relatedDefinitions[$ref] = ['$ref' => $ref];
                 }
                 // A relationship literally named "relationships"/"included" is prefixed at runtime too.
-                $relationshipName = ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES[$propertyName] ?? $propertyName;
+                $relationshipName = ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$propertyName] ?? $propertyName;
                 if ($isOne) {
                     $relationships[$relationshipName]['properties']['data'] = [
                         'oneOf' => [
@@ -346,7 +346,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
             // Reserved names (id, type, links, relationships, included) are prefixed by the
             // ReservedAttributeNameConverter at runtime; mirror that single source of truth here.
-            $attributes[ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES[$propertyName] ?? $propertyName] = $property;
+            $attributes[ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$propertyName] ?? $propertyName] = $property;
         }
 
         $replacement = self::PROPERTY_PROPS;

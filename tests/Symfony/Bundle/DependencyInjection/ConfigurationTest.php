@@ -249,6 +249,7 @@ class ConfigurationTest extends TestCase
                 'use_iri_as_id' => false,
                 'allow_client_generated_id' => false,
                 'strict_resource_type' => false,
+                'strict_member_names' => false,
             ],
             'enable_scalar' => true,
             'enable_head_request_optimization' => true,
