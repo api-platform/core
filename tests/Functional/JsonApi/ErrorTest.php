@@ -69,8 +69,10 @@ class ErrorTest extends ApiTestCase
         $this->assertJsonEquals([
             'errors' => [
                 [
+                    'status' => '422',
+                    'title' => 'Validation Failed',
                     'detail' => 'This value should not be blank.',
-                    'source' => ['pointer' => 'data/attributes/name'],
+                    'source' => ['pointer' => '/data/attributes/name'],
                 ],
             ],
         ]);
