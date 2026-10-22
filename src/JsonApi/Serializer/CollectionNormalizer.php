@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\IriHelper;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
+use ApiPlatform\State\Util\RequestParser;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -41,29 +43,29 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     protected function getPaginationData(iterable $object, array $context = []): array
     {
         [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
-        $parsed = IriHelper::parseIri($context['uri'] ?? '/', $this->pageParameterName);
+        $parsed = $this->parseUri($context['uri'] ?? '/');
 
         $operation = $context['operation'] ?? $this->getOperation($context);
         $urlGenerationStrategy = $operation->getUrlGenerationStrategy();
 
         $data = [
             'links' => [
-                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $urlGenerationStrategy),
+                'self' => $this->createPageIri($parsed, $paginated ? $currentPage : null, $urlGenerationStrategy),
             ],
         ];
 
         if ($paginated) {
             if (null !== $lastPage) {
-                $data['links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
-                $data['links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
+                $data['links']['first'] = $this->createPageIri($parsed, 1., $urlGenerationStrategy);
+                $data['links']['last'] = $this->createPageIri($parsed, $lastPage, $urlGenerationStrategy);
             }
 
             if (1. !== $currentPage) {
-                $data['links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
+                $data['links']['prev'] = $this->createPageIri($parsed, $currentPage - 1., $urlGenerationStrategy);
             }
 
             if (null !== $lastPage && $currentPage !== $lastPage || null === $lastPage && $pageTotalItems >= $itemsPerPage) {
-                $data['links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
+                $data['links']['next'] = $this->createPageIri($parsed, $currentPage + 1., $urlGenerationStrategy);
             }
         }
 
@@ -77,6 +79,39 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * @return array{parts: array<string, mixed>, parameters: array<string, mixed>}
+     */
+    private function parseUri(string $uri): array
+    {
+        $parts = parse_url($uri);
+        if (false === $parts) {
+            throw new InvalidArgumentException(\sprintf('The request URI "%s" is malformed.', $uri));
+        }
+
+        return ['parts' => $parts, 'parameters' => isset($parts['query']) ? RequestParser::parseRequestParams($parts['query']) : []];
+    }
+
+    /**
+     * @param array{parts: array<string, mixed>, parameters: array<string, mixed>} $parsed
+     */
+    private function createPageIri(array $parsed, ?float $page, ?int $urlGenerationStrategy): string
+    {
+        $parameters = $parsed['parameters'];
+        $pageParameters = \is_array($parameters['page'] ?? null) ? $parameters['page'] : [];
+        unset($parameters['page'], $parameters[$this->pageParameterName], $pageParameters[$this->pageParameterName]);
+
+        if (null !== $page) {
+            $pageParameters = [$this->pageParameterName => $page] + $pageParameters;
+        }
+
+        if ([] !== $pageParameters) {
+            $parameters['page'] = $pageParameters;
+        }
+
+        return IriHelper::createIri($parsed['parts'], $parameters, null, null, $urlGenerationStrategy);
     }
 
     /**
