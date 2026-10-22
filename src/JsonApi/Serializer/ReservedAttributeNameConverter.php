@@ -31,8 +31,21 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
         'included' => '_included',
     ];
 
-    public function __construct(private readonly ?NameConverterInterface $nameConverter = null)
+    public const STRICT_JSON_API_RESERVED_ATTRIBUTES = [
+        'id' => 'resourceId',
+        'type' => 'resourceType',
+    ];
+
+    public function __construct(private readonly ?NameConverterInterface $nameConverter = null, private readonly bool $strictMemberNames = false)
     {
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getReservedAttributes(bool $strictMemberNames = false): array
+    {
+        return $strictMemberNames ? self::STRICT_JSON_API_RESERVED_ATTRIBUTES : self::JSON_API_RESERVED_ATTRIBUTES;
     }
 
     /**
@@ -48,8 +61,9 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
             return $propertyName;
         }
 
-        if (isset(self::JSON_API_RESERVED_ATTRIBUTES[$propertyName])) {
-            $propertyName = self::JSON_API_RESERVED_ATTRIBUTES[$propertyName];
+        $reserved = self::getReservedAttributes($this->strictMemberNames);
+        if (isset($reserved[$propertyName])) {
+            $propertyName = $reserved[$propertyName];
         }
 
         return $propertyName;
@@ -60,8 +74,9 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
      */
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
-        if (\in_array($propertyName, self::JSON_API_RESERVED_ATTRIBUTES, true)) {
-            $propertyName = substr($propertyName, 1);
+        $original = array_search($propertyName, self::getReservedAttributes($this->strictMemberNames), true);
+        if (false !== $original) {
+            $propertyName = $original;
         }
 
         if (null !== $this->nameConverter) {

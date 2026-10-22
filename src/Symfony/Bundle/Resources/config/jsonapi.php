@@ -42,6 +42,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
             service('api_platform.jsonapi.resource_linkage_resolver'),
+            false,
         ]);
 
     $services->set('api_platform.jsonapi.encoder', JsonEncoder::class)
@@ -49,7 +50,7 @@ return static function (ContainerConfigurator $container) {
         ->tag('serializer.encoder');
 
     $services->set('api_platform.jsonapi.name_converter.reserved_attribute_name', ReservedAttributeNameConverter::class)
-        ->args([service('api_platform.name_converter')->ignoreOnInvalid()]);
+        ->args([service('api_platform.name_converter')->ignoreOnInvalid(), false]);
 
     $services->set('api_platform.jsonapi.normalizer.entrypoint', EntrypointNormalizer::class)
         ->args([

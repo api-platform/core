@@ -976,6 +976,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
@@ -1052,7 +1053,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app) {
-            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
+            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class), (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false));
         });
 
         if (interface_exists(FieldsBuilderEnumInterface::class)) {

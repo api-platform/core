@@ -719,6 +719,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('state/jsonapi.php');
 
         $useIriAsId = $config['jsonapi']['use_iri_as_id'];
+        $strictMemberNames = $config['jsonapi']['strict_member_names'] ?? false;
+
+        $container->getDefinition('api_platform.jsonapi.name_converter.reserved_attribute_name')->replaceArgument(1, $strictMemberNames);
+        $container->getDefinition('api_platform.jsonapi.json_schema.schema_factory')->replaceArgument(6, $strictMemberNames);
 
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
         $itemNormalizer->replaceArgument(7, [

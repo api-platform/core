@@ -92,7 +92,7 @@ trait ItemNormalizerTrait
 
         // Surface the client-generated id so the entity setter receives it.
         if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
-            $dataToDenormalize[ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES['id']] = $data['data']['id'];
+            $dataToDenormalize[$this->nameConverter?->normalize('id', $type, self::FORMAT) ?? 'id'] = $data['data']['id'];
         }
 
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
