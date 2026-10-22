@@ -129,6 +129,25 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
             }
         }
 
+        foreach (['oneOf', 'anyOf'] as $key) {
+            if (!\is_array($schema[$key] ?? null)) {
+                continue;
+            }
+
+            $members = array_values(array_filter($schema[$key], static fn ($member) => ['type' => 'null'] !== $member));
+            if (\count($members) === \count($schema[$key])) {
+                continue;
+            }
+
+            unset($schema[$key]);
+            if (1 === \count($members) && !isset($members[0]['$ref'])) {
+                $schema += $members[0];
+            } elseif ([] !== $members) {
+                $schema[$key] = $members;
+            }
+            $schema['nullable'] = true;
+        }
+
         if (\array_key_exists('examples', $schema)) {
             $schema['example'] = $schema['examples'];
             unset($schema['examples']);

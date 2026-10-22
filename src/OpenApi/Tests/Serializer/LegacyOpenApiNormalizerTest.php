@@ -152,6 +152,37 @@ final class LegacyOpenApiNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']));
     }
 
+    public function testConvertsNullTypeMemberOfOneOfToNullable(): void
+    {
+        $document = [
+            'openapi' => '3.1.0',
+            'components' => ['schemas' => [
+                'Dummy' => [
+                    'properties' => [
+                        'inline' => ['oneOf' => [['type' => 'null'], ['type' => 'object', 'properties' => ['id' => ['type' => 'string']]]]],
+                        'reference' => ['oneOf' => [['type' => 'null'], ['$ref' => '#/components/schemas/Other']]],
+                        'several' => ['anyOf' => [['type' => 'string'], ['type' => 'null'], ['type' => 'integer']]],
+                    ],
+                ],
+            ]],
+        ];
+
+        $expected = [
+            'openapi' => '3.0.0',
+            'components' => ['schemas' => [
+                'Dummy' => [
+                    'properties' => [
+                        'inline' => ['type' => 'object', 'properties' => ['id' => ['type' => 'string']], 'nullable' => true],
+                        'reference' => ['oneOf' => [['$ref' => '#/components/schemas/Other']], 'nullable' => true],
+                        'several' => ['anyOf' => [['type' => 'string'], ['type' => 'integer']], 'nullable' => true],
+                    ],
+                ],
+            ]],
+        ];
+
+        $this->assertSame($expected, $this->buildNormalizer($document)->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']));
+    }
+
     public function testRecursesIntoItems(): void
     {
         $document = [
