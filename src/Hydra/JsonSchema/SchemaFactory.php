@@ -109,7 +109,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Strictly speaking, it is possible to include `@id` or `@context` in the input,
         // but the generated JSON Schema does not include `"additionalProperties": false` by default,
         // so it is possible to include `@id` or `@context` in the input even if the input schema is a JSON schema.
-        if (Schema::TYPE_INPUT === $type) {
+        if (Schema::TYPE_INPUT === $type && 'jsonapi' !== $format) {
             $format = 'json';
         }
 
