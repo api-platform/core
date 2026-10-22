@@ -71,7 +71,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         ],
         'attributes' => [
             'type' => 'object',
-            'properties' => [],
         ],
     ];
 
@@ -350,7 +349,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $replacement = self::PROPERTY_PROPS;
-        $replacement['attributes']['properties'] = $attributes;
+        if ([] !== $attributes) {
+            $replacement['attributes']['properties'] = $attributes;
+        }
 
         $included = [];
         if (\count($relationships) > 0) {

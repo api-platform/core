@@ -18,7 +18,11 @@ use ApiPlatform\Doctrine\Orm\Tests\DoctrineOrmFilterTestCase;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\DummyDate;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\DummyImmutableDate;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\DummyUtcDate;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>
@@ -54,6 +58,71 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
 
         $this->assertEquals(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
         $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
+    }
+
+    #[DataProvider('provideUtcDateTypes')]
+    public function testApplyUtcDate(string $property, string $type): void
+    {
+        $filter = new DateFilter($this->managerRegistry, null, [$property => null]);
+        $value = '2026-10-21T14:30:00+02:00';
+        $dateClass = str_contains($type, '_immutable') ? \DateTimeImmutable::class : \DateTime::class;
+
+        foreach (['before' => '<=', 'strictly_before' => '<', 'after' => '>=', 'strictly_after' => '>'] as $operator => $comparison) {
+            $queryBuilder = $this->managerRegistry->getManagerForClass(DummyUtcDate::class)->getRepository(DummyUtcDate::class)->createQueryBuilder('o');
+            $filter->apply($queryBuilder, new QueryNameGenerator(), DummyUtcDate::class, null, ['filters' => [$property => [$operator => $value]]]);
+
+            $this->assertSame(\sprintf('SELECT o FROM %s o WHERE o.%s %s :%s_p1', DummyUtcDate::class, $property, $comparison, $property), $queryBuilder->getDQL());
+            $parameter = $queryBuilder->getParameter($property.'_p1');
+            $this->assertNotNull($parameter);
+            $this->assertSame($type, $parameter->getType());
+            $this->assertInstanceOf($dateClass, $parameter->getValue());
+            $this->assertSame($value, $parameter->getValue()->format(\DateTimeInterface::ATOM));
+        }
+    }
+
+    #[DataProvider('provideUtcDateTypes')]
+    public function testApplyUtcDateNormalizesDatabaseValue(string $property, string $type): void
+    {
+        if (!Type::hasType($type)) {
+            $this->markTestSkipped('UTC datetime types require Doctrine DBAL 4.5 or later.');
+        }
+
+        $manager = $this->managerRegistry->getManagerForClass(DummyUtcDate::class);
+        $this->assertInstanceOf(EntityManagerInterface::class, $manager);
+        $queryBuilder = $manager->getRepository(DummyUtcDate::class)->createQueryBuilder('o');
+        $filter = new DateFilter($this->managerRegistry, null, [$property => null]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), DummyUtcDate::class, null, ['filters' => [$property => ['after' => '2026-10-21T14:30:00+02:00']]]);
+
+        $parameter = $queryBuilder->getParameter($property.'_p1');
+        $this->assertNotNull($parameter);
+        $this->assertSame('2026-10-21 12:30:00', Type::getType($parameter->getType())->convertToDatabaseValue($parameter->getValue(), $manager->getConnection()->getDatabasePlatform()));
+        $this->assertSame('2026-10-21T14:30:00+02:00', $parameter->getValue()->format(\DateTimeInterface::ATOM));
+    }
+
+    #[DataProvider('provideUtcDateTypes')]
+    public function testGetDescriptionUtcDate(string $property, string $type): void
+    {
+        foreach ([null, [$property => null]] as $properties) {
+            $filter = new DateFilter($this->managerRegistry, null, $properties);
+            $description = $filter->getDescription(DummyUtcDate::class);
+
+            $this->assertCount(null === $properties ? 8 : 4, $description);
+            foreach (['before', 'strictly_before', 'after', 'strictly_after'] as $operator) {
+                $this->assertSame([
+                    'property' => $property,
+                    'type' => \DateTimeInterface::class,
+                    'required' => false,
+                ], $description[$property.'['.$operator.']']);
+            }
+        }
+    }
+
+    public static function provideUtcDateTypes(): array
+    {
+        return [
+            'mutable' => ['date', 'datetime_utc'],
+            'immutable' => ['immutableDate', 'datetime_utc_immutable'],
+        ];
     }
 
     public static function provideApplyTestData(): array
