@@ -69,6 +69,9 @@
         "symfony/validator": "^7.4 || ^8.0",
         "webonyx/graphql-php": "^15.0"
     },
+    "conflict": {
+        "symfony/framework-bundle": "<7.4"
+    },
     "suggest": {
         "ext-deepclone": "To speed up the PHP files metadata cache with symfony/var-exporter 8.1+ (install symfony/deepclone with PIE).",
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
