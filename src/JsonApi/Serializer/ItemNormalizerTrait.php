@@ -79,10 +79,10 @@ trait ItemNormalizerTrait
             }
         }
 
-        $dataToDenormalize = array_merge(
-            $data['data']['attributes'] ?? [],
-            $data['data']['relationships'] ?? []
-        );
+        $dataToDenormalize = $data['data']['attributes'] ?? [];
+        foreach ($data['data']['relationships'] ?? [] as $name => $relationship) {
+            $dataToDenormalize[$name] = \is_array($relationship) && \array_key_exists('data', $relationship) ? $relationship['data'] : $relationship;
+        }
 
         // Surface the client-generated id so the entity setter receives it.
         if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
