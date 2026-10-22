@@ -146,13 +146,16 @@ final class DateFilter implements DateFilterInterface, FilterInterface, JsonSche
     use NameConverterAwareTrait;
     use PropertyAwareFilterTrait;
 
+    // Use literal UTC type names for compatibility with Doctrine DBAL versions before 4.5.
     public const DOCTRINE_DATE_TYPES = [
         Types::DATE_MUTABLE => true,
         Types::DATETIME_MUTABLE => true,
+        'datetime_utc' => true,
         Types::DATETIMETZ_MUTABLE => true,
         Types::TIME_MUTABLE => true,
         Types::DATE_IMMUTABLE => true,
         Types::DATETIME_IMMUTABLE => true,
+        'datetime_utc_immutable' => true,
         Types::DATETIMETZ_IMMUTABLE => true,
         Types::TIME_IMMUTABLE => true,
     ];
