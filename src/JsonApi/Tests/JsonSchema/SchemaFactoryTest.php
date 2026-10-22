@@ -120,7 +120,6 @@ class SchemaFactoryTest extends TestCase
                     ],
                     'attributes' => [
                         'type' => 'object',
-                        'properties' => [],
                     ],
                 ],
                 'required' => [
