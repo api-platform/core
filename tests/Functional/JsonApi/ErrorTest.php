@@ -17,6 +17,7 @@ use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\ErrorProblem;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiErrorTestResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ErrorTest extends ApiTestCase
 {
@@ -112,5 +113,48 @@ class ErrorTest extends ApiTestCase
         $this->assertSame('404', $body['errors'][0]['status']);
         $this->assertArrayHasKey('detail', $body['errors'][0]);
         $this->assertArrayHasKey('type', $body['errors'][0]);
+    }
+
+    public function testRouterNotFoundRendersJsonApiErrorObject(): void
+    {
+        $response = $this->requestWithSymfonyErrorHandling('GET', '/does_not_exist');
+
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
+        $error = $response->toArray(false)['errors'][0];
+        $this->assertSame('/errors/404', $error['id']);
+        $this->assertSame('An error occurred', $error['title']);
+        $this->assertStringContainsString('No route found', $error['detail']);
+        $this->assertSame('404', $error['status']);
+        $this->assertSame('404', $error['code']);
+        $this->assertSame('/errors/404', $error['type']);
+        $this->assertSame(['type' => '/errors/404'], $error['links']);
+    }
+
+    public function testMethodNotAllowedRendersJsonApiErrorObject(): void
+    {
+        $response = $this->requestWithSymfonyErrorHandling('DELETE', '/jsonapi_error_test/existing');
+
+        $this->assertResponseStatusCodeSame(405);
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
+        $error = $response->toArray(false)['errors'][0];
+        $this->assertSame('/errors/405', $error['id']);
+        $this->assertSame('An error occurred', $error['title']);
+        $this->assertStringContainsString('Method Not Allowed', $error['detail']);
+        $this->assertSame('405', $error['status']);
+        $this->assertSame('405', $error['code']);
+        $this->assertSame('/errors/405', $error['type']);
+        $this->assertSame(['type' => '/errors/405'], $error['links']);
+    }
+
+    private function requestWithSymfonyErrorHandling(string $method, string $uri): ResponseInterface
+    {
+        $client = self::createClient();
+        $client->disableReboot();
+        static::getContainer()->get('api_platform.listener.exception')->handleSymfonyErrors = false;
+
+        return $client->request($method, $uri, [
+            'headers' => ['accept' => 'application/vnd.api+json'],
+        ]);
     }
 }
