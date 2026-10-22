@@ -96,7 +96,7 @@ return [
 
         // Require the "type" member of JSON:API request resource objects (400
         // when missing) and reject a "type" that does not match the endpoint
-        // resource on POST (409 Conflict). Off by default.
+        // resource on POST, PUT and PATCH (409 Conflict). Off by default.
         'strict_resource_type' => false,
     ],
 

@@ -111,7 +111,7 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->booleanNode('strict_resource_type')
                             ->defaultFalse()
-                            ->info('Require the "type" member of JSON:API request resource objects (400 when missing) and reject a "type" that does not match the endpoint resource on POST (409 Conflict), per https://jsonapi.org/format/#crud-creating-responses-409.')
+                            ->info('Require the "type" member of JSON:API request resource objects (400 when missing) and reject a "type" that does not match the endpoint resource on POST, PUT and PATCH (409 Conflict), per https://jsonapi.org/format/#crud-creating-responses-409.')
                         ->end()
                     ->end()
                 ->end()
