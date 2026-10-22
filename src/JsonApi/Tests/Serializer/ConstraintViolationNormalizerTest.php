@@ -71,21 +71,27 @@ class ConstraintViolationNormalizerTest extends TestCase
             [
                 'errors' => [
                     [
+                        'status' => '422',
+                        'title' => 'Validation Failed',
                         'detail' => 'This value should not be null.',
                         'source' => [
-                            'pointer' => 'data/relationships/relatedDummy',
+                            'pointer' => '/data/relationships/relatedDummy',
                         ],
                     ],
                     [
+                        'status' => '422',
+                        'title' => 'Validation Failed',
                         'detail' => 'This value should not be null.',
                         'source' => [
-                            'pointer' => 'data/attributes/name',
+                            'pointer' => '/data/attributes/name',
                         ],
                     ],
                     [
+                        'status' => '422',
+                        'title' => 'Validation Failed',
                         'detail' => 'Unknown violation.',
                         'source' => [
-                            'pointer' => 'data',
+                            'pointer' => '/data',
                         ],
                     ],
                 ],
@@ -111,9 +117,11 @@ class ConstraintViolationNormalizerTest extends TestCase
             [
                 'errors' => [
                     [
+                        'status' => '422',
+                        'title' => 'Validation Failed',
                         'detail' => 'Invalid page value.',
                         'source' => [
-                            'pointer' => 'data/attributes/page',
+                            'pointer' => '/data/attributes/page',
                         ],
                     ],
                 ],
@@ -140,9 +148,11 @@ class ConstraintViolationNormalizerTest extends TestCase
             [
                 'errors' => [
                     [
+                        'status' => '422',
+                        'title' => 'Validation Failed',
                         'detail' => 'Invalid value.',
                         'source' => [
-                            'pointer' => 'data/attributes/field',
+                            'pointer' => '/data/attributes/field',
                         ],
                     ],
                 ],

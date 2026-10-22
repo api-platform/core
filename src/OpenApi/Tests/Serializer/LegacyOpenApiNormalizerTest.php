@@ -152,6 +152,37 @@ final class LegacyOpenApiNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']));
     }
 
+    public function testConvertsNullTypeMemberOfOneOfToNullable(): void
+    {
+        $document = [
+            'openapi' => '3.1.0',
+            'components' => ['schemas' => [
+                'Dummy' => [
+                    'properties' => [
+                        'inline' => ['oneOf' => [['type' => 'null'], ['type' => 'object', 'properties' => ['id' => ['type' => 'string']]]]],
+                        'reference' => ['oneOf' => [['type' => 'null'], ['$ref' => '#/components/schemas/Other']]],
+                        'several' => ['anyOf' => [['type' => 'string'], ['type' => 'null'], ['type' => 'integer']]],
+                    ],
+                ],
+            ]],
+        ];
+
+        $expected = [
+            'openapi' => '3.0.0',
+            'components' => ['schemas' => [
+                'Dummy' => [
+                    'properties' => [
+                        'inline' => ['type' => 'object', 'properties' => ['id' => ['type' => 'string']], 'nullable' => true],
+                        'reference' => ['oneOf' => [['$ref' => '#/components/schemas/Other']], 'nullable' => true],
+                        'several' => ['anyOf' => [['type' => 'string'], ['type' => 'integer']], 'nullable' => true],
+                    ],
+                ],
+            ]],
+        ];
+
+        $this->assertSame($expected, $this->buildNormalizer($document)->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']));
+    }
+
     public function testRecursesIntoItems(): void
     {
         $document = [
@@ -344,6 +375,21 @@ final class LegacyOpenApiNormalizerTest extends TestCase
         $schema = $result['paths']['/dummies']['post']['requestBody']['content']['application/json']['schema'];
         $this->assertSame('object', $schema['type']);
         $this->assertSame(['type' => 'string', 'nullable' => true], $schema['properties']['name']);
+    }
+
+    public function testRemovesKeysNotDefinedIn30(): void
+    {
+        $document = [
+            'openapi' => '3.1.0',
+            'jsonSchemaDialect' => 'https://spec.openapis.org/oas/3.1/dialect/base',
+            'components' => ['schemas' => []],
+            'webhooks' => new \ArrayObject(),
+        ];
+
+        $normalizer = $this->buildNormalizer($document);
+        $result = $normalizer->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']);
+
+        $this->assertSame(['openapi' => '3.0.0', 'components' => ['schemas' => []]], $result);
     }
 
     private function buildNormalizer(array $document): LegacyOpenApiNormalizer

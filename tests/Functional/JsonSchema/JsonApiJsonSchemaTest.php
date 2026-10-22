@@ -59,7 +59,8 @@ class JsonApiJsonSchemaTest extends ApiTestCase
     {
         $speciesSchema = $this->schemaFactory->buildSchema(Issue6317::class, 'jsonapi', Schema::TYPE_OUTPUT);
         $this->assertEquals('#/definitions/Issue6317.jsonapi', $speciesSchema['$ref']);
-        $data = $speciesSchema['definitions']['Issue6317.jsonapi']['properties']['data'];
+        $this->assertSame(['$ref' => '#/definitions/Issue6317.jsonapi.resource'], $speciesSchema['definitions']['Issue6317.jsonapi']['properties']['data']);
+        $data = $speciesSchema['definitions']['Issue6317.jsonapi.resource'];
         $this->assertSame('object', $data['type']);
         $this->assertSame(['type' => 'string'], $data['properties']['id']);
         $this->assertSame(['type' => 'string'], $data['properties']['type']);
@@ -82,40 +83,40 @@ class JsonApiJsonSchemaTest extends ApiTestCase
 
         $questionSchema = $this->schemaFactory->buildSchema(Question::class, 'jsonapi', Schema::TYPE_OUTPUT);
         $json = $questionSchema->getDefinitions();
-        $properties = $json['Question.jsonapi']['properties']['data']['properties'];
+        $properties = $json['Question.jsonapi.resource']['properties'];
         $included = $json['Question.jsonapi']['properties']['included'];
 
         $this->assertArrayHasKey('answer', $properties['relationships']['properties']);
         $this->assertArrayHasKey('anyOf', $included['items']);
         $this->assertCount(1, $included['items']['anyOf']);
         $this->assertArrayHasKey('$ref', $included['items']['anyOf'][0]);
-        $this->assertSame('#/definitions/Answer.jsonapi', $included['items']['anyOf'][0]['$ref']);
+        $this->assertSame('#/definitions/Answer.jsonapi.resource', $included['items']['anyOf'][0]['$ref']);
     }
 
     public function testJsonApiIncludesSchemaForAnimalObservation(): void
     {
         $animalObservationSchema = $this->schemaFactory->buildSchema(AnimalObservation::class, 'jsonapi', Schema::TYPE_OUTPUT);
         $json = $animalObservationSchema->getDefinitions();
-        $properties = $json['AnimalObservation.jsonapi']['properties']['data']['properties'];
+        $properties = $json['AnimalObservation.jsonapi.resource']['properties'];
         $included = $json['AnimalObservation.jsonapi']['properties']['included'];
 
         $this->assertArrayHasKey('individuals', $properties['relationships']['properties']);
         $this->assertArrayHasKey('anyOf', $included['items']);
         $this->assertCount(1, $included['items']['anyOf']);
-        $this->assertSame('#/definitions/Animal.jsonapi', $included['items']['anyOf'][0]['$ref']);
+        $this->assertSame('#/definitions/Animal.jsonapi.resource', $included['items']['anyOf'][0]['$ref']);
     }
 
     public function testJsonApiIncludesSchemaForAnimal(): void
     {
         $animalSchema = $this->schemaFactory->buildSchema(Animal::class, 'jsonapi', Schema::TYPE_OUTPUT);
         $json = $animalSchema->getDefinitions();
-        $properties = $json['Animal.jsonapi']['properties']['data']['properties'];
+        $properties = $json['Animal.jsonapi.resource']['properties'];
         $included = $json['Animal.jsonapi']['properties']['included'];
 
         $this->assertArrayHasKey('species', $properties['relationships']['properties']);
         $this->assertArrayHasKey('anyOf', $included['items']);
         $this->assertCount(1, $included['items']['anyOf']);
-        $this->assertSame('#/definitions/Species.jsonapi', $included['items']['anyOf'][0]['$ref']);
+        $this->assertSame('#/definitions/Species.jsonapi.resource', $included['items']['anyOf'][0]['$ref']);
     }
 
     public function testJsonApiIncludesSchemaForSpecies(): void
@@ -131,30 +132,25 @@ class JsonApiJsonSchemaTest extends ApiTestCase
                         'properties' => [
                             'data' => [
                                 'type' => 'array',
-                                'items' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'id' => [
-                                            'type' => 'string',
-                                        ],
-                                        'type' => [
-                                            'type' => 'string',
-                                        ],
-                                        'attributes' => [
-                                            'type' => 'object',
-                                        ],
-                                    ],
-                                    'required' => [
-                                        'type',
-                                        'id',
-                                    ],
-                                ],
+                                'items' => ['$ref' => '#/definitions/Species.jsonapi.resource'],
                             ],
                         ],
                     ],
                 ],
             ],
             $speciesSchema->getArrayCopy()
+        );
+        $this->assertArraySubset(
+            [
+                'type' => 'object',
+                'properties' => [
+                    'id' => ['type' => 'string'],
+                    'type' => ['type' => 'string'],
+                    'attributes' => ['type' => 'object'],
+                ],
+                'required' => ['type', 'id'],
+            ],
+            $speciesSchema->getDefinitions()['Species.jsonapi.resource']
         );
     }
 }

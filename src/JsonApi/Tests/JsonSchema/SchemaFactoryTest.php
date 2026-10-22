@@ -24,6 +24,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -105,7 +107,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']));
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
-        $this->assertArrayHasKey('data', $properties);
+        $this->assertSame(['$ref' => '#/definitions/'.$rootDefinitionKey.'.resource'], $properties['data']);
         $this->assertEquals(
             [
                 'type' => 'object',
@@ -126,7 +128,7 @@ class SchemaFactoryTest extends TestCase
                     'id',
                 ],
             ],
-            $properties['data']
+            $definitions[$rootDefinitionKey.'.resource']
         );
     }
 
@@ -160,19 +162,27 @@ class SchemaFactoryTest extends TestCase
         $objectSchema = $resultSchema['allOf'][1];
         $this->assertArrayHasKey('data', $objectSchema['properties']);
 
-        $this->assertArrayHasKey('items', $objectSchema['properties']['data']);
-        $this->assertArrayNotHasKey('$ref', $objectSchema['properties']['data']['items']['properties']['attributes']);
-        $this->assertSame('object', $objectSchema['properties']['data']['items']['properties']['attributes']['type']);
+        $this->assertSame(['$ref' => '#/definitions/Dummy.jsonapi.resource'], $objectSchema['properties']['data']['items']);
 
-        $properties = $objectSchema['properties'];
-        $this->assertArrayHasKey('data', $properties);
-        $this->assertArrayHasKey('items', $properties['data']);
-        $this->assertArrayHasKey('id', $properties['data']['items']['properties']);
-        $this->assertArrayHasKey('type', $properties['data']['items']['properties']);
-        $this->assertArrayHasKey('attributes', $properties['data']['items']['properties']);
+        $resource = $resultSchema['definitions']['Dummy.jsonapi.resource'];
+        $this->assertArrayNotHasKey('$ref', $resource['properties']['attributes']);
+        $this->assertSame('object', $resource['properties']['attributes']['type']);
+        $this->assertArrayHasKey('id', $resource['properties']);
+        $this->assertArrayHasKey('type', $resource['properties']);
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
+    }
+
+    public function testCollectionBaseSchemaNoPaginationDeclaresDataItems(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, new GetCollection(paginationEnabled: false));
+
+        $this->assertSame('#/definitions/JsonApiCollectionBaseSchemaNoPagination', $resultSchema['allOf'][0]['$ref']);
+
+        $data = $resultSchema['definitions']['JsonApiCollectionBaseSchemaNoPagination']['properties']['data'];
+        $this->assertSame('array', $data['type']);
+        $this->assertSame(['type' => 'object'], $data['items']);
     }
 
     public function testPostInputSchemaDoesNotRequireId(): void
@@ -181,8 +191,8 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']['data']));
-        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $this->assertSame(['$ref' => '#/definitions/'.$rootDefinitionKey.'.resource'], $definitions[$rootDefinitionKey]['properties']['data']);
+        $data = $definitions[$rootDefinitionKey.'.resource'];
         $this->assertArrayHasKey('required', $data);
         $this->assertSame(['type'], $data['required']);
     }
@@ -193,7 +203,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $data = $definitions[$rootDefinitionKey.'.resource'];
         $this->assertSame(['type', 'id'], $data['required']);
     }
 
@@ -203,7 +213,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $data = $definitions[$rootDefinitionKey.'.resource'];
         $this->assertSame(['type', 'id'], $data['required']);
     }
 
@@ -214,7 +224,7 @@ class SchemaFactoryTest extends TestCase
 
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $dataProperties = $definitions[$rootDefinitionKey]['properties']['data']['properties'];
+        $dataProperties = $definitions[$rootDefinitionKey.'.resource']['properties'];
 
         $this->assertArrayHasKey('attributes', $dataProperties);
         $this->assertArrayNotHasKey('$ref', $dataProperties['attributes']);
@@ -238,7 +248,7 @@ class SchemaFactoryTest extends TestCase
 
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $dataProperties = $definitions[$rootDefinitionKey]['properties']['data']['properties'];
+        $dataProperties = $definitions[$rootDefinitionKey.'.resource']['properties'];
 
         // a resource identifier object MUST contain type and id, @see https://jsonapi.org/format/#document-resource-identifier-objects
         $linkage = $dataProperties['relationships']['properties']['relatedDummy']['properties']['data']['oneOf'][1];
@@ -256,14 +266,40 @@ class SchemaFactoryTest extends TestCase
         $included = $definitions[$rootDefinitionKey]['properties']['included'];
 
         $refs = array_column($included['items']['anyOf'], '$ref');
-        $this->assertContains('#/definitions/RelatedDummy.jsonapi', $refs);
-        $this->assertContains('#/definitions/OtherRelatedDummy.jsonapi', $refs, 'every target of a polymorphic relation must be listed in included');
+        $this->assertContains('#/definitions/RelatedDummy.jsonapi.resource', $refs);
+        $this->assertContains('#/definitions/OtherRelatedDummy.jsonapi.resource', $refs, 'every target of a polymorphic relation must be listed in included');
     }
 
-    private function buildSchemaFactoryWithPolymorphicRelation(): SchemaFactory
+    public function testIncludedReferencesNotExposedRelatedResource(): void
+    {
+        $schemaFactory = $this->buildSchemaFactoryWithRelation((new NotExposed())->withClass(RelatedDummy::class)->withShortName('RelatedDummy'));
+        $resultSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonapi');
+
+        $definitions = $resultSchema->getDefinitions();
+        $included = $definitions[$resultSchema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertSame([['$ref' => '#/definitions/RelatedDummy.jsonapi.resource']], $included['items']['anyOf']);
+        $this->assertArrayHasKey('RelatedDummy.jsonapi', $definitions);
+    }
+
+    public function testIncludedListsExposedAndNotExposedTargets(): void
+    {
+        $schemaFactory = $this->buildSchemaFactoryWithPolymorphicRelation((new NotExposed())->withClass(RelatedDummy::class)->withShortName('RelatedDummy'));
+        $resultSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonapi');
+
+        $definitions = $resultSchema->getDefinitions();
+        $included = $definitions[$resultSchema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertEqualsCanonicalizing(
+            [['$ref' => '#/definitions/RelatedDummy.jsonapi.resource'], ['$ref' => '#/definitions/OtherRelatedDummy.jsonapi.resource']],
+            $included['items']['anyOf']
+        );
+    }
+
+    private function buildSchemaFactoryWithPolymorphicRelation(?Operation $relatedOperation = null): SchemaFactory
     {
         $dummyOperation = (new Get())->withName('get')->withShortName('Dummy');
-        $relatedOperation = (new Get())->withName('get')->withShortName('RelatedDummy');
+        $relatedOperation ??= (new Get())->withName('get')->withShortName('RelatedDummy');
         $otherRelatedOperation = (new Get())->withName('get')->withShortName('OtherRelatedDummy');
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -335,10 +371,10 @@ class SchemaFactoryTest extends TestCase
         );
     }
 
-    private function buildSchemaFactoryWithRelation(): SchemaFactory
+    private function buildSchemaFactoryWithRelation(?Operation $relatedOperation = null): SchemaFactory
     {
         $dummyOperation = (new Get())->withName('get')->withShortName('Dummy');
-        $relatedOperation = (new Get())->withName('get')->withShortName('RelatedDummy');
+        $relatedOperation ??= (new Get())->withName('get')->withShortName('RelatedDummy');
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(Dummy::class)->willReturn(

@@ -40,8 +40,9 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
-use Symfony\Component\Translation\Command\TranslationExtractCommand;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -190,16 +191,20 @@ class ApiPlatformExtensionTest extends TestCase
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function testObjectMapperDoesNotLoadDeprecatedTranslationCommand(): void
+    public function testObjectMapperGateDoesNotAutoloadTranslationCommands(): void
     {
-        if (!class_exists(TranslationExtractCommand::class)) {
-            self::markTestSkipped('Requires the Symfony 8.2 translation command.');
-        }
+        spl_autoload_register(static function (string $class): void {
+            if ('Symfony\\Component\\Translation\\Command\\TranslationExtractCommand' === $class || FrameworkTranslationExtractCommand::class === $class) {
+                throw new \Error(\sprintf('Class "%s" must not be autoloaded.', $class));
+            }
+        }, true, true);
 
         (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
 
-        self::assertTrue($this->container->hasDefinition('api_platform.object_mapper.metadata_factory'));
-        self::assertFalse(class_exists(FrameworkTranslationExtractCommand::class, false));
+        self::assertSame(
+            class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle']),
+            $this->container->hasDefinition('api_platform.object_mapper.metadata_factory')
+        );
     }
 
     public function testCommonConfiguration(): void

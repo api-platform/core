@@ -120,6 +120,6 @@ return static function (ContainerConfigurator $container) {
         ->tag('serializer.normalizer', ['priority' => -780]);
 
     $services->set('api_platform.jsonapi.normalizer.error', ErrorNormalizer::class)
-        ->args([service('api_platform.jsonapi.normalizer.item')])
+        ->args([service('api_platform.jsonapi.normalizer.item'), service('serializer.normalizer.problem')->nullOnInvalid()])
         ->tag('serializer.normalizer', ['priority' => -790]);
 };
