@@ -1,5 +1,37 @@
 # Changelog
 
+## v5.1.0 (unreleased)
+
+API Platform 5.1 contains every change shipped in the v5.0.x releases, plus the changes below.
+
+### Notes
+
+* JSON:API: a `PATCH` or `PUT` whose `data.id` does not match the endpoint now returns `409 Conflict`, as the specification requires; it used to be applied to the endpoint's resource ([#8752](https://github.com/api-platform/core/pull/8752)). With `jsonapi.strict_resource_type` enabled, a mismatched `data.type` also returns `409` on `PATCH` and `PUT`, not only on `POST`.
+* JSON:API: `jsonapi.strict_member_names` (off by default) exposes the `id` and `type` properties as `resourceId` and `resourceType` attributes instead of `_id` and `_type`, which are not valid member names, and stops renaming `links`, `relationships` and `included` ([#8752](https://github.com/api-platform/core/pull/8752)).
+
+### Breaking changes
+
+* [eb915e2a1](https://github.com/api-platform/core/commit/eb915e2a19a7a53b4d508ebae7cd9e4eea30b57b) fix(jsonapi)!: drop non-spec type member from error objects (#8732)
+* JSON:API error objects no longer carry a top-level `type` member; read `links.type` instead ([#8732](https://github.com/api-platform/core/pull/8732)).
+
+### Features
+
+* [9090a0dbd](https://github.com/api-platform/core/commit/9090a0dbd63571ca2726b228c54b4d4e85870ec4) feat(jsonapi): spec-compliant PATCH conflicts and member names (#8752)
+* [bcb592abe](https://github.com/api-platform/core/commit/bcb592abe627ce303f31883479c1df681c92df72) feat(jsonapi): opt-in strict resource type check on write (#8739)
+* [23c4876d1](https://github.com/api-platform/core/commit/23c4876d1726b17826fbc8901791f8f843eadf42) feat(doctrine): add an input format to DateFilter (#8678)
+* [70abf9361](https://github.com/api-platform/core/commit/70abf9361f91ed510132e0527c938af9fe0518f0) feat(metadata): add ScalarHeaderParameter (#8679)
+* [6f77a4d70](https://github.com/api-platform/core/commit/6f77a4d70fea96bdc1c259749cecfdeb135e9704) feat(openapi): accept Tag objects in operation tags (#8618)
+* [d067679df](https://github.com/api-platform/core/commit/d067679df769f911132f0e56c5cc3622831b0301) feat(hydra): hydra:title from property jsonldContext (#8616)
+* [2c956d173](https://github.com/api-platform/core/commit/2c956d173fcaf429f4d01bee2ae3dcf84f8fa812) feat(metadata): ResponseHeaderParameter for declaring HTTP response headers (#7875)
+* [557623c16](https://github.com/api-platform/core/commit/557623c1606d908b6eda68d1bbe36eaa108e4089) feat(hydra): normalize Hydra\Collection objects (#8539)
+* [e22e9210e](https://github.com/api-platform/core/commit/e22e9210e77a2939d0a12fb408392e4c43cb4647) feat(symfony): map ForeignKeyConstraintViolationException to 409 by default (#8548)
+
+### Bug fixes
+
+* [45dad9480](https://github.com/api-platform/core/commit/45dad94802963c8039a8a10e0b47d9ed0f82501a) fix(metadata): match parameter subclasses in Parameters lookups (#8710)
+* [2bba68f6c](https://github.com/api-platform/core/commit/2bba68f6c9dc83609759c48abdad9bc7c2880c4f) fix(openapi): document array query params once (#8638)
+* [e3fe5cd57](https://github.com/api-platform/core/commit/e3fe5cd5743ac56f3ba36daa3fc91afe2e24d734) fix(jsonld): filter @context by serializer groups (#8563)
+
 ## v5.0.4
 
 API Platform 5.0.4 contains every change shipped in [v4.4.5](#v445), plus the changes below.
