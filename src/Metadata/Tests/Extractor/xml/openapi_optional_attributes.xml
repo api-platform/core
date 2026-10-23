@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+           https://api-platform.com/schema/metadata/resources-3.0.xsd">
+    <resource class="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program">
+        <operations>
+            <operation class="ApiPlatform\Metadata\Post">
+                <openapi>
+                    <externalDocs description="More about programs" url="https://example.com/programs"/>
+                    <parameters>
+                        <parameter name="format" in="query"/>
+                    </parameters>
+                    <requestBody/>
+                </openapi>
+            </operation>
+        </operations>
+    </resource>
+</resources>
