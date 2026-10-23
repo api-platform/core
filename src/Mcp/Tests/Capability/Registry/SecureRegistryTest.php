@@ -34,6 +34,26 @@ use PHPUnit\Framework\TestCase;
 
 class SecureRegistryTest extends TestCase
 {
+    public function testListChangePublishingCapabilityIsForwarded(): void
+    {
+        $inner = $this->createMock(ListChangePublishingRegistryInterface::class);
+        $inner->expects($this->exactly(2))->method('publishesListChanges')->willReturn(true, false);
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->never())->method('load');
+
+        $registry = new SecureRegistry($inner, $loader);
+
+        $this->assertTrue($registry->publishesListChanges());
+        $this->assertFalse($registry->publishesListChanges());
+    }
+
+    public function testRegistryWithoutNotificationPublishingReturnsFalse(): void
+    {
+        $registry = new SecureRegistry(new Registry(), $this->createStub(LoaderInterface::class));
+
+        $this->assertFalse($registry->publishesListChanges());
+    }
+
     public function testToolsAreLoadedIntoTheRegistryOnFirstRead(): void
     {
         $inputSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
@@ -248,4 +268,10 @@ class SecureRegistryTest extends TestCase
             $accessChecker,
         );
     }
+}
+
+// Keep the forwarding test runnable with both SDK 0.8 and 0.9.
+interface ListChangePublishingRegistryInterface extends RegistryInterface
+{
+    public function publishesListChanges(): bool;
 }

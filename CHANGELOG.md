@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Bug fixes
+
+* fix(mcp): support MCP SDK 0.9 by forwarding the registry list-change publishing capability.
+
 ## v5.0.5
 
 API Platform 5.0.5 contains every change shipped in [v4.4.6](#v446), plus the changes below.

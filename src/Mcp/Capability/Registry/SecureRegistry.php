@@ -103,6 +103,12 @@ final class SecureRegistry implements RegistryInterface
         $this->inner->unregisterPrompt($name);
     }
 
+    public function publishesListChanges(): bool
+    {
+        // MCP SDK 0.8 does not expose this capability.
+        return method_exists($this->inner, 'publishesListChanges') && $this->inner->publishesListChanges();
+    }
+
     public function hasTool(string $name): bool
     {
         $this->load();
