@@ -54,7 +54,7 @@ final class ApiProperty
      * @param Type|null                                                                                                                                   $nativeType              The internal PHP type
      */
     public function __construct(
-        private ?string $description = null,
+        private string|\Stringable|null $description = null,
         private ?bool $readable = null,
         private ?bool $writable = null,
         private ?bool $readableLink = null,
@@ -240,10 +240,10 @@ final class ApiProperty
 
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description instanceof \Stringable ? (string) $this->description : $this->description;
     }
 
-    public function withDescription(string $description): static
+    public function withDescription(string|\Stringable $description): static
     {
         $self = clone $this;
         $self->description = $description;
