@@ -1,5 +1,26 @@
 # Changelog
 
+## v5.0.5
+
+API Platform 5.0.5 contains every change shipped in [v4.4.6](#v446), plus the changes below.
+
+### Bug fixes
+
+* [c1e21bb9d](https://github.com/api-platform/core/commit/c1e21bb9dba677be3e2903e16f328abeb939f705) fix(jsonapi): reject malformed request documents (#8736)
+* [3f081fece](https://github.com/api-platform/core/commit/3f081fecead21ab1705dea984f2527479d18faaf) fix(jsonapi): unwrap relationship linkage before denormalization (#8730)
+* [5974d943e](https://github.com/api-platform/core/commit/5974d943e07083aede1388453140e371a21855ef) fix(jsonapi): normalize symfony-rendered errors (#8731)
+* [acc6bfc26](https://github.com/api-platform/core/commit/acc6bfc265af71c2059da2cda0ab85d1a210b19d) fix(jsonapi): add status and title, fix pointer (#8755)
+* [a446a4f38](https://github.com/api-platform/core/commit/a446a4f3836ca0c8c2ec322fde10d1e808b60817) fix(jsonapi): keep bracket page param in links (#8753)
+* [4601b50b1](https://github.com/api-platform/core/commit/4601b50b1cb0006abf1b27028f95b1b8419c7447) fix(jsonapi): emit no empty properties list in attributes (#8757)
+* [1ad0bb44d](https://github.com/api-platform/core/commit/1ad0bb44df7822668f6eac6bbe1ae31a9a946f04) fix(jsonapi): split schema relationships on the input/output class (#8728)
+* [e03a71b60](https://github.com/api-platform/core/commit/e03a71b600547224340f62a9eb8a8a2c22bd5640) fix(jsonapi): document non-exposed relations in included schema (#8734)
+* [c810012f7](https://github.com/api-platform/core/commit/c810012f768c905d83cdd0222f1b20bbaac14456) fix(jsonapi): describe included items as resource objects (#8743)
+* [82496b3e8](https://github.com/api-platform/core/commit/82496b3e851ac79ac3165c44b84f04906ee21fce) fix(jsonapi): declare items on no-pagination collection data schema (#8727)
+* [715bba558](https://github.com/api-platform/core/commit/715bba55895116b61f2199563405218e2307798b) fix(hydra): keep jsonapi input schemas out of the json rewrite (#8741)
+* [80d869000](https://github.com/api-platform/core/commit/80d8690005289b3335dc7f03e068c07df0cf1b70) fix(openapi): use nullable instead of null type in 3.0 (#8754)
+* [7e1cb3072](https://github.com/api-platform/core/commit/7e1cb3072480705dacefddae58c292372423b507) fix(doctrine): support UTC datetime types in ORM filters (#8746)
+* [db299e9a1](https://github.com/api-platform/core/commit/db299e9a170bbcf9fd1629641c63512265670563) fix(httpcache): keep purging relations after a skipped one (#8738)
+
 ## v5.0.4
 
 API Platform 5.0.4 contains every change shipped in [v4.4.5](#v445), plus the changes below.
