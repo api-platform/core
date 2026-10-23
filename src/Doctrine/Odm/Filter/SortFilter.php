@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\SortFilterInterface;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -38,7 +39,9 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
-    use OpenApiFilterTrait;
+    use OpenApiFilterTrait {
+        getOpenApiParameters as private getOpenApiFilterParameters;
+    }
 
     public function __construct(
         private readonly ?string $nullsComparison = null,
@@ -96,5 +99,13 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
     public function getSchema(Parameter $parameter): array
     {
         return ['type' => 'string', 'enum' => ['asc', 'desc', 'ASC', 'DESC']];
+    }
+
+    /**
+     * A sort direction is a single value, so the array form is only documented when castToArray is enabled explicitly.
+     */
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return $this->getOpenApiFilterParameters($parameter->withCastToArray($parameter->getCastToArray() ?? false));
     }
 }
