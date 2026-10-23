@@ -157,3 +157,7 @@ services:
 
     ApiPlatform\Tests\Fixtures\TestBundle\Filter\QueryParameterFilter:
         tags:  [ 'api_platform.filter' ]
+
+    app_issue7655_exact_filter:
+        class: 'ApiPlatform\Doctrine\Orm\Filter\ExactFilter'
+        tags:  [ 'api_platform.filter' ]
