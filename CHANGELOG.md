@@ -132,6 +132,13 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
 
+## v4.4.6
+
+### Bug fixes
+
+* [1ea9db85c](https://github.com/api-platform/core/commit/1ea9db85c7596e0978b77ae5126da9e3535693e4) fix(symfony): drop translation command probe for object mapper (#8726)
+* [c9a56fbe4](https://github.com/api-platform/core/commit/c9a56fbe43441dc63387cc12b792e3ae930d8b77) fix(openapi): remove webhooks and jsonSchemaDialect from 3.0.0 documents (#8722)
+
 ## v4.4.5
 
 ### Bug fixes
