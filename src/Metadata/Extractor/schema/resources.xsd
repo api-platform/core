@@ -79,8 +79,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="args">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="arg" maxOccurs="unbounded" type="arg"/>
+        <xsd:sequence>
+            <xsd:element name="arg" minOccurs="0" maxOccurs="unbounded" type="arg"/>
         </xsd:sequence>
     </xsd:complexType>
 
