@@ -32,6 +32,7 @@ use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFacto
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
 use ApiPlatform\Symfony\Metadata\Resource\Factory\ContainerParameterResourceMetadataCollectionFactory;
+use ApiPlatform\Symfony\Metadata\Resource\Factory\ControllerApiOperationResourceMetadataCollectionFactory;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -150,6 +151,15 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.metadata.resource.metadata_collection_factory.alternate_uri', AlternateUriResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner')]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.controller_api_operation', ControllerApiOperationResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1100)
+        ->args([
+            '%api_platform.controller_operations%',
+            service('api_platform.metadata.resource.metadata_collection_factory.controller_api_operation.inner'),
+            service('logger')->nullOnInvalid(),
+            '%api_platform.defaults%',
+        ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.parameter', ParameterResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1000)

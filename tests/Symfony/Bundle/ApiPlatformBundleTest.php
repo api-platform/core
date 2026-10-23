@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ControllerApiOperationPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ErrorResourceAttributeLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
@@ -48,6 +49,7 @@ class ApiPlatformBundleTest extends TestCase
 
         $this->assertContains(AttributeFilterPass::class, $passClasses);
         $this->assertContains(AttributeResourcePass::class, $passClasses);
+        $this->assertContains(ControllerApiOperationPass::class, $passClasses);
         $this->assertContains(FilterPass::class, $passClasses);
         $this->assertContains(ElasticsearchClientPass::class, $passClasses);
         $this->assertContains(GraphQlTypePass::class, $passClasses);
