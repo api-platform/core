@@ -478,6 +478,18 @@ class XmlExtractorTest extends TestCase
         ];
     }
 
+    public function testLessStrictSchema(): void
+    {
+        $resource = (new XmlResourceExtractor([__DIR__.'/xml/less_strict_schema.xml']))->getResources()[Comment::class][0];
+
+        $this->assertFalse($resource['openapi']);
+        $this->assertSame(0, $resource['paginationItemsPerPage']);
+        $this->assertSame(['https://example.com/a', 'https://example.com/b'], array_map(static fn ($link) => $link->getHref(), $resource['links']));
+        $this->assertSame(['X-A' => 'a', 'X-B' => 'b'], $resource['headers']);
+        $this->assertSame(-1, $resource['operations'][0]['priority']);
+        $this->assertSame([], $resource['graphQlOperations'][0]['args']);
+    }
+
     /**
      * Tests issue #8175: two XML operations sharing an explicit name silently
      * dropped one another. The factory must reject the duplicate up front.
