@@ -509,8 +509,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         $links = [];
-        foreach ($resource->links as $link) {
-            $links[] = new Link(rel: (string) $link->link->attributes()->rel, href: (string) $link->link->attributes()->href);
+        foreach ($resource->links->link as $link) {
+            $links[] = new Link(rel: (string) $link->attributes()->rel, href: (string) $link->attributes()->href);
         }
 
         return $links;
@@ -526,8 +526,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         $headers = [];
-        foreach ($resource->headers as $header) {
-            $headers[(string) $header->header->attributes()->key] = (string) $header->header->attributes()->value;
+        foreach ($resource->headers->header as $header) {
+            $headers[(string) $header->attributes()->key] = (string) $header->attributes()->value;
         }
 
         return $headers;

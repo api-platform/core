@@ -420,7 +420,7 @@
 
     <xsd:complexType name="links">
         <xsd:sequence>
-            <xsd:element ref="link"/>
+            <xsd:element ref="link" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -433,7 +433,7 @@
 
     <xsd:complexType name="headers">
         <xsd:sequence>
-            <xsd:element ref="header"/>
+            <xsd:element ref="header" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 
