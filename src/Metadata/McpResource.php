@@ -186,6 +186,7 @@ final class McpResource extends HttpOperation
         ?bool $jsonStream = null,
         array $extraProperties = [],
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: $method,
@@ -273,6 +274,7 @@ final class McpResource extends HttpOperation
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
             map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate,
         );
     }
 
