@@ -36,11 +36,7 @@ class SecureRegistryTest extends TestCase
 {
     public function testListChangePublishingCapabilityIsForwarded(): void
     {
-        if (!method_exists(RegistryInterface::class, 'publishesListChanges')) {
-            $this->markTestSkipped('List change publishing requires MCP SDK 0.9.');
-        }
-
-        $inner = $this->createMock(RegistryInterface::class);
+        $inner = $this->createMock(ListChangePublishingRegistryInterface::class);
         $inner->expects($this->exactly(2))->method('publishesListChanges')->willReturn(true, false);
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->never())->method('load');
@@ -272,4 +268,10 @@ class SecureRegistryTest extends TestCase
             $accessChecker,
         );
     }
+}
+
+// Keep the forwarding test runnable with both SDK 0.8 and 0.9.
+interface ListChangePublishingRegistryInterface extends RegistryInterface
+{
+    public function publishesListChanges(): bool;
 }
