@@ -161,8 +161,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'securityPostDenormalizeMessage' => $this->phpize($resource, 'securityPostDenormalizeMessage', 'string'),
             'securityPostValidation' => $this->resolveExpressionPlaceholder($this->phpize($resource, 'securityPostValidation', 'string', resolve: false)),
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
-            'input' => $this->phpize($resource, 'input', 'bool|string'),
-            'output' => $this->phpize($resource, 'output', 'bool|string'),
+            'input' => $this->buildInputOutput($resource, 'input'),
+            'output' => $this->buildInputOutput($resource, 'output'),
             'normalizationContext' => $this->buildArrayValue($resource, 'normalizationContext'),
             'denormalizationContext' => $this->buildArrayValue($resource, 'denormalizationContext'),
             'collectDenormalizationErrors' => $this->phpize($resource, 'collectDenormalizationErrors', 'bool'),
@@ -304,6 +304,18 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $resource['mercure'];
+    }
+
+    /**
+     * @return array{class?: string, name?: string}|bool|string|null
+     */
+    private function buildInputOutput(array $resource, string $key): array|bool|string|null
+    {
+        if (\is_array($resource[$key] ?? null)) {
+            return $resource[$key];
+        }
+
+        return $this->phpize($resource, $key, 'bool|string');
     }
 
     private function buildMessenger(array $resource): bool|array|string|null

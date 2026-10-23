@@ -126,7 +126,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
             'bool|string' => \in_array($resource[$key], ['1', '0', 1, 0, 'true', 'false', true, false], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string'),
             'string' => (string) $resource[$key],
             'integer' => (int) $resource[$key],
-            'bool' => \in_array($resource[$key], ['1', 'true', 1, true], false),
+            'bool' => \is_bool($resource[$key]) ? $resource[$key] : filter_var($resource[$key], \FILTER_VALIDATE_BOOLEAN),
             default => throw new InvalidArgumentException(\sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key]))),
         };
     }

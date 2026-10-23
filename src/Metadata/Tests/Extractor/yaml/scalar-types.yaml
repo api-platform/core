@@ -1,0 +1,6 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   paginationEnabled: 'false'
+            input:
+                class: ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program
+                name: ProgramInput
