@@ -225,6 +225,12 @@ trait OperationDefaultsTrait
 
         $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, $resource->getClass());
 
+        foreach ([$operation->getStatus(), ...array_values($operation->getExceptionToStatus() ?? [])] as $status) {
+            if (null !== $status && (!\is_int($status) || $status < 100 || $status >= 600)) {
+                throw new RuntimeException(\sprintf('The HTTP status code "%s" of operation "%s" of resource "%s" is not valid.', $status, $operationName, $resource->getClass()));
+            }
+        }
+
         return [
             $operationName,
             $operation,
