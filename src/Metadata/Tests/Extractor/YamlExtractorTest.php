@@ -581,6 +581,14 @@ class YamlExtractorTest extends TestCase
         $this->assertSame(Program::class.'Output', $resources[Program::class][0]['operations'][0]['output']);
     }
 
+    public function testScalarTypes(): void
+    {
+        $resource = (new YamlResourceExtractor([__DIR__.'/yaml/scalar-types.yaml']))->getResources()[Program::class][0];
+
+        $this->assertFalse($resource['paginationEnabled']);
+        $this->assertSame(['class' => Program::class, 'name' => 'ProgramInput'], $resource['input']);
+    }
+
     public function testExtendingYamlResourcesByMultipleYamlFiles(): void
     {
         $extractor = new YamlResourceExtractor([
