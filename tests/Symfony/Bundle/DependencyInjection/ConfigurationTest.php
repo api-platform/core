@@ -277,6 +277,39 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public static function objectDefaultProvider(): iterable
+    {
+        yield 'mcp' => ['mcp', ['tool' => ['description' => 'Get a book']]];
+        yield 'graph_ql_operations' => ['graph_ql_operations', [['class' => 'ApiPlatform\Metadata\GraphQl\Query']]];
+        yield 'state_options' => ['state_options', ['entity_class' => 'App\Entity\Book']];
+        yield 'links' => ['links', [['rel' => 'preload', 'href' => '/books']]];
+        yield 'openapi' => ['openapi', ['summary' => 'A book']];
+    }
+
+    #[DataProvider('objectDefaultProvider')]
+    public function testDefaultsThatNeedObjects(string $key, array $value): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(\sprintf('The "defaults.%s" option is not supported, it needs objects. Set it on the resources instead.', $key));
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [$key => $value],
+            ],
+        ]);
+    }
+
+    public function testOpenapiDefaultCanBeABoolean(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => ['openapi' => false],
+            ],
+        ]);
+
+        $this->assertFalse($config['defaults']['openapi']);
+    }
+
     public static function invalidHttpStatusCodeValueProvider(): array
     {
         return [
