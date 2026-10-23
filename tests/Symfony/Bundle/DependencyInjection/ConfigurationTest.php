@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
@@ -539,5 +540,44 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertEquals(['resource:read-write' => 'Read and write resource data'], $config['oauth']['scopes']);
+    }
+
+    public function testDefaultParameters(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [
+                        HeaderParameter::class => ['key' => 'API-Token'],
+                        'request_id' => ['class' => HeaderParameter::class, 'key' => 'Request-ID'],
+                        'api_version' => ['key' => 'api_version'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(3, $config['defaults']['parameters']);
+    }
+
+    public static function invalidDefaultParameterProvider(): iterable
+    {
+        yield 'unknown class option' => ['api_token', ['class' => 'ApiPlatform\Metadata\HeaderParamter'], 'ApiPlatform\Metadata\HeaderParamter'];
+        yield 'unknown class as key' => ['ApiPlatform\Metadata\HeaderParamter', ['key' => 'API-Token'], 'ApiPlatform\Metadata\HeaderParamter'];
+        yield 'not a parameter' => ['api_token', ['class' => \stdClass::class], \stdClass::class];
+    }
+
+    #[DataProvider('invalidDefaultParameterProvider')]
+    public function testDefaultParametersWithInvalidClass(string $name, array $parameter, string $class): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(\sprintf('The default parameter "%s" must reference a class extending "ApiPlatform\Metadata\Parameter", "%s" given.', $name, $class));
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [$name => $parameter],
+                ],
+            ],
+        ]);
     }
 }
