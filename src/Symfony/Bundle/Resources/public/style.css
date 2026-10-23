@@ -384,3 +384,121 @@ header #logo img {
     transform: translate(4px, -100%);
   }
 }
+
+/** LOGIN PLUGIN (swagger-ui-login-plugin.js) **/
+
+/* "Authorize" / "Logout" button in the response body */
+.swagger-ui .api-platform-login-response {
+  position: relative;
+}
+
+/* Aligned with the "Download" (right: 10px) and "Copy" (right: 100px, width: 30px) buttons of the response body */
+.swagger-ui .api-platform-login-response .api-platform-login-actions {
+  position: absolute;
+  bottom: 10px;
+  right: 140px;
+  display: flex;
+  gap: 10px;
+}
+
+.swagger-ui .api-platform-login-btn {
+  align-items: center;
+  background: #7d8293;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  height: 30px;
+  justify-content: center;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+.swagger-ui .api-platform-login-btn.authorized {
+  background: #49cc90;
+}
+
+/* "Login" button next to "Authorize" and its dialog */
+.swagger-ui .api-platform-login-bar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.swagger-ui .api-platform-login-bar .auth-wrapper {
+  flex: 0 0 auto;
+}
+
+.swagger-ui .api-platform-login-dialog .auth-container {
+  border-bottom: none;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-field {
+  margin: 0 0 12px;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-field label {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-field label .required {
+  color: #f93e3e;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-field input[type=text],
+.swagger-ui .api-platform-login-dialog .api-platform-login-field input[type=password],
+.swagger-ui .api-platform-login-dialog .api-platform-login-field input[type=number],
+.swagger-ui .api-platform-login-dialog .api-platform-login-field select,
+.swagger-ui .api-platform-login-dialog .api-platform-login-field textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-field textarea {
+  font-family: monospace;
+  font-size: 12px;
+  padding: 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-result {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-result h6 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-result.success {
+  background: rgba(73, 204, 144, .1);
+  border: 1px solid #49cc90;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-result.error {
+  background: rgba(249, 62, 62, .1);
+  border: 1px solid #f93e3e;
+}
+
+.swagger-ui .api-platform-login-dialog .api-platform-login-result pre {
+  margin: 8px 0 0;
+  max-height: 200px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 12px;
+}
