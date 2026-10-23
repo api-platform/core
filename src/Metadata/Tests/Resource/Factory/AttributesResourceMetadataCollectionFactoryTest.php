@@ -277,6 +277,22 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
     }
 
+    public function testCreateWithListDefaults(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'types' => ['https://schema.org/CreativeWork'],
+            'schemes' => ['https'],
+        ]);
+
+        $resourceMetadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class);
+        $operation = $resourceMetadataCollection->getOperation('_api_AttributeResource_get');
+
+        $this->assertSame(['https://schema.org/CreativeWork'], $resourceMetadataCollection[0]->getTypes());
+        $this->assertInstanceOf(HttpOperation::class, $operation);
+        $this->assertSame(['https://schema.org/CreativeWork'], $operation->getTypes());
+        $this->assertSame(['https'], $operation->getSchemes());
+    }
+
     public function testOverrideNameWithoutOperations(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();

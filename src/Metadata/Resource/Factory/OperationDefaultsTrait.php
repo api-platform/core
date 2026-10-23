@@ -82,7 +82,13 @@ trait OperationDefaultsTrait
                     $value = [$value];
                 }
 
-                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+                $value = array_merge($value, $currentValue);
+
+                if (array_is_list($value)) {
+                    $value = array_values(array_unique($value, \SORT_REGULAR));
+                }
+
+                $operation = $operation->{'with'.$upperKey}($value);
             }
 
             if (null !== $currentValue || null === $value) {
