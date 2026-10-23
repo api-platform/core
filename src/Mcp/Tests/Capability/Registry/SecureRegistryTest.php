@@ -34,6 +34,30 @@ use PHPUnit\Framework\TestCase;
 
 class SecureRegistryTest extends TestCase
 {
+    public function testListChangePublishingCapabilityIsForwarded(): void
+    {
+        if (!method_exists(RegistryInterface::class, 'publishesListChanges')) {
+            $this->markTestSkipped('List change publishing requires MCP SDK 0.9.');
+        }
+
+        $inner = $this->createMock(RegistryInterface::class);
+        $inner->expects($this->exactly(2))->method('publishesListChanges')->willReturn(true, false);
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->never())->method('load');
+
+        $registry = new SecureRegistry($inner, $loader);
+
+        $this->assertTrue($registry->publishesListChanges());
+        $this->assertFalse($registry->publishesListChanges());
+    }
+
+    public function testRegistryWithoutNotificationPublishingReturnsFalse(): void
+    {
+        $registry = new SecureRegistry(new Registry(), $this->createStub(LoaderInterface::class));
+
+        $this->assertFalse($registry->publishesListChanges());
+    }
+
     public function testToolsAreLoadedIntoTheRegistryOnFirstRead(): void
     {
         $inputSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
