@@ -24,6 +24,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class SurrogateKeysPurger implements PurgerInterface
 {
+    use PurgeResponsesTrait;
+
     private const MAX_HEADER_SIZE_PER_BATCH = 1500;
     private const SEPARATOR = ', ';
     private const HEADER = 'Surrogate-Key';
@@ -64,19 +66,25 @@ class SurrogateKeysPurger implements PurgerInterface
      */
     public function purge(array $iris): void
     {
-        foreach ($this->getChunkedIris($iris) as $chunk) {
+        $chunks = iterator_to_array($this->getChunkedIris($iris), false);
+        foreach ($chunks as $chunk) {
             if (\strlen((string) $chunk) > $this->maxHeaderLength) {
                 throw new RuntimeException(\sprintf('IRI "%s" is too long to fit current max header length (currently set to "%s"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.', $chunk, $this->maxHeaderLength));
             }
+        }
 
+        $responses = [];
+        foreach ($chunks as $chunk) {
             foreach ($this->clients as $client) {
-                $client->request(
+                $responses[] = $client->request(
                     $this->method,
                     '',
-                    ['headers' => [$this->header => $chunk]]
+                    ['headers' => [$this->header => $chunk], 'user_data' => [$this->header, $chunk]]
                 );
             }
         }
+
+        $this->assertPurgeSucceeded($responses);
     }
 
     /**
