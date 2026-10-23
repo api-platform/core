@@ -278,8 +278,26 @@ class ApiLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_item'));
         $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_by_uuid_item'));
         $this->assertNull($routeCollection->get('api_dummies_get_collection'));
-        $this->assertNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNotNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNotNull($routeCollection->get('api_doc'));
         $this->assertNull($routeCollection->get('api_entrypoint'));
+        $this->assertNull($routeCollection->get('api_validation_errors'));
+        $this->assertNotNull($routeCollection->get('api_genid'));
+    }
+
+    public function testApiLoaderIrisTypeWithoutJsonLdRegistersNeitherDocsNorContextRoutes(): void
+    {
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}{._format}')->withController('api_platform.action.get_item'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection, formats: ['json' => ['application/json']])->load(null, ApiLoader::TYPE_IRIS);
+
+        $this->assertNotNull($routeCollection->get('api_dummies_get_item'));
+        $this->assertNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNull($routeCollection->get('api_doc'));
         $this->assertNotNull($routeCollection->get('api_genid'));
     }
 
@@ -355,7 +373,7 @@ class ApiLoaderTest extends TestCase
         $this->assertSame(RelatedDummyEntity::class, $route->getDefault('_api_resource_class'));
     }
 
-    private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection, ?ResourceMetadataCollection $relatedResourceCollection = null): ApiLoader
+    private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection, ?ResourceMetadataCollection $relatedResourceCollection = null, array $formats = ['jsonld' => ['application/ld+json']]): ApiLoader
     {
         $routingConfig = __DIR__.'/../../../src/Symfony/Bundle/Resources/config/routing';
 
@@ -397,7 +415,7 @@ class ApiLoaderTest extends TestCase
 
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false);
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), $formats, [], false, true, true, false);
     }
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
