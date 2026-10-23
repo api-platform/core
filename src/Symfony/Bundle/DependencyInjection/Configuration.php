@@ -663,6 +663,17 @@ final class Configuration implements ConfigurationInterface
                 }
 
                 return $normalizedDefaults;
+            })
+            ->end()
+            ->validate()
+            ->always(static function (array $defaults): array {
+                foreach (['mcp', 'graph_ql_operations', 'state_options', 'links', 'openapi'] as $option) {
+                    if (null !== ($defaults[$option] ?? null) && ('openapi' !== $option || !\is_bool($defaults[$option]))) {
+                        throw new InvalidConfigurationException(\sprintf('The "defaults.%s" option is not supported, it needs objects. Set it on the resources instead.', $option));
+                    }
+                }
+
+                return $defaults;
             });
 
         $this->defineDefault($defaultsNode, new \ReflectionClass(ApiResource::class), $nameConverter);
