@@ -178,6 +178,20 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
+    public function testOpenApiDocumentsSortParameterAsSingleValueOnly(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $parameters = $response->toArray()['paths']['/filter_employees']['get']['parameters'];
+        $names = array_column($parameters, 'name');
+
+        $this->assertContains('orderName', $names);
+        $this->assertNotContains('orderName[]', $names);
+    }
+
     public function testIriFilterOnDepartment(): void
     {
         $response = self::createClient()->request('GET', '/filter_departments');
