@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Hydra\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
@@ -43,6 +46,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ClassInfoTrait;
     use ContextTrait;
+    use HydraOperationsTrait;
+    use HydraPrefixTrait;
     use ItemNormalizerTrait {
         denormalize as private doDenormalize;
     }
@@ -134,7 +139,34 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $metadata['@type'] = $type;
         }
 
+        if ($isResourceClass && isset($metadata['@id']) && $this->resourceMetadataCollectionFactory && $operation = $this->getIriOperation($resourceClass, $context)) {
+            $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+            if ($hydraOperations = $this->getExposedHydraOperations($operation, $this->resourceMetadataCollectionFactory, $this->resourceAccessChecker, $data, $context + $this->defaultContext, $hydraPrefix)) {
+                $metadata[$hydraPrefix.'operation'] = $hydraOperations;
+            }
+        }
+
         return $metadata + $normalizedData;
+    }
+
+    private function getIriOperation(string $resourceClass, array $context): ?HttpOperation
+    {
+        $operation = $context['operation'] ?? null;
+        if (isset($context['item_uri_template']) && $this->operationMetadataFactory) {
+            $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
+        }
+
+        if ($operation instanceof HttpOperation && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
+            return $operation;
+        }
+
+        try {
+            $operation = $this->resourceMetadataCollectionFactory?->create($resourceClass)->getOperation(null, false, true);
+        } catch (OperationNotFoundException) {
+            return null;
+        }
+
+        return $operation instanceof HttpOperation ? $operation : null;
     }
 
     /**
