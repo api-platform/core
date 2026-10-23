@@ -363,7 +363,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
         $data = [];
         foreach ($resource->paginationViaCursor->paginationField as $paginationField) {
-            $data[(string) $paginationField['field']] = (string) $paginationField['direction'];
+            $data[] = ['field' => (string) $paginationField['field'], 'direction' => (string) $paginationField['direction']];
         }
 
         return $data;
