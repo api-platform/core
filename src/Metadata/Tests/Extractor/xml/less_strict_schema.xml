@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+           https://api-platform.com/schema/metadata/resources-3.0.xsd">
+    <resource class="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment" openapi="false" paginationItemsPerPage="0">
+        <links>
+            <link rel="a" href="https://example.com/a"/>
+            <link rel="b" href="https://example.com/b"/>
+        </links>
+        <headers>
+            <header key="X-A" value="a"/>
+            <header key="X-B" value="b"/>
+        </headers>
+        <operations>
+            <operation class="ApiPlatform\Metadata\Get" priority="-1"/>
+        </operations>
+        <graphQlOperations>
+            <graphQlOperation class="ApiPlatform\Metadata\GraphQl\Query" name="notRetrievedQuery">
+                <args/>
+            </graphQlOperation>
+        </graphQlOperations>
+    </resource>
+</resources>
