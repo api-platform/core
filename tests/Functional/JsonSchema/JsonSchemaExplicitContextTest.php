@@ -99,8 +99,7 @@ class JsonSchemaExplicitContextTest extends ApiTestCase
         $schema = $this->schemaFactory->buildSchema(ReadWriteGroupedItem::class, 'jsonapi', Schema::TYPE_OUTPUT, $operation);
 
         $this->assertStringNotContainsString('rw.read', $schema->getRootDefinitionKey());
-        $definition = $schema->getDefinitions()[$schema->getRootDefinitionKey()];
-        $attributes = $definition['properties']['data']['properties']['attributes']['properties'];
+        $attributes = $schema->getDefinitions()[$schema->getRootDefinitionKey().'.resource']['properties']['attributes']['properties'];
         $this->assertArrayHasKey('secretToken', $attributes);
         $this->assertArrayHasKey('title', $attributes);
     }

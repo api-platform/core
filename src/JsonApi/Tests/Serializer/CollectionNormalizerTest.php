@@ -80,8 +80,8 @@ class CollectionNormalizerTest extends TestCase
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
-            'request_uri' => '/foos?page=3',
-            'uri' => 'http://example.com/foos?page=3',
+            'request_uri' => '/foos?page[page]=3',
+            'uri' => 'http://example.com/foos?page[page]=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
             'root_operation_name' => 'get',
@@ -101,11 +101,11 @@ class CollectionNormalizerTest extends TestCase
 
         $expected = [
             'links' => [
-                'self' => '/foos?page=3',
-                'first' => '/foos?page=1',
-                'last' => '/foos?page=7',
-                'prev' => '/foos?page=2',
-                'next' => '/foos?page=4',
+                'self' => '/foos?page%5Bpage%5D=3',
+                'first' => '/foos?page%5Bpage%5D=1',
+                'last' => '/foos?page%5Bpage%5D=7',
+                'prev' => '/foos?page%5Bpage%5D=2',
+                'next' => '/foos?page%5Bpage%5D=4',
             ],
             'data' => [
                 [
@@ -125,9 +125,9 @@ class CollectionNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
-            'request_uri' => '/foos?page=3',
+            'request_uri' => '/foos?page[page]=3',
             'operation_name' => 'get',
-            'uri' => 'http://example.com/foos?page=3',
+            'uri' => 'http://example.com/foos?page[page]=3',
             'resource_class' => 'Foo',
         ]));
     }
@@ -157,8 +157,8 @@ class CollectionNormalizerTest extends TestCase
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
-            'request_uri' => '/foos?page=3',
-            'uri' => 'http://example.com/foos?page=3',
+            'request_uri' => '/foos?page[page]=3',
+            'uri' => 'http://example.com/foos?page[page]=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
             'root_operation_name' => 'get',
@@ -178,9 +178,9 @@ class CollectionNormalizerTest extends TestCase
 
         $expected = [
             'links' => [
-                'self' => '/foos?page=3',
-                'prev' => '/foos?page=2',
-                'next' => '/foos?page=4',
+                'self' => '/foos?page%5Bpage%5D=3',
+                'prev' => '/foos?page%5Bpage%5D=2',
+                'next' => '/foos?page%5Bpage%5D=4',
             ],
             'data' => [
                 [
@@ -199,9 +199,9 @@ class CollectionNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
-            'request_uri' => '/foos?page=3',
+            'request_uri' => '/foos?page[page]=3',
             'operation_name' => 'get',
-            'uri' => 'http://example.com/foos?page=3',
+            'uri' => 'http://example.com/foos?page[page]=3',
             'resource_class' => 'Foo',
         ]));
     }
