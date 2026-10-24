@@ -145,6 +145,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $properties = $definitions[$definitionName]['properties'] ?? [];
 
         if (Error::class === $className && !isset($properties['errors'])) {
+            $definitions[$definitionName]['type'] = 'object';
             $definitions[$definitionName]['properties'] = [
                 'errors' => [
                     'type' => 'array',
@@ -163,6 +164,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (!$collectionKey) {
+            $definitions[$definitionName]['type'] = 'object';
             $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, []);
             $schema['$ref'] = $prefix.$definitionName;
 
