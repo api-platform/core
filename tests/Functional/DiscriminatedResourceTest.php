@@ -418,7 +418,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         ])->toArray();
         $schemas = $json['components']['schemas'];
 
-        // Output (JSON-LD): the base definition keeps its own properties and lists its subtypes.
+        // Output (JSON-LD): the base definition only lists its subtypes, each of them carrying the common properties.
         $output = $this->findDefinition($schemas, $json['paths']['/discriminated_books/{id}']['get']['responses']['200']['content']['application/ld+json']['schema']['$ref']);
         $this->assertSame([
             'propertyName' => 'kind',
@@ -431,8 +431,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
             ['$ref' => '#/components/schemas/DiscriminatedBook.DiscriminatedFictionBook.jsonld'],
             ['$ref' => '#/components/schemas/DiscriminatedBook.DiscriminatedTechnicalBook.jsonld'],
         ], $output['oneOf']);
-        $this->assertArrayHasKey('title', $output['properties']);
-        $this->assertArrayNotHasKey('genre', $output['properties']);
+        $this->assertArrayNotHasKey('properties', $output);
 
         $fiction = $schemas['DiscriminatedBook.DiscriminatedFictionBook.jsonld'];
         $this->assertSame(['type' => 'string', 'enum' => ['fiction']], $fiction['properties']['kind']);
@@ -488,6 +487,46 @@ final class DiscriminatedResourceTest extends ApiTestCase
     /**
      * Resolves a definition, unwrapping the Hydra item decoration if any.
      */
+    public static function parentSchemaProvider(): iterable
+    {
+        yield 'output json' => ['/discriminated_books/{id}', 'get', 'application/json'];
+        yield 'output jsonld' => ['/discriminated_books/{id}', 'get', 'application/ld+json'];
+        yield 'input json' => ['/discriminated_books', 'post', 'application/json'];
+        yield 'input jsonld' => ['/discriminated_books', 'post', 'application/ld+json'];
+        yield 'input merge-patch' => ['/discriminated_books/{id}', 'patch', 'application/merge-patch+json'];
+        yield 'output jsonapi' => ['/discriminated_books/{id}', 'get', 'application/vnd.api+json'];
+    }
+
+    /**
+     * Every "oneOf" branch is a complete description of a subtype: repeating the common properties
+     * next to "oneOf" makes Swagger UI display them twice.
+     */
+    #[DataProvider('parentSchemaProvider')]
+    public function testOpenApiParentSchemaOnlyListsItsSubtypes(string $path, string $method, string $mimeType): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+        $schemas = $json['components']['schemas'];
+
+        $operation = $json['paths'][$path][$method];
+        $ref = 'get' === $method ? $operation['responses']['200']['content'][$mimeType]['schema']['$ref'] : $operation['requestBody']['content'][$mimeType]['schema']['$ref'];
+        $parent = $this->findDefinition($schemas, $ref);
+        if ('application/vnd.api+json' === $mimeType) {
+            $parent = $this->findDefinition($schemas, $parent['properties']['data']['$ref']);
+        }
+
+        $this->assertCount(2, $parent['oneOf']);
+        $this->assertArrayNotHasKey('properties', $parent);
+        $this->assertArrayNotHasKey('required', $parent);
+
+        foreach ($parent['oneOf'] as $branch) {
+            $branch = $this->findDefinition($schemas, $branch['$ref']);
+            $properties = 'application/vnd.api+json' === $mimeType ? $branch['properties']['attributes']['properties'] : $branch['properties'];
+            $this->assertArrayHasKey('title', $properties);
+        }
+    }
+
     private function findDefinition(array $schemas, string $ref): array
     {
         $definition = $schemas[substr($ref, \strlen('#/components/schemas/'))];

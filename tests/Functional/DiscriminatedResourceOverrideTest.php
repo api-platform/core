@@ -252,7 +252,6 @@ final class DiscriminatedResourceOverrideTest extends ApiTestCase
 
         $this->assertSame('integer', $schemas['DiscriminatedVehicle.DiscriminatedTruck.jsonld']['properties']['rating']['type']);
         $this->assertSame([['type' => 'number'], ['type' => 'integer']], $schemas['DiscriminatedVehicle.DiscriminatedCar.jsonld']['properties']['rating']['anyOf']);
-        $this->assertSame([['type' => 'number'], ['type' => 'integer']], $schemas['DiscriminatedVehicle.jsonld']['allOf'][1]['properties']['rating']['anyOf']);
     }
 
     public function testSchemaDocumentsOverriddenProperties(): void
@@ -265,7 +264,6 @@ final class DiscriminatedResourceOverrideTest extends ApiTestCase
         // Overridden writability: "plate" is read-only on cars, but still writable on trucks.
         $this->assertTrue($schemas['DiscriminatedVehicle.DiscriminatedCar']['properties']['plate']['readOnly']);
         $this->assertArrayNotHasKey('readOnly', $schemas['DiscriminatedVehicle.DiscriminatedTruck']['properties']['plate']);
-        $this->assertArrayNotHasKey('readOnly', $schemas['DiscriminatedVehicle']['properties']['plate']);
         $this->assertArrayHasKey('payload', $schemas['DiscriminatedVehicle.DiscriminatedTruck']['properties']);
 
         // Overridden constraints are documented on the subtype only.
