@@ -449,7 +449,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $schema->getDefinitions();
 
         $base = $definitions['DiscriminatedAnimal'];
-        $this->assertSame(['name'], array_keys($base['properties']));
+        $this->assertArrayNotHasKey('properties', $base);
         $this->assertSame([
             ['$ref' => '#/components/schemas/DiscriminatedAnimal.DiscriminatedCat'],
             ['$ref' => '#/components/schemas/DiscriminatedAnimal.DiscriminatedDog'],
@@ -481,7 +481,7 @@ class SchemaFactoryTest extends TestCase
         $rootDefinitionKey = $schema->getRootDefinitionKey();
 
         $base = $definitions[$rootDefinitionKey];
-        $this->assertSame(['type' => 'string', 'enum' => ['phone', 'gadget']], $base['properties']['kind']);
+        $this->assertArrayNotHasKey('properties', $base);
         $this->assertArrayNotHasKey('additionalProperties', $base);
         $this->assertSame([
             'type' => 'object',
