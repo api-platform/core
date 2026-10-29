@@ -254,19 +254,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
             $definition['oneOf'] = $oneOf;
 
+            // Every branch carries the common properties: they are not repeated next to "oneOf"
             // "additionalProperties" ignores the properties declared in the "oneOf" branches, they are restricted by the branches instead
-            unset($definition['additionalProperties']);
+            unset($definition['properties'], $definition['required'], $definition['additionalProperties']);
         }
 
         // An instance of the class itself carries its own type
-        if ($ownTypeValues && !isset($definition['properties'][$typeProperty])) {
-            if ($oneOf) {
-                $properties = $definition['properties'] ?? [];
-                $properties[$typeProperty] = ['type' => 'string', 'enum' => array_map('strval', array_keys($discriminatorMapping))];
-                $definition['properties'] = $properties;
-            } else {
-                $this->addTypeProperties($definition, [$typeProperty => ['type' => 'string', 'enum' => $ownTypeValues]], $isPartialUpdate || \in_array($mapping->getDefaultType(), $ownTypeValues, true));
-            }
+        if ($ownTypeValues && !$oneOf && !isset($definition['properties'][$typeProperty])) {
+            $this->addTypeProperties($definition, [$typeProperty => ['type' => 'string', 'enum' => $ownTypeValues]], $isPartialUpdate || \in_array($mapping->getDefaultType(), $ownTypeValues, true));
         }
 
         $definition['discriminator'] = ['propertyName' => $typeProperty, 'mapping' => $discriminatorMapping];
