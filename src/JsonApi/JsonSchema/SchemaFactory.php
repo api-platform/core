@@ -293,7 +293,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Capture the resource's operation up front; the relationship loop below reassigns $operation.
         $resourceOperation = $operation;
         $definitions = $schema->getDefinitions();
-        $properties = $definitions[$key]['properties'] ?? [];
+        // A definition listing its subtypes in "oneOf" carries no properties: an instance of the class itself is described by its inline branch
+        $ownBranch = null;
+        foreach (isset($definitions[$key]['discriminator']) ? $definitions[$key]['oneOf'] ?? [] : [] as $branch) {
+            if (!isset($branch['$ref'])) {
+                $ownBranch = $branch;
+                break;
+            }
+        }
+        $properties = $ownBranch['properties'] ?? $definitions[$key]['properties'] ?? [];
 
         $attributes = [];
         $relationships = [];
@@ -392,34 +400,33 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         ];
 
         // Subtypes declared in a serializer discriminator map: the type property lives in "attributes" so an OpenAPI discriminator cannot be used
-        $typeProperty = null;
+        $oneOf = [];
         foreach ($this->getDiscriminatedSubtypes($key, $propertyClass, $definitions, $schema->getVersion()) as [$subKey, $subClass, $typeProperty]) {
+            $attributeName = ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$typeProperty] ?? $typeProperty;
+
+            // The inline branch of a class declared in its own discriminator map describes the instances of the class itself
+            if (!$oneOf && null !== $ownBranch) {
+                if (\in_array($typeProperty, $ownBranch['required'] ?? [], true)) {
+                    $data['properties']['attributes']['required'] = [$attributeName];
+                }
+                $oneOf[] = $data;
+            }
+
             $subDocumentDefinitionName = $documentDefinitionName.'.'.(new \ReflectionClass($subClass))->getShortName();
             $subSchema = $this->buildDefinitionPropertiesSchema($subKey, $subDocumentDefinitionName, $subClass, $format, $type, $resourceOperation, $schema, $serializerContext);
             if (\in_array($typeProperty, $definitions[$subKey]['required'] ?? [], true)) {
-                $definitions[$subDocumentDefinitionName.'.resource']['properties']['attributes']['required'] = [ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$typeProperty] ?? $typeProperty];
+                $definitions[$subDocumentDefinitionName.'.resource']['properties']['attributes']['required'] = [$attributeName];
             }
-            $data['oneOf'][] = $subSchema['data'];
+            $oneOf[] = $subSchema['data'];
 
             foreach ($subSchema['included']['items']['anyOf'] ?? [] as $relatedDefinition) {
                 $relatedDefinitions[$relatedDefinition['$ref']] = $relatedDefinition;
             }
         }
 
-        // The inline "oneOf" branch of a class declared in its own discriminator map describes the instances of the class itself
-        foreach (null !== $typeProperty ? $definitions[$key]['oneOf'] : [] as $branch) {
-            if (isset($branch['$ref']) || !isset($branch['properties'][$typeProperty])) {
-                continue;
-            }
-
-            $attributeName = ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$typeProperty] ?? $typeProperty;
-            $ownData = $data;
-            unset($ownData['oneOf']);
-            $ownData['properties']['attributes']['properties'][$attributeName] = $branch['properties'][$typeProperty];
-            if (\in_array($typeProperty, $branch['required'] ?? [], true)) {
-                $ownData['properties']['attributes']['required'] = [$attributeName];
-            }
-            array_unshift($data['oneOf'], $ownData);
+        // Every branch carries the common members: they are not repeated next to "oneOf"
+        if ($oneOf) {
+            $data = ['type' => 'object', 'oneOf' => $oneOf];
         }
 
         if ($relatedDefinitions && !$included) {
