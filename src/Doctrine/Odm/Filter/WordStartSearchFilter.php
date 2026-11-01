@@ -49,7 +49,7 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
 
         if (\is_array($values)) {
             // nested arrays (e.g. "?name[][foo]=bar") cannot be matched against a field
-            $values = array_filter($values, \is_scalar(...));
+            $values = array_values(array_filter($values, \is_scalar(...)));
             if ([] === $values) {
                 return;
             }

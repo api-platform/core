@@ -46,18 +46,19 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
         }
 
         $property = $parameter->getProperty();
-        $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
-        $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 
         if (\is_array($values)) {
             // nested arrays (e.g. "?name[][foo]=bar") cannot be matched against a field
-            $values = array_filter($values, \is_scalar(...));
+            $values = array_values(array_filter($values, \is_scalar(...)));
             if ([] === $values) {
                 return;
             }
         }
+
+        $alias = $queryBuilder->getRootAliases()[0];
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
+        $field = $alias.'.'.$property;
 
         if (!is_iterable($values)) {
             $values = [$values];
