@@ -19,6 +19,9 @@ use ApiPlatform\State\Pagination\Pagination;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 class PaginationTest extends TestCase
 {
     public function testGraphQlCursorOffset(): void
