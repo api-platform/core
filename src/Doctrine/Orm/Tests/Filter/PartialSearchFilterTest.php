@@ -22,6 +22,9 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 final class PartialSearchFilterTest extends TestCase
 {
     public function testNestedArrayValuesAreIgnored(): void

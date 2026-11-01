@@ -24,6 +24,9 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 final class RegexSearchFilterNestedArrayValuesTest extends TestCase
 {
     private DocumentManager $manager;

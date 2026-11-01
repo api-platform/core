@@ -25,6 +25,9 @@ use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 final class LikeSearchFilterNestedArrayValuesTest extends TestCase
 {
     public static function provideFilters(): iterable
