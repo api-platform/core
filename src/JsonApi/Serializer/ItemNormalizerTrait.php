@@ -132,6 +132,11 @@ trait ItemNormalizerTrait
             throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
+        // integer identifiers are still accepted when the id is not an IRI, they are cast to string below
+        if (!\is_string($value['id']) && ($this->useIriAsId || !\is_int($value['id']))) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "id" attribute of the "%s" relationship must be "string", "%s" given.', $attributeName, \gettype($value['id'])), $value['id'], ['string'], $context['deserialization_path'] ?? null, true);
+        }
+
         try {
             $context += ['fetch_data' => true];
             if ($this->useIriAsId) {

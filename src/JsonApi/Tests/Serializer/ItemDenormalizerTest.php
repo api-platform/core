@@ -16,13 +16,17 @@ namespace ApiPlatform\JsonApi\Tests\Serializer;
 use ApiPlatform\JsonApi\Serializer\ItemDenormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
+use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
@@ -78,5 +82,48 @@ class ItemDenormalizerTest extends TestCase
             ItemNormalizer::FORMAT,
             ['api_allow_update' => false]
         );
+    }
+
+    public static function provideNonStringRelationshipIds(): iterable
+    {
+        yield 'integer' => [1, true];
+        yield 'array' => [['x'], true];
+        yield 'boolean' => [true, true];
+        yield 'array in identifier mode' => [['x'], false];
+    }
+
+    #[DataProvider('provideNonStringRelationshipIds')]
+    public function testDenormalizeRelationRejectsNonStringId(mixed $id, bool $useIriAsId): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->shouldNotBeCalled();
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $denormalizer = new ItemDenormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            useIriAsId: $useIriAsId,
+        );
+
+        try {
+            (new \ReflectionMethod($denormalizer, 'denormalizeRelation'))->invoke(
+                $denormalizer,
+                'relatedDummy',
+                new ApiProperty(),
+                RelatedDummy::class,
+                ['type' => 'RelatedDummy', 'id' => $id],
+                ItemDenormalizer::FORMAT,
+                ['deserialization_path' => 'relatedDummy']
+            );
+            $this->fail('A NotNormalizableValueException should have been thrown.');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('relatedDummy', $e->getPath());
+            $this->assertSame(['string'], $e->getExpectedTypes());
+            $this->assertTrue($e->canUseMessageForUser());
+        }
     }
 }
