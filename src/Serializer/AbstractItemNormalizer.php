@@ -652,7 +652,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $collectionKeyType = $type->getCollectionKeyType();
 
                 while ($collectionKeyType instanceof WrappingTypeInterface) {
-                    $collectionKeyType = $type->getWrappedType();
+                    $collectionKeyType = $collectionKeyType->getWrappedType();
                 }
 
                 if (!$collectionKeyType->accepts($index)) {
