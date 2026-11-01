@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Extension;
 
 use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Doctrine\Odm\PartialPaginator;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
@@ -39,6 +40,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     /**
      * {@inheritdoc}
      *
+     * @throws InvalidArgumentException
      * @throws RuntimeException
      */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
@@ -56,6 +58,11 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         }
 
         [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+        // $offset + $limit is used as an integer limit below, it must not overflow
+        if (!$doesCount && $limit > 0 && $offset > \PHP_INT_MAX - $limit) {
+            throw new InvalidArgumentException('Page parameter is too large.');
+        }
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
