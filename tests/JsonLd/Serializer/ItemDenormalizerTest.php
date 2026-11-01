@@ -26,6 +26,9 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 class ItemDenormalizerTest extends TestCase
 {
     use ProphecyTrait;
