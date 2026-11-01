@@ -29,7 +29,7 @@ final class EqualsFilter implements FilterInterface
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
         if (\is_array($values)) {
-            $values = array_values(array_filter($values, 'is_scalar'));
+            $values = array_values(array_filter($values, static fn (mixed $value): bool => \is_scalar($value) || $value instanceof \DateTimeInterface));
 
             if (!$values) {
                 return $builder;
