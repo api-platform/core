@@ -81,7 +81,7 @@ trait RangeFilterTrait
         $operators = [self::PARAMETER_BETWEEN, self::PARAMETER_GREATER_THAN, self::PARAMETER_GREATER_THAN_OR_EQUAL, self::PARAMETER_LESS_THAN, self::PARAMETER_LESS_THAN_OR_EQUAL];
 
         foreach ($values as $operator => $value) {
-            if (!\in_array($operator, $operators, true)) {
+            if (!\in_array($operator, $operators, true) || !\is_scalar($value)) {
                 unset($values[$operator]);
             }
         }

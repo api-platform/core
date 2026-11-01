@@ -148,6 +148,44 @@ class PartialSearchFilterTest extends TestCase
         $this->assertArrayHasKey('match', $context);
     }
 
+    public function testPartialSearchIgnoresNestedArrayValues(): void
+    {
+        $filter = new PartialSearchFilter();
+
+        $parameter = new QueryParameter(property: 'name', key: 'name');
+        $parameter->setValue([['foo' => 'bar']]);
+        $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
+
+        $context = [
+            'parameter' => $parameter,
+            'filters' => ['name' => [['foo' => 'bar']]],
+        ];
+
+        $filter->apply($aggregationBuilder, Dummy::class, null, $context);
+
+        $this->assertArrayNotHasKey('match', $context);
+        $this->assertNoPipelineStages($aggregationBuilder);
+    }
+
+    public function testPartialSearchSkipsNestedArrayValuesAmongScalarValues(): void
+    {
+        $filter = new PartialSearchFilter();
+
+        $parameter = new QueryParameter(property: 'name', key: 'name');
+        $parameter->setValue([['foo' => 'bar'], 'baz']);
+        $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
+
+        $context = [
+            'parameter' => $parameter,
+            'filters' => ['name' => [['foo' => 'bar'], 'baz']],
+        ];
+
+        $filter->apply($aggregationBuilder, Dummy::class, null, $context);
+
+        $this->assertArrayHasKey('match', $context);
+        $this->assertNoPipelineStages($aggregationBuilder);
+    }
+
     private function assertNoPipelineStages(Builder $aggregationBuilder): void
     {
         try {

@@ -51,6 +51,14 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             return;
         }
 
+        if (\is_array($values)) {
+            // nested arrays (e.g. "?name[][foo]=bar") cannot be matched against a field
+            $values = array_filter($values, \is_scalar(...));
+            if ([] === $values) {
+                return;
+            }
+        }
+
         $match = $context['match'] = $context['match'] ??
             $aggregationBuilder
             ->matchExpr();
