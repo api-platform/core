@@ -23,6 +23,9 @@ use Orchestra\Testbench\TestCase;
 use Workbench\App\Purger\MockPurger;
 use Workbench\Database\Factories\AuthorFactory;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 class GraphQlPurgerTest extends TestCase
 {
     use ApiTestAssertionsTrait;
