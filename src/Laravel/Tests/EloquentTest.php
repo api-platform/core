@@ -112,6 +112,14 @@ class EloquentTest extends TestCase
         $this->assertSame($response->json()['member'][0], $book);
     }
 
+    public function testPartialSearchFilterWithArrayValue(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
+        $this->get('/api/books?name[]=a&name[]=b', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->get('/api/books?name[x]=a', ['Accept' => ['application/ld+json']])->assertOk();
+    }
+
     public function testDateFilterEqual(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();

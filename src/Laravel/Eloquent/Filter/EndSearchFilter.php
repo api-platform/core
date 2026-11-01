@@ -27,6 +27,10 @@ final class EndSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
+        if (!\is_string($values)) {
+            return $builder;
+        }
+
         return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), 'like', '%'.$values);
     }
 }

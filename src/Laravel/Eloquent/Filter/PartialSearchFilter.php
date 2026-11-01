@@ -28,6 +28,10 @@ final class PartialSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
+        if (!\is_string($values)) {
+            return $builder;
+        }
+
         return $this->addNestedParameterJoins(
             $builder,
             $parameter,
