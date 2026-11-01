@@ -56,7 +56,10 @@ class ApiPlatformEventProvider extends ServiceProvider
         $httpClients = static fn (Application $app) => $app->make('api_platform.http_cache.clients_array');
 
         $this->app->singleton(VarnishPurger::class, static function (Application $app) use ($httpClients) {
-            return new VarnishPurger($httpClients($app));
+            return new VarnishPurger(
+                $httpClients($app),
+                Config::get('api-platform.http_cache.invalidation.max_header_length', 7500)
+            );
         });
 
         $this->app->singleton(VarnishXKeyPurger::class, static function (Application $app) use ($httpClients) {
