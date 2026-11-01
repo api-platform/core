@@ -22,6 +22,9 @@ use Illuminate\Database\Eloquent\Builder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @author Ali Ben Macha <contact@benmacha.tn>
+ */
 final class SearchFilterTest extends TestCase
 {
     public static function provideNonStringValues(): iterable
