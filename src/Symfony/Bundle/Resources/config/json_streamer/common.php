@@ -22,21 +22,25 @@ use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamerDumper;
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
+    // symfony/json-streamer 8.1 renamed the "json_streamer.value_transformer" tag
+    $valueTransformerTag = interface_exists(PropertyValueTransformerInterface::class) ? 'json_streamer.property_value_transformer' : 'json_streamer.value_transformer';
+
     $services->set('api_platform.jsonld.json_streamer.stream_writer', JsonStreamWriter::class)
         ->args([
-            tagged_locator('json_streamer.value_transformer', 'key'),
+            tagged_locator($valueTransformerTag, 'key'),
             service('api_platform.jsonld.json_streamer.write.property_metadata_loader'),
             '%.json_streamer.stream_writers_dir.jsonld%',
             service('config_cache_factory')->ignoreOnInvalid(),
         ]);
 
     $jsonStreamReaderArgs = [
-        tagged_locator('json_streamer.value_transformer', 'key'),
+        tagged_locator($valueTransformerTag, 'key'),
         service('json_streamer.read.property_metadata_loader'),
         '%.json_streamer.stream_readers_dir.jsonld%',
     ];
@@ -65,18 +69,18 @@ return static function (ContainerConfigurator $container) {
 
     $services->set('api_platform.jsonld.json_streamer.write.value_transformer.iri', IriValueTransformer::class)
         ->args([service('api_platform.iri_converter')])
-        ->tag('json_streamer.value_transformer');
+        ->tag($valueTransformerTag);
 
     $services->set('api_platform.jsonld.json_streamer.write.value_transformer.type', TypeValueTransformer::class)
         ->args([
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ])
-        ->tag('json_streamer.value_transformer');
+        ->tag($valueTransformerTag);
 
     $services->set('api_platform.jsonld.json_streamer.write.value_transformer.context', ContextValueTransformer::class)
         ->args([service('api_platform.router')])
-        ->tag('json_streamer.value_transformer');
+        ->tag($valueTransformerTag);
 
     // FrameworkBundle 8.1+ registers DateTimeValueObjectTransformer itself; skip to avoid duplicate registration and TransformerPass validation breakage (issue #7954).
     if (class_exists(DateTimeValueObjectTransformer::class) && !class_exists(DeprecateJsonStreamerValueTransformerTagPass::class)) {

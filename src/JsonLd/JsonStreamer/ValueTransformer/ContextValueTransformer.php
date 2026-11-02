@@ -15,10 +15,9 @@ namespace ApiPlatform\JsonLd\JsonStreamer\ValueTransformer;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
 
-final class ContextValueTransformer implements ValueTransformerInterface
+final class ContextValueTransformer implements PropertyValueTransformerInterface
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
