@@ -16,7 +16,9 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -26,6 +28,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Get]
 #[ApiResource(uriTemplate: '/companies/{companyId}/employees', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company']], normalizationContext: ['groups' => ['company_employees_read']])]
 #[GetCollection]
+#[GetCollection(
+    uriTemplate: '/companies-by-resolved-name/{name}/employees',
+    uriVariables: [
+        'name' => new Link(
+            identifiers: ['name'],
+            fromClass: Company::class,
+            toProperty: 'company',
+            provider: ReadLinkParameterProvider::class,
+            extraProperties: ['uri_template' => '/doctrine-company-by-name/{name}', 'write_uri_variable' => true],
+        ),
+    ],
+)]
 #[ODM\Document]
 class Employee
 {

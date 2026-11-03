@@ -544,6 +544,20 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                     ],
                 ],
+                'gt (array value)' => [
+                    [],
+                ],
+                'gt (array value) + lte' => [
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lte' => 19.99,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
     }

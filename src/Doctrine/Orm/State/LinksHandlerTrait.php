@@ -65,6 +65,8 @@ trait LinksHandlerTrait
                 $fromClass = $this->getLinkFromClass($link, $operation);
             }
 
+            $identifiers = $this->resolveLinkIdentifiers($identifiers, $link, $fromClass);
+
             $fromClassMetadata = $manager->getClassMetadata($fromClass);
             $identifierProperties = $link->getIdentifiers();
             $hasCompositeIdentifiers = 1 < \count($identifierProperties);

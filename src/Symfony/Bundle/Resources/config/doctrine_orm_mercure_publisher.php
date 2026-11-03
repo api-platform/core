@@ -33,5 +33,6 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.mercure.include_type%',
         ])
         ->tag('doctrine.event_listener', ['event' => 'onFlush'])
-        ->tag('doctrine.event_listener', ['event' => 'postFlush']);
+        ->tag('doctrine.event_listener', ['event' => 'postFlush'])
+        ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore']);
 };

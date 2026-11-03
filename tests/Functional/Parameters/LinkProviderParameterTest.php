@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResou
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Company as DocumentCompany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompanyBadge as DocumentCompanyBadge;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Employee as DocumentEmployee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompanyBadge;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -322,5 +323,29 @@ final class LinkProviderParameterTest extends ApiTestCase
 
         $r = self::createClient()->request('GET', '/issue_7469_test_resources/'.$issue7469Dummy->id, ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testResolvedUriVariableQueriesDoctrineLink(): void
+    {
+        $manager = $this->getManager();
+        $employeeClass = $this->isMongoDB() ? DocumentEmployee::class : Employee::class;
+        $companyClass = $this->isMongoDB() ? DocumentCompany::class : Company::class;
+        $employee = new $employeeClass();
+        $employee->setName('me');
+        $company = new $companyClass();
+        $company->setName('Test');
+        $employee->setCompany($company);
+        $manager->persist($company);
+        $manager->persist($employee);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/companies-by-resolved-name/Test/employees');
+        self::assertResponseStatusCodeSame(200);
+        self::assertJsonContains([
+            'hydra:totalItems' => 1,
+            'hydra:member' => [
+                ['name' => 'me'],
+            ],
+        ]);
     }
 }

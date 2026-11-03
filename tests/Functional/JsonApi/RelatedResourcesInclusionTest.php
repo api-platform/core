@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
+use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Test\Constraint\MatchesJsonSchema;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProperty;
@@ -53,6 +55,30 @@ final class RelatedResourcesInclusionTest extends ApiTestCase
             $this->markTestSkipped();
         }
         $this->recreateSchema(self::getResources());
+    }
+
+    public function testIncludedItemsSchemaMatchesRuntimeResourceObject(): void
+    {
+        $this->seedDummyPropertyObjects(1);
+
+        $response = self::createClient()->request('GET', '/dummy_properties/1?include=group', [
+            'headers' => ['Accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $schemaFactory = self::getContainer()->get('api_platform.json_schema.schema_factory');
+        $schema = $schemaFactory->buildSchema(DummyProperty::class, 'jsonapi', Schema::TYPE_OUTPUT);
+        $definitions = $schema->getDefinitions();
+        $anyOf = $definitions[$schema->getRootDefinitionKey()]['properties']['included']['items']['anyOf'];
+
+        $this->assertNotEmpty($anyOf);
+
+        $includedSchema = new MatchesJsonSchema(['definitions' => $definitions, 'anyOf' => $anyOf]);
+        $included = $response->toArray()['included'][0];
+
+        $this->assertThat($included, $includedSchema);
+        $this->assertThat(['type' => 1] + $included, $this->logicalNot($includedSchema));
     }
 
     public function testIncludeManyToOneRelation(): void

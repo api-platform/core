@@ -1,10 +1,64 @@
 # Changelog
 
+## v5.0.5
+
+API Platform 5.0.5 contains every change shipped in [v4.4.6](#v446), plus the changes below.
+
+### Bug fixes
+
+* [c1e21bb9d](https://github.com/api-platform/core/commit/c1e21bb9dba677be3e2903e16f328abeb939f705) fix(jsonapi): reject malformed request documents (#8736)
+* [3f081fece](https://github.com/api-platform/core/commit/3f081fecead21ab1705dea984f2527479d18faaf) fix(jsonapi): unwrap relationship linkage before denormalization (#8730)
+* [5974d943e](https://github.com/api-platform/core/commit/5974d943e07083aede1388453140e371a21855ef) fix(jsonapi): normalize symfony-rendered errors (#8731)
+* [acc6bfc26](https://github.com/api-platform/core/commit/acc6bfc265af71c2059da2cda0ab85d1a210b19d) fix(jsonapi): add status and title, fix pointer (#8755)
+* [a446a4f38](https://github.com/api-platform/core/commit/a446a4f3836ca0c8c2ec322fde10d1e808b60817) fix(jsonapi): keep bracket page param in links (#8753)
+* [4601b50b1](https://github.com/api-platform/core/commit/4601b50b1cb0006abf1b27028f95b1b8419c7447) fix(jsonapi): emit no empty properties list in attributes (#8757)
+* [1ad0bb44d](https://github.com/api-platform/core/commit/1ad0bb44df7822668f6eac6bbe1ae31a9a946f04) fix(jsonapi): split schema relationships on the input/output class (#8728)
+* [e03a71b60](https://github.com/api-platform/core/commit/e03a71b600547224340f62a9eb8a8a2c22bd5640) fix(jsonapi): document non-exposed relations in included schema (#8734)
+* [c810012f7](https://github.com/api-platform/core/commit/c810012f768c905d83cdd0222f1b20bbaac14456) fix(jsonapi): describe included items as resource objects (#8743)
+* [82496b3e8](https://github.com/api-platform/core/commit/82496b3e851ac79ac3165c44b84f04906ee21fce) fix(jsonapi): declare items on no-pagination collection data schema (#8727)
+* [715bba558](https://github.com/api-platform/core/commit/715bba55895116b61f2199563405218e2307798b) fix(hydra): keep jsonapi input schemas out of the json rewrite (#8741)
+* [80d869000](https://github.com/api-platform/core/commit/80d8690005289b3335dc7f03e068c07df0cf1b70) fix(openapi): use nullable instead of null type in 3.0 (#8754)
+* [7e1cb3072](https://github.com/api-platform/core/commit/7e1cb3072480705dacefddae58c292372423b507) fix(doctrine): support UTC datetime types in ORM filters (#8746)
+* [db299e9a1](https://github.com/api-platform/core/commit/db299e9a170bbcf9fd1629641c63512265670563) fix(httpcache): keep purging relations after a skipped one (#8738)
+
 ## v5.0.4
+
+API Platform 5.0.4 contains every change shipped in [v4.4.5](#v445), plus the changes below.
 
 ### Notes
 
 * Laravel: an optional `BelongsTo` or `MorphTo` relation (nullable foreign key column) is now typed as nullable, so it accepts `null` on write and clears the relation (#8664). This changes the generated docs for every nullable `BelongsTo`: JSON Schema and OpenAPI mark it nullable, and GraphQL drops the `!` on these fields, inputs included.
+
+### Features
+
+* [5bd3b330b](https://github.com/api-platform/core/commit/5bd3b330bd4f67befbb271391c16204f6e1d95e2) feat(metadata): accept operation class names in parameter operations (#8624)
+
+### Bug fixes
+
+* [52ae551a7](https://github.com/api-platform/core/commit/52ae551a7235f57fbaba809dab05d41426bbbf62) fix(doctrine): accept resolved resources in links (#8687)
+* [34c6f0081](https://github.com/api-platform/core/commit/34c6f00814d6526b2d905d7dac8c52272f65b4f1) fix(doctrine): put-create under a slug parent link (#8688)
+* [c33a56674](https://github.com/api-platform/core/commit/c33a5667470b38b3c1f2c79b6c332f251387f203) fix(laravel): accept null on an optional belongsTo (#8666)
+* [942d712d9](https://github.com/api-platform/core/commit/942d712d9aa30645b989b16b839029262d51cad9) fix(validator): returns 422 for backed enum errors (#8656)
+* [be1cc582f](https://github.com/api-platform/core/commit/be1cc582fe0de49e42b8b003f8786f0f35d6171c) fix(validator): support GroupSequence validation groups (#8645)
+* [48f0d3988](https://github.com/api-platform/core/commit/48f0d3988981ea41fe43fcde3bb5cbafa33dd019) fix(metadata): operation parameters take precedence over parameter attributes on properties (#8623)
+* [ea207ab00](https://github.com/api-platform/core/commit/ea207ab009b91347602b678f8c73542462d76250) fix(metadata): allow GraphQL operations in parameter attributes on properties (#8621)
+* [d4a7660b9](https://github.com/api-platform/core/commit/d4a7660b9e699c1f9ef661bc7a15182de3b839f4) fix(metadata): do not override the parameter provider with the filter provider (#8689)
+* [f4f60aa80](https://github.com/api-platform/core/commit/f4f60aa804994e6d34342112bafb8f6844fb70d4) fix(metadata): apply defaults that use a can* getter (#8691)
+* [a26acbe5a](https://github.com/api-platform/core/commit/a26acbe5ab38ea37a3f8526cdd8a5e76da3c2192) fix(metadata): keep queryParameterValidationEnabled on ApiResource (#8692)
+* [2b44e5ea0](https://github.com/api-platform/core/commit/2b44e5ea0c0c617a060384189339f3e605adc6a8) fix(metadata): pass stateOptions and map to the GraphQL QueryCollection parent constructor (#8693)
+* [82188af79](https://github.com/api-platform/core/commit/82188af791aae1fc7af390f0202c27749481b410) fix(metadata): copy contentNegotiation in withOperation() (#8694)
+* [431ab66d5](https://github.com/api-platform/core/commit/431ab66d535d19adec293a111e96859d12ed334b) fix(metadata): Put::withAllowCreate() and Link::withFromProperty() return a new instance (#8685)
+* [996c37a5c](https://github.com/api-platform/core/commit/996c37a5c31fa625b8d759c31ce79140fff35258) fix(metadata): keep explicit readableLink and writableLink on collections of non-resource classes (#8706)
+* [0aa5088bc](https://github.com/api-platform/core/commit/0aa5088bc815c2a794392fd69e57a76bba3fcf30) fix(doctrine): read the column default option with doctrine/orm 3 (#8705)
+* [e0ea3b09c](https://github.com/api-platform/core/commit/e0ea3b09c8a891d559610b4edfa13a9855db950d) fix(doctrine): accept SortDirection enum in ordering (#8662)
+* [dab2e7cbe](https://github.com/api-platform/core/commit/dab2e7cbea8b583f98b140924a08af64fbb62965) fix(jsonschema): keep operation groups in context (#8643)
+* [07babd80e](https://github.com/api-platform/core/commit/07babd80e59e67ba80cf837f51bf425f6efa692c) fix(jsonschema): nested gen_id follows the property (#8644)
+* [0d00de4a5](https://github.com/api-platform/core/commit/0d00de4a50507e632d617f2ab78e7bfab8c3b636) fix(jsonschema): nested resource ignores output DTO (#8652)
+* [c33594aa2](https://github.com/api-platform/core/commit/c33594aa2154aec04d327d59430bb1108899cf1e) fix(jsonschema): use allOf for intersection types (#8653)
+
+### Dependencies
+
+* `api-platform/doctrine-common` now requires `symfony/property-access` ([#8687](https://github.com/api-platform/core/pull/8687)).
 
 ## v5.0.3
 
@@ -98,6 +152,26 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
+
+## v4.4.6
+
+### Bug fixes
+
+* [1ea9db85c](https://github.com/api-platform/core/commit/1ea9db85c7596e0978b77ae5126da9e3535693e4) fix(symfony): drop translation command probe for object mapper (#8726)
+* [c9a56fbe4](https://github.com/api-platform/core/commit/c9a56fbe43441dc63387cc12b792e3ae930d8b77) fix(openapi): remove webhooks and jsonSchemaDialect from 3.0.0 documents (#8722)
+
+## v4.4.5
+
+### Bug fixes
+
+* [93383c416](https://github.com/api-platform/core/commit/93383c41695cda67292b367fa0c748bacf958e7b) fix(symfony): reset the Mercure publisher between requests (#8684)
+* [359c13bd2](https://github.com/api-platform/core/commit/359c13bd2c4423b4e310386ae8723dbad289bc0a) fix(symfony): reset the skolem IRI converter between requests (#8681)
+* [5a953cb1a](https://github.com/api-platform/core/commit/5a953cb1ad728cc87362bf66eaf570d4ad1920b5) fix(state): restore 422 for empty scalar params (#8675)
+* [4e8310224](https://github.com/api-platform/core/commit/4e83102243b1fcdbd54d0005a96e85b53031414d) fix(state): avoid deprecated PartialDenormalizationException::getErrors() (#8663)
+* [3e04ee396](https://github.com/api-platform/core/commit/3e04ee396f0cfed1ecf72be3c3681dd0fd1288ed) fix(doctrine): left join nested props in OrFilter (#8674)
+* [53225aa9e](https://github.com/api-platform/core/commit/53225aa9e27568843faadb6b3a73ae5992384d6f) fix(doctrine): use ON for arbitrary join in links (#8672)
+* [02a04450c](https://github.com/api-platform/core/commit/02a04450c610b4b0401ac747474521cdc3b74b65) fix(doctrine): use a portable LIKE escape char (#8671)
+* [a71b68357](https://github.com/api-platform/core/commit/a71b683571dc315842a8fb454e2cc866a0eca7e1) fix(jsonschema): emit an empty schema for mixed (#8670)
 
 ## v4.4.4
 
