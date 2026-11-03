@@ -69,7 +69,6 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
 
         // Collection associations (OneToMany/ManyToMany) require a JOIN to compare individual elements.
         if ($ormLeafMetadata['is_collection_valued']) {
-            // In an OR group, an INNER JOIN would drop the rows matched by the other branches
             if (Join::LEFT_JOIN === $this->joinTypeFor($context)) {
                 $queryBuilder->leftJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
             } else {
