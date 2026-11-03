@@ -1780,6 +1780,30 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
+    public function testDenormalizeBadWrappedKeyType(): void
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the key "a" must be');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummies']));
+
+        $type = Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::nullable(Type::int()));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType($type)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturnArgument(1);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, DenormalizerInterface::class]);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $this->createStub(PropertyAccessorInterface::class), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->denormalize(['relatedDummies' => ['a' => ['bar' => 'baz']]], Dummy::class);
+    }
+
     public function testNullable(): void
     {
         $data = [
