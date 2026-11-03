@@ -92,6 +92,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                     'example' => $propertyValues['example'] ?? null,
                     'schema' => $this->buildAttribute($propertyValues, 'schema'),
                     'genId' => $this->phpize($propertyValues, 'genId', 'bool'),
+                    'hydra' => $this->phpize($propertyValues, 'hydra', 'bool'),
                     'uriTemplate' => $this->phpize($propertyValues, 'uriTemplate', 'string'),
                     'property' => $this->phpize($propertyValues, 'property', 'string'),
                     'nativeType' => $this->phpize($propertyValues, 'nativeType', 'string'),
