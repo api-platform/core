@@ -195,6 +195,7 @@ return [
     // MCP (Model Context Protocol) configuration
     'mcp' => [
         'enabled' => true,
+        'middleware' => [],
     ],
 
     // install `api-platform/http-cache`
