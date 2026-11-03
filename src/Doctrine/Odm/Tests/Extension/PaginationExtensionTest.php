@@ -287,17 +287,16 @@ class PaginationExtensionTest extends TestCase
             'page_parameter_name' => '_page',
         ]);
 
-        $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
+        $aggregationBuilder = $this->createMock(Builder::class);
+        $aggregationBuilder->expects($this->never())->method('facet');
 
-        // the offset ((page - 1) * 30) still fits in an integer, but offset + limit does not
         $context = ['filters' => ['_page' => 307445734561825861, 'itemsPerPage' => 30]];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationPartial(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(30), $context);
+        $extension->applyToCollection($aggregationBuilder, 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationPartial(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(30), $context);
     }
 
     public function testSupportsResult(): void

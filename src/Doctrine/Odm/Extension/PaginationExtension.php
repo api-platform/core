@@ -59,7 +59,6 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
         [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
 
-        // $offset + $limit is used as an integer limit below, it must not overflow
         if (!$doesCount && $limit > 0 && $offset > \PHP_INT_MAX - $limit) {
             throw new InvalidArgumentException('Page parameter is too large.');
         }
