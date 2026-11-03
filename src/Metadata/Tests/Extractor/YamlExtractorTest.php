@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -644,5 +645,13 @@ class YamlExtractorTest extends TestCase
         return [
             [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml".'],
         ];
+    }
+
+    #[IgnoreDeprecations]
+    public function testQueryParameterValidateIsDeprecated(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: The "queryParameterValidate" option has no effect, it is deprecated and will be removed in 6.0. Use "queryParameterValidationEnabled" instead.');
+
+        (new YamlResourceExtractor([__DIR__.'/yaml/query-parameter-validate.yaml']))->getResources();
     }
 }

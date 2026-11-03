@@ -418,7 +418,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             }
 
             $data[] = array_merge($datum, [
-                'collection' => $this->phpize($operation, 'collection', 'bool'),
                 'class' => (string) $operation['class'],
                 'method' => $this->phpize($operation, 'method', 'string'),
                 'read' => $this->phpize($operation, 'read', 'bool'),
@@ -426,7 +425,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 'validate' => $this->phpize($operation, 'validate', 'bool'),
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
-                'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
