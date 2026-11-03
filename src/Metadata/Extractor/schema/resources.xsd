@@ -23,6 +23,7 @@
         <xsd:attributeGroup ref="extendedBase"/>
         <xsd:attribute type="xsd:string" name="uriTemplate"/>
         <xsd:attribute type="xsd:string" name="class" use="required"/>
+        <xsd:attribute type="xsd:boolean" name="openapi"/>
     </xsd:complexType>
 
     <xsd:complexType name="operations">
@@ -45,7 +46,7 @@
         <xsd:attribute type="xsd:boolean" name="write"/>
         <xsd:attribute type="xsd:boolean" name="serialize"/>
         <xsd:attribute type="xsd:boolean" name="openapi"/>
-        <xsd:attribute type="xsd:positiveInteger" name="priority"/>
+        <xsd:attribute type="xsd:integer" name="priority"/>
         <xsd:attribute type="xsd:integer" name="routePriority"/>
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
@@ -73,14 +74,14 @@
         <xsd:attribute type="xsd:boolean" name="validate"/>
         <xsd:attribute type="xsd:boolean" name="write"/>
         <xsd:attribute type="xsd:boolean" name="serialize"/>
-        <xsd:attribute type="xsd:positiveInteger" name="priority"/>
+        <xsd:attribute type="xsd:integer" name="priority"/>
         <xsd:attribute type="xsd:integer" name="routePriority"/>
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>
 
     <xsd:complexType name="args">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="arg" maxOccurs="unbounded" type="arg"/>
+        <xsd:sequence>
+            <xsd:element name="arg" minOccurs="0" maxOccurs="unbounded" type="arg"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -420,7 +421,7 @@
 
     <xsd:complexType name="links">
         <xsd:sequence>
-            <xsd:element ref="link"/>
+            <xsd:element ref="link" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -433,7 +434,7 @@
 
     <xsd:complexType name="headers">
         <xsd:sequence>
-            <xsd:element ref="header"/>
+            <xsd:element ref="header" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -513,8 +514,8 @@
         <xsd:attribute type="xsd:boolean" name="paginationEnabled"/>
         <xsd:attribute type="xsd:boolean" name="paginationFetchJoinCollection"/>
         <xsd:attribute type="xsd:boolean" name="paginationUseOutputWalkers"/>
-        <xsd:attribute type="xsd:positiveInteger" name="paginationItemsPerPage"/>
-        <xsd:attribute type="xsd:positiveInteger" name="paginationMaximumItemsPerPage"/>
+        <xsd:attribute type="xsd:nonNegativeInteger" name="paginationItemsPerPage"/>
+        <xsd:attribute type="xsd:nonNegativeInteger" name="paginationMaximumItemsPerPage"/>
         <xsd:attribute type="xsd:boolean" name="paginationPartial"/>
         <xsd:attribute type="xsd:string" name="paginationType"/>
         <xsd:attribute type="xsd:string" name="processor"/>

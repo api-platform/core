@@ -80,7 +80,7 @@ trait ResourceExtractorTrait
 
     private function buildArgs(\SimpleXMLElement $resource): ?array
     {
-        if (!isset($resource->args->arg)) {
+        if (!isset($resource->args)) {
             return null;
         }
 
