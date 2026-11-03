@@ -77,13 +77,13 @@ trait OperationDefaultsTrait
                     $value = [$value];
                 }
 
-                $value = array_merge($value, $currentValue);
-
-                if (array_is_list($value)) {
-                    $value = array_values(array_unique($value, \SORT_REGULAR));
+                foreach ($value as $index => $item) {
+                    if (\is_int($index) && \in_array($item, $currentValue, true)) {
+                        unset($value[$index]);
+                    }
                 }
 
-                $operation = $operation->{'with'.$upperKey}($value);
+                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
             }
 
             if (null !== $currentValue || null === $value) {
