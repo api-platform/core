@@ -1032,7 +1032,7 @@ class ApiPlatformProvider extends ServiceProvider
             $this->registerGraphQl();
         }
 
-        if (class_exists(McpController::class)) {
+        if (class_exists(McpController::class) && $this->app['config']->get('api-platform.mcp.enabled', true)) {
             $this->registerMcp();
         }
 
