@@ -551,23 +551,24 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']);
-        if (isset($this->safeCacheKeysCache[$resourceClass])) {
-            return $this->safeCacheKeysCache[$resourceClass];
+        $options = $this->getFactoryOptions($context);
+        $cacheKey = $resourceClass.'|'.hash('xxh128', serialize($options));
+        if (isset($this->safeCacheKeysCache[$cacheKey])) {
+            return $this->safeCacheKeysCache[$cacheKey];
         }
 
-        $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
-        $this->safeCacheKeysCache[$resourceClass] = true;
+        $this->safeCacheKeysCache[$cacheKey] = true;
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
-            if (null !== $propertyMetadata->getSecurity()) {
-                $this->safeCacheKeysCache[$resourceClass] = false;
+            if (null !== ($propertyMetadata->getSecurity() ?? $propertyMetadata->getPolicy())) {
+                $this->safeCacheKeysCache[$cacheKey] = false;
                 break;
             }
         }
 
-        return $this->safeCacheKeysCache[$resourceClass];
+        return $this->safeCacheKeysCache[$cacheKey];
     }
 
     /**

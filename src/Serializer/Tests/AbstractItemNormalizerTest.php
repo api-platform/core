@@ -364,6 +364,82 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => SecuredDummy::class]));
     }
 
+    public function testNormalizeDoesNotCacheAttributesGuardedByPolicy(): void
+    {
+        $dummy = new SecuredDummy();
+        $dummy->setTitle('myPublicTitle');
+        $dummy->setAdminOnlyProperty('secret');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => 'adminOnlyProperty' === $property
+            ? (new ApiProperty())->withReadable(true)->withPolicy('adminOnly')
+            : (new ApiProperty())->withReadable(true));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/secured_dummies/1');
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturnCallback(static fn (object $object, string $property): string => 'title' === $property ? 'myPublicTitle' : 'secret');
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(SecuredDummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturnOnConsecutiveCalls(true, false);
+
+        $serializer = $this->createStub(Serializer::class);
+        $serializer->method('normalize')->willReturnArgument(0);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, $resourceAccessChecker) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $context = ['resources' => []];
+        $this->assertArrayHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, $context));
+        $this->assertArrayNotHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, $context));
+    }
+
+    public function testNormalizeSafeCacheKeyDependsOnSerializerGroups(): void
+    {
+        $dummy = new SecuredDummy();
+        $dummy->setTitle('myPublicTitle');
+        $dummy->setAdminOnlyProperty('secret');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class, array $options): PropertyNameCollection => new PropertyNameCollection(['admin'] === ($options['serializer_groups'] ?? null) ? ['title', 'adminOnlyProperty'] : ['title']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => 'adminOnlyProperty' === $property
+            ? (new ApiProperty())->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')')
+            : (new ApiProperty())->withReadable(true));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/secured_dummies/1');
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturnCallback(static fn (object $object, string $property): string => 'title' === $property ? 'myPublicTitle' : 'secret');
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(SecuredDummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturnOnConsecutiveCalls(true, false);
+
+        $serializer = $this->createStub(Serializer::class);
+        $serializer->method('normalize')->willReturnArgument(0);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, $resourceAccessChecker) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->normalize($dummy, null, ['resources' => [], 'groups' => ['public']]);
+        $this->assertArrayHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, ['resources' => [], 'groups' => ['admin']]));
+        $this->assertArrayNotHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, ['resources' => [], 'groups' => ['admin']]));
+    }
+
     private function createCacheKeySafeProbe(
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         PropertyMetadataFactoryInterface $propertyMetadataFactory,
