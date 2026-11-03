@@ -29,16 +29,25 @@ final class EqualsFilter implements FilterInterface
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
         if (\is_array($values)) {
-            $values = array_values(array_filter($values, static fn (mixed $value): bool => \is_scalar($value) || $value instanceof \DateTimeInterface));
+            if (!array_is_list($values)) {
+                return $builder;
+            }
 
-            if (!$values) {
+            $in = [];
+            foreach ($values as $value) {
+                if (!\is_array($value)) {
+                    $in[] = $value;
+                }
+            }
+
+            if (!$in) {
                 return $builder;
             }
 
             return $this->addNestedParameterJoins(
                 $builder,
                 $parameter,
-                static fn (Builder $query, string $property, string $whereClause) => $query->{$whereClause.'In'}($property, $values),
+                static fn (Builder $query, string $property, string $whereClause) => $query->{$whereClause.'In'}($property, $in),
                 $context['whereClause'] ?? 'where'
             );
         }
