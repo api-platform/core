@@ -1782,33 +1782,25 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testDenormalizeBadWrappedKeyType(): void
     {
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $this->markTestSkipped('Wrapping key types require symfony/type-info.');
-        }
-
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The type of the key "a" must be');
 
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['relatedDummies']));
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummies']));
 
         $type = Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::nullable(Type::int()));
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType($type)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType($type)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturnArgument(1);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(DenormalizerInterface::class);
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, DenormalizerInterface::class]);
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(IriConverterInterface::class)->reveal(), $resourceClassResolverProphecy->reveal(), $this->prophesize(PropertyAccessorInterface::class)->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
-        $normalizer->setSerializer($serializerProphecy->reveal());
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $this->createStub(PropertyAccessorInterface::class), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
 
-        // the nullable key type is unwrapped instead of looping forever
         $normalizer->denormalize(['relatedDummies' => ['a' => ['bar' => 'baz']]], Dummy::class);
     }
 
