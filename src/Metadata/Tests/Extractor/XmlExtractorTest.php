@@ -185,7 +185,7 @@ class XmlExtractorTest extends TestCase
                     'messenger' => 'input',
                     'order' => ['foo', 'bar'],
                     'paginationViaCursor' => [
-                        'id' => 'DESC',
+                        ['field' => 'id', 'direction' => 'DESC'],
                     ],
                     'exceptionToStatus' => [
                         ExceptionInterface::class => 400,
@@ -263,7 +263,7 @@ class XmlExtractorTest extends TestCase
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                'id' => 'DESC',
+                                ['field' => 'id', 'direction' => 'DESC'],
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -370,7 +370,7 @@ class XmlExtractorTest extends TestCase
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                'id' => 'DESC',
+                                ['field' => 'id', 'direction' => 'DESC'],
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -431,6 +431,16 @@ class XmlExtractorTest extends TestCase
                 ],
             ],
         ], $extractor->getResources());
+    }
+
+    public function testPaginationViaCursor(): void
+    {
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/pagination_via_cursor.xml']))->getResources();
+
+        $this->assertSame([
+            ['field' => 'id', 'direction' => 'DESC'],
+            ['field' => 'createdAt', 'direction' => 'ASC'],
+        ], $resources[Comment::class][0]['paginationViaCursor']);
     }
 
     public function testContainerParametersAreResolved(): void
