@@ -114,10 +114,15 @@ class EloquentTest extends TestCase
 
     public function testPartialSearchFilterWithArrayValue(): void
     {
-        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        foreach (['Alpha', 'Bravo', 'Charlie'] as $name) {
+            BookFactory::new()->has(AuthorFactory::new())->create(['name' => $name]);
+        }
 
-        $this->get('/api/books?name[]=a&name[]=b', ['Accept' => ['application/ld+json']])->assertOk();
-        $this->get('/api/books?name[x]=a', ['Accept' => ['application/ld+json']])->assertOk();
+        $response = $this->get('/api/books?name[]=lph&name[]=rav', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertEqualsCanonicalizing(['Alpha', 'Bravo'], array_column($response->json()['member'], 'name'));
+
+        $response = $this->get('/api/books?name[x]=lph', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertCount(3, $response->json()['member']);
     }
 
     public function testDateFilterEqual(): void
