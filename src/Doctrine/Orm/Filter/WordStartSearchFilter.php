@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
@@ -32,6 +33,7 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
     use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = false)
     {
@@ -48,12 +50,9 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
         $property = $parameter->getProperty();
         $values = $parameter->getValue();
 
-        if (\is_array($values)) {
-            // nested arrays (e.g. "?name[][foo]=bar") cannot be matched against a field
-            $values = array_values(array_filter($values, \is_scalar(...)));
-            if ([] === $values) {
-                return;
-            }
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
         }
 
         $alias = $queryBuilder->getRootAliases()[0];

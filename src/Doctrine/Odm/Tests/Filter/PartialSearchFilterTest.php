@@ -13,13 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Tests\Filter;
 
+use ApiPlatform\Doctrine\Odm\Filter\EndSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\WordStartSearchFilter;
 use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\RelatedDummy;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class PartialSearchFilterTest extends TestCase
@@ -148,10 +153,17 @@ class PartialSearchFilterTest extends TestCase
         $this->assertArrayHasKey('match', $context);
     }
 
-    public function testPartialSearchIgnoresNestedArrayValues(): void
+    public static function provideSearchFilters(): iterable
     {
-        $filter = new PartialSearchFilter();
+        yield 'partial' => [new PartialSearchFilter()];
+        yield 'start' => [new StartSearchFilter()];
+        yield 'end' => [new EndSearchFilter()];
+        yield 'word start' => [new WordStartSearchFilter()];
+    }
 
+    #[DataProvider('provideSearchFilters')]
+    public function testNestedArrayValuesAreIgnored(FilterInterface $filter): void
+    {
         $parameter = new QueryParameter(property: 'name', key: 'name');
         $parameter->setValue([['foo' => 'bar']]);
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
@@ -164,26 +176,6 @@ class PartialSearchFilterTest extends TestCase
         $filter->apply($aggregationBuilder, Dummy::class, null, $context);
 
         $this->assertArrayNotHasKey('match', $context);
-        $this->assertNoPipelineStages($aggregationBuilder);
-    }
-
-    public function testPartialSearchSkipsNestedArrayValuesAmongScalarValues(): void
-    {
-        $filter = new PartialSearchFilter();
-
-        $parameter = new QueryParameter(property: 'name', key: 'name');
-        $parameter->setValue([['foo' => 'bar'], 'baz']);
-        $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
-
-        $context = [
-            'parameter' => $parameter,
-            'filters' => ['name' => [['foo' => 'bar'], 'baz']],
-        ];
-
-        $filter->apply($aggregationBuilder, Dummy::class, null, $context);
-
-        $this->assertArrayHasKey('match', $context);
-        $this->assertNoPipelineStages($aggregationBuilder);
     }
 
     private function assertNoPipelineStages(Builder $aggregationBuilder): void

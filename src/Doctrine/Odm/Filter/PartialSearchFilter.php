@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -30,6 +31,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = true)
     {
@@ -51,12 +53,9 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             return;
         }
 
-        if (\is_array($values)) {
-            // nested arrays (e.g. "?name[][foo]=bar") cannot be matched against a field
-            $values = array_values(array_filter($values, \is_scalar(...)));
-            if ([] === $values) {
-                return;
-            }
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
         }
 
         $match = $context['match'] = $context['match'] ??
