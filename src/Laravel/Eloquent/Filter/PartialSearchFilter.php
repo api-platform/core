@@ -28,10 +28,26 @@ final class PartialSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
+        if (\is_array($values) && !array_is_list($values)) {
+            return $builder;
+        }
+
         return $this->addNestedParameterJoins(
             $builder,
             $parameter,
-            static fn (Builder $query, string $property, string $whereClause) => $query->{$whereClause}($property, 'like', '%'.$values.'%'),
+            static function (Builder $query, string $property, string $whereClause) use ($values) {
+                if (!\is_array($values)) {
+                    return $query->{$whereClause}($property, 'like', '%'.$values.'%');
+                }
+
+                return $query->{$whereClause}(static function (Builder $group) use ($property, $values): void {
+                    foreach ($values as $value) {
+                        if (!\is_array($value)) {
+                            $group->orWhere($property, 'like', '%'.$value.'%');
+                        }
+                    }
+                });
+            },
             $context['whereClause'] ?? 'where'
         );
     }

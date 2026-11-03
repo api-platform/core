@@ -277,6 +277,28 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationPartial(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(20), $context);
     }
 
+    public function testApplyToCollectionWithPartialPaginationAndPageTooLarge(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Page parameter is too large.');
+
+        $pagination = new Pagination([
+            'partial' => true,
+            'page_parameter_name' => '_page',
+        ]);
+
+        $aggregationBuilder = $this->createMock(Builder::class);
+        $aggregationBuilder->expects($this->never())->method('facet');
+
+        $context = ['filters' => ['_page' => 307445734561825861, 'itemsPerPage' => 30]];
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $extension->applyToCollection($aggregationBuilder, 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationPartial(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(30), $context);
+    }
+
     public function testSupportsResult(): void
     {
         $pagination = new Pagination();

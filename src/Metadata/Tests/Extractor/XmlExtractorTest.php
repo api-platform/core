@@ -185,7 +185,7 @@ class XmlExtractorTest extends TestCase
                     'messenger' => 'input',
                     'order' => ['foo', 'bar'],
                     'paginationViaCursor' => [
-                        'id' => 'DESC',
+                        ['field' => 'id', 'direction' => 'DESC'],
                     ],
                     'exceptionToStatus' => [
                         ExceptionInterface::class => 400,
@@ -263,7 +263,7 @@ class XmlExtractorTest extends TestCase
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                'id' => 'DESC',
+                                ['field' => 'id', 'direction' => 'DESC'],
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -370,7 +370,7 @@ class XmlExtractorTest extends TestCase
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                'id' => 'DESC',
+                                ['field' => 'id', 'direction' => 'DESC'],
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -433,6 +433,16 @@ class XmlExtractorTest extends TestCase
         ], $extractor->getResources());
     }
 
+    public function testPaginationViaCursor(): void
+    {
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/pagination_via_cursor.xml']))->getResources();
+
+        $this->assertSame([
+            ['field' => 'id', 'direction' => 'DESC'],
+            ['field' => 'createdAt', 'direction' => 'ASC'],
+        ], $resources[Comment::class][0]['paginationViaCursor']);
+    }
+
     public function testContainerParametersAreResolved(): void
     {
         $parameters = [
@@ -459,6 +469,17 @@ class XmlExtractorTest extends TestCase
         $this->assertSame('is_granted("ROLE_USER")', $resources[User::class][0]['operations'][0]['security']);
     }
 
+    public function testParameterOpenApiAndPriority(): void
+    {
+        $parameter = (new XmlResourceExtractor([__DIR__.'/xml/parameter_openapi.xml']))->getResources()[Comment::class][0]['parameters']['q'];
+
+        $this->assertSame(10, $parameter->getPriority());
+        $this->assertSame('q', $parameter->getOpenApi()->getName());
+        $this->assertSame('query', $parameter->getOpenApi()->getIn());
+        $this->assertSame('Search', $parameter->getOpenApi()->getDescription());
+        $this->assertTrue($parameter->getOpenApi()->getAllowReserved());
+    }
+
     #[DataProvider('getInvalidPaths')]
     public function testInvalidXML(string $path, string $error): void
     {
@@ -476,6 +497,18 @@ class XmlExtractorTest extends TestCase
                 "/^Error while parsing .+\/xml\/invalid\/required_class.xml: \[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./",
             ],
         ];
+    }
+
+    public function testLessStrictSchema(): void
+    {
+        $resource = (new XmlResourceExtractor([__DIR__.'/xml/less_strict_schema.xml']))->getResources()[Comment::class][0];
+
+        $this->assertFalse($resource['openapi']);
+        $this->assertSame(0, $resource['paginationItemsPerPage']);
+        $this->assertSame(['https://example.com/a', 'https://example.com/b'], array_map(static fn ($link) => $link->getHref(), $resource['links']));
+        $this->assertSame(['X-A' => 'a', 'X-B' => 'b'], $resource['headers']);
+        $this->assertSame(-1, $resource['operations'][0]['priority']);
+        $this->assertSame([], $resource['graphQlOperations'][0]['args']);
     }
 
     /**
@@ -506,5 +539,17 @@ class XmlExtractorTest extends TestCase
         $this->assertEquals('path', $parameters[0]->getIn());
         $this->assertEquals('john-doe', $parameters[0]->getExample());
         $this->assertEquals('format', $parameters[1]->getName());
+    }
+
+    public function testOpenApiExternalDocsAndOptionalAttributes(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_optional_attributes.xml']);
+        $openapi = $extractor->getResources()[Program::class][0]['operations'][0]['openapi'];
+
+        $this->assertSame('More about programs', $openapi->getExternalDocs()->getDescription());
+        $this->assertSame('https://example.com/programs', $openapi->getExternalDocs()->getUrl());
+        $this->assertSame('', $openapi->getParameters()[0]->getDescription());
+        $this->assertFalse($openapi->getParameters()[0]->getRequired());
+        $this->assertFalse($openapi->getRequestBody()->getRequired());
     }
 }

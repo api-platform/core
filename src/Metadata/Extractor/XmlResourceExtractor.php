@@ -218,8 +218,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         $data['externalDocs'] = isset($openapi->externalDocs) ? new ExternalDocumentation(
-            description: $this->phpize($resource, 'description', 'string'),
-            url: $this->phpize($resource, 'url', 'string'),
+            description: $this->phpize($openapi->externalDocs, 'description', 'string', ''),
+            url: $this->phpize($openapi->externalDocs, 'url', 'string', ''),
         ) : null;
 
         if (isset($openapi->parameters->parameter)) {
@@ -227,8 +227,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 $data['parameters'][] = new OpenApiParameter(
                     name: $this->phpize($parameter, 'name', 'string'),
                     in: $this->phpize($parameter, 'in', 'string'),
-                    description: $this->phpize($parameter, 'description', 'string'),
-                    required: $this->phpize($parameter, 'required', 'bool'),
+                    description: $this->phpize($parameter, 'description', 'string', ''),
+                    required: $this->phpize($parameter, 'required', 'bool', false),
                     deprecated: $this->phpize($parameter, 'deprecated', 'bool', false),
                     allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool', null),
                     schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : [],
@@ -244,7 +244,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $data['requestBody'] = isset($openapi->requestBody) ? new RequestBody(
             description: $this->phpize($openapi->requestBody, 'description', 'string'),
             content: isset($openapi->requestBody->content->values) ? new \ArrayObject($this->buildValues($openapi->requestBody->content->values)) : null,
-            required: $this->phpize($openapi->requestBody, 'required', 'bool'),
+            required: $this->phpize($openapi->requestBody, 'required', 'bool', false),
         ) : null;
 
         $data['callbacks'] = isset($openapi->callbacks->values) ? new \ArrayObject($this->buildValues($openapi->callbacks->values)) : null;
@@ -363,7 +363,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
         $data = [];
         foreach ($resource->paginationViaCursor->paginationField as $paginationField) {
-            $data[(string) $paginationField['field']] = (string) $paginationField['direction'];
+            $data[] = ['field' => (string) $paginationField['field'], 'direction' => (string) $paginationField['direction']];
         }
 
         return $data;
@@ -509,8 +509,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         $links = [];
-        foreach ($resource->links as $link) {
-            $links[] = new Link(rel: (string) $link->link->attributes()->rel, href: (string) $link->link->attributes()->href);
+        foreach ($resource->links->link as $link) {
+            $links[] = new Link(rel: (string) $link->attributes()->rel, href: (string) $link->attributes()->href);
         }
 
         return $links;
@@ -526,8 +526,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         $headers = [];
-        foreach ($resource->headers as $header) {
-            $headers[(string) $header->header->attributes()->key] = (string) $header->header->attributes()->value;
+        foreach ($resource->headers->header as $header) {
+            $headers[(string) $header->attributes()->key] = (string) $header->attributes()->value;
         }
 
         return $headers;
@@ -552,12 +552,12 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : null,
                 openApi: isset($parameter->openapi) ? new OpenApiParameter(
                     name: $this->phpize($parameter->openapi, 'name', 'string'),
-                    in: $this->phpize($parameter->openapi, 'in', 'string'),
-                    description: $this->phpize($parameter->openapi, 'description', 'string'),
-                    required: $this->phpize($parameter->openapi, 'required', 'bool'),
-                    deprecated: $this->phpize($parameter->openapi, 'deprecated', 'bool'),
+                    in: $this->phpize($parameter->openapi, 'in', 'string', $this->phpize($parameter, 'in', 'string', 'query')),
+                    description: $this->phpize($parameter->openapi, 'description', 'string', ''),
+                    required: $this->phpize($parameter->openapi, 'required', 'bool', false),
+                    deprecated: $this->phpize($parameter->openapi, 'deprecated', 'bool', false),
                     allowEmptyValue: $this->phpize($parameter->openapi, 'allowEmptyValue', 'bool'),
-                    schema: isset($parameter->openapi->schema->values) ? $this->buildValues($parameter->openapi->schema->values) : null,
+                    schema: isset($parameter->openapi->schema->values) ? $this->buildValues($parameter->openapi->schema->values) : [],
                     style: $this->phpize($parameter->openapi, 'style', 'string'),
                     explode: $this->phpize($parameter->openapi, 'explode', 'bool'),
                     allowReserved: $this->phpize($parameter->openapi, 'allowReserved', 'bool'),

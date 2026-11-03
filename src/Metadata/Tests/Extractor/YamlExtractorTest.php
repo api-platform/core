@@ -539,6 +539,15 @@ class YamlExtractorTest extends TestCase
         $this->assertEquals('john-doe', $operation->getParameters()[0]->getExample());
     }
 
+    public function testOpenApiParametersAllowReserved(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/openapi-allow-reserved.yaml']))->getResources();
+        $operation = $resources[Program::class][0]['operations'][0];
+
+        $this->assertTrue($operation['openapi']->getParameters()[0]->getAllowReserved());
+        $this->assertTrue($operation['parameters']['q']->getOpenApi()->getAllowReserved());
+    }
+
     public function testOpenApiParameterWithoutNameThrowsClearException(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -579,6 +588,14 @@ class YamlExtractorTest extends TestCase
 
         $this->assertArrayHasKey('output', $resources[Program::class][0]['operations'][0]);
         $this->assertSame(Program::class.'Output', $resources[Program::class][0]['operations'][0]['output']);
+    }
+
+    public function testScalarTypes(): void
+    {
+        $resource = (new YamlResourceExtractor([__DIR__.'/yaml/scalar-types.yaml']))->getResources()[Program::class][0];
+
+        $this->assertFalse($resource['paginationEnabled']);
+        $this->assertSame(['class' => Program::class, 'name' => 'ProgramInput'], $resource['input']);
     }
 
     public function testExtendingYamlResourcesByMultipleYamlFiles(): void

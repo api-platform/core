@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -30,6 +31,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = true)
     {
@@ -48,6 +50,11 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
         if (\is_array($values) && !array_is_list($values)) {
             // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
+
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
             return;
         }
 
