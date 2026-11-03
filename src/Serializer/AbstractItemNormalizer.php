@@ -308,9 +308,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $securityMessage = $operation?->getSecurityMessage() ?? null;
 
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
-        foreach (array_keys($data) as $attribute) {
-            $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
-
+        foreach ($this->getDenormalizedAttributes($data, $resourceClass, $format, $context) as $attribute) {
             try {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
             } catch (PropertyNotFoundException) {
@@ -336,6 +334,54 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $object;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getDenormalizedAttributes(array $data, string $resourceClass, ?string $format, array $context): array
+    {
+        $attributes = [];
+
+        if ($this->classMetadataFactory?->hasMetadataFor($resourceClass)) {
+            foreach ($this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() as $propertyName => $attributeMetadata) {
+                $elements = $attributeMetadata->getSerializedPath()?->getElements();
+                if (!$elements || !$this->hasNestedValue($elements, $data)) {
+                    continue;
+                }
+
+                $attributes[] = $propertyName;
+                $data = $this->removeNestedValue($elements, $data);
+            }
+        }
+
+        foreach (array_keys($data) as $key) {
+            $attributes[] = $this->nameConverter ? $this->nameConverter->denormalize((string) $key, $resourceClass, $format, $context) : (string) $key;
+        }
+
+        return array_values(array_unique($attributes));
+    }
+
+    private function hasNestedValue(array $path, mixed $data): bool
+    {
+        foreach ($path as $element) {
+            if (!\is_array($data) || !\array_key_exists($element, $data)) {
+                return false;
+            }
+            $data = $data[$element];
+        }
+
+        return true;
+    }
+
+    private function removeNestedValue(array $path, array $data): array
+    {
+        $element = array_shift($path);
+        if (!$path || !\is_array($data[$element]) || !$data[$element] = $this->removeNestedValue($path, $data[$element])) {
+            unset($data[$element]);
+        }
+
+        return $data;
     }
 
     /**
