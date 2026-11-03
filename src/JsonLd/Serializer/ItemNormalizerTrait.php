@@ -55,7 +55,6 @@ trait ItemNormalizerTrait
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        // The @id is resolved as an IRI below, reject anything else than a string
         if (isset($data['@id']) && !\is_string($data['@id']) && (!isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]) || ($context['deep_object_to_populate'] ?? false))) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "@id" attribute must be "string", "%s" given.', \gettype($data['@id'])), $data['@id'], ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.@id' : '@id', true);
         }

@@ -22,8 +22,6 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
@@ -31,8 +29,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 class ItemDenormalizerTest extends TestCase
 {
-    use ProphecyTrait;
-
     public static function provideNonStringIds(): iterable
     {
         yield 'integer' => [123];
@@ -43,24 +39,20 @@ class ItemDenormalizerTest extends TestCase
     #[DataProvider('provideNonStringIds')]
     public function testDenormalizeRejectsNonStringId(mixed $id): void
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->shouldNotBeCalled();
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->expects($this->never())->method('getResourceFromIri');
 
         $denormalizer = new ItemDenormalizer(
-            $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(),
-            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
-            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $iriConverterProphecy->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal()
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $this->createStub(PropertyNameCollectionFactoryInterface::class),
+            $this->createStub(PropertyMetadataFactoryInterface::class),
+            $iriConverter,
+            $this->createStub(ResourceClassResolverInterface::class)
         );
 
-        try {
-            $denormalizer->denormalize(['@id' => $id], RelatedDummy::class, ItemDenormalizer::FORMAT, ['deserialization_path' => 'relatedDummy']);
-            $this->fail('A NotNormalizableValueException should have been thrown.');
-        } catch (NotNormalizableValueException $e) {
-            $this->assertSame('relatedDummy.@id', $e->getPath());
-            $this->assertSame(['string'], $e->getExpectedTypes());
-            $this->assertTrue($e->canUseMessageForUser());
-        }
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the "@id" attribute must be "string"');
+
+        $denormalizer->denormalize(['@id' => $id], RelatedDummy::class, ItemDenormalizer::FORMAT, ['deserialization_path' => 'relatedDummy']);
     }
 }

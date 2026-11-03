@@ -69,6 +69,7 @@ trait ItemNormalizerTrait
             } elseif (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             } else {
+                $this->assertValidId($data['data']['id'], 'The type of the "data.id" attribute', 'data.id');
                 $context += ['fetch_data' => false];
                 if ($this->useIriAsId) {
                     $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['data']['id'], $context);
@@ -105,6 +106,13 @@ trait ItemNormalizerTrait
         }
     }
 
+    private function assertValidId(mixed $id, string $subject, ?string $path): void
+    {
+        if (!\is_string($id) && ($this->useIriAsId || !\is_int($id))) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('%s must be "string", "%s" given.', $subject, \gettype($id)), $id, ['string'], $path, true);
+        }
+    }
+
     private function isJsonObject(mixed $value): bool
     {
         return \is_array($value) && ([] === $value || !array_is_list($value));
@@ -132,10 +140,7 @@ trait ItemNormalizerTrait
             throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
-        // integer identifiers are still accepted when the id is not an IRI, they are cast to string below
-        if (!\is_string($value['id']) && ($this->useIriAsId || !\is_int($value['id']))) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "id" attribute of the "%s" relationship must be "string", "%s" given.', $attributeName, \gettype($value['id'])), $value['id'], ['string'], $context['deserialization_path'] ?? null, true);
-        }
+        $this->assertValidId($value['id'], \sprintf('The type of the "id" attribute of the "%s" relationship', $attributeName), $context['deserialization_path'] ?? null);
 
         try {
             $context += ['fetch_data' => true];

@@ -19,6 +19,8 @@ use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
 use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -26,9 +28,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\TypeInfo\Type;
 
 class ItemDenormalizerTest extends TestCase
 {
@@ -84,46 +86,33 @@ class ItemDenormalizerTest extends TestCase
         );
     }
 
-    public static function provideNonStringRelationshipIds(): iterable
+    public static function provideNonStringIds(): iterable
     {
-        yield 'integer' => [1, true];
-        yield 'array' => [['x'], true];
-        yield 'boolean' => [true, true];
-        yield 'array in identifier mode' => [['x'], false];
+        yield 'array resource id' => [['data' => ['id' => ['x'], 'type' => 'Dummy']], true];
+        yield 'integer resource id with IRIs' => [['data' => ['id' => 1, 'type' => 'Dummy']], true];
+        yield 'array resource id without IRIs' => [['data' => ['id' => ['x'], 'type' => 'Dummy']], false];
+        yield 'integer relationship id with IRIs' => [['data' => ['type' => 'Dummy', 'relationships' => ['relatedDummy' => ['data' => ['id' => 1, 'type' => 'RelatedDummy']]]]], true];
+        yield 'array relationship id' => [['data' => ['type' => 'Dummy', 'relationships' => ['relatedDummy' => ['data' => ['id' => ['x'], 'type' => 'RelatedDummy']]]]], false];
     }
 
-    #[DataProvider('provideNonStringRelationshipIds')]
-    public function testDenormalizeRelationRejectsNonStringId(mixed $id, bool $useIriAsId): void
+    #[DataProvider('provideNonStringIds')]
+    public function testDenormalizeRejectsNonStringId(array $data, bool $useIriAsId): void
     {
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->shouldNotBeCalled();
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummy']));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::object(RelatedDummy::class))->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->expects($this->never())->method('getResourceFromIri');
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturnArgument(1);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $denormalizer = new ItemDenormalizer(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            useIriAsId: $useIriAsId,
-        );
+        $denormalizer = new ItemDenormalizer($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, useIriAsId: $useIriAsId);
 
-        try {
-            (new \ReflectionMethod($denormalizer, 'denormalizeRelation'))->invoke(
-                $denormalizer,
-                'relatedDummy',
-                new ApiProperty(),
-                RelatedDummy::class,
-                ['type' => 'RelatedDummy', 'id' => $id],
-                ItemDenormalizer::FORMAT,
-                ['deserialization_path' => 'relatedDummy']
-            );
-            $this->fail('A NotNormalizableValueException should have been thrown.');
-        } catch (NotNormalizableValueException $e) {
-            $this->assertSame('relatedDummy', $e->getPath());
-            $this->assertSame(['string'], $e->getExpectedTypes());
-            $this->assertTrue($e->canUseMessageForUser());
-        }
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessageMatches('/must be "string"/');
+
+        $denormalizer->denormalize($data, Dummy::class, ItemDenormalizer::FORMAT, ['operation' => new Patch()]);
     }
 }
