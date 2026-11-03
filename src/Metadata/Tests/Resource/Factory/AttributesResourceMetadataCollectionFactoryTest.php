@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -437,7 +438,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $factory = new AttributesResourceMetadataCollectionFactory();
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(SameNameDifferentMethodOperations::class);
@@ -447,7 +448,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperations::class));
 
         $factory->create(SameNameGraphQlOperations::class);
@@ -457,7 +458,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperationAttributes::class));
 
         $factory->create(SameNameGraphQlOperationAttributes::class);

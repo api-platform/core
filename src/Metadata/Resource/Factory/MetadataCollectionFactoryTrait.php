@@ -273,8 +273,6 @@ trait MetadataCollectionFactoryTrait
     }
 
     /**
-     * GraphQL operations are indexed by name, a duplicate would silently replace the first one.
-     *
      * @param array<string, mixed> $operations
      */
     private function assertGraphQlOperationNameIsUnique(array $operations, string $key, string $resourceClass): void
