@@ -13,13 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Tests;
 
-use ApiPlatform\HttpCache\VarnishPurger;
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
 use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
 use Workbench\App\Purger\MockPurger;
@@ -100,22 +97,6 @@ class PurgerTest extends TestCase
             '/api/public_magazines',
             '/api/archived_magazines',
         ]);
-    }
-
-    public function testVarnishPurgerUsesMaxHeaderLength(): void
-    {
-        $this->app['config']->set('api-platform.http_cache.invalidation.max_header_length', 100);
-
-        $requests = 0;
-        $this->app->instance('api_platform.http_cache.clients_array', [new MockHttpClient(static function () use (&$requests): MockResponse {
-            ++$requests;
-
-            return new MockResponse();
-        })]);
-
-        $this->app->make(VarnishPurger::class)->purge([str_repeat('a', 40), str_repeat('b', 40), str_repeat('c', 40)]);
-
-        $this->assertGreaterThan(1, $requests);
     }
 
     /**

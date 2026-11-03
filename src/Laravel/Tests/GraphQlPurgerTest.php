@@ -20,12 +20,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\App\Models\Author;
 use Workbench\App\Purger\MockPurger;
 use Workbench\Database\Factories\AuthorFactory;
 
-/**
- * @author Ali Ben Macha <contact@benmacha.tn>
- */
 class GraphQlPurgerTest extends TestCase
 {
     use ApiTestAssertionsTrait;
@@ -51,6 +49,7 @@ class GraphQlPurgerTest extends TestCase
 
     public function testPurgeOnMutation(): void
     {
+        /** @var Author $author */
         $author = AuthorFactory::new()->create();
 
         $response = $this->postJson('/api/graphql', [
