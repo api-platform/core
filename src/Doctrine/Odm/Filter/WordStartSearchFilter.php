@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -31,6 +32,7 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = true)
     {
@@ -46,6 +48,11 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
 
         $property = $parameter->getProperty();
         $values = $parameter->getValue();
+
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
+        }
         $match = $context['match'] = $context['match'] ??
             $aggregationBuilder
             ->matchExpr();
