@@ -218,8 +218,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         $data['externalDocs'] = isset($openapi->externalDocs) ? new ExternalDocumentation(
-            description: $this->phpize($resource, 'description', 'string'),
-            url: $this->phpize($resource, 'url', 'string'),
+            description: $this->phpize($openapi->externalDocs, 'description', 'string', ''),
+            url: $this->phpize($openapi->externalDocs, 'url', 'string', ''),
         ) : null;
 
         if (isset($openapi->parameters->parameter)) {
@@ -227,8 +227,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 $data['parameters'][] = new OpenApiParameter(
                     name: $this->phpize($parameter, 'name', 'string'),
                     in: $this->phpize($parameter, 'in', 'string'),
-                    description: $this->phpize($parameter, 'description', 'string'),
-                    required: $this->phpize($parameter, 'required', 'bool'),
+                    description: $this->phpize($parameter, 'description', 'string', ''),
+                    required: $this->phpize($parameter, 'required', 'bool', false),
                     deprecated: $this->phpize($parameter, 'deprecated', 'bool', false),
                     allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool', null),
                     schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : [],
@@ -244,7 +244,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $data['requestBody'] = isset($openapi->requestBody) ? new RequestBody(
             description: $this->phpize($openapi->requestBody, 'description', 'string'),
             content: isset($openapi->requestBody->content->values) ? new \ArrayObject($this->buildValues($openapi->requestBody->content->values)) : null,
-            required: $this->phpize($openapi->requestBody, 'required', 'bool'),
+            required: $this->phpize($openapi->requestBody, 'required', 'bool', false),
         ) : null;
 
         $data['callbacks'] = isset($openapi->callbacks->values) ? new \ArrayObject($this->buildValues($openapi->callbacks->values)) : null;
