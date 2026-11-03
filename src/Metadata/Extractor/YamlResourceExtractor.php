@@ -278,7 +278,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                     schema: $parameter['schema'] ?? [],
                     style: $parameter['style'] ?? null,
                     explode: $parameter['explode'] ?? false,
-                    allowReserved: $parameter['allowReserved '] ?? false,
+                    allowReserved: $parameter['allowReserved'] ?? false,
                     example: $parameter['example'] ?? null,
                     examples: isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null,
                     content: isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null
@@ -520,7 +520,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                     schema: $parameter['openapi']['schema'] ?? $parameter['schema'] ?? [],
                     style: $parameter['openapi']['style'] ?? null,
                     explode: $parameter['openapi']['explode'] ?? false,
-                    allowReserved: $parameter['openapi']['allowReserved '] ?? false,
+                    allowReserved: $parameter['openapi']['allowReserved'] ?? false,
                     example: $parameter['openapi']['example'] ?? null,
                     examples: isset($parameter['openapi']['examples']) ? new \ArrayObject($parameter['openapi']['examples']) : null,
                     content: isset($parameter['openapi']['content']) ? new \ArrayObject($parameter['openapi']['content']) : null

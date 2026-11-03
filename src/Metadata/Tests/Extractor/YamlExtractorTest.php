@@ -539,6 +539,15 @@ class YamlExtractorTest extends TestCase
         $this->assertEquals('john-doe', $operation->getParameters()[0]->getExample());
     }
 
+    public function testOpenApiParametersAllowReserved(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/openapi-allow-reserved.yaml']))->getResources();
+        $operation = $resources[Program::class][0]['operations'][0];
+
+        $this->assertTrue($operation['openapi']->getParameters()[0]->getAllowReserved());
+        $this->assertTrue($operation['parameters']['q']->getOpenApi()->getAllowReserved());
+    }
+
     public function testOpenApiParameterWithoutNameThrowsClearException(): void
     {
         $this->expectException(InvalidArgumentException::class);
