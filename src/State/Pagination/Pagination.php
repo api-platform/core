@@ -224,11 +224,6 @@ final class Pagination
         return $operation?->getPaginationEnabled() ?? $enabled;
     }
 
-    /**
-     * Decodes a GraphQL cursor into the offset it points to, null if it is not valid base64.
-     *
-     * @throws InvalidArgumentException
-     */
     private function decodeCursor(string $cursor): ?int
     {
         if (false === ($decoded = base64_decode($cursor, true))) {
@@ -237,7 +232,7 @@ final class Pagination
 
         // the cursor is incremented by one for "after", keep the result within the int range
         if (false === filter_var($decoded, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => \PHP_INT_MAX - 1]])) {
-            throw new InvalidArgumentException('Cursor should be a base64 encoded non-negative integer');
+            throw new \UnexpectedValueException('' === $cursor ? 'Empty cursor is invalid' : \sprintf('Cursor %s is invalid', $cursor));
         }
 
         return (int) $decoded;

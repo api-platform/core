@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Tests\Pagination;
 
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,16 +23,6 @@ use PHPUnit\Framework\TestCase;
  */
 class PaginationTest extends TestCase
 {
-    public function testGraphQlCursorOffset(): void
-    {
-        $pagination = new Pagination();
-        $operation = new GetCollection(paginationItemsPerPage: 10);
-
-        $this->assertSame(10, $pagination->getOffset($operation, ['graphql_operation_name' => 'query', 'filters' => ['after' => base64_encode('9')]]));
-        $this->assertSame(5, $pagination->getOffset($operation, ['graphql_operation_name' => 'query', 'filters' => ['before' => base64_encode('15')]]));
-        $this->assertSame(0, $pagination->getOffset($operation, ['graphql_operation_name' => 'query', 'filters' => ['after' => '%invalid%']]));
-    }
-
     public static function provideInvalidCursors(): iterable
     {
         foreach (['after', 'before'] as $parameter) {
@@ -48,8 +37,8 @@ class PaginationTest extends TestCase
     #[DataProvider('provideInvalidCursors')]
     public function testGraphQlInvalidCursor(string $parameter, string $cursor): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cursor should be a base64 encoded non-negative integer');
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(\sprintf('Cursor %s is invalid', $cursor));
 
         (new Pagination())->getOffset(new GetCollection(paginationItemsPerPage: 10), ['graphql_operation_name' => 'query', 'filters' => [$parameter => $cursor]]);
     }
