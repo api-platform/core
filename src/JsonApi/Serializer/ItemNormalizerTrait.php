@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\BadRequestException;
+use ApiPlatform\Metadata\Exception\ConflictException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
@@ -53,7 +55,14 @@ trait ItemNormalizerTrait
         }
 
         $operation = $context['operation'] ?? null;
+        $this->assertValidRequestDocument($data, $operation, $type, $context);
+
         $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
+        if (!$isPostOperation && $operation instanceof HttpOperation && \is_object($context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? null)) {
+            if (isset($data['data']['id'])) {
+                $this->assertIdMatchesEndpoint((string) $data['data']['id'], $context[AbstractItemNormalizer::OBJECT_TO_POPULATE], $operation, $type);
+            }
+        }
         $allowClientGeneratedId = true === ($context[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? $this->defaultContext[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? false);
 
         // Avoid issues with proxies if we populated the object
@@ -76,17 +85,80 @@ trait ItemNormalizerTrait
             }
         }
 
-        $dataToDenormalize = array_merge(
-            $data['data']['attributes'] ?? [],
-            $data['data']['relationships'] ?? []
-        );
+        $dataToDenormalize = $data['data']['attributes'] ?? [];
+        foreach ($data['data']['relationships'] ?? [] as $name => $relationship) {
+            $dataToDenormalize[$name] = \is_array($relationship) && \array_key_exists('data', $relationship) ? $relationship['data'] : $relationship;
+        }
 
         // Surface the client-generated id so the entity setter receives it.
         if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
-            $dataToDenormalize[ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES['id']] = $data['data']['id'];
+            $dataToDenormalize[$this->nameConverter?->normalize('id', $type, self::FORMAT) ?? 'id'] = $data['data']['id'];
         }
 
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
+    }
+
+    private function assertValidRequestDocument(mixed $data, mixed $operation, string $resourceClass, array $context): void
+    {
+        if (!\is_array($data) || !isset($data['data']) || !$this->isJsonObject($data['data'])) {
+            throw new BadRequestException('The request document must be an object with a "data" member holding a resource object.');
+        }
+
+        foreach (['attributes', 'relationships'] as $member) {
+            if (\array_key_exists($member, $data['data']) && !$this->isJsonObject($data['data'][$member])) {
+                throw new BadRequestException(\sprintf('The "%s" member of the resource object must be an object.', $member));
+            }
+        }
+
+        if (true !== ($context[ItemNormalizer::STRICT_RESOURCE_TYPE] ?? $this->defaultContext[ItemNormalizer::STRICT_RESOURCE_TYPE] ?? false)) {
+            return;
+        }
+
+        if (!isset($data['data']['type']) || !\is_string($data['data']['type'])) {
+            throw new BadRequestException('The resource object must have a "type" member.');
+        }
+
+        if (!$operation instanceof HttpOperation) {
+            return;
+        }
+
+        $acceptedTypes = array_filter([$operation->getShortName(), $this->getResourceShortName($resourceClass)]);
+        if (!\in_array($data['data']['type'], $acceptedTypes, true)) {
+            throw new ConflictException(\sprintf('The resource object type "%s" does not match the type of this endpoint, expected one of "%s".', $data['data']['type'], implode('", "', array_unique($acceptedTypes))));
+        }
+    }
+
+    private function assertIdMatchesEndpoint(string $id, object $object, HttpOperation $operation, string $resourceClass): void
+    {
+        if ($this->useIriAsId) {
+            $requested = $id;
+            $actual = $this->iriConverter->getIriFromResource($object);
+        } elseif (\count($operation->getUriVariables() ?? []) > 1) {
+            return;
+        } else {
+            $requested = $this->reconstructIri($resourceClass, $id, $operation);
+            $actual = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation);
+        }
+
+        if (parse_url($requested, \PHP_URL_PATH) !== parse_url($actual, \PHP_URL_PATH)) {
+            throw new ConflictException(\sprintf('The resource object id "%s" does not match the id of this endpoint.', $id));
+        }
+    }
+
+    private function getResourceShortName(string $resourceClass): string
+    {
+        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+
+            return $resourceMetadata->getOperation()->getShortName();
+        }
+
+        return (new \ReflectionClass($resourceClass))->getShortName();
+    }
+
+    private function isJsonObject(mixed $value): bool
+    {
+        return \is_array($value) && ([] === $value || !array_is_list($value));
     }
 
     protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool

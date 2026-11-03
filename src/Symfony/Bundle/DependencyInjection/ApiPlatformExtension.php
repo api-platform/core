@@ -54,6 +54,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ResourceMutatorInterface;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
@@ -70,7 +71,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
 use Symfony\AI\McpBundle\McpBundle;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -89,7 +89,6 @@ use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
-use Symfony\Component\Translation\Command\TranslationExtractCommand;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -210,10 +209,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLinkSecurityConfiguration($loader, $config);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
-        // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service.
         // willBeAvailable mirrors FrameworkBundle's own gate: when symfony/object-mapper is in dev-only,
         // FrameworkBundle skips object_mapper.php and the "object_mapper" service we alias to does not exist.
-        if (class_exists(ObjectMapper::class) && (class_exists(TranslationExtractCommand::class) || class_exists(FrameworkTranslationExtractCommand::class)) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
+        if (class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('state/object_mapper.php');
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }
@@ -276,6 +274,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             QueryCollection::class,
             NotExposed::class,
             HeaderParameter::class,
+            ScalarHeaderParameter::class,
             Post::class,
             GetCollection::class,
             Put::class,
@@ -717,14 +716,24 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('state/jsonapi.php');
 
         $useIriAsId = $config['jsonapi']['use_iri_as_id'];
+        $strictMemberNames = $config['jsonapi']['strict_member_names'] ?? false;
+
+        $container->getDefinition('api_platform.jsonapi.name_converter.reserved_attribute_name')->replaceArgument(1, $strictMemberNames);
+        $container->getDefinition('api_platform.jsonapi.json_schema.schema_factory')->replaceArgument(6, $strictMemberNames);
 
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
-        $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemNormalizer->replaceArgument(7, [
+            JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
+            JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
+        ]);
         $itemNormalizer->addArgument($useIriAsId);
         $itemNormalizer->addArgument(new Reference('api_platform.jsonapi.resource_linkage_resolver'));
 
         $itemDenormalizer = $container->getDefinition('api_platform.jsonapi.denormalizer.item');
-        $itemDenormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemDenormalizer->replaceArgument(7, [
+            JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
+            JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
+        ]);
         $itemDenormalizer->addArgument($useIriAsId);
     }
 

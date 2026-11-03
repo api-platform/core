@@ -93,6 +93,16 @@ return [
         // https://jsonapi.org/format/#crud-creating-client-ids. Off by default
         // to avoid id spoofing on public endpoints.
         'allow_client_generated_id' => false,
+
+        // Require the "type" member of JSON:API request resource objects (400
+        // when missing) and reject a "type" that does not match the endpoint
+        // resource on POST, PUT and PATCH (409 Conflict). Off by default.
+        'strict_resource_type' => false,
+
+        // Expose the "id" and "type" properties as "resourceId" and "resourceType"
+        // attributes instead of "_id" and "_type", which are not valid JSON:API
+        // member names. Off by default.
+        'strict_member_names' => false,
     ],
 
     'graphql' => [

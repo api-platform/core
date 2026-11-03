@@ -70,7 +70,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         ?string $name = null,
         $provider = null,
         $processor = null,
-        protected ?OptionsInterface $stateOptions = null,
+        ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         ?bool $queryParameterValidationEnabled = null,
         mixed $rules = null,
@@ -78,6 +78,7 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         array $extraProperties = [],
 
         ?bool $nested = null,
+        ?bool $map = null,
     ) {
         parent::__construct(
             resolver: $resolver,
@@ -128,12 +129,14 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
             name: $name ?: 'collection_query',
             provider: $provider,
             processor: $processor,
+            stateOptions: $stateOptions,
             parameters: $parameters,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             policy: $policy,
             rules: $rules,
             extraProperties: $extraProperties,
             nested: $nested,
+            map: $map,
         );
     }
 }

@@ -209,6 +209,7 @@ final class ModelMetadata
         }
 
         $relations = [];
+        $nullableColumns = null;
         $class = new \ReflectionClass($model);
 
         foreach ($class->getMethods() as $method) {
@@ -262,6 +263,16 @@ final class ModelMetadata
                 'related' => \get_class($relation->getRelated()),
                 'foreign_key' => method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : null,
             ];
+
+            if ($relation instanceof BelongsTo) {
+                $nullableColumns ??= array_column($model->getConnection()->getSchemaBuilder()->getColumns($model->getTable()), 'nullable', 'name');
+                $relations[$relationName]['nullable'] = (bool) ($nullableColumns[$relation->getForeignKeyName()] ?? false);
+            }
+        }
+
+        // Don't cache nullability read from a missing table, see getAttributes().
+        if ([] === $nullableColumns) {
+            return $relations;
         }
 
         return $this->relations[$model::class] = $relations;

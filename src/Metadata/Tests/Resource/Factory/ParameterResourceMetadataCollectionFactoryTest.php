@@ -1264,6 +1264,26 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertArrayNotHasKey('nested_properties_info', $param->getExtraProperties());
     }
 
+    public function testExplicitProviderIsNotOverriddenByFilterProvider(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(readable: true));
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory()
+        );
+
+        $parameters = $parameterFactory->create(HasExplicitParameterProvider::class)->getOperation(forceCollection: true)->getParameters();
+
+        $this->assertSame('custom_provider', $parameters->get('explicit')->getProvider());
+        $this->assertSame('filter_provider', $parameters->get('default')->getProvider());
+    }
+
     public function testProviderAttachedForClassStringFilterNotRegisteredAsFilterInterface(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -1301,6 +1321,27 @@ class ClassStringParameterProviderFilter implements ParameterProviderFilterInter
     {
         return 'test_class_string_filter_provider';
     }
+}
+
+class ParameterProviderFilter implements FilterInterface, ParameterProviderFilterInterface
+{
+    public function getDescription(string $resourceClass): array
+    {
+        return [];
+    }
+
+    public static function getParameterProvider(): string
+    {
+        return 'filter_provider';
+    }
+}
+
+#[ApiResource]
+#[QueryParameter(key: 'explicit', filter: new ParameterProviderFilter(), provider: 'custom_provider')]
+#[QueryParameter(key: 'default', filter: new ParameterProviderFilter())]
+class HasExplicitParameterProvider
+{
+    public $id;
 }
 
 #[ApiResource]

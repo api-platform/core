@@ -62,6 +62,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public const ALLOW_CLIENT_GENERATED_ID = 'allow_client_generated_id';
 
+    /**
+     * Denormalization context flag making the resource object "type" mandatory (400) and, on POST,
+     * checked against the endpoint resource type (409). Set in the context or via the bundle
+     * configuration ("api_platform.jsonapi.strict_resource_type").
+     */
+    public const STRICT_RESOURCE_TYPE = 'strict_resource_type';
+
     private array $componentsCache = [];
     private bool $useIriAsId;
     private readonly ResourceLinkageResolver $resourceLinkageResolver;
@@ -438,16 +445,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return CompositeIdentifierParser::stringify($identifiers);
-    }
-
-    private function getResourceShortName(string $resourceClass): string
-    {
-        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
-            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-
-            return $resourceMetadata->getOperation()->getShortName();
-        }
-
-        return (new \ReflectionClass($resourceClass))->getShortName();
     }
 }

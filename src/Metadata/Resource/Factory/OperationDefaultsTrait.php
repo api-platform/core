@@ -61,6 +61,11 @@ trait OperationDefaultsTrait
 
             $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
+            $can = 'can'.$upperKey;
+
+            if (!method_exists($operation, $getter) && method_exists($operation, $can)) {
+                $getter = $can;
+            }
 
             if (!method_exists($operation, $getter)) {
                 if (!isset($extraProperties[$key])) {

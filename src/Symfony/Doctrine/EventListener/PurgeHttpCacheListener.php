@@ -179,10 +179,10 @@ final class PurgeHttpCacheListener
         /** @var array|AssociationMapping $associationMapping according to the version of doctrine orm */
         foreach ($associationMappings as $property => $associationMapping) {
             if ($associationMapping instanceof AssociationMapping && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
-                return;
+                continue;
             }
             if (!$this->propertyAccessor->isReadable($entity, $property)) {
-                return;
+                continue;
             }
 
             if (
@@ -192,16 +192,16 @@ final class PurgeHttpCacheListener
                 && !$this->resourceClassResolver->isResourceClass($targetEntity)
             ) {
                 if (!$this->objectMapper) {
-                    return;
+                    continue;
                 }
 
                 $targetRefl = new \ReflectionClass($targetEntity);
                 if ($this->objectMapperMetadata) {
                     if (!$this->objectMapperMetadata->create($targetRefl->newInstanceWithoutConstructor())) {
-                        return;
+                        continue;
                     }
                 } elseif (!$targetRefl->getAttributes(Map::class)) {
-                    return;
+                    continue;
                 }
             }
 

@@ -25,7 +25,7 @@ final class ErrorNormalizer implements NormalizerInterface
 {
     public const FORMAT = 'jsonapi';
 
-    public function __construct(private ?NormalizerInterface $itemNormalizer = null)
+    public function __construct(private ?NormalizerInterface $itemNormalizer = null, private ?NormalizerInterface $problemNormalizer = null)
     {
     }
 
@@ -34,11 +34,27 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
-        $error = $jsonApiObject['data']['attributes'] ?? [];
-        $error['id'] = $jsonApiObject['data']['id'];
+        if ($data instanceof FlattenException) {
+            $type = \sprintf('/errors/%d', $data->getStatusCode());
+            unset($context['exception']);
+            $problem = $this->problemNormalizer->normalize($data, $format, ['type' => $type] + $context);
+            $error = [
+                'id' => $problem['type'],
+                'title' => $problem['title'],
+                'detail' => $problem['detail'],
+                'status' => $problem['status'],
+                'type' => $problem['type'],
+                'code' => (string) $problem['status'],
+            ];
+        } else {
+            $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
+            $error = $jsonApiObject['data']['attributes'] ?? [];
+            $error['id'] = $jsonApiObject['data']['id'];
+        }
+
         if (isset($error['type'])) {
             $error['links'] = ['type' => $error['type']];
+            unset($error['type']);
         }
 
         if (!isset($error['code']) && method_exists($data, 'getId')) {
@@ -76,7 +92,7 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
+        return self::FORMAT === $format && ($data instanceof \Exception || ($data instanceof FlattenException && null !== $this->problemNormalizer));
     }
 
     /**
@@ -87,7 +103,7 @@ final class ErrorNormalizer implements NormalizerInterface
         if (self::FORMAT === $format) {
             return [
                 \Exception::class => true,
-                FlattenException::class => true,
+                FlattenException::class => null !== $this->problemNormalizer,
             ];
         }
 

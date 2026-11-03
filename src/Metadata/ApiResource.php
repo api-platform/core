@@ -1024,6 +1024,7 @@ class ApiResource extends Metadata
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,

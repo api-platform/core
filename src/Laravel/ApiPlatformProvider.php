@@ -976,6 +976,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
@@ -1052,7 +1053,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app) {
-            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
+            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class), (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false));
         });
 
         if (interface_exists(FieldsBuilderEnumInterface::class)) {
@@ -1086,6 +1087,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
             $defaultContext[JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID] = (bool) $config->get('api-platform.jsonapi.allow_client_generated_id', false);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
             $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', false);
 
             return new JsonApiItemNormalizer(
@@ -1109,6 +1111,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(JsonApiItemDenormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
 
             return new JsonApiItemDenormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),

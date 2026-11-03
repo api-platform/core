@@ -101,4 +101,35 @@ trait DateFilterTrait
 
         return $value;
     }
+
+    private function createDateFromValue(string $value, bool $immutable, ?string $format): ?\DateTimeInterface
+    {
+        if (null === $format) {
+            try {
+                return $immutable ? new \DateTimeImmutable($value) : new \DateTime($value);
+            } catch (\Exception) {
+                return null;
+            }
+        }
+
+        // "!" resets unparsed fields to the epoch, otherwise they take the current time
+        $pattern = str_starts_with($format, '!') || str_contains($format, '|') ? $format : '!'.$format;
+        $date = $immutable ? \DateTimeImmutable::createFromFormat($pattern, $value) : \DateTime::createFromFormat($pattern, $value);
+        $errors = \DateTimeImmutable::getLastErrors();
+
+        if (false === $date || (false !== $errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+            return null;
+        }
+
+        return $date;
+    }
+
+    private function getInvalidDateMessage(string $field, ?string $format): string
+    {
+        if (null === $format) {
+            return \sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field);
+        }
+
+        return \sprintf('The field "%s" has a wrong date format. Expected format "%s"', $field, $format);
+    }
 }

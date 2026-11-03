@@ -55,12 +55,6 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         foreach ($this->buildResources($resources, $resourceClass) as $resource) {
-            foreach ($this->defaults['attributes'] ?? [] as $key => $value) {
-                if (method_exists($resource, 'get'.ucfirst($key)) && !$resource->{'get'.ucfirst($key)}()) {
-                    $resource = $resource->{'with'.ucfirst($key)}($value);
-                }
-            }
-
             $resourceMetadataCollection[] = $resource;
         }
 

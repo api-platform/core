@@ -36,13 +36,14 @@ use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Publishes resources updates to the Mercure hub.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class PublishMercureUpdatesListener
+final class PublishMercureUpdatesListener implements ResetInterface
 {
     use DispatchTrait;
     use ResourceClassInfoTrait;
@@ -149,7 +150,7 @@ final class PublishMercureUpdatesListener
         }
     }
 
-    private function reset(): void
+    public function reset(): void
     {
         $this->createdObjects = [];
         $this->updatedObjects = [];
