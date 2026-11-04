@@ -43,6 +43,8 @@ final class EntrypointNormalizer implements NormalizerInterface
     {
         $entrypoint = ['_links' => ['self' => ['href' => $this->urlGenerator->generate('api_entrypoint')]]];
 
+        $bases = [];
+
         foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
@@ -60,7 +62,7 @@ final class EntrypointNormalizer implements NormalizerInterface
                     }
 
                     try {
-                        $href = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
+                        $href = $this->iriConverter->getIriFromResource($operation->getClass(), $operation->getUrlGenerationStrategy() ?? UrlGeneratorInterface::ABS_PATH, $operation);
                         $entrypoint['_links'][lcfirst($operation->getShortName())]['href'] = $href;
                     } catch (InvalidArgumentException) {
                         // Ignore resources without GET operations
@@ -69,27 +71,24 @@ final class EntrypointNormalizer implements NormalizerInterface
             }
 
             if (null !== $itemOperation) {
-                $this->addItemLink($entrypoint, $itemOperation);
+                $this->addItemLink($entrypoint, $itemOperation, $bases);
             }
         }
 
         return $entrypoint;
     }
 
-    private function addItemLink(array &$entrypoint, Get $operation): void
+    private function addItemLink(array &$entrypoint, Get $operation, array &$bases): void
     {
-        $parameters = [];
-        foreach (array_keys($operation->getUriVariables() ?? []) as $parameterName) {
-            $parameters[$parameterName] = '{'.$parameterName.'}';
-        }
-
-        try {
-            $href = $this->urlGenerator->generate($operation->getName(), $parameters, UrlGeneratorInterface::ABS_PATH);
-        } catch (InvalidArgumentException|\InvalidArgumentException) {
+        $uriTemplate = $operation->getUriTemplate();
+        if (null === $uriTemplate) {
             return;
         }
 
-        $entrypoint['_links'][lcfirst($operation->getShortName()).'Item'] = ['href' => str_replace(['%7B', '%7D'], ['{', '}'], $href), 'templated' => true];
+        $strategy = $operation->getUrlGenerationStrategy() ?? UrlGeneratorInterface::ABS_PATH;
+        $bases[$strategy] ??= rtrim($this->urlGenerator->generate('api_entrypoint', [], $strategy), '/');
+
+        $entrypoint['_links'][lcfirst($operation->getShortName()).'Item'] = ['href' => $bases[$strategy].($operation->getRoutePrefix() ?? '').$uriTemplate, 'templated' => true];
     }
 
     /**
