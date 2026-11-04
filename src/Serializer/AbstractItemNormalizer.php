@@ -703,7 +703,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, ['array', 'string'], $context['deserialization_path'] ?? null, true);
     }
 
-    private function getResourceFromIri(string $data, array $context, string $resourceClass): ?object
+    protected function getResourceFromIri(string $data, array $context, string $resourceClass): ?object
     {
         try {
             $item = $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);

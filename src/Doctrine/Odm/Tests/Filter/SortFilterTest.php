@@ -19,7 +19,9 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\RelatedDummy;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\ThirdLevel;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SortFilterTest extends TestCase
@@ -336,5 +338,26 @@ class SortFilterTest extends TestCase
         // Only $sort should be present — no $lookup/$unwind since they were deduplicated
         $this->assertCount(1, $pipeline);
         $this->assertEquals(['$sort' => ['relatedDummy_lkup.name' => 1]], $pipeline[0]);
+    }
+
+    /**
+     * @param list<string> $expectedNames
+     */
+    #[DataProvider('provideCastToArray')]
+    public function testGetOpenApiParameters(?bool $castToArray, array $expectedNames): void
+    {
+        $parameter = new QueryParameter(key: 'orderName', property: 'name', castToArray: $castToArray);
+
+        $openApiParameters = (new SortFilter())->getOpenApiParameters($parameter);
+        $openApiParameters = \is_array($openApiParameters) ? $openApiParameters : [$openApiParameters];
+
+        $this->assertSame($expectedNames, array_map(static fn (OpenApiParameter $openApiParameter): string => $openApiParameter->getName(), $openApiParameters));
+    }
+
+    public static function provideCastToArray(): iterable
+    {
+        yield 'default' => [null, ['orderName']];
+        yield 'castToArray disabled' => [false, ['orderName']];
+        yield 'castToArray enabled' => [true, ['orderName[]']];
     }
 }

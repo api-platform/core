@@ -15,12 +15,10 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\BadRequestException;
-use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -131,7 +129,6 @@ trait ItemNormalizerTrait
     /**
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
@@ -142,33 +139,16 @@ trait ItemNormalizerTrait
 
         $this->assertValidId($value['id'], \sprintf('The type of the "id" attribute of the "%s" relationship', $attributeName), $context['deserialization_path'] ?? null);
 
-        try {
-            $context += ['fetch_data' => true];
-            if ($this->useIriAsId) {
-                return $this->iriConverter->getResourceFromIri($value['id'], $context);
-            }
-
-            /** @var HttpOperation $getOperation */
-            $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
-            $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
-
-            return $this->iriConverter->getResourceFromIri($iri, $context);
-        } catch (ItemNotFoundException $e) {
-            if (!isset($context['not_normalizable_value_exceptions'])) {
-                throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-            }
-            $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
-                $e->getMessage(),
-                $value,
-                [$className],
-                $context['deserialization_path'] ?? null,
-                true,
-                $e->getCode(),
-                $e
-            );
-
-            return null;
+        $context += ['fetch_data' => true];
+        if ($this->useIriAsId) {
+            return $this->getResourceFromIri((string) $value['id'], $context, $className);
         }
+
+        /** @var HttpOperation $getOperation */
+        $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
+        $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
+
+        return $this->getResourceFromIri($iri, $context, $className);
     }
 
     /**
