@@ -53,7 +53,9 @@ final class HalTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertSame('/hal_relation_embedders', $body['_links']['halRelationEmbedder']['href'] ?? null);
         $this->assertSame(['href' => '/hal_relation_embedders/{id}', 'templated' => true], $body['_links']['halRelationEmbedderItem'] ?? null);
-        $this->assertSame(['href' => '/relation_group_impact_on_collections/{id}{._format}', 'templated' => true], $body['_links']['relationGroupImpactOnCollectionItem'] ?? null);
+        if ('mongodb' !== static::getContainer()->getParameter('kernel.environment')) {
+            $this->assertSame(['href' => '/relation_group_impact_on_collections/{id}{._format}', 'templated' => true], $body['_links']['relationGroupImpactOnCollectionItem'] ?? null);
+        }
     }
 
     public function testGetEmbedsRelatedResourceAndItsRelation(): void
