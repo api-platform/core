@@ -15,10 +15,12 @@ namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\EndSearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\StartSearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\WordStartSearchFilter;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\RelatedDummy;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,6 +53,33 @@ final class NestedPropertyJoinTypeTest extends TestCase
 
         $dql = $queryBuilder->getDQL();
         $this->assertStringContainsString($expectedJoin, $dql);
+        $this->assertStringNotContainsString($unexpectedJoin, $dql);
+    }
+
+    #[DataProvider('provideWhereClauses')]
+    public function testIriFilterCollectionJoinTypeDependsOnWhereClause(string $whereClause, string $expectedJoin, string $unexpectedJoin): void
+    {
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $queryBuilder = (new QueryBuilder($entityManager))->select('o')->from(Dummy::class, 'o');
+        $parameter = (new QueryParameter(key: 'relatedDummies', property: 'relatedDummies'))
+            ->withExtraProperties([
+                '_api_values' => 'x',
+                'nested_properties_info' => ['relatedDummies' => [
+                    'relation_classes' => [],
+                    'converted_relation_segments' => [],
+                    'leaf_property' => 'relatedDummies',
+                    'orm_leaf_metadata' => [
+                        'is_collection_valued' => true,
+                        'association_target_class' => RelatedDummy::class,
+                        'identifier_type' => null,
+                    ],
+                ]],
+            ]);
+
+        (new IriFilter())->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, null, ['parameter' => $parameter, 'whereClause' => $whereClause]);
+
+        $dql = $queryBuilder->getDQL();
+        $this->assertStringContainsString($expectedJoin.' o.relatedDummies', $dql);
         $this->assertStringNotContainsString($unexpectedJoin, $dql);
     }
 
