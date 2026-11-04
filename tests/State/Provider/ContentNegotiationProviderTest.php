@@ -120,4 +120,26 @@ class ContentNegotiationProviderTest extends TestCase
 
         $provider->provide($operation, [], $context);
     }
+
+    public function testContentTypeIsCaseInsensitive(): void
+    {
+        $decorated = $this->prophesize(ProviderInterface::class);
+        $decorated->provide(Argument::cetera())->willReturn(new \stdClass());
+
+        $provider = new ContentNegotiationProvider($decorated->reveal(), new Negotiator(), ['jsonld' => ['application/ld+json']], ['jsonld' => ['application/ld+json']]);
+
+        $request = new Request(
+            server: [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/',
+                'CONTENT_TYPE' => 'Application/LD+JSON; charset=utf-8',
+            ],
+            content: '{}'
+        );
+
+        $operation = (new Post(inputFormats: ['jsonld' => ['application/ld+json']]))->withDeserialize();
+        $provider->provide($operation, [], ['request' => $request]);
+
+        $this->assertSame('jsonld', $request->attributes->get('input_format'));
+    }
 }
