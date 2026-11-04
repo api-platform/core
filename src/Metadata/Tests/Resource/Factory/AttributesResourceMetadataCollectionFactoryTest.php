@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -37,6 +38,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithSh
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\InvalidExceptionToStatusOperation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
@@ -395,6 +397,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         }
     }
 
+    public function testInvalidExceptionToStatusThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The HTTP status code "999" of operation "_api_InvalidExceptionToStatusOperation_get" of resource "%s" is not valid.', InvalidExceptionToStatusOperation::class));
+
+        $factory->create(InvalidExceptionToStatusOperation::class);
+    }
+
     public function testWithParameters(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
@@ -451,7 +463,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $factory = new AttributesResourceMetadataCollectionFactory();
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(SameNameDifferentMethodOperations::class);
