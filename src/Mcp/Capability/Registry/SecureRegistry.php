@@ -106,7 +106,7 @@ final class SecureRegistry implements RegistryInterface
     public function publishesListChanges(): bool
     {
         // MCP SDK 0.8 does not expose this capability.
-        return method_exists($this->inner, 'publishesListChanges') && $this->inner->publishesListChanges();
+        return method_exists($this->inner, 'publishesListChanges') && $this->inner->publishesListChanges(); // @phpstan-ignore function.alreadyNarrowedType
     }
 
     public function hasTool(string $name): bool
