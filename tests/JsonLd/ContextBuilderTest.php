@@ -226,6 +226,17 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy']));
     }
 
+    public function testAnonymousResourceContextIsNotComputedWhenTheDocumentAlreadyHasOne(): void
+    {
+        $output = new OutputDto();
+        $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->shouldNotBeCalled();
+        $this->urlGeneratorProphecy->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('');
+
+        $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
+
+        $this->assertSame(['@type' => 'OutputDto', '@id' => '/dummies'], $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'has_context' => true]));
+    }
+
     public function testResourceContextWithoutHydraPrefix(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [
