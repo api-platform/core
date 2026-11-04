@@ -25,8 +25,12 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use Doctrine\Common\EventArgs;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
+use Doctrine\ODM\MongoDB\PersistentCollection\PersistentCollectionInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
@@ -86,8 +90,18 @@ final class PurgeHttpCacheListener
     /**
      * Collects tags from updated and deleted entities, including relations.
      */
-    public function onFlush(OnFlushEventArgs $eventArgs): void
+    public function onFlush(EventArgs $eventArgs): void
     {
+        if ($eventArgs instanceof MongoDbOdmOnFlushEventArgs) {
+            $this->onFlushOdm($eventArgs->getDocumentManager());
+
+            return;
+        }
+
+        if (!$eventArgs instanceof OrmOnFlushEventArgs) {
+            return;
+        }
+
         // @phpstan-ignore-next-line
         $em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
@@ -207,6 +221,106 @@ final class PurgeHttpCacheListener
 
             $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
         }
+    }
+
+    private function onFlushOdm(DocumentManager $documentManager): void
+    {
+        $uow = $documentManager->getUnitOfWork();
+        $upserts = $uow->getScheduledDocumentUpserts();
+        $this->scheduledInsertions = array_merge($uow->getScheduledDocumentInsertions(), $upserts);
+
+        foreach ($this->scheduledInsertions as $document) {
+            $this->gatherOdmRelationTags($documentManager, $document);
+        }
+
+        foreach ($upserts as $document) {
+            $this->gatherResourceAndItemTags($document, true);
+        }
+
+        foreach ($uow->getScheduledDocumentUpdates() as $document) {
+            $this->gatherResourceAndItemTags($document, true);
+            $metadata = $documentManager->getClassMetadata($this->getObjectClass($document));
+
+            foreach ($uow->getDocumentChangeSet($document) as $property => $change) {
+                if (!$metadata->hasReference($property)) {
+                    continue;
+                }
+
+                foreach ($change as $value) {
+                    $this->addTagsFor($value);
+
+                    if ($value instanceof PersistentCollectionInterface) {
+                        $this->addTagsFor($value->getDeleteDiff());
+                    }
+                }
+            }
+
+            $this->gatherOdmRelationTags($documentManager, $document);
+        }
+
+        foreach ($uow->getScheduledDocumentDeletions() as $document) {
+            $this->gatherResourceAndItemTags($document, true);
+            $this->gatherOdmRelationTags($documentManager, $document);
+        }
+    }
+
+    private function gatherOdmRelationTags(DocumentManager $documentManager, object $document): void
+    {
+        $uow = $documentManager->getUnitOfWork();
+        $metadata = $documentManager->getClassMetadata($this->getObjectClass($document));
+
+        foreach ($metadata->getAssociationNames() as $property) {
+            if (!$metadata->hasReference($property)) {
+                continue;
+            }
+
+            $targetDocument = $metadata->getAssociationTargetClass($property);
+            if (null !== $targetDocument && !$this->isMappedToResource($targetDocument)) {
+                continue;
+            }
+
+            if (!$this->propertyAccessor->isReadable($document, $property)) {
+                continue;
+            }
+
+            $value = $this->propertyAccessor->getValue($document, $property);
+
+            if (!$value || \is_scalar($value)) {
+                continue;
+            }
+
+            if (!is_iterable($value)) {
+                if (!$uow->isScheduledForInsert($value)) {
+                    $this->addTagsFor($value);
+                }
+
+                continue;
+            }
+
+            foreach ($value as $related) {
+                if (!$uow->isScheduledForInsert($related)) {
+                    $this->addTagsFor($related);
+                }
+            }
+        }
+    }
+
+    private function isMappedToResource(string $class): bool
+    {
+        if ($this->resourceClassResolver->isResourceClass($class)) {
+            return true;
+        }
+
+        if (!$this->objectMapper) {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($class);
+        if ($this->objectMapperMetadata) {
+            return (bool) $this->objectMapperMetadata->create($reflection->newInstanceWithoutConstructor());
+        }
+
+        return [] !== $reflection->getAttributes(Map::class);
     }
 
     private function addTagsFor(mixed $value): void
