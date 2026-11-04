@@ -82,6 +82,12 @@ trait OperationDefaultsTrait
                     $value = [$value];
                 }
 
+                foreach ($value as $index => $item) {
+                    if (\is_int($index) && \in_array($item, $currentValue, true)) {
+                        unset($value[$index]);
+                    }
+                }
+
                 $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
             }
 
