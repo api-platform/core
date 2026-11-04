@@ -300,12 +300,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $type, $format, $context);
 
-        // Bypass the post-denormalize attribute revert logic if the object could not be
-        // cloned since we cannot possibly revert any changes made to it.
-        if (null !== $objectToPopulate && null === $previousObject) {
-            return $object;
-        }
-
         $options = $this->getFactoryOptions($context);
         $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $options));
 
@@ -330,7 +324,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
-                if ($throwOnPropertyAccessDenied) {
+                if ($throwOnPropertyAccessDenied || (null !== $objectToPopulate && null === $previousObject)) {
                     throw new AccessDeniedException($securityMessage ?? 'Access denied', detail: $securityMessage);
                 }
                 if (null !== $previousObject) {

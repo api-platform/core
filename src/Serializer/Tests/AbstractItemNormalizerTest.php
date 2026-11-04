@@ -59,6 +59,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\TypeInfo\Type;
 
@@ -2234,6 +2235,38 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(NonCloneableDummy::class, $actual);
         $this->assertSame($dummy, $actual);
         $propertyAccessorProphecy->setValue($actual, 'name', 'bar')->shouldHaveBeenCalled();
+    }
+
+    public function testDenormalizeUpdateNonCloneableWithDeniedPostDenormalizeSecuredPropertyThrows(): void
+    {
+        $dummy = new NonCloneableDummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            method_exists(PropertyInfoExtractor::class, 'getType')
+                ? (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withWritable(true)->withSecurityPostDenormalize('false')
+                : (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)->withWritable(true)->withSecurityPostDenormalize('false')
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(NonCloneableDummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $serializer = $this->createStub(Serializer::class);
+
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $this->createStub(PropertyAccessorInterface::class), null, null, [], null, $resourceAccessChecker) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $this->expectException(AccessDeniedException::class);
+
+        $normalizer->denormalize(['name' => 'bar'], NonCloneableDummy::class, null, [AbstractItemNormalizer::OBJECT_TO_POPULATE => $dummy]);
     }
 
     public function testDenormalizeObjectWithNullDisabledTypeEnforcement(): void
