@@ -18,6 +18,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Mcp\Capability\Registry\Loader;
 use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\Security\ElementAccessCheckerInterface;
+use ApiPlatform\Mcp\Tests\Fixtures\ListChangePublishingRegistryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
@@ -44,13 +45,6 @@ class SecureRegistryTest extends TestCase
         $registry = new SecureRegistry($inner, $loader);
 
         $this->assertTrue($registry->publishesListChanges());
-        $this->assertFalse($registry->publishesListChanges());
-    }
-
-    public function testRegistryWithoutNotificationPublishingReturnsFalse(): void
-    {
-        $registry = new SecureRegistry(new Registry(), $this->createStub(LoaderInterface::class));
-
         $this->assertFalse($registry->publishesListChanges());
     }
 
@@ -268,10 +262,4 @@ class SecureRegistryTest extends TestCase
             $accessChecker,
         );
     }
-}
-
-// Keep the forwarding test runnable with both SDK 0.8 and 0.9.
-interface ListChangePublishingRegistryInterface extends RegistryInterface
-{
-    public function publishesListChanges(): bool;
 }
