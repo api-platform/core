@@ -14,11 +14,23 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Doctrine\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use Doctrine\Common\EventArgs;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
+use Doctrine\ODM\MongoDB\PersistentCollection\PersistentCollectionInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
@@ -35,8 +47,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class PurgeHttpCacheListener
 {
-    use PurgeHttpCacheTagsTrait;
+    use ClassInfoTrait;
     private readonly PropertyAccessorInterface $propertyAccessor;
+    private array $tags = [];
+
     private array $scheduledInsertions = [];
 
     public function __construct(private readonly PurgerInterface $purger,
@@ -76,8 +90,18 @@ final class PurgeHttpCacheListener
     /**
      * Collects tags from updated and deleted entities, including relations.
      */
-    public function onFlush(OnFlushEventArgs $eventArgs): void
+    public function onFlush(EventArgs $eventArgs): void
     {
+        if ($eventArgs instanceof MongoDbOdmOnFlushEventArgs) {
+            $this->onFlushOdm($eventArgs->getDocumentManager());
+
+            return;
+        }
+
+        if (!$eventArgs instanceof OrmOnFlushEventArgs) {
+            return;
+        }
+
         // @phpstan-ignore-next-line
         $em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
@@ -117,6 +141,51 @@ final class PurgeHttpCacheListener
         $this->tags = [];
     }
 
+    private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void
+    {
+        $resources = $this->getResourcesForEntity($entity);
+
+        foreach ($resources as $resource) {
+            try {
+                foreach ($this->getCollectionOperations($resource) as $operation) {
+                    $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, $operation);
+                    $this->tags[$iri] = $iri;
+                }
+
+                if ($purgeItem) {
+                    $this->addTagForItem($entity);
+                }
+            } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+        }
+    }
+
+    /**
+     * @return iterable<Operation&CollectionOperationInterface>
+     */
+    private function getCollectionOperations(object $resource): iterable
+    {
+        if (!$this->resourceMetadataCollectionFactory) {
+            yield new GetCollection();
+
+            return;
+        }
+
+        foreach ($this->resourceMetadataCollectionFactory->create($this->getObjectClass($resource)) as $apiResource) {
+            foreach ($apiResource->getOperations() ?? [] as $operation) {
+                if (!$operation instanceof CollectionOperationInterface || !$operation instanceof HttpOperation) {
+                    continue;
+                }
+
+                if (!empty($operation->getUriVariables())) {
+                    continue;
+                }
+
+                yield $operation;
+            }
+        }
+    }
+
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
         $associationMappings = $em->getClassMetadata($entity::class)->getAssociationMappings();
@@ -154,6 +223,87 @@ final class PurgeHttpCacheListener
         }
     }
 
+    private function onFlushOdm(DocumentManager $documentManager): void
+    {
+        $uow = $documentManager->getUnitOfWork();
+        $upserts = $uow->getScheduledDocumentUpserts();
+        $this->scheduledInsertions = array_merge($uow->getScheduledDocumentInsertions(), $upserts);
+
+        foreach ($this->scheduledInsertions as $document) {
+            $this->gatherOdmRelationTags($documentManager, $document);
+        }
+
+        foreach ($upserts as $document) {
+            $this->gatherResourceAndItemTags($document, true);
+        }
+
+        foreach ($uow->getScheduledDocumentUpdates() as $document) {
+            $this->gatherResourceAndItemTags($document, true);
+            $metadata = $documentManager->getClassMetadata($this->getObjectClass($document));
+
+            foreach ($uow->getDocumentChangeSet($document) as $property => $change) {
+                if (!$metadata->hasReference($property)) {
+                    continue;
+                }
+
+                foreach ($change as $value) {
+                    $this->addTagsFor($value);
+
+                    if ($value instanceof PersistentCollectionInterface) {
+                        $this->addTagsFor($value->getDeleteDiff());
+                    }
+                }
+            }
+
+            $this->gatherOdmRelationTags($documentManager, $document);
+        }
+
+        foreach ($uow->getScheduledDocumentDeletions() as $document) {
+            $this->gatherResourceAndItemTags($document, true);
+            $this->gatherOdmRelationTags($documentManager, $document);
+        }
+    }
+
+    private function gatherOdmRelationTags(DocumentManager $documentManager, object $document): void
+    {
+        $metadata = $documentManager->getClassMetadata($this->getObjectClass($document));
+
+        foreach ($metadata->getAssociationNames() as $property) {
+            if (!$metadata->hasReference($property)) {
+                continue;
+            }
+
+            $targetDocument = $metadata->getAssociationTargetClass($property);
+            if (null !== $targetDocument && !$this->isMappedToResource($targetDocument)) {
+                continue;
+            }
+
+            if (!$this->propertyAccessor->isReadable($document, $property)) {
+                continue;
+            }
+
+            $this->addTagsFor($this->propertyAccessor->getValue($document, $property));
+        }
+    }
+
+    private function isMappedToResource(string $class): bool
+    {
+        if ($this->resourceClassResolver->isResourceClass($class)) {
+            return true;
+        }
+
+        if (!$this->objectMapper) {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($class);
+        if ($this->objectMapperMetadata) {
+            return (bool) $this->objectMapperMetadata->create($reflection->newInstanceWithoutConstructor());
+        }
+
+        return [] !== $reflection->getAttributes(Map::class);
+    }
+
     private function addTagsFor(mixed $value): void
     {
         if (!$value || \is_scalar($value)) {
@@ -173,5 +323,59 @@ final class PurgeHttpCacheListener
         foreach ($value as $v) {
             $this->addTagForItem($v);
         }
+    }
+
+    private function addTagForItem(mixed $value): void
+    {
+        $resources = $this->getResourcesForEntity($value);
+
+        foreach ($resources as $resource) {
+            try {
+                $iri = $this->iriConverter->getIriFromResource($resource);
+                $this->tags[$iri] = $iri;
+            } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+        }
+    }
+
+    private function getResourcesForEntity(object $entity): array
+    {
+        $resources = [];
+
+        if (!$this->resourceClassResolver->isResourceClass($class = $this->getObjectClass($entity))) {
+            // is the entity mapped to resource(s)?
+            if (!$this->objectMapper) {
+                return [];
+            }
+
+            if ($this->objectMapperMetadata) {
+                $mappings = $this->objectMapperMetadata->create($entity);
+
+                if (!$mappings) {
+                    return [];
+                }
+
+                $resources = array_map(
+                    fn ($mapping) => $this->objectMapper->map($entity, $mapping->target),
+                    $mappings
+                );
+            } else {
+                $mapAttributes = (new \ReflectionClass($class))->getAttributes(Map::class);
+
+                if (!$mapAttributes) {
+                    return [];
+                }
+
+                // loop over all mappings to fetch all resources mapped to this entity
+                $resources = array_map(
+                    fn ($mapAttribute) => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
+                    $mapAttributes
+                );
+            }
+        } else {
+            $resources[] = $entity;
+        }
+
+        return $resources;
     }
 }

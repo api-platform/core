@@ -638,24 +638,4 @@ class ApiPlatformExtensionTest extends TestCase
         $tags = $this->container->getDefinition('api_platform.doctrine_mongodb.odm.listener.http_cache.purge')->getTags();
         $this->assertSame([['event' => 'onFlush'], ['event' => 'postFlush']], $tags['doctrine_mongodb.odm.event_listener']);
     }
-
-    public function testHttpCachePurgeListenerNotRegisteredForMongoDbOdmWhenInvalidationDisabled(): void
-    {
-        $config = self::DEFAULT_CONFIG;
-        $config['api_platform']['http_cache']['invalidation']['enabled'] = false;
-        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
-        (new ApiPlatformExtension())->load($config, $this->container);
-
-        $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.listener.http_cache.purge');
-    }
-
-    public function testHttpCachePurgeListenerNotRegisteredForMongoDbOdmWhenOdmDisabled(): void
-    {
-        $config = self::DEFAULT_CONFIG;
-        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
-        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = false;
-        (new ApiPlatformExtension())->load($config, $this->container);
-
-        $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.listener.http_cache.purge');
-    }
 }

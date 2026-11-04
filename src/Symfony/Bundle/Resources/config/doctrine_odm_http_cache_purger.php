@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use ApiPlatform\Symfony\Doctrine\Odm\EventListener\PurgeHttpCacheListener;
+use ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
