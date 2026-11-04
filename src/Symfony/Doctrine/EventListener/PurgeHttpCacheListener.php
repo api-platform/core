@@ -266,6 +266,7 @@ final class PurgeHttpCacheListener
 
     private function gatherOdmRelationTags(DocumentManager $documentManager, object $document): void
     {
+        $uow = $documentManager->getUnitOfWork();
         $metadata = $documentManager->getClassMetadata($this->getObjectClass($document));
 
         foreach ($metadata->getAssociationNames() as $property) {
@@ -282,7 +283,25 @@ final class PurgeHttpCacheListener
                 continue;
             }
 
-            $this->addTagsFor($this->propertyAccessor->getValue($document, $property));
+            $value = $this->propertyAccessor->getValue($document, $property);
+
+            if (!$value || \is_scalar($value)) {
+                continue;
+            }
+
+            if (!is_iterable($value)) {
+                if (!$uow->isScheduledForInsert($value)) {
+                    $this->addTagsFor($value);
+                }
+
+                continue;
+            }
+
+            foreach ($value as $related) {
+                if (!$uow->isScheduledForInsert($related)) {
+                    $this->addTagsFor($related);
+                }
+            }
         }
     }
 
