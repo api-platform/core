@@ -39,6 +39,7 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceChild
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceRelated;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithMultipleRequiredConstructorArgs;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithNullableConstructorArg;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithVariadicConstructorArg;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\NonCloneableDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\NotificationType;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnly;
@@ -55,6 +56,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -2204,6 +2207,39 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(DummyWithNullableConstructorArg::class, $result);
         $this->assertSame('Hello', $result->title);
         $this->assertNull($result->description);
+    }
+
+    public function testDenormalizeVariadicConstructorArg(): void
+    {
+        $this->assertSame(['a', 'b'], $this->denormalizeVariadicConstructorArg(['tagNames' => ['a', 'b']])->tagNames);
+    }
+
+    public function testDenormalizeVariadicConstructorArgWithNameConverter(): void
+    {
+        $this->assertSame(['a', 'b'], $this->denormalizeVariadicConstructorArg(['tag_names' => ['a', 'b']], new CamelCaseToSnakeCaseNameConverter())->tagNames);
+    }
+
+    private function denormalizeVariadicConstructorArg(array $data, ?NameConverterInterface $nameConverter = null): DummyWithVariadicConstructorArg
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyWithVariadicConstructorArg::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['tagNames']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyWithVariadicConstructorArg::class, 'tagNames', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::list(Type::string()))->withReadable(true)->withWritable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyWithVariadicConstructorArg::class)->willReturn(DummyWithVariadicConstructorArg::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyWithVariadicConstructorArg::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), $nameConverter, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        return $normalizer->denormalize($data, DummyWithVariadicConstructorArg::class);
     }
 }
 
