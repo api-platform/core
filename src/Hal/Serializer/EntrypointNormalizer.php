@@ -16,6 +16,7 @@ namespace ApiPlatform\Hal\Serializer;
 use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -45,8 +46,14 @@ final class EntrypointNormalizer implements NormalizerInterface
         foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
+            $itemOperation = null;
+
             foreach ($resourceMetadata as $resource) {
                 foreach ($resource->getOperations() as $operation) {
+                    if ($operation instanceof Get && (null === $itemOperation || \count($operation->getUriVariables() ?? []) < \count($itemOperation->getUriVariables() ?? []))) {
+                        $itemOperation = $operation;
+                    }
+
                     /** @var Operation $operation */
                     if (!$operation instanceof CollectionOperationInterface) {
                         continue;
@@ -60,9 +67,29 @@ final class EntrypointNormalizer implements NormalizerInterface
                     }
                 }
             }
+
+            if (null !== $itemOperation) {
+                $this->addItemLink($entrypoint, $itemOperation);
+            }
         }
 
         return $entrypoint;
+    }
+
+    private function addItemLink(array &$entrypoint, Get $operation): void
+    {
+        $parameters = [];
+        foreach (array_keys($operation->getUriVariables() ?? []) as $parameterName) {
+            $parameters[$parameterName] = '{'.$parameterName.'}';
+        }
+
+        try {
+            $href = $this->urlGenerator->generate($operation->getName(), $parameters, UrlGeneratorInterface::ABS_PATH);
+        } catch (InvalidArgumentException|\InvalidArgumentException) {
+            return;
+        }
+
+        $entrypoint['_links'][lcfirst($operation->getShortName()).'Item'] = ['href' => str_replace(['%7B', '%7D'], ['{', '}'], $href), 'templated' => true];
     }
 
     /**

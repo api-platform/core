@@ -43,6 +43,17 @@ final class HalTest extends ApiTestCase
         $this->assertContains('/hal_relation_embedders', $hrefs);
     }
 
+    public function testEntrypointExposesTemplatedItemLinks(): void
+    {
+        $response = self::createClient()->request('GET', '/', [
+            'headers' => ['Accept' => 'application/hal+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('/hal_relation_embedders', $body['_links']['halRelationEmbedder']['href'] ?? null);
+        $this->assertSame(['href' => '/hal_relation_embedders/{id}', 'templated' => true], $body['_links']['halRelationEmbedderItem'] ?? null);
+    }
+
     public function testGetEmbedsRelatedResourceAndItsRelation(): void
     {
         $response = self::createClient()->request('GET', '/hal_relation_embedders/1', [
