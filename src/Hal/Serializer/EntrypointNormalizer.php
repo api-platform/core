@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -52,11 +51,10 @@ final class EntrypointNormalizer implements NormalizerInterface
 
             foreach ($resourceMetadata as $resource) {
                 foreach ($resource->getOperations() as $operation) {
-                    if ($operation instanceof Get && (null === $itemOperation || \count($operation->getUriVariables() ?? []) < \count($itemOperation->getUriVariables() ?? []))) {
+                    if ($operation instanceof Get && [] !== ($uriVariables = $operation->getUriVariables() ?? []) && (null === $itemOperation || \count($uriVariables) < \count($itemOperation->getUriVariables() ?? []))) {
                         $itemOperation = $operation;
                     }
 
-                    /** @var Operation $operation */
                     if (!$operation instanceof CollectionOperationInterface) {
                         continue;
                     }

@@ -17,6 +17,7 @@ use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\HalRelatedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\HalThirdLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\RelationEmbedder;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationGroupImpactOnCollection;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class HalTest extends ApiTestCase
@@ -27,7 +28,7 @@ final class HalTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [RelationEmbedder::class, HalRelatedResource::class, HalThirdLevel::class];
+        return [RelationEmbedder::class, HalRelatedResource::class, HalThirdLevel::class, RelationGroupImpactOnCollection::class];
     }
 
     public function testEntrypointListsResourcesAsHalLinks(): void
@@ -52,6 +53,7 @@ final class HalTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertSame('/hal_relation_embedders', $body['_links']['halRelationEmbedder']['href'] ?? null);
         $this->assertSame(['href' => '/hal_relation_embedders/{id}', 'templated' => true], $body['_links']['halRelationEmbedderItem'] ?? null);
+        $this->assertSame(['href' => '/relation_group_impact_on_collections/{id}{._format}', 'templated' => true], $body['_links']['relationGroupImpactOnCollectionItem'] ?? null);
     }
 
     public function testGetEmbedsRelatedResourceAndItsRelation(): void
