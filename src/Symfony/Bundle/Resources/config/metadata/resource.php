@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFact
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\HydraOperationsResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\MainControllerResourceMetadataCollectionFactory;
@@ -150,6 +151,10 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.metadata.resource.metadata_collection_factory.alternate_uri', AlternateUriResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner')]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.hydra_operations', HydraOperationsResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 150)
+        ->args([service('api_platform.metadata.resource.metadata_collection_factory.hydra_operations.inner')]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.parameter', ParameterResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1000)
