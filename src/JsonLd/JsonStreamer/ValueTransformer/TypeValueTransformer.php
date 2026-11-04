@@ -18,10 +18,9 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
 
-final class TypeValueTransformer implements ValueTransformerInterface
+final class TypeValueTransformer implements PropertyValueTransformerInterface
 {
     public function __construct(
         private readonly ResourceClassResolverInterface $resourceClassResolver,
