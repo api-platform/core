@@ -35,6 +35,8 @@ use ApiPlatform\Doctrine\Odm\Serializer\DoctrineOdmOperationResourceClassResolve
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Doctrine\Odm\State\LinksHandler;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
 return function (ContainerConfigurator $container) {
@@ -55,14 +57,20 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.remove_processor'])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Common\State\RemoveProcessor']);
 
-    $services->alias(RemoveProcessor::class, 'api_platform.doctrine_mongodb.odm.state.remove_processor');
+    $services->alias(RemoveProcessor::class, 'api_platform.doctrine_mongodb.odm.state.remove_processor')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'odmRemove\')] ProcessorInterface $processor" instead.');
+
+    $services->alias(ProcessorInterface::class.' $odmRemove', 'api_platform.doctrine_mongodb.odm.state.remove_processor');
 
     $services->set('api_platform.doctrine_mongodb.odm.state.persist_processor', PersistProcessor::class)
         ->args([service('doctrine_mongodb')])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.persist_processor'])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Common\State\PersistProcessor']);
 
-    $services->alias(PersistProcessor::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor');
+    $services->alias(PersistProcessor::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'odmPersist\')] ProcessorInterface $processor" instead.');
+
+    $services->alias(ProcessorInterface::class.' $odmPersist', 'api_platform.doctrine_mongodb.odm.state.persist_processor');
 
     $services->set('api_platform.doctrine_mongodb.odm.search_filter', SearchFilter::class)
         ->abstract()
@@ -215,7 +223,10 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Odm\State\CollectionProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.collection_provider']);
 
-    $services->alias(CollectionProvider::class, 'api_platform.doctrine_mongodb.odm.state.collection_provider');
+    $services->alias(CollectionProvider::class, 'api_platform.doctrine_mongodb.odm.state.collection_provider')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'odmCollection\')] ProviderInterface $provider" instead.');
+
+    $services->alias(ProviderInterface::class.' $odmCollection', 'api_platform.doctrine_mongodb.odm.state.collection_provider');
 
     $services->set('api_platform.doctrine_mongodb.odm.state.item_provider', ItemProvider::class)
         ->args([
@@ -227,9 +238,12 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Odm\State\ItemProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.item_provider']);
 
-    $services->alias(ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.item_provider');
+    $services->alias(ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.item_provider')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'odmItem\')] ProviderInterface $provider" instead.');
 
-    $services->alias('api_platform.state.item_provider', 'ApiPlatform\Doctrine\Odm\State\ItemProvider');
+    $services->alias(ProviderInterface::class.' $odmItem', 'api_platform.doctrine_mongodb.odm.state.item_provider');
+
+    $services->alias('api_platform.state.item_provider', 'api_platform.doctrine_mongodb.odm.state.item_provider');
 
     $services->set('api_platform.doctrine.odm.metadata.resource.metadata_collection_factory', DoctrineMongoDbOdmResourceCollectionMetadataFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, -50)

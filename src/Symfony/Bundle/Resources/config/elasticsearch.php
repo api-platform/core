@@ -25,6 +25,7 @@ use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
+use ApiPlatform\State\ProviderInterface;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -119,7 +120,10 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Elasticsearch\State\ItemProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100]);
 
-    $services->alias(ItemProvider::class, 'api_platform.elasticsearch.state.item_provider');
+    $services->alias(ItemProvider::class, 'api_platform.elasticsearch.state.item_provider')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'elasticsearchItem\')] ProviderInterface $provider" instead.');
+
+    $services->alias(ProviderInterface::class.' $elasticsearchItem', 'api_platform.elasticsearch.state.item_provider');
 
     $services->set('api_platform.elasticsearch.state.collection_provider', CollectionProvider::class)
         ->args([
@@ -132,7 +136,10 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Elasticsearch\State\CollectionProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100]);
 
-    $services->alias(CollectionProvider::class, 'api_platform.elasticsearch.state.collection_provider');
+    $services->alias(CollectionProvider::class, 'api_platform.elasticsearch.state.collection_provider')
+        ->deprecate('api-platform/core', '5.1', 'The "%alias_id%" service alias is deprecated, use "#[Target(\'elasticsearchCollection\')] ProviderInterface $provider" instead.');
+
+    $services->alias(ProviderInterface::class.' $elasticsearchCollection', 'api_platform.elasticsearch.state.collection_provider');
 
     $services->set('api_platform.elasticsearch.metadata.resource.metadata_collection_factory', ElasticsearchProviderResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
