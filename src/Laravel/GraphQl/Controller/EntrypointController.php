@@ -16,11 +16,14 @@ namespace ApiPlatform\Laravel\GraphQl\Controller;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Laravel\Eloquent\Listener\PurgeHttpCacheListener;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,6 +69,11 @@ final class EntrypointController
         try {
             if ($request->isMethod('GET') && 'html' === $format) {
                 return ($this->graphiQlAction)();
+            }
+
+            if (interface_exists(PurgerInterface::class)) {
+                Event::listen('eloquent.saved: *', [PurgeHttpCacheListener::class, 'handleModelSaved']);
+                Event::listen('eloquent.deleted: *', [PurgeHttpCacheListener::class, 'handleModelDeleted']);
             }
 
             [$query, $operationName, $variables] = $this->parseRequest($request, $format);

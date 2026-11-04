@@ -16,12 +16,10 @@ namespace ApiPlatform\JsonApi\Serializer;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\BadRequestException;
 use ApiPlatform\Metadata\Exception\ConflictException;
-use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -75,6 +73,7 @@ trait ItemNormalizerTrait
             } elseif (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             } else {
+                $this->assertValidId($data['data']['id'], 'The type of the "data.id" attribute', 'data.id');
                 $context += ['fetch_data' => false];
                 if ($this->useIriAsId) {
                     $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['data']['id'], $context);
@@ -156,6 +155,13 @@ trait ItemNormalizerTrait
         return (new \ReflectionClass($resourceClass))->getShortName();
     }
 
+    private function assertValidId(mixed $id, string $subject, ?string $path): void
+    {
+        if (!\is_string($id) && ($this->useIriAsId || !\is_int($id))) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('%s must be "string", "%s" given.', $subject, \gettype($id)), $id, ['string'], $path, true);
+        }
+    }
+
     private function isJsonObject(mixed $value): bool
     {
         return \is_array($value) && ([] === $value || !array_is_list($value));
@@ -174,7 +180,6 @@ trait ItemNormalizerTrait
     /**
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
@@ -183,33 +188,18 @@ trait ItemNormalizerTrait
             throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
-        try {
-            $context += ['fetch_data' => true];
-            if ($this->useIriAsId) {
-                return $this->iriConverter->getResourceFromIri($value['id'], $context);
-            }
+        $this->assertValidId($value['id'], \sprintf('The type of the "id" attribute of the "%s" relationship', $attributeName), $context['deserialization_path'] ?? null);
 
-            /** @var HttpOperation $getOperation */
-            $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
-            $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
-
-            return $this->iriConverter->getResourceFromIri($iri, $context);
-        } catch (ItemNotFoundException $e) {
-            if (!isset($context['not_normalizable_value_exceptions'])) {
-                throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-            }
-            $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
-                $e->getMessage(),
-                $value,
-                [$className],
-                $context['deserialization_path'] ?? null,
-                true,
-                $e->getCode(),
-                $e
-            );
-
-            return null;
+        $context += ['fetch_data' => true];
+        if ($this->useIriAsId) {
+            return $this->getResourceFromIri((string) $value['id'], $context, $className);
         }
+
+        /** @var HttpOperation $getOperation */
+        $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
+        $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
+
+        return $this->getResourceFromIri($iri, $context, $className);
     }
 
     /**

@@ -72,7 +72,7 @@ trait ResourceExtractorTrait
                     return (bool) XmlUtils::phpize($resource[$key]);
                 }
 
-                return \in_array($resource[$key], ['1', 'true', 1, true], false);
+                return \is_bool($resource[$key]) ? $resource[$key] : filter_var($resource[$key], \FILTER_VALIDATE_BOOLEAN);
         }
 
         throw new InvalidArgumentException(\sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])));
@@ -80,7 +80,7 @@ trait ResourceExtractorTrait
 
     private function buildArgs(\SimpleXMLElement $resource): ?array
     {
-        if (!isset($resource->args->arg)) {
+        if (!isset($resource->args)) {
             return null;
         }
 

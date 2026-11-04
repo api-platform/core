@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\FieldMapping;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -68,7 +69,11 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
 
         // Collection associations (OneToMany/ManyToMany) require a JOIN to compare individual elements.
         if ($ormLeafMetadata['is_collection_valued']) {
-            $queryBuilder->join(\sprintf('%s.%s', $alias, $property), $parameterName);
+            if (Join::LEFT_JOIN === $this->joinTypeFor($context)) {
+                $queryBuilder->leftJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
+            } else {
+                $queryBuilder->innerJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
+            }
 
             if (is_iterable($value)) {
                 $queryBuilder

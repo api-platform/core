@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -37,11 +38,14 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithSh
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\InvalidExceptionToStatusOperation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagationTarget;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameDifferentMethodOperations;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameGraphQlOperationAttributes;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameGraphQlOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
@@ -277,6 +281,22 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
     }
 
+    public function testCreateWithListDefaults(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'types' => ['https://schema.org/CreativeWork'],
+            'schemes' => ['https'],
+        ]);
+
+        $resourceMetadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class);
+        $operation = $resourceMetadataCollection->getOperation('_api_AttributeResource_get');
+
+        $this->assertSame(['https://schema.org/CreativeWork'], $resourceMetadataCollection[0]->getTypes());
+        $this->assertInstanceOf(HttpOperation::class, $operation);
+        $this->assertSame(['https://schema.org/CreativeWork'], $operation->getTypes());
+        $this->assertSame(['https'], $operation->getSchemes());
+    }
+
     public function testOverrideNameWithoutOperations(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
@@ -379,6 +399,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         }
     }
 
+    public function testInvalidExceptionToStatusThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The HTTP status code "999" of operation "_api_InvalidExceptionToStatusOperation_get" of resource "%s" is not valid.', InvalidExceptionToStatusOperation::class));
+
+        $factory->create(InvalidExceptionToStatusOperation::class);
+    }
+
     public function testWithParameters(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
@@ -435,9 +465,29 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $factory = new AttributesResourceMetadataCollectionFactory();
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(SameNameDifferentMethodOperations::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperations::class));
+
+        $factory->create(SameNameGraphQlOperations::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameOnAttributesThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperationAttributes::class));
+
+        $factory->create(SameNameGraphQlOperationAttributes::class);
     }
 }

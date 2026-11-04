@@ -35,6 +35,7 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\State\ApiResource\Error;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -56,9 +57,17 @@ class SchemaFactoryTest extends TestCase
                 ])),
             ])
         );
+        $resourceMetadataFactory->create(Error::class)->willReturn(
+            new ResourceMetadataCollection(Error::class, [
+                (new ApiResource())->withOperations(new Operations([
+                    'get' => (new Get())->withClass(Error::class)->withName('get'),
+                ])),
+            ])
+        );
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_INPUT])->willReturn(new PropertyNameCollection());
+        $propertyNameCollectionFactory->create(Error::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $definitionNameFactory = new DefinitionNameFactory();
@@ -72,6 +81,7 @@ class SchemaFactoryTest extends TestCase
 
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolver->isResourceClass(Error::class)->willReturn(true);
 
         $this->schemaFactory = new SchemaFactory(
             schemaFactory: $baseSchemaFactory,
@@ -105,6 +115,7 @@ class SchemaFactoryTest extends TestCase
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']));
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
         $this->assertSame(['$ref' => '#/definitions/'.$rootDefinitionKey.'.resource'], $properties['data']);
@@ -190,10 +201,20 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
         $this->assertSame(['$ref' => '#/definitions/'.$rootDefinitionKey.'.resource'], $definitions[$rootDefinitionKey]['properties']['data']);
         $data = $definitions[$rootDefinitionKey.'.resource'];
         $this->assertArrayHasKey('required', $data);
         $this->assertSame(['type'], $data['required']);
+    }
+
+    public function testErrorSchemaIsAnObject(): void
+    {
+        $operation = (new Get())->withClass(Error::class)->withName('get')->withShortName('Error');
+        $resultSchema = $this->schemaFactory->buildSchema(Error::class, 'jsonapi', Schema::TYPE_OUTPUT, $operation);
+        $definitions = $resultSchema->getDefinitions();
+
+        $this->assertSame('object', $definitions[$resultSchema->getRootDefinitionKey()]['type']);
     }
 
     public function testPatchInputSchemaRequiresId(): void
