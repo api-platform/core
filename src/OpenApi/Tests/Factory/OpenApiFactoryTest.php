@@ -958,6 +958,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1003,6 +1004,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1216,6 +1218,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1365,6 +1368,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1749,6 +1753,13 @@ class OpenApiFactoryTest extends TestCase
         $linkParameterGuardParameters = $openApi->getPaths()->getPath('/link-parameter-guard')->getGet()->getParameters();
         $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar' === $parameter->getName()));
         $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar[]' === $parameter->getName()));
+    }
+
+    public function testPageParameterHasAMinimum(): void
+    {
+        $page = $this->getParameterByName($this->getGeneratedQueryParameters([], null), 'page');
+
+        $this->assertSame(['type' => 'integer', 'default' => 1, 'minimum' => 1], $page->getSchema());
     }
 
     public function testFilterlessArrayQueryParameterWithBracketKeyIsNotSuffixedTwice(): void
