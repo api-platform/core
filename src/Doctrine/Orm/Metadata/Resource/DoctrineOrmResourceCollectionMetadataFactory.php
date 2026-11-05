@@ -49,6 +49,10 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
                 foreach ($operations as $operationName => $operation) {
                     $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
 
+                    if (!class_exists($entityClass) && !interface_exists($entityClass)) {
+                        continue;
+                    }
+
                     $manager = $this->managerRegistry->getManagerForClass($entityClass);
                     if (!$manager instanceof EntityManagerInterface) {
                         continue;
@@ -76,7 +80,7 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
                     $entityClass = $this->getStateOptionsClass($graphQlOperation, $graphQlOperation->getClass(), Options::class);
 
-                    if (!$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
+                    if ((!class_exists($entityClass) && !interface_exists($entityClass)) || !$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
                         continue;
                     }
 
