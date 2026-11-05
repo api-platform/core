@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Mcp\Server;
 
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\State\ToolProvider;
 use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use Mcp\Capability\Discovery\SchemaValidator;
 use Mcp\Schema\JsonRpc\Error;
 use Mcp\Schema\JsonRpc\Request;
 use Mcp\Schema\JsonRpc\Response;
@@ -41,6 +44,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttp
  */
 final class Handler implements RequestHandlerInterface
 {
+    private readonly SchemaValidator $schemaValidator;
+
     /**
      * @param array<class-string, int> $exceptionToStatus
      */
@@ -49,9 +54,12 @@ final class Handler implements RequestHandlerInterface
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
         private readonly RequestStack $requestStack,
+        private readonly ToolInputSchemaFactory $inputSchemaFactory,
         private readonly LoggerInterface $logger = new NullLogger(),
         private readonly array $exceptionToStatus = [],
+        ?SchemaValidator $schemaValidator = null,
     ) {
+        $this->schemaValidator = $schemaValidator ?? new SchemaValidator(logger: $logger);
     }
 
     public function supports(Request $request): bool
@@ -90,6 +98,23 @@ final class Handler implements RequestHandlerInterface
 
         if (null === $operation) {
             return Error::forMethodNotFound(\sprintf('MCP operation "%s" not found.', $operationNameOrUri), $request->getId());
+        }
+
+        if (!$isResource && $operation instanceof McpTool) {
+            $validationErrors = $this->schemaValidator->validateAgainstJsonSchema([] === $arguments ? new \stdClass() : $arguments, $this->inputSchemaFactory->create($operation));
+            if ([] !== $validationErrors) {
+                if (\in_array('internal', array_column($validationErrors, 'keyword'), true)) {
+                    $this->logger->error('Tool input schema validation failed internally.', ['tool' => $operationNameOrUri, 'validation_errors' => $validationErrors]);
+
+                    return Error::forInternalError('Internal server error.', $request->getId());
+                }
+
+                return Error::forInvalidParams(
+                    "Invalid parameters for tool '{$operationNameOrUri}': ".self::summarizeValidationErrors($validationErrors),
+                    $request->getId(),
+                    ['validation_errors' => $validationErrors]
+                );
+            }
         }
 
         $uriVariables = [];
@@ -211,5 +236,26 @@ final class Handler implements RequestHandlerInterface
         }
 
         return $exception->getMessage();
+    }
+
+    /**
+     * @param list<array{pointer?: string, message?: string}> $validationErrors
+     */
+    private static function summarizeValidationErrors(array $validationErrors): string
+    {
+        $errorMessages = [];
+
+        foreach ($validationErrors as $errorDetail) {
+            $pointer = $errorDetail['pointer'] ?? '';
+            $message = $errorDetail['message'] ?? 'Unknown validation error';
+            $errorMessages[] = ('/' !== $pointer && '' !== $pointer ? "Property '{$pointer}': " : '').$message;
+        }
+
+        $summary = implode('; ', \array_slice($errorMessages, 0, 3));
+        if (\count($errorMessages) > 3) {
+            $summary .= '; ...and more errors.';
+        }
+
+        return $summary;
     }
 }

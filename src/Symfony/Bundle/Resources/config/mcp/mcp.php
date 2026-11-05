@@ -15,6 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Mcp\Capability\Registry\Loader;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter;
 use ApiPlatform\Mcp\Security\ExpressionAccessChecker;
@@ -28,11 +29,17 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.json_schema.schema_factory'),
         ]);
 
+    $services->set('api_platform.mcp.json_schema.tool_input_schema_factory', ToolInputSchemaFactory::class)
+        ->args([
+            service('api_platform.mcp.json_schema.schema_factory'),
+        ]);
+
     $services->set('api_platform.mcp.loader', Loader::class)
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.mcp.json_schema.schema_factory'),
+            service('api_platform.mcp.json_schema.tool_input_schema_factory'),
         ])
         ->tag('mcp.loader');
 
