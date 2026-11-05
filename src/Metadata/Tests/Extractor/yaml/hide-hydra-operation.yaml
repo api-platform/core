@@ -8,3 +8,10 @@ resources:
             operations:
                 ApiPlatform\Metadata\GetCollection:
                     hideHydraOperation: true
+        -   uriTemplate: /programs/visible
+            hideHydraOperation: true
+            strictQueryParameterValidation: true
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    hideHydraOperation: false
+                    strictQueryParameterValidation: false

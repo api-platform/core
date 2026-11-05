@@ -590,6 +590,8 @@ class YamlExtractorTest extends TestCase
         $this->assertTrue($resources[0]['operations'][0]['hideHydraOperation']);
         $this->assertTrue($resources[0]['operations'][0]['strictQueryParameterValidation']);
         $this->assertTrue($resources[1]['operations'][0]['hideHydraOperation']);
+        $this->assertFalse($resources[2]['operations'][0]['hideHydraOperation']);
+        $this->assertFalse($resources[2]['operations'][0]['strictQueryParameterValidation']);
     }
 
     public function testInputAndOutputAreStrings(): void
