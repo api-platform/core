@@ -361,12 +361,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
-                $defaultSchema = ['type' => 'string'];
-                if (null !== $p->getDefault()) {
-                    $defaultSchema['default'] = $p->getDefault();
+                $parameterSchema = $p->getSchema() ?? ['type' => 'string'];
+                if (null !== $p->getDefault() && !isset($parameterSchema['default'])) {
+                    $parameterSchema['default'] = $p->getDefault();
                 }
-
-                $parameterSchema = $p->getSchema() ?? $defaultSchema;
                 $castToArray = $p->getCastToArray();
                 $parameterDescription = $p->getDescription() ?? "$resourceShortName $key";
                 $parameterRequired = $p->getRequired() ?? false;

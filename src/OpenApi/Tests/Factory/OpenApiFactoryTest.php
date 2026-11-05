@@ -1770,6 +1770,37 @@ class OpenApiFactoryTest extends TestCase
         }
     }
 
+    public function testQueryParameterDefaultIsDocumented(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'itemsCount' => new QueryParameter(key: 'itemsCount', schema: ['type' => 'integer'], default: 10),
+            'sort' => new QueryParameter(key: 'sort', default: 'asc'),
+        ], null);
+
+        $this->assertSame(['type' => 'integer', 'default' => 10], $this->getParameterByName($parameters, 'itemsCount')->getSchema());
+        $this->assertSame(['type' => 'string', 'default' => 'asc'], $this->getParameterByName($parameters, 'sort')->getSchema());
+    }
+
+    public function testHeaderParameterDefaultIsDocumented(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'X-Items-Count' => new HeaderParameter(key: 'X-Items-Count', schema: ['type' => 'integer'], default: 10),
+        ], null);
+
+        $parameter = $this->getParameterByName($parameters, 'X-Items-Count');
+        $this->assertSame('header', $parameter->getIn());
+        $this->assertSame(['type' => 'integer', 'default' => 10], $parameter->getSchema());
+    }
+
+    public function testParameterSchemaDefaultIsKept(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'itemsCount' => new QueryParameter(key: 'itemsCount', schema: ['type' => 'integer', 'default' => 5], default: 10),
+        ], null);
+
+        $this->assertSame(['type' => 'integer', 'default' => 5], $this->getParameterByName($parameters, 'itemsCount')->getSchema());
+    }
+
     public function testDeleteOperationWithDeserializeDocumentsRequestBody(): void
     {
         $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
