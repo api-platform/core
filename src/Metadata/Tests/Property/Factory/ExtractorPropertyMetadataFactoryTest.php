@@ -42,6 +42,22 @@ final class ExtractorPropertyMetadataFactoryTest extends TestCase
         self::assertSame('user.isAdmin() === true', $metadata->getSecurity());
     }
 
+    public function testCreateNativeTypeWithoutDecoratedFactory(): void
+    {
+        $extractor = $this->createStub(PropertyExtractorInterface::class);
+        $extractor->method('getProperties')->willReturn([
+            Comment::class => [
+                'tags' => [
+                    'nativeType' => 'list<string>',
+                ],
+            ],
+        ]);
+
+        $metadata = (new ExtractorPropertyMetadataFactory($extractor))->create(Comment::class, 'tags');
+
+        self::assertSame('list<string>', (string) $metadata->getNativeType());
+    }
+
     public function testCreateNativeTypeWithDecoratedFactory(): void
     {
         $extractor = $this->createStub(PropertyExtractorInterface::class);
