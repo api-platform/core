@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Author;
@@ -101,6 +104,75 @@ class JsonLdTest extends TestCase
             'name' => 'Don Quichotte',
         ]);
         $this->assertMatchesRegularExpression('~^/api/books/~', $response->json('@id'));
+    }
+
+    public function testCreateBookWithAnIriWithoutRoute(): void
+    {
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 'Don Quichotte',
+                'author' => '/api/nope/1',
+                'isbn' => fake()->isbn13(),
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(400);
+        $this->assertStringContainsString('Invalid IRI "/api/nope/1"', $response->json('detail'));
+    }
+
+    public function testCreateBookWithAnInvalidType(): void
+    {
+        AuthorFactory::new()->create();
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 123,
+                'author' => $this->getIriFromResource(Author::find(1)),
+                'isbn' => fake()->isbn13(),
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(400);
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function usePreviouslyPublishedExceptionToStatus($app): void
+    {
+        $app['config']->set('api-platform.exception_to_status', [
+            AuthenticationException::class => 401,
+            AuthorizationException::class => 403,
+        ]);
+    }
+
+    #[DefineEnvironment('usePreviouslyPublishedExceptionToStatus')]
+    public function testCreateBookWithAnInvalidTypeAndAPreviouslyPublishedConfig(): void
+    {
+        AuthorFactory::new()->create();
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 123,
+                'author' => $this->getIriFromResource(Author::find(1)),
+                'isbn' => fake()->isbn13(),
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(400);
     }
 
     public function testUpdateBook(): void

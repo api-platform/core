@@ -11,10 +11,12 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 
 return [
@@ -116,6 +118,8 @@ return [
     'exception_to_status' => [
         AuthenticationException::class => 401,
         AuthorizationException::class => 403,
+        SerializerExceptionInterface::class => 400,
+        InvalidArgumentException::class => 400,
     ],
 
     'redoc' => [
