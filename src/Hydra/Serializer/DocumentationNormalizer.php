@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -263,7 +264,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $hydraOperations = [];
         foreach ($resourceMetadata->getOperations() as $operation) {
-            if (true === $operation->getHideHydraOperation()) {
+            if (true === $operation->getHideHydraOperation() || $operation instanceof NotExposed) {
                 continue;
             }
 
