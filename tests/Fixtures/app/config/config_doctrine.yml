@@ -130,6 +130,13 @@ services:
             $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
             $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue8765\Issue8765BookProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue8765\Issue8765BookProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+        arguments:
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5605\MainResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue5605\MainResourceProvider'
         tags:
