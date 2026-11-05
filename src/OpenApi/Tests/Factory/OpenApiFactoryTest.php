@@ -1501,6 +1501,64 @@ class OpenApiFactoryTest extends TestCase
         $factory->__invoke();
     }
 
+    public function testForbiddenResponseForEverySecurityOption(): void
+    {
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+
+        $post = (new Post())->withClass(Dummy::class)->withShortName('Dummy')->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            'postDenormalize' => $post->withName('post_denormalize')->withUriTemplate('/post-denormalize')->withSecurityPostDenormalize('is_granted("ROLE_ADMIN")'),
+            'postValidation' => $post->withName('post_validation')->withUriTemplate('/post-validation')->withSecurityPostValidation('is_granted("ROLE_ADMIN")'),
+            'parameter' => $post->withName('parameter')->withUriTemplate('/parameter')->withParameters(['q' => new QueryParameter(key: 'q', security: 'is_granted("ROLE_ADMIN")')]),
+            'policy' => $post->withName('policy')->withUriTemplate('/policy')->withPolicy('create'),
+            'link' => $post->withName('link')->withUriTemplate('/link/{id}')->withUriVariables(['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], security: 'is_granted("ROLE_ADMIN")')]),
+            'noSecurity' => $post->withName('no_security')->withUriTemplate('/no-security'),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $paths = $factory->__invoke()->getPaths();
+
+        $this->assertArrayHasKey('403', $paths->getPath('/post-denormalize')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/post-validation')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/parameter')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/policy')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/link/{id}')->getPost()->getResponses());
+        $this->assertArrayNotHasKey('403', $paths->getPath('/no-security')->getPost()->getResponses());
+    }
+
     public function testStringFilterWithUserDescriptionOverridesFilterDescription(): void
     {
         $filterLocator = $this->createStub(ContainerInterface::class);

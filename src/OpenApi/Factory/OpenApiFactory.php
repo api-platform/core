@@ -472,7 +472,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            if ($overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
+            if ($overrideResponses && !isset($existingResponses[403]) && $this->canDenyAccess($operation)) {
                 $openapiOperation = $this->addOperationErrors($openapiOperation, [
                     $defaultError->withStatus(403)->withDescription('Forbidden'),
                 ], $resourceMetadataCollection, $schema, $schemas, $operation, $schemaSerializerContext);
@@ -538,6 +538,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
         }
+    }
+
+    private function canDenyAccess(HttpOperation $operation): bool
+    {
+        if ($operation->getSecurity() || $operation->getSecurityPostDenormalize() || $operation->getSecurityPostValidation() || $operation->getPolicy()) {
+            return true;
+        }
+
+        foreach ([$operation->getUriVariables() ?? [], $operation->getParameters() ?? []] as $parameters) {
+            foreach ($parameters as $parameter) {
+                if ($parameter instanceof MetadataParameter && null !== $parameter->getSecurity()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
