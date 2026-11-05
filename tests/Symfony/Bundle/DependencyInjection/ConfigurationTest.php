@@ -300,6 +300,18 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testDefaultsThatNeedObjectsInCamelCase(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "defaults.state_options" option is not supported, it needs objects. Set it on the resources instead.');
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => ['stateOptions' => ['entity_class' => 'App\\Entity\\Book']],
+            ],
+        ]);
+    }
+
     public function testOpenapiDefaultCanBeABoolean(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
