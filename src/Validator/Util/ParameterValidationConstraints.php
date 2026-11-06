@@ -73,16 +73,16 @@ trait ParameterValidationConstraints
         $maximum = $schema['exclusiveMaximum'] ?? $schema['maximum'] ?? null;
         $exclusiveMaximum = isset($schema['exclusiveMaximum']);
 
-        if ($minimum && $maximum) {
+        if (null !== $minimum && null !== $maximum) {
             if (!$exclusiveMinimum && !$exclusiveMaximum) {
                 $assertions[] = new Range(min: $minimum, max: $maximum);
             } else {
                 $assertions[] = $exclusiveMinimum ? new GreaterThan(value: $minimum) : new GreaterThanOrEqual(value: $minimum);
                 $assertions[] = $exclusiveMaximum ? new LessThan(value: $maximum) : new LessThanOrEqual(value: $maximum);
             }
-        } elseif ($minimum) {
+        } elseif (null !== $minimum) {
             $assertions[] = $exclusiveMinimum ? new GreaterThan(value: $minimum) : new GreaterThanOrEqual(value: $minimum);
-        } elseif ($maximum) {
+        } elseif (null !== $maximum) {
             $assertions[] = $exclusiveMaximum ? new LessThan(value: $maximum) : new LessThanOrEqual(value: $maximum);
         }
 
