@@ -534,6 +534,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameters;
         }
 
+        if (!class_exists($resourceClass) && !interface_exists($resourceClass)) {
+            return $parameters;
+        }
+
         foreach ((new \ReflectionClass($resourceClass))->getProperties() as $reflectionProperty) {
             foreach ($reflectionProperty->getAttributes(Parameter::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 $parameter = $attribute->newInstance();

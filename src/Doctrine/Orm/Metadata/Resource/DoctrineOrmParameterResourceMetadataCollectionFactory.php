@@ -78,7 +78,7 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
         }
 
         $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
-        if (!$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
+        if ((!class_exists($entityClass) && !interface_exists($entityClass)) || !$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
             return $operation;
         }
 
