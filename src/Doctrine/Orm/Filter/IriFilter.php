@@ -54,9 +54,10 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
 
         // Use precomputed ORM leaf metadata when available (nested properties),
         // otherwise resolve at runtime by walking the association chain.
+        // A leaf that is not an association (e.g. a nested backed enum column) has no target class: it is also resolved at runtime.
         $ormLeafMetadata = $this->getOrmLeafMetadata($parameter);
 
-        if (null === $ormLeafMetadata) {
+        if (!isset($ormLeafMetadata['association_target_class'])) {
             $ormLeafMetadata = $this->resolveLeafMetadataAtRuntime($queryBuilder, $resourceClass, $parameter->getProperty(), $property);
         }
 
@@ -136,7 +137,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     }
 
     /**
-     * @return array{is_collection_valued: bool, association_target_class: string, identifier_type: ?string}|null
+     * @return array{is_collection_valued: bool, association_target_class: ?string, identifier_type: ?string}|null
      */
     private function getOrmLeafMetadata(mixed $parameter): ?array
     {
