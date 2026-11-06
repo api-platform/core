@@ -107,6 +107,31 @@ class ObjectMapperOutputProcessorTest extends TestCase
         $this->assertSame($result, $processor->process($entity, $operation));
     }
 
+    public function testProcessMapsEntityToDefinedOutputClass(): void
+    {
+        $entity = new \stdClass();
+        $entity->id = 1;
+        $dto = new \stdClass();
+        $dto->id = 1;
+        $result = new \stdClass();
+        $operation = new Post(class: ObjectMapperOutputDummy::class, output: ['class' => ObjectMapperOutputDtoDummy::class], map: true);
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($entity, ObjectMapperOutputDtoDummy::class)
+            ->willReturn($dto);
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($dto, $operation, [], $this->anything())
+            ->willReturn($result);
+
+        $processor = new ObjectMapperOutputProcessor($objectMapper, $decorated);
+        $this->assertSame($result, $processor->process($entity, $operation));
+    }
+
     public function testProcessSetsPersistedDataOnRequest(): void
     {
         $entity = new \stdClass();
@@ -134,5 +159,9 @@ class ObjectMapperOutputProcessorTest extends TestCase
 }
 
 class ObjectMapperOutputDummy
+{
+}
+
+class ObjectMapperOutputDtoDummy
 {
 }
