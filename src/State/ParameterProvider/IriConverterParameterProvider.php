@@ -41,7 +41,10 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
         }
 
         $extraProperties = $parameter->getExtraProperties();
-        $iriConverterContext = ['fetch_data' => $extraProperties['fetch_data'] ?? false];
+        $iriConverterContext = [
+            'fetch_data' => $extraProperties['fetch_data'] ?? false,
+            'map_resource' => $extraProperties['map_resource'] ?? (null === $parameter->getFilter()),
+        ];
 
         if (\is_array($value)) {
             $entities = [];

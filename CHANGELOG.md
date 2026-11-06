@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.6
+
+### Notes
+
+* A parameter resolved through `IriConverterParameterProvider` that declares a `filter` now receives the `stateOptions` entity instead of the object-mapped resource (#8802). This fixes `IriFilter` on mapped resources, but a custom filter written against the mapped DTO now gets the entity. Restore the previous value with `extraProperties: ['map_resource' => true]` on the parameter.
+
 ## v5.0.5
 
 API Platform 5.0.5 contains every change shipped in [v4.4.6](#v446), plus the changes below.

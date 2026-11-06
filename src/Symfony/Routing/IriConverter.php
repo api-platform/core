@@ -124,6 +124,10 @@ final class IriConverter implements IriConverterInterface
             $dispatchOperation = $operation;
         }
 
+        if (false === ($context['map_resource'] ?? null)) {
+            $dispatchOperation = $dispatchOperation->withMap(false);
+        }
+
         if ($item = $this->provider->provide($dispatchOperation, $uriVariables, $context)) {
             return $item;
         }
