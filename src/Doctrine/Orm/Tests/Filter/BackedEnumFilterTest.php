@@ -45,6 +45,36 @@ final class BackedEnumFilterTest extends DoctrineOrmFilterTestCase
         yield 'negative' => ['-1'];
     }
 
+    public function testApplyWithAssociativeArray(): void
+    {
+        $this->doTestApply(
+            ['dummyBackedEnum' => null],
+            ['dummyBackedEnum' => ['foo' => 'one']],
+            \sprintf('SELECT o FROM %s o WHERE o.dummyBackedEnum = :dummyBackedEnum_p1', Dummy::class),
+            ['dummyBackedEnum_p1' => 'one'],
+        );
+    }
+
+    public function testApplyIgnoresInvalidValuesInMultipleValues(): void
+    {
+        $this->doTestApply(
+            ['dummyBackedEnum' => null],
+            ['dummyBackedEnum' => ['one', 'zero']],
+            \sprintf('SELECT o FROM %s o WHERE o.dummyBackedEnum = :dummyBackedEnum_p1', Dummy::class),
+            ['dummyBackedEnum_p1' => 'one'],
+        );
+    }
+
+    public function testApplyIgnoresInvalidValuesInTheInClause(): void
+    {
+        $this->doTestApply(
+            ['dummyBackedEnum' => null],
+            ['dummyBackedEnum' => ['one', 'zero', 'two']],
+            \sprintf('SELECT o FROM %s o WHERE o.dummyBackedEnum IN (:dummyBackedEnum_p1)', Dummy::class),
+            ['dummyBackedEnum_p1' => ['one', 'two']],
+        );
+    }
+
     public static function provideApplyTestData(): array
     {
         return array_merge_recursive(
