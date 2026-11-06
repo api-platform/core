@@ -159,6 +159,26 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
 
+## v4.4.7
+
+### Security
+
+* [55bbbe7b3](https://github.com/api-platform/core/commit/55bbbe7b39bfa6ac121db84c0dc39a6e19ecde13) fix(serializer): securityPostDenormalize with serialized name ([GHSA-8v47-3hr7-pqm3](https://github.com/api-platform/core/security/advisories/GHSA-8v47-3hr7-pqm3))
+* [5248f9a02](https://github.com/api-platform/core/commit/5248f9a028bf9ce509386f83b655a041e084a41c) fix(serializer): disable attribute cache for policy-guarded properties ([GHSA-cwhh-732q-p35c](https://github.com/api-platform/core/security/advisories/GHSA-cwhh-732q-p35c))
+* [b3975a7d9](https://github.com/api-platform/core/commit/b3975a7d9ce7a60bfd67c0711a0cd691aed9fabd) fix(graphql): clear managers on failed mutation ([GHSA-35f3-vw58-447m](https://github.com/api-platform/core/security/advisories/GHSA-35f3-vw58-447m))
+
+### Bug fixes
+
+* [c633ad24c](https://github.com/api-platform/core/commit/c633ad24c7f2d0b66273a8edb2fdcbab901199de) fix(serializer): enforce securityPostDenormalize on non-cloneable objects (#8787)
+* [cf6bde483](https://github.com/api-platform/core/commit/cf6bde483eede4ed8a33645aab929bf905870897) fix(jsonapi): check relation IRI type on denormalization (#8788)
+* [b319ab120](https://github.com/api-platform/core/commit/b319ab120b1d6ff82340ef3ec436e3cb281780ba) fix(laravel): honor mcp.enabled and add mcp.middleware (#8789)
+* [edc952cff](https://github.com/api-platform/core/commit/edc952cff6cdccdbdfecc9cae4d47f29093abebc) fix(graphql): update existing object on nested input id (#8786)
+* [7166df654](https://github.com/api-platform/core/commit/7166df654368fa807be82d3082413e59e7810a81) fix(doctrine): document SortFilter parameters as a single value (#8759)
+
+### Dependencies
+
+* [725ffed73](https://github.com/api-platform/core/commit/725ffed73bdf1745c0d96e9999e735a35f29c3db) chore(jsonapi): require serializer ^4.4.7 (#8800)
+
 ## v4.4.6
 
 ### Bug fixes
