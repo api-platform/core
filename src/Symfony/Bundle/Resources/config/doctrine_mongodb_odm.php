@@ -239,7 +239,7 @@ return function (ContainerConfigurator $container) {
         ]);
 
     $services->set('api_platform.doctrine.odm.metadata.resource.parameter_metadata_collection_factory', DoctrineMongoDbOdmParameterResourceMetadataCollectionFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 999)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 789)
         ->args([
             service('doctrine_mongodb'),
             service('api_platform.doctrine.odm.metadata.resource.parameter_metadata_collection_factory.inner'),
