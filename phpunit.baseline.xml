@@ -73,6 +73,7 @@
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "EmbeddedDummy" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "FilteredAttributeParameter" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "FilterValidator" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
+   <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "IexactSearchItem" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "JsonApiFilteringProperty" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "MainResource" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on the "RelatedDummy2" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.]]></issue>
@@ -109,6 +110,7 @@
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on "ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\DummyExceptionToStatus" with the "#[ApiFilter]" attribute is deprecated, use the "#[QueryParameter]" attribute instead. The "#[ApiFilter]" attribute will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on "ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\DummyForBackedEnumFilter" with the "#[ApiFilter]" attribute is deprecated, use the "#[QueryParameter]" attribute instead. The "#[ApiFilter]" attribute will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on "ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\FilteredAttributeParameter" with the "#[ApiFilter]" attribute is deprecated, use the "#[QueryParameter]" attribute instead. The "#[ApiFilter]" attribute will be removed in 6.0.]]></issue>
+   <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on "ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\IexactSearchItem" with the "#[ApiFilter]" attribute is deprecated, use the "#[QueryParameter]" attribute instead. The "#[ApiFilter]" attribute will be removed in 6.0.]]></issue>
    <issue><![CDATA[Since api-platform/core 4.4: Declaring filters on "ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\SearchFilterParameter" with the "#[ApiFilter]" attribute is deprecated, use the "#[QueryParameter]" attribute instead. The "#[ApiFilter]" attribute will be removed in 6.0.]]></issue>
   </line>
  </file>
