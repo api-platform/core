@@ -41,12 +41,16 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttp
  */
 final class Handler implements RequestHandlerInterface
 {
+    /**
+     * @param array<class-string, int> $exceptionToStatus
+     */
     public function __construct(
         private readonly OperationMetadataFactoryInterface $operationMetadataFactory,
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
         private readonly RequestStack $requestStack,
         private readonly LoggerInterface $logger = new NullLogger(),
+        private readonly array $exceptionToStatus = [],
     ) {
     }
 
@@ -138,13 +142,14 @@ final class Handler implements RequestHandlerInterface
         // HTTP exception (e.g. access denied, validation, not found) is converted into a JSON-RPC
         // error carrying its message. Both API Platform's and Symfony's HttpExceptionInterface
         // qualify: throwing Symfony's NotFoundHttpException from a state provider is a documented
-        // idiom, and API Platform has no 404 equivalent of its own. Anything else stays uncaught
-        // and reaches the SDK's own generic handler, which does not leak arbitrary exception
-        // messages to the client.
+        // idiom, and API Platform has no 404 equivalent of its own. So is any exception mapped to
+        // a client error status (< 500) through exception_to_status. Anything else is rethrown and
+        // reaches the SDK's own generic handler, which does not leak arbitrary exception messages
+        // to the client.
         try {
             $body = $this->provider->provide($operation, $uriVariables, $context);
-        } catch (HttpExceptionInterface|SymfonyHttpExceptionInterface $e) {
-            return Error::forInternalError($this->getPublicErrorMessage($e), $request->getId());
+        } catch (\Throwable $e) {
+            return $this->toError($e, $operation, $request);
         }
 
         if (!$isResource && null !== ($httpRequest = $context['request'] ?? null)) {
@@ -164,9 +169,34 @@ final class Handler implements RequestHandlerInterface
 
         try {
             return $this->processor->process($body, $operation, $uriVariables, $context);
-        } catch (HttpExceptionInterface|SymfonyHttpExceptionInterface $e) {
-            return Error::forInternalError($this->getPublicErrorMessage($e), $request->getId());
+        } catch (\Throwable $e) {
+            return $this->toError($e, $operation, $request);
         }
+    }
+
+    private function toError(\Throwable $e, HttpOperation $operation, Request $request): Error
+    {
+        if (!$e instanceof HttpExceptionInterface && !$e instanceof SymfonyHttpExceptionInterface) {
+            $status = $this->getMappedStatus($e, $operation);
+            if (null === $status || $status >= 500) {
+                throw $e;
+            }
+        }
+
+        return Error::forInternalError($this->getPublicErrorMessage($e), $request->getId());
+    }
+
+    private function getMappedStatus(\Throwable $e, HttpOperation $operation): ?int
+    {
+        $exceptionToStatus = array_merge($this->exceptionToStatus, $operation->getExceptionToStatus() ?? []);
+
+        foreach ($exceptionToStatus as $class => $status) {
+            if (is_a($e::class, $class, true)) {
+                return $status;
+            }
+        }
+
+        return null;
     }
 
     private function getPublicErrorMessage(\Throwable $exception): string

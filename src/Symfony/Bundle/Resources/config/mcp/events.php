@@ -82,6 +82,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.mcp.state_processor'),
             service('request_stack'),
             service('logger')->ignoreOnInvalid(),
+            param('api_platform.exception_to_status'),
         ])
         ->tag('mcp.request_handler');
 };

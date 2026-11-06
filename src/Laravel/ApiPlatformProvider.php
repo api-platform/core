@@ -1346,7 +1346,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ProviderInterface::class),
                 $app->make(StructuredContentProcessor::class),
                 $app->make(RequestStack::class),
-                $app->make(LoggerInterface::class)
+                $app->make(LoggerInterface::class),
+                $app['config']->get('api-platform.exception_to_status', [])
             );
         });
 
