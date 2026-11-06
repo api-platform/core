@@ -848,6 +848,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('doctrine_orm.php');
 
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/doctrine_orm.php');
+        }
+
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
         }
@@ -878,6 +882,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.odm.links_handler');
 
         $loader->load('doctrine_mongodb_odm.php');
+
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/doctrine_mongodb_odm.php');
+        }
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
