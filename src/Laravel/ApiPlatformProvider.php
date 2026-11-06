@@ -118,6 +118,7 @@ use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Mcp\Capability\Registry\Loader as McpLoader;
 use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory as McpSchemaFactory;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
 use ApiPlatform\Mcp\Security\PolicyAccessChecker;
@@ -1281,11 +1282,18 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ToolInputSchemaFactory::class, static function (Application $app) {
+            return new ToolInputSchemaFactory(
+                $app->make(McpSchemaFactory::class)
+            );
+        });
+
         $this->app->singleton(McpLoader::class, static function (Application $app) {
             return new McpLoader(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(McpSchemaFactory::class)
+                $app->make(McpSchemaFactory::class),
+                $app->make(ToolInputSchemaFactory::class)
             );
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
@@ -1370,7 +1378,9 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ProviderInterface::class),
                 $app->make(StructuredContentProcessor::class),
                 $app->make(RequestStack::class),
-                $app->make(LoggerInterface::class)
+                $app->make(ToolInputSchemaFactory::class),
+                $app->make(LoggerInterface::class),
+                $app['config']->get('api-platform.exception_to_status', [])
             );
         });
 

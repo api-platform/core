@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\JsonLd;
 
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsDeprecated;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsPostOnly;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -27,7 +28,7 @@ final class HydraDocsTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [HydraDocsResource::class, HydraDocsRelated::class, HydraDocsDeprecated::class];
+        return [HydraDocsResource::class, HydraDocsRelated::class, HydraDocsDeprecated::class, HydraDocsPostOnly::class];
     }
 
     public function testDocumentationLinkHeader(): void
@@ -132,6 +133,15 @@ final class HydraDocsTest extends ApiTestCase
         $this->assertNotNull($relateds);
         $this->assertSame('#JsonLdHydraDocsRelated', $relateds['hydra:property']['range']);
         $this->assertArrayNotHasKey('owl:maxCardinality', $relateds['hydra:property']);
+    }
+
+    public function testNotExposedOperationsAreNotDocumented(): void
+    {
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocsPostOnly');
+
+        $this->assertNotNull($resource);
+        $this->assertNull($this->findOperation($resource, 'GET'));
     }
 
     public function testOperationMetadata(): void

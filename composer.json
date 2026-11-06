@@ -181,7 +181,7 @@
         "symfony/mcp-bundle": "^0.13 || ^0.15",
         "symfony/mercure-bundle": "^0.5",
         "symfony/messenger": "^7.4 || ^8.0",
-        "symfony/object-mapper": "^7.4 || ^8.0",
+        "symfony/object-mapper": "^7.4.4 || ^8.0.4",
         "symfony/routing": "^7.4 || ^8.0",
         "symfony/security-bundle": "^7.4 || ^8.0",
         "symfony/security-core": "^7.4 || ^8.0",

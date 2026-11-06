@@ -386,12 +386,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
-                $defaultSchema = ['type' => 'string'];
-                if (null !== $p->getDefault()) {
-                    $defaultSchema['default'] = $p->getDefault();
+                $parameterSchema = $p->getSchema() ?? ['type' => 'string'];
+                if (null !== $p->getDefault() && !isset($parameterSchema['default'])) {
+                    $parameterSchema['default'] = $p->getDefault();
                 }
-
-                $parameterSchema = $p->getSchema() ?? $defaultSchema;
                 $castToArray = $p->getCastToArray();
                 $parameterDescription = $p->getDescription() ?? "$resourceShortName $key";
                 $parameterRequired = $p->getRequired() ?? false;
@@ -491,7 +489,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            if ($overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
+            if ($overrideResponses && !isset($existingResponses[403]) && $this->canDenyAccess($operation)) {
                 $openapiOperation = $this->addOperationErrors($openapiOperation, [
                     $defaultError->withStatus(403)->withDescription('Forbidden'),
                 ], $resourceMetadataCollection, $schema, $schemas, $operation, $schemaSerializerContext);
@@ -592,6 +590,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
         }
+    }
+
+    private function canDenyAccess(HttpOperation $operation): bool
+    {
+        if ($operation->getSecurity() || $operation->getSecurityPostDenormalize() || $operation->getSecurityPostValidation() || $operation->getPolicy()) {
+            return true;
+        }
+
+        foreach ([$operation->getUriVariables() ?? [], $operation->getParameters() ?? []] as $parameters) {
+            foreach ($parameters as $parameter) {
+                if ($parameter instanceof MetadataParameter && null !== $parameter->getSecurity()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1001,7 +1016,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 false,
                 false,
                 null,
-                ['type' => 'integer', 'default' => 1],
+                ['type' => 'integer', 'default' => 1, 'minimum' => 1],
             );
 
             if ($operation->getPaginationClientItemsPerPage() ?? $this->paginationOptions->getClientItemsPerPage()) {

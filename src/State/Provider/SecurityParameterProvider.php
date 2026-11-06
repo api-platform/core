@@ -69,6 +69,8 @@ final class SecurityParameterProvider implements ProviderInterface
                 continue;
             }
 
+            $targetResource = null;
+
             $value = $parameter->getValue();
             if ($parameter instanceof Link) {
                 $targetResource = $parameter->getFromClass() ?? $parameter->getToClass() ?? null;

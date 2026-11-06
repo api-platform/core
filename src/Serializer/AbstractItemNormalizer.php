@@ -298,12 +298,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $type, $format, $context);
 
-        // Bypass the post-denormalize attribute revert logic if the object could not be
-        // cloned since we cannot possibly revert any changes made to it.
-        if (null !== $objectToPopulate && null === $previousObject) {
-            return $object;
-        }
-
         $options = $this->getFactoryOptions($context);
         $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $options));
 
@@ -312,9 +306,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $securityMessage = $operation?->getSecurityMessage() ?? null;
 
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
-        foreach (array_keys($data) as $attribute) {
-            $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
-
+        foreach ($this->getDenormalizedAttributes($data, $resourceClass, $format, $context) as $attribute) {
             try {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
             } catch (PropertyNotFoundException) {
@@ -328,7 +320,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
-                if ($throwOnPropertyAccessDenied) {
+                if ($throwOnPropertyAccessDenied || (null !== $objectToPopulate && null === $previousObject)) {
                     throw new AccessDeniedException($securityMessage ?? 'Access denied', detail: $securityMessage);
                 }
                 if (null !== $previousObject) {
@@ -340,6 +332,54 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $object;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getDenormalizedAttributes(array $data, string $resourceClass, ?string $format, array $context): array
+    {
+        $attributes = [];
+
+        if ($this->classMetadataFactory?->hasMetadataFor($resourceClass)) {
+            foreach ($this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() as $propertyName => $attributeMetadata) {
+                $elements = $attributeMetadata->getSerializedPath()?->getElements();
+                if (!$elements || !$this->hasNestedValue($elements, $data)) {
+                    continue;
+                }
+
+                $attributes[] = $propertyName;
+                $data = $this->removeNestedValue($elements, $data);
+            }
+        }
+
+        foreach (array_keys($data) as $key) {
+            $attributes[] = $this->nameConverter ? $this->nameConverter->denormalize((string) $key, $resourceClass, $format, $context) : (string) $key;
+        }
+
+        return array_values(array_unique($attributes));
+    }
+
+    private function hasNestedValue(array $path, mixed $data): bool
+    {
+        foreach ($path as $element) {
+            if (!\is_array($data) || !\array_key_exists($element, $data)) {
+                return false;
+            }
+            $data = $data[$element];
+        }
+
+        return true;
+    }
+
+    private function removeNestedValue(array $path, array $data): array
+    {
+        $element = array_shift($path);
+        if (!$path || !\is_array($data[$element]) || !$data[$element] = $this->removeNestedValue($path, $data[$element])) {
+            unset($data[$element]);
+        }
+
+        return $data;
     }
 
     /**
@@ -377,11 +417,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
                 if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
-                        if (!\is_array($data[$paramName])) {
+                        if (!\is_array($data[$key])) {
                             throw new RuntimeException(\sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
                         }
 
-                        $params[] = $data[$paramName];
+                        $params = array_merge(array_values($params), $data[$key]);
+
+                        unset($data[$key]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                     try {
@@ -555,23 +597,24 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']);
-        if (isset($this->safeCacheKeysCache[$resourceClass])) {
-            return $this->safeCacheKeysCache[$resourceClass];
+        $options = $this->getFactoryOptions($context);
+        $cacheKey = $resourceClass.'|'.hash('xxh128', serialize($options));
+        if (isset($this->safeCacheKeysCache[$cacheKey])) {
+            return $this->safeCacheKeysCache[$cacheKey];
         }
 
-        $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
-        $this->safeCacheKeysCache[$resourceClass] = true;
+        $this->safeCacheKeysCache[$cacheKey] = true;
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
-            if (null !== $propertyMetadata->getSecurity()) {
-                $this->safeCacheKeysCache[$resourceClass] = false;
+            if (null !== ($propertyMetadata->getSecurity() ?? $propertyMetadata->getPolicy())) {
+                $this->safeCacheKeysCache[$cacheKey] = false;
                 break;
             }
         }
 
-        return $this->safeCacheKeysCache[$resourceClass];
+        return $this->safeCacheKeysCache[$cacheKey];
     }
 
     /**

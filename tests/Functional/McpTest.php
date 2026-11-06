@@ -125,7 +125,6 @@ class McpTest extends ApiTestCase
         $sessionId = $this->initializeMcpSession($client);
 
         $res = $this->callTool($client, $sessionId, 'update_book_status', [
-            'id' => null,
             'isbn' => '123',
             'title' => 'Test Book',
             'status' => 'pending',
@@ -240,6 +239,33 @@ class McpTest extends ApiTestCase
         } else {
             self::assertResponseIsSuccessful();
         }
+    }
+
+    public function testToolCallRejectsArgumentsNotMatchingInputSchema(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
+        }
+
+        if (!$this->isPsr17FactoryAvailable()) {
+            $this->markTestSkipped('PSR-17 HTTP factory implementation not available (required for MCP)');
+        }
+
+        $client = self::createClient();
+        $sessionId = $this->initializeMcpSession($client);
+
+        $res = $this->callTool($client, $sessionId, 'validate_input', [
+            'name' => ['not', 'a', 'string'],
+        ]);
+
+        $result = $res->toArray(false);
+        self::assertArrayHasKey('error', $result);
+        self::assertSame(-32602, $result['error']['code']);
+        self::assertStringContainsString("Invalid parameters for tool 'validate_input'", $result['error']['message']);
     }
 
     public function testValidationSuccess(): void

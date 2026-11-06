@@ -640,7 +640,7 @@ final class ApiProperty
     public function withSerialize(array|Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth $serialize): static
     {
         $self = clone $this;
-        $self->serialize = (array) $serialize;
+        $self->serialize = \is_array($serialize) ? $serialize : [$serialize];
 
         return $self;
     }

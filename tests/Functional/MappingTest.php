@@ -162,6 +162,46 @@ final class MappingTest extends ApiTestCase
         ]]);
     }
 
+    public function testIriFilterOnMappedRelationFiltersByEntity(): void
+    {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB is not tested');
+        }
+
+        $this->recreateSchema([MappedResourceWithRelationEntity::class, MappedResourceWithRelationRelatedEntity::class]);
+        $manager = $this->getManager();
+
+        $relateds = [];
+        foreach (['first', 'second'] as $name) {
+            $related = new MappedResourceWithRelationRelatedEntity();
+            $related->name = $name;
+            $manager->persist($related);
+            $relateds[] = $related;
+        }
+        $manager->flush();
+
+        foreach ($relateds as $i => $related) {
+            $entity = new MappedResourceWithRelationEntity();
+            $entity->setId($i + 1);
+            $entity->setRelated($related);
+            $manager->persist($entity);
+        }
+        $manager->flush();
+
+        $response = self::createClient()->request('GET', '/mapped_resource_with_relations?relation=/mapped_resource_with_relation_relateds/'.$relateds[0]->getId(), [
+            'headers' => ['accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $members = $response->toArray()['member'];
+        $this->assertCount(1, $members);
+        $this->assertSame('1', $members[0]['id']);
+    }
+
     public function testMapPutAllowCreate(): void
     {
         if (!$this->getContainer()->has('api_platform.object_mapper')) {

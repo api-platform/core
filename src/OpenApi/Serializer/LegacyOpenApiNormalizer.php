@@ -48,7 +48,13 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         }
 
         foreach ($openapi['paths'] ?? [] as $path => $operations) {
-            $openapi['paths'][$path] = $this->downgradePathItem($operations);
+            if ([] === $pathItem = $this->downgradePathItem($operations)) {
+                unset($openapi['paths'][$path]);
+
+                continue;
+            }
+
+            $openapi['paths'][$path] = $pathItem;
         }
 
         return $openapi;
@@ -69,6 +75,8 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         if (!\is_array($pathItem)) {
             return $pathItem;
         }
+
+        unset($pathItem['query']);
 
         foreach ($pathItem as $method => $operation) {
             if (!\is_array($operation)) {
