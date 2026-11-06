@@ -608,7 +608,7 @@ abstract class Operation extends Metadata
          */
         protected ?array $paginationViaCursor = null,
         protected ?array $order = null,
-        protected ?string $description = null,
+        protected string|\Stringable|null $description = null,
         protected ?array $normalizationContext = null,
         protected ?array $denormalizationContext = null,
         protected ?bool $collectDenormalizationErrors = null,
