@@ -62,6 +62,12 @@ final class ApiLoader extends Loader
 
         if ($notExposedOnly) {
             $routeCollection->addCollection($this->fileLoader->load('genid.php'));
+
+            // JSON-LD responses, errors included, link to the API documentation and to the context.
+            if (isset($this->formats['jsonld'])) {
+                $routeCollection->addCollection($this->fileLoader->load('docs.php'));
+                $routeCollection->addCollection($this->fileLoader->load('jsonld.php'));
+            }
         } else {
             $this->loadExternalFiles($routeCollection);
         }
