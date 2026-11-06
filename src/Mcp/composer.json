@@ -34,7 +34,7 @@
         "mcp/sdk": "^0.8 || ^0.9",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "symfony/http-foundation": "^7.4 || ^8.0",
-        "symfony/object-mapper": "^7.4 || ^8.0",
+        "symfony/object-mapper": "^7.4.4 || ^8.0.4",
         "symfony/polyfill-php85": "^1.32",
         "symfony/serializer": "^7.4 || ^8.0"
     },
