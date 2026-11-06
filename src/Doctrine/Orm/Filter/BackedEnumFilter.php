@@ -129,10 +129,10 @@ final class BackedEnumFilter extends AbstractFilter
 
         $values = \is_array($value) ? $value : [$value];
 
-        $normalizedValues = array_filter(array_map(
+        $normalizedValues = array_values(array_filter(array_map(
             fn ($v) => $this->normalizeValue($v, $property),
             $values
-        ), static fn ($value) => null !== $value);
+        ), static fn ($value) => null !== $value));
 
         if (empty($normalizedValues)) {
             return;
@@ -147,17 +147,17 @@ final class BackedEnumFilter extends AbstractFilter
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
-        if (1 === \count($values)) {
+        if (1 === \count($normalizedValues)) {
             $queryBuilder
                 ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $values[0]);
+                ->setParameter($valueParameter, $normalizedValues[0]);
 
             return;
         }
 
         $queryBuilder
             ->andWhere(\sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $values);
+            ->setParameter($valueParameter, $normalizedValues);
     }
 
     /**
