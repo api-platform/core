@@ -392,6 +392,44 @@ final class LegacyOpenApiNormalizerTest extends TestCase
         $this->assertSame(['openapi' => '3.0.0', 'components' => ['schemas' => []]], $result);
     }
 
+    public function testRemovesQueryOperations(): void
+    {
+        $document = [
+            'openapi' => '3.1.0',
+            'paths' => [
+                '/books' => [
+                    'get' => ['operationId' => 'getBooks'],
+                    'query' => ['operationId' => 'queryBooks'],
+                ],
+            ],
+        ];
+
+        $normalizer = $this->buildNormalizer($document);
+        $result = $normalizer->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']);
+
+        $this->assertSame(['get' => ['operationId' => 'getBooks']], $result['paths']['/books']);
+    }
+
+    public function testRemovesAPathThatOnlyHasAQueryOperation(): void
+    {
+        $document = [
+            'openapi' => '3.1.0',
+            'paths' => [
+                '/books' => [
+                    'get' => ['operationId' => 'getBooks'],
+                ],
+                '/books/search' => [
+                    'query' => ['operationId' => 'queryBooks'],
+                ],
+            ],
+        ];
+
+        $normalizer = $this->buildNormalizer($document);
+        $result = $normalizer->normalize(new \stdClass(), null, ['spec_version' => '3.0.0']);
+
+        $this->assertSame(['/books' => ['get' => ['operationId' => 'getBooks']]], $result['paths']);
+    }
+
     private function buildNormalizer(array $document): LegacyOpenApiNormalizer
     {
         $decorated = $this->prophesize(NormalizerInterface::class);
