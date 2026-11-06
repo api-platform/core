@@ -1,0 +1,22 @@
+namespace App\State;
+
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
+
+class BookStateProvider implements ProviderInterface
+{
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    {
+        if ($operation instanceof Get) {
+            // TODO: provide state for Get operation
+        }
+
+        if ($operation instanceof GetCollection) {
+            // TODO: provide state for GetCollection operation
+        }
+
+        return null;
+    }
+}
