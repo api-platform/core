@@ -221,6 +221,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface, 
             new OpenApiParameter(name: $key.'[lt]', in: $in),
             new OpenApiParameter(name: $key.'[gte]', in: $in),
             new OpenApiParameter(name: $key.'[lte]', in: $in),
+            new OpenApiParameter(name: $key.'[between]', in: $in),
         ];
     }
 }
