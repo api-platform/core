@@ -300,9 +300,21 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 return;
             }
 
-            $queryBuilder
-                ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
-                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
+            if ($caseSensitive) {
+                $queryBuilder
+                    ->andWhere($queryBuilder->expr()->in($aliasedField, $valueParameter))
+                    ->setParameter($valueParameter, $values);
+
+                return;
+            }
+
+            $keyValueParameters = [];
+            foreach (array_values($values) as $key => $value) {
+                $keyValueParameters[] = $keyValueParameter = \sprintf('%s_%s', $valueParameter, $key);
+                $queryBuilder->setParameter($keyValueParameter, $value);
+            }
+
+            $queryBuilder->andWhere(\sprintf('%s IN(%s)', $wrapCase($aliasedField), implode(', ', array_map($wrapCase, $keyValueParameters))));
 
             return;
         }

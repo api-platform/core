@@ -307,6 +307,17 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $this->assertSame($expectedDql, $queryBuilder->getQuery()->getDQL());
     }
 
+    public function testApplyCaseInsensitiveMultipleValuesWithNonAsciiCharacters(): void
+    {
+        $this->doTestApply(
+            ['name' => 'iexact'],
+            ['name' => ['ÉCOLE', 'Gare']],
+            \sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(LOWER(:name_p1_0), LOWER(:name_p1_1))', static::ALIAS, Dummy::class),
+            ['name_p1_0' => 'ÉCOLE', 'name_p1_1' => 'Gare'],
+            self::buildSearchFilter(...),
+        );
+    }
+
     public static function provideApplyTestData(): array
     {
         $filterFactory = self::buildSearchFilter(...);
@@ -340,12 +351,10 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values; case insensitive)' => [
-                    \sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(:name_p1)', static::ALIAS, Dummy::class),
+                    \sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(LOWER(:name_p1_0), LOWER(:name_p1_1))', static::ALIAS, Dummy::class),
                     [
-                        'name_p1' => [
-                            'case',
-                            'insensitive',
-                        ],
+                        'name_p1_0' => 'CaSE',
+                        'name_p1_1' => 'inSENSitive',
                     ],
                     $filterFactory,
                 ],
