@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -641,6 +642,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
+        // symfony/serializer only reads the current value of typed attributes (https://github.com/symfony/symfony/pull/67883), and it can't type them here
+        if (!isset($context[static::OBJECT_TO_POPULATE])
+            && ($context[static::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[static::DEEP_OBJECT_TO_POPULATE] ?? false)
+            && null !== $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context))->getNativeType()
+        ) {
+            try {
+                $context[static::OBJECT_TO_POPULATE] = $this->propertyAccessor->getValue($object, $attribute);
+            } catch (NoSuchPropertyException|UninitializedPropertyException) {
+            }
+        }
+
         try {
             $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
         } catch (NotNormalizableValueException $exception) {
