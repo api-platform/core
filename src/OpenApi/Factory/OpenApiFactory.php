@@ -947,7 +947,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 false,
                 false,
                 null,
-                ['type' => 'integer', 'default' => 1],
+                ['type' => 'integer', 'default' => 1, 'minimum' => 1],
             );
 
             if ($operation->getPaginationClientItemsPerPage() ?? $this->paginationOptions->getClientItemsPerPage()) {
