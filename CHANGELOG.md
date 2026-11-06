@@ -6,6 +6,72 @@
 
 * A parameter resolved through `IriConverterParameterProvider` that declares a `filter` now receives the `stateOptions` entity instead of the object-mapped resource (#8802). This fixes `IriFilter` on mapped resources, but a custom filter written against the mapped DTO now gets the entity. Restore the previous value with `extraProperties: ['map_resource' => true]` on the parameter.
 
+### Security
+
+* [55bbbe7b3](https://github.com/api-platform/core/commit/55bbbe7b39bfa6ac121db84c0dc39a6e19ecde13) fix(serializer): securityPostDenormalize with serialized name ([GHSA-8v47-3hr7-pqm3](https://github.com/api-platform/core/security/advisories/GHSA-8v47-3hr7-pqm3))
+* [5248f9a02](https://github.com/api-platform/core/commit/5248f9a028bf9ce509386f83b655a041e084a41c) fix(serializer): disable attribute cache for policy-guarded properties ([GHSA-cwhh-732q-p35c](https://github.com/api-platform/core/security/advisories/GHSA-cwhh-732q-p35c))
+* [b3975a7d9](https://github.com/api-platform/core/commit/b3975a7d9ce7a60bfd67c0711a0cd691aed9fabd) fix(graphql): clear managers on failed mutation ([GHSA-35f3-vw58-447m](https://github.com/api-platform/core/security/advisories/GHSA-35f3-vw58-447m))
+
+### Bug fixes
+
+* [7166df654](https://github.com/api-platform/core/commit/7166df654368fa807be82d3082413e59e7810a81) fix(doctrine): document SortFilter parameters as a single value (#8759)
+* [fceab5e7c](https://github.com/api-platform/core/commit/fceab5e7cb3a7490635040f5b8cffbeb1f2ca9f7) fix(doctrine): ignore nested array values in range and search filters (#8775)
+* [de9c2b244](https://github.com/api-platform/core/commit/de9c2b2448d509f0727b7c38c918ccae9244af43) fix(doctrine): left join collection associations in IriFilter inside OR groups (#8777)
+* [71640b81e](https://github.com/api-platform/core/commit/71640b81e4f02c050ab4bc2df702bfda082a03ee) fix(doctrine): reject too large pages with ODM partial pagination (#8776)
+* [edc952cff](https://github.com/api-platform/core/commit/edc952cff6cdccdbdfecc9cae4d47f29093abebc) fix(graphql): update existing object on nested input id (#8786)
+* [a5174089c](https://github.com/api-platform/core/commit/a5174089c43f9aff0a7e321eace19ca9d9d590dd) fix(hal): make the collection JSON schema match the normalizer (#8809)
+* [85a2cc3e1](https://github.com/api-platform/core/commit/85a2cc3e15bdff9387f56986542f028dcc83ebd4) fix(hydra): do not document NotExposed operations (#8811)
+* [cf6bde483](https://github.com/api-platform/core/commit/cf6bde483eede4ed8a33645aab929bf905870897) fix(jsonapi): check relation IRI type on denormalization (#8788)
+* [ac7de6479](https://github.com/api-platform/core/commit/ac7de6479ca7669390404d990ea85581c56fc958) fix(jsonapi): declare type: object on JSON:API resource schemas (#8724)
+* [5127b9d0a](https://github.com/api-platform/core/commit/5127b9d0aff78917dcfa8be241f9a99df618afb4) fix(jsonschema): keep description and externalDocs on nested resources (#8723)
+* [40df29b2f](https://github.com/api-platform/core/commit/40df29b2f8052901cf977c977e3087d67ad64dcb) fix(laravel): filter on every value given to EqualsFilter (#8783)
+* [b319ab120](https://github.com/api-platform/core/commit/b319ab120b1d6ff82340ef3ec436e3cb281780ba) fix(laravel): honor mcp.enabled and add mcp.middleware (#8789)
+* [93e161642](https://github.com/api-platform/core/commit/93e161642bfadcbd16fe2beb52cbe8f96edb6589) fix(laravel): ignore non-string values in search filters (#8781)
+* [d644bdda4](https://github.com/api-platform/core/commit/d644bdda4c1ae4d8045647ceb49d4c4d359f07a3) fix(laravel): purge the HTTP cache on GraphQL mutations (#8782)
+* [fceb40bdf](https://github.com/api-platform/core/commit/fceb40bdfd3c2d9a7d56f5362039df730fb70631) fix(laravel): return 400 for invalid IRIs and serializer errors (#8805)
+* [ee2c81320](https://github.com/api-platform/core/commit/ee2c813207f66278dd67c41007cbedd0f3075c69) fix(laravel): validate header parameters against headers (#8711)
+* [6c90416f5](https://github.com/api-platform/core/commit/6c90416f55373e855b7266ed9f34ca7a425ce991) fix(mcp): honor exception_to_status in tool errors (#8804)
+* [ba3d61f66](https://github.com/api-platform/core/commit/ba3d61f66a2cec281f578ff30af07393f9c69a3c) fix(mcp): support MCP SDK 0.9 registry capabilities (#8758)
+* [5fc5abd33](https://github.com/api-platform/core/commit/5fc5abd33e30eb434062d7017d00b2a320f594a4) fix(mcp): validate tool arguments against inputSchema (#8803)
+* [dfe7e59f4](https://github.com/api-platform/core/commit/dfe7e59f4603287f20d533ab06a84265b2443653) fix(metadata): accept openapi and priority on XML parameters (#8737)
+* [ee873b6da](https://github.com/api-platform/core/commit/ee873b6daf8777b01b559fe0b434a1f2b95154b4) fix(metadata): convert the YAML and XML nativeType of a property when it has a parent (#8742)
+* [cec0b2bfa](https://github.com/api-platform/core/commit/cec0b2bfab54b86c535a6c67d3d304c207588f35) fix(metadata): do not duplicate list defaults on operations (#8712)
+* [4f7564cb4](https://github.com/api-platform/core/commit/4f7564cb420f4d6dfdcc0a2e737c0e8e603d73c5) fix(metadata): extract the hydra option of properties from YAML and XML (#8740)
+* [c5db2e1db](https://github.com/api-platform/core/commit/c5db2e1dbba0c75aeeb1c2e64fc2af83bbc5eb17) fix(metadata): extract XML paginationViaCursor as a list of fields (#8729)
+* [70e788063](https://github.com/api-platform/core/commit/70e7880639885545394ab5f23f7af54c93f5dd0d) fix(metadata): parse YAML booleans and input/output arrays correctly (#8761)
+* [615601feb](https://github.com/api-platform/core/commit/615601febb8335fdacd85ad16988b95fc2a16aba) fix(metadata): read allowReserved of OpenAPI parameters in YAML (#8716)
+* [c1354c870](https://github.com/api-platform/core/commit/c1354c87015a2e57eff05b17b43ef11064ce162f) fix(metadata): read hideHydraOperation and strictQueryParameterValidation in YAML (#8719)
+* [b87f7a368](https://github.com/api-platform/core/commit/b87f7a3686a555ea80811b760179b2894a7f1bd9) fix(metadata): read method and routeName of operations in YAML (#8720)
+* [c6ed398c7](https://github.com/api-platform/core/commit/c6ed398c7fe64bb35e1a8a851b5c7a7ce97fb703) fix(metadata): read XML OpenAPI externalDocs and optional attributes (#8735)
+* [d75363a82](https://github.com/api-platform/core/commit/d75363a82f9672e3a6cbddacefdf4560cbbd6f2a) fix(metadata): reject duplicate GraphQL operation names instead of silently dropping them (#8713)
+* [e6f9316d6](https://github.com/api-platform/core/commit/e6f9316d62341e7a88ff523cff3a8ceff834f6c1) fix(metadata): reject invalid HTTP status codes on operations (#8714)
+* [9f5b230b7](https://github.com/api-platform/core/commit/9f5b230b71cabeca7e61b111bb595be18d94b25b) fix(metadata): relax the XML schema where it rejects valid metadata (#8760)
+* [b7eac2f6c](https://github.com/api-platform/core/commit/b7eac2f6c459191e0ab9612ca3a9b2d7348302a7) fix(metadata): wrap a single attribute in ApiProperty::withSerialize() (#8794)
+* [d82083888](https://github.com/api-platform/core/commit/d82083888f6622ca9c41bd98b80b5077ef96af89) fix(openapi): document the 403 response for every security option (#8808)
+* [0a10ec815](https://github.com/api-platform/core/commit/0a10ec8159dd7ab4c5b4c8b68bd6cab407b76750) fix(openapi): document the default of a parameter that has a schema (#8807)
+* [d7e254f0f](https://github.com/api-platform/core/commit/d7e254f0f5d0df00ad9070323e3c97e9ab8ecaa1) fix(openapi): document the minimum of the page parameter (#8812)
+* [ccb2c1756](https://github.com/api-platform/core/commit/ccb2c1756b6f6a89e14df0aa55f8e7cf5f345fa1) fix(openapi): remove the QUERY operations from the 3.0 export (#8810)
+* [c633ad24c](https://github.com/api-platform/core/commit/c633ad24c7f2d0b66273a8edb2fdcbab901199de) fix(serializer): enforce securityPostDenormalize on non-cloneable objects (#8787)
+* [764fa056e](https://github.com/api-platform/core/commit/764fa056e094afccb920e9b1d7a7a488cf705b52) fix(serializer): pass variadic constructor arguments like Symfony (#8792)
+* [7700d7012](https://github.com/api-platform/core/commit/7700d70123418bbfd35b70eb7b24462248f2220d) fix(serializer): reject a non-string id in JSON-LD and JSON:API relations (#8778)
+* [33b2bb04f](https://github.com/api-platform/core/commit/33b2bb04f3dddcb3505dc7823fed89e57d5595e9) fix(serializer): unwrap the collection key type, not the collection type (#8780)
+* [5c655f737](https://github.com/api-platform/core/commit/5c655f73746db0de451f2180075b86854231c5b3) fix(state): compare the request content type case-insensitively (#8798)
+* [104e03a81](https://github.com/api-platform/core/commit/104e03a81180320cf5fbf2cf04574d5c1a80b263) fix(state): reject invalid GraphQL pagination cursors (#8779)
+* [5829292d1](https://github.com/api-platform/core/commit/5829292d1e88def657d5f68da68809a22be980cb) fix(state): reset the target resource for each parameter security check (#8797)
+* [11b8697fc](https://github.com/api-platform/core/commit/11b8697fc10c87468da7fb97562b8f527b1f1eb6) fix(state): send the Sunset header as an HTTP date in GMT (#8799)
+* [b13a5a10f](https://github.com/api-platform/core/commit/b13a5a10f6ca6a70b182d69ec0d0f497b1dfcacc) fix(state): skip object mapping for IRI filter values (#8802)
+* [394cb659c](https://github.com/api-platform/core/commit/394cb659c43ee0ba7424c2f961e0d8e6d9229fd7) fix(symfony): reject defaults that need objects (#8762)
+* [63356f2c6](https://github.com/api-platform/core/commit/63356f2c689479f99cda2d4e3ef1ec2c4ff8ca2b) fix(symfony): validate the classes of the default parameters (#8715)
+* [85d4e75cc](https://github.com/api-platform/core/commit/85d4e75ccb499bd9bfd971b180c7ef4f12e345ed) fix(validator): accept 0 as a parameter minimum or maximum (#8806)
+
+### Performance
+
+* [4c16ff2c6](https://github.com/api-platform/core/commit/4c16ff2c607989c345357ee4a264f13eebecb4ce) perf(jsonld): do not compute the anonymous context when the document already has one (#8796)
+
+### Dependencies
+
+* [bada7a576](https://github.com/api-platform/core/commit/bada7a5764cc8ba24913da62407441181b82da95) chore: bump doctrine-common and serializer floors (#8801)
+
 ## v5.0.5
 
 API Platform 5.0.5 contains every change shipped in [v4.4.6](#v446), plus the changes below.
