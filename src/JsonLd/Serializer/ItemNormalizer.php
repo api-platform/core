@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\ContextTrait;
@@ -130,7 +131,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $normalizedData;
         }
 
-        if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($resourceClass, $isResourceClass, $context))) {
+        if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($data, $resourceClass, $isResourceClass, $context))) {
             $metadata['@type'] = $type;
         }
 
@@ -140,7 +141,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * @return string|array<int, string>|null
      */
-    private function resolveType(string $resourceClass, bool $isResourceClass, array $context): string|array|null
+    private function resolveType(object $data, string $resourceClass, bool $isResourceClass, array $context): string|array|null
     {
         $operation = $context['operation'] ?? null;
 
@@ -157,6 +158,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
+        // A subtype declared in the discriminator map of the resource is typed by its own class, documented as a subclass of the resource
+        if (null === $types && $isResourceClass && null !== $discriminatedClass = $this->getDiscriminatedClass($data, $resourceClass)) {
+            return ClassDiscriminatorHelper::getShortName($discriminatedClass);
+        }
+
         if (null === $types) {
             $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
             if (isset($context['item_uri_template']) || $operation->getClass() === $typeClass) {

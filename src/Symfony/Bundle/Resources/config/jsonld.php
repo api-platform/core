@@ -34,6 +34,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.symfony.iri_converter.skolem'),
             service('api_platform.name_converter'),
             '%api_platform.serializer.default_context%',
+            service('api_platform.serializer.class_discriminator_resolver')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.jsonld.normalizer.item', ItemNormalizer::class)
