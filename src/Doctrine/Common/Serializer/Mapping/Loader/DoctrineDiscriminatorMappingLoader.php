@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
@@ -24,7 +25,8 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
  * Exposes the Doctrine inheritance discriminator map (ORM and MongoDB ODM) of an API resource as a serializer
  * discriminator map, so the subtypes of a Doctrine hierarchy are read, written and documented as such.
  *
- * A serializer discriminator map declared in the hierarchy always takes precedence.
+ * A serializer discriminator map declared in the hierarchy always takes precedence. It is detected using the
+ * explicit serializer loaders (attributes, XML, YAML) when they are given, attributes only otherwise.
  *
  * The serializer does not inherit discriminator maps: every class having subclasses in the Doctrine map gets
  * its own map, restricted to itself and its subclasses, so a resource declared in the middle of a hierarchy
@@ -34,9 +36,13 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
  */
 final class DoctrineDiscriminatorMappingLoader implements LoaderInterface
 {
+    /** @var array<string, bool> */
+    private array $serializerDiscriminatorMaps = [];
+
     public function __construct(
         private readonly ManagerRegistry $managerRegistry,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly ?LoaderInterface $serializerLoader = null,
     ) {
     }
 
@@ -128,11 +134,26 @@ final class DoctrineDiscriminatorMappingLoader implements LoaderInterface
     private function hasSerializerDiscriminatorMap(array $hierarchy): bool
     {
         foreach ($hierarchy as $class) {
-            if (class_exists($class) && (new \ReflectionClass($class))->getAttributes(DiscriminatorMap::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+            if (class_exists($class) && ($this->serializerDiscriminatorMaps[$class] ??= $this->declaresSerializerDiscriminatorMap($class))) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private function declaresSerializerDiscriminatorMap(string $class): bool
+    {
+        if (null === $this->serializerLoader) {
+            return (bool) (new \ReflectionClass($class))->getAttributes(DiscriminatorMap::class, \ReflectionAttribute::IS_INSTANCEOF);
+        }
+
+        $classMetadata = new ClassMetadata($class);
+        $this->serializerLoader->loadClassMetadata($classMetadata);
+
+        return null !== $classMetadata->getClassDiscriminatorMapping();
     }
 }

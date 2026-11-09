@@ -60,7 +60,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.property_accessor'),
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
-            [],
+            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),

@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource;
 
-final class DiscriminatedGadgetStore
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
+
+#[DiscriminatorMap(typeProperty: 'frame', mapping: [
+    'bike' => DiscriminatedBike::class,
+    'mountain' => DiscriminatedMountainBike::class,
+])]
+class DiscriminatedBike extends DiscriminatedVehicle
 {
-    /**
-     * @var array<int, DiscriminatedGadget>
-     */
-    public static array $gadgets = [];
+    public int $gears = 1;
 }

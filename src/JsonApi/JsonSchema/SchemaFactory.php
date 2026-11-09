@@ -19,6 +19,7 @@ use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\DefinitionNameFactoryInterface;
 use ApiPlatform\JsonSchema\ResourceMetadataTrait;
 use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
@@ -135,6 +136,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $definitions = $schema->getDefinitions();
         $collectionKey = $schema->getItemsDefinitionKey();
+        $subtypeDefinitionName = $this->getSubtypeDefinitionNameFactory($className, $type, $operation, $jsonApiSerializerContext);
 
         // Already computed
         if (!$collectionKey && isset($definitions[$definitionName])) {
@@ -167,7 +169,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if (!$collectionKey) {
             $definitions[$definitionName]['type'] = 'object';
-            $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, []);
+            $definitions[$definitionName]['properties'] = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, [], $subtypeDefinitionName);
             $schema['$ref'] = $prefix.$definitionName;
 
             return $schema;
@@ -265,7 +267,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['items']);
         unset($schema['type']);
 
-        $properties = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, []);
+        $properties = $this->buildDefinitionPropertiesSchema($key, $definitionName, $inputOrOutputClass, $format, $type, $operation, $schema, [], $subtypeDefinitionName);
 
         $properties['data'] = [
             'type' => 'array',
@@ -288,14 +290,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
     }
 
-    private function buildDefinitionPropertiesSchema(string $key, string $documentDefinitionName, string $propertyClass, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
+    /**
+     * @param (\Closure(class-string): string)|null $subtypeDefinitionName
+     */
+    private function buildDefinitionPropertiesSchema(string $key, string $documentDefinitionName, string $propertyClass, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext, ?\Closure $subtypeDefinitionName = null): array
     {
         // Capture the resource's operation up front; the relationship loop below reassigns $operation.
         $resourceOperation = $operation;
         $definitions = $schema->getDefinitions();
         // A definition listing its subtypes in "oneOf" carries no properties: an instance of the class itself is described by its inline branch
         $ownBranch = null;
-        foreach (isset($definitions[$key]['discriminator']) ? $definitions[$key]['oneOf'] ?? [] : [] as $branch) {
+        foreach (null !== $this->classDiscriminatorResolver?->getMappingForClass($propertyClass) ? $definitions[$key]['oneOf'] ?? [] : [] as $branch) {
             if (!isset($branch['$ref'])) {
                 $ownBranch = $branch;
                 break;
@@ -401,7 +406,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         // Subtypes declared in a serializer discriminator map: the type property lives in "attributes" so an OpenAPI discriminator cannot be used
         $oneOf = [];
-        foreach ($this->getDiscriminatedSubtypes($key, $propertyClass, $definitions, $schema->getVersion()) as [$subKey, $subClass, $typeProperty]) {
+        foreach ($this->getDiscriminatedSubtypes($key, $propertyClass, $definitions, $schema->getVersion(), $subtypeDefinitionName) as [$subKey, $subClass, $typeProperty]) {
             $attributeName = ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames)[$typeProperty] ?? $typeProperty;
 
             // The inline branch of a class declared in its own discriminator map describes the instances of the class itself
@@ -413,7 +418,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $subDocumentDefinitionName = $documentDefinitionName.'.'.(new \ReflectionClass($subClass))->getShortName();
-            $subSchema = $this->buildDefinitionPropertiesSchema($subKey, $subDocumentDefinitionName, $subClass, $format, $type, $resourceOperation, $schema, $serializerContext);
+            $subSchema = $this->buildDefinitionPropertiesSchema($subKey, $subDocumentDefinitionName, $subClass, $format, $type, $resourceOperation, $schema, $serializerContext, $subtypeDefinitionName);
             if (\in_array($typeProperty, $definitions[$subKey]['required'] ?? [], true)) {
                 $definitions[$subDocumentDefinitionName.'.resource']['properties']['attributes']['required'] = [$attributeName];
             }
@@ -456,23 +461,44 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     }
 
     /**
+     * Mirrors the name the decorated factory gives to the definition of a subtype declared in a discriminator map.
+     *
+     * @return (\Closure(class-string): string)|null
+     */
+    private function getSubtypeDefinitionNameFactory(string $className, string $type, ?Operation $operation, array $serializerContext): ?\Closure
+    {
+        if (null === $this->classDiscriminatorResolver) {
+            return null;
+        }
+
+        $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
+        $isInput = Schema::TYPE_INPUT === $type;
+        $definitionFormat = $isInput && 'PATCH' === $method ? 'merge-patch+json' : 'json';
+        $serializerContext += ($operation ? $this->getSerializerContext($operation, $type) : []) + [
+            'schema_type' => $type,
+            BaseSchemaFactory::PARTIAL_UPDATE => $isInput && 'PUT' === $method && !($operation?->getExtraProperties()['standard_put'] ?? true),
+        ];
+
+        return fn (string $subClass): string => $this->definitionNameFactory->create($className, $definitionFormat, $subClass, $operation, $serializerContext);
+    }
+
+    /**
+     * @param (\Closure(class-string): string)|null $subtypeDefinitionName
+     *
      * @return iterable<array{string, class-string, string}>
      */
-    private function getDiscriminatedSubtypes(string $key, string $className, \ArrayObject $definitions, string $version): iterable
+    private function getDiscriminatedSubtypes(string $key, string $className, \ArrayObject $definitions, string $version, ?\Closure $subtypeDefinitionName): iterable
     {
-        $discriminator = $definitions[$key]['discriminator'] ?? null;
-        if (null === $this->classDiscriminatorResolver || !isset($definitions[$key]['oneOf'], $discriminator['mapping']) || null === $mapping = $this->classDiscriminatorResolver->getMappingForClass($className)) {
+        if (null === $subtypeDefinitionName || !isset($definitions[$key]['oneOf']) || null === $mapping = $this->classDiscriminatorResolver?->getMappingForClass($className)) {
             return;
         }
 
+        // The "$ref" branches of "oneOf" reference the definitions of the direct subtypes
+        $refs = array_flip(array_column($definitions[$key]['oneOf'], '$ref'));
         $prefix = $this->getSchemaUriPrefix($version);
-        foreach (ClassDiscriminatorHelper::getDirectSubtypes($mapping, $className) as $typeValue => $subClass) {
-            if (null === $ref = $discriminator['mapping'][$typeValue] ?? null) {
-                continue;
-            }
-
-            $subKey = substr($ref, \strlen($prefix));
-            if (isset($definitions[$subKey])) {
+        foreach (ClassDiscriminatorHelper::getDirectSubtypes($mapping, $className) as $subClass) {
+            $subKey = $subtypeDefinitionName($subClass);
+            if (isset($refs[$prefix.$subKey], $definitions[$subKey])) {
                 yield [$subKey, $subClass, $mapping->getTypeProperty()];
             }
         }

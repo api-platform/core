@@ -59,6 +59,7 @@ use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -346,7 +347,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setDefinition('serializer.normalizer.number', $numberNormalizerDefinition);
         }
 
-        $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix']] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);
+        // Doctrine discriminator maps are exposed as serializer discriminator maps: they need resource polymorphism
+        $discriminatorMap = $config['serializer']['discriminator_map']
+            || ($this->isConfigEnabled($container, $config['doctrine']) && $config['doctrine']['discriminator_map'])
+            || ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && $config['doctrine_mongodb_odm']['discriminator_map']);
+        $container->setParameter('api_platform.serializer.discriminator_map', $discriminatorMap);
+        if ($discriminatorMap) {
+            $container->setAlias('api_platform.serializer.class_discriminator_resolver', 'serializer.mapping.class_discriminator_resolver');
+        }
+
+        $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix'], AbstractItemNormalizer::DISCRIMINATOR_MAP => $discriminatorMap] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);
 
         $container->setParameter('api_platform.serializer.default_context', $defaultContext);
         if (!$container->hasParameter('serializer.default_context')) {
@@ -725,7 +735,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $itemNormalizer->replaceArgument(7, [
             JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
             JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
-        ]);
+        ] + $itemNormalizer->getArgument(7));
         $itemNormalizer->addArgument($useIriAsId);
         $itemNormalizer->addArgument(new Reference('api_platform.jsonapi.resource_linkage_resolver'));
 
@@ -733,7 +743,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $itemDenormalizer->replaceArgument(7, [
             JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
             JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
-        ]);
+        ] + $itemDenormalizer->getArgument(7));
         $itemDenormalizer->addArgument($useIriAsId);
     }
 

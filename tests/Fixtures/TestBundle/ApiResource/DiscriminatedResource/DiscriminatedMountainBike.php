@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource;
 
-final class DiscriminatedPetDog extends DiscriminatedPet
+final class DiscriminatedMountainBike extends DiscriminatedBike
 {
-    public bool $goodBoy = true;
+    public ?string $suspension = null;
 }

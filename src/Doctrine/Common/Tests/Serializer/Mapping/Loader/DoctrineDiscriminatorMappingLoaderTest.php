@@ -21,16 +21,14 @@ use Doctrine\ORM\Mapping\DiscriminatorColumnMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
 final class DoctrineDiscriminatorMappingLoaderTest extends TestCase
 {
-    use ProphecyTrait;
-
     private const ORM_MAP = [
         'vehicle' => LoaderVehicle::class,
         'car' => LoaderCar::class,
@@ -87,6 +85,24 @@ final class DoctrineDiscriminatorMappingLoaderTest extends TestCase
         $metadata = new ClassMetadata(LoaderSerializerMappedChild::class);
 
         $this->assertFalse($this->createLoader([LoaderSerializerMappedChild::class => $doctrineMetadata])->loadClassMetadata($metadata));
+        $this->assertNull($metadata->getClassDiscriminatorMapping());
+    }
+
+    public function testSerializerDiscriminatorMapDeclaredWithAnotherLoaderWins(): void
+    {
+        $serializerLoader = $this->createStub(LoaderInterface::class);
+        $serializerLoader->method('loadClassMetadata')->willReturnCallback(static function (ClassMetadataInterface $metadata): bool {
+            if (LoaderVehicle::class !== $metadata->getName()) {
+                return false;
+            }
+
+            $metadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping('type', ['car' => LoaderCar::class]));
+
+            return true;
+        });
+        $metadata = new ClassMetadata(LoaderCar::class);
+
+        $this->assertFalse($this->createLoader([LoaderCar::class => $this->createOrmMetadata(LoaderCar::class, self::ORM_MAP)], serializerLoader: $serializerLoader)->loadClassMetadata($metadata));
         $this->assertNull($metadata->getClassDiscriminatorMapping());
     }
 
@@ -178,22 +194,23 @@ final class DoctrineDiscriminatorMappingLoaderTest extends TestCase
      * @param array<class-string, object> $doctrineMetadata
      * @param class-string[]|null         $resourceClasses  defaults to the root of every hierarchy
      */
-    private function createLoader(array $doctrineMetadata, ?array $resourceClasses = null): DoctrineDiscriminatorMappingLoader
+    private function createLoader(array $doctrineMetadata, ?array $resourceClasses = null, ?LoaderInterface $serializerLoader = null): DoctrineDiscriminatorMappingLoader
     {
         $resourceClasses ??= [LoaderVehicle::class, LoaderSerializerMappedBase::class];
 
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass(Argument::type('string'))->willReturn(null);
+        $managers = [];
         foreach ($doctrineMetadata as $class => $metadata) {
-            $manager = $this->prophesize(ObjectManager::class);
-            $manager->getClassMetadata($class)->willReturn($metadata);
-            $managerRegistry->getManagerForClass($class)->willReturn($manager->reveal());
+            $managers[$class] = $this->createStub(ObjectManager::class);
+            $managers[$class]->method('getClassMetadata')->willReturn($metadata);
         }
 
-        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(static fn (array $args): bool => \in_array($args[0], $resourceClasses, true));
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturnCallback(static fn (string $class): ?ObjectManager => $managers[$class] ?? null);
 
-        return new DoctrineDiscriminatorMappingLoader($managerRegistry->reveal(), $resourceClassResolver->reveal());
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn (string $class): bool => \in_array($class, $resourceClasses, true));
+
+        return new DoctrineDiscriminatorMappingLoader($managerRegistry, $resourceClassResolver, $serializerLoader);
     }
 }
 

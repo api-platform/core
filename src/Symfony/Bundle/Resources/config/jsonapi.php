@@ -43,7 +43,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
             service('api_platform.jsonapi.resource_linkage_resolver'),
             false,
-            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+            service('api_platform.serializer.class_discriminator_resolver')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.jsonapi.encoder', JsonEncoder::class)
@@ -78,7 +78,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.property_accessor'),
             service('api_platform.jsonapi.name_converter.reserved_attribute_name'),
             service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
-            [],
+            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
@@ -96,7 +96,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.property_accessor'),
             service('api_platform.jsonapi.name_converter.reserved_attribute_name'),
             service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
-            [],
+            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),

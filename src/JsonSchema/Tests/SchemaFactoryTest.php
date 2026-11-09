@@ -473,6 +473,18 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame(['type' => 'string', 'enum' => ['dog']], $dog['properties']['species']);
     }
 
+    public function testBuildJsonSchemaDocumentsDiscriminatorMapSubtypesWithoutOpenApiDiscriminator(): void
+    {
+        $definitions = $this->createDiscriminatorSchemaFactory()->buildSchema(DiscriminatedAnimal::class)->getDefinitions();
+
+        $this->assertSame([
+            ['$ref' => '#/definitions/DiscriminatedAnimal.DiscriminatedCat'],
+            ['$ref' => '#/definitions/DiscriminatedAnimal.DiscriminatedDog'],
+        ], $definitions['DiscriminatedAnimal']['oneOf']);
+        $this->assertArrayNotHasKey('discriminator', $definitions['DiscriminatedAnimal']);
+        $this->assertSame(['type' => 'string', 'enum' => ['cat']], $definitions['DiscriminatedAnimal.DiscriminatedCat']['properties']['species']);
+    }
+
     public function testBuildSchemaDocumentsClassDeclaredInItsOwnDiscriminatorMap(): void
     {
         $schemaFactory = $this->createDiscriminatorSchemaFactory();
@@ -512,27 +524,28 @@ class SchemaFactoryTest extends TestCase
 
     private function createDiscriminatorSchemaFactory(bool $withClassDiscriminatorResolver = true): SchemaFactory
     {
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(DiscriminatedAnimal::class, Argument::cetera())->willReturn(new PropertyNameCollection(['name']));
-        $propertyNameCollectionFactoryProphecy->create(DiscriminatedCat::class, Argument::cetera())->willReturn(new PropertyNameCollection(['lives', 'name']));
-        $propertyNameCollectionFactoryProphecy->create(DiscriminatedDog::class, Argument::cetera())->willReturn(new PropertyNameCollection(['goodBoy', 'name']));
-        $propertyNameCollectionFactoryProphecy->create(DiscriminatedGadget::class, Argument::cetera())->willReturn(new PropertyNameCollection(['name']));
-        $propertyNameCollectionFactoryProphecy->create(DiscriminatedPhone::class, Argument::cetera())->willReturn(new PropertyNameCollection(['name', 'number']));
+        $propertyNames = [
+            DiscriminatedAnimal::class => ['name'],
+            DiscriminatedCat::class => ['lives', 'name'],
+            DiscriminatedDog::class => ['goodBoy', 'name'],
+            DiscriminatedGadget::class => ['name'],
+            DiscriminatedPhone::class => ['name', 'number'],
+        ];
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Argument::any(), 'name', Argument::cetera())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true)->withSchema(['type' => 'string']));
-        $propertyMetadataFactoryProphecy->create(DiscriminatedCat::class, 'lives', Argument::cetera())->willReturn((new ApiProperty())->withNativeType(Type::int())->withReadable(true)->withWritable(true)->withSchema(['type' => 'integer']));
-        $propertyMetadataFactoryProphecy->create(DiscriminatedPhone::class, 'number', Argument::cetera())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true)->withSchema(['type' => 'string']));
-        $propertyMetadataFactoryProphecy->create(DiscriminatedDog::class, 'goodBoy', Argument::cetera())->willReturn((new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(true)->withSchema(['type' => 'boolean']));
+        $schemas = ['name' => [Type::string(), 'string'], 'lives' => [Type::int(), 'integer'], 'number' => [Type::string(), 'string'], 'goodBoy' => [Type::bool(), 'boolean']];
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => (new ApiProperty())->withNativeType($schemas[$property][0])->withReadable(true)->withWritable(true)->withSchema(['type' => $schemas[$property][1]]));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(false);
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
 
         return new SchemaFactory(
-            resourceMetadataFactory: $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
-            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
+            resourceMetadataFactory: $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            resourceClassResolver: $resourceClassResolver,
             definitionNameFactory: new DefinitionNameFactory(),
             classDiscriminatorResolver: $withClassDiscriminatorResolver ? new ClassDiscriminatorFromClassMetadata(new ClassMetadataFactory(new AttributeLoader())) : null,
         );

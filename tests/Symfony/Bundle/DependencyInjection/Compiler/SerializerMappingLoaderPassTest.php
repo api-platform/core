@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 
 final class SerializerMappingLoaderPassTest extends TestCase
 {
@@ -35,10 +36,15 @@ final class SerializerMappingLoaderPassTest extends TestCase
         $this->assertCount(3, $chainLoaders);
         $this->assertSame([$orm, $odm], \array_slice($chainLoaders, 1));
 
+        foreach ([$orm, $odm] as $loader) {
+            $serializerLoader = $loader->getArgument('$serializerLoader');
+            $this->assertSame(LoaderChain::class, $serializerLoader->getClass());
+            $this->assertSame([$chainLoaders[0]], $serializerLoader->getArgument(0));
+        }
+
+        // The cache warmer builds the metadata of the classes mapped by the other loaders: they must get their Doctrine map too
         $warmerLoaders = $container->getDefinition('serializer.mapping.cache_warmer')->getArgument(0);
-        $this->assertCount(4, $warmerLoaders);
-        $this->assertSame(PropertyMetadataLoader::class, $warmerLoaders[1]->getClass());
-        $this->assertSame([$orm, $odm], \array_slice($warmerLoaders, 2));
+        $this->assertSame([$chainLoaders[0], $container->getDefinition('api_platform.serializer.property_metadata_loader'), $orm, $odm], $warmerLoaders);
     }
 
     public function testChainLoaderIsUntouchedWithoutDoctrineDiscriminatorMappingLoader(): void

@@ -717,7 +717,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(UrlGeneratorInterface::class),
                 $app->make(IriConverterInterface::class),
                 $app->make(NameConverterInterface::class),
-                $defaultContext
+                $defaultContext,
+                self::getResourceClassDiscriminatorResolver($app),
             );
         });
 
@@ -974,7 +975,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
-                $app->make(ClassDiscriminatorResolverInterface::class),
+                self::getResourceClassDiscriminatorResolver($app),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {
@@ -985,7 +986,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
                 strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
-                classDiscriminatorResolver: $app->make(ClassDiscriminatorResolverInterface::class),
+                classDiscriminatorResolver: self::getResourceClassDiscriminatorResolver($app),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
@@ -1019,7 +1020,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(UrlGeneratorInterface::class),
                 $app->make(NameConverterInterface::class),
                 $defaultContext,
-                $entrypointEnabled
+                $entrypointEnabled,
+                self::getResourceClassDiscriminatorResolver($app),
             );
         });
 
@@ -1680,5 +1682,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
+    }
+
+    /**
+     * Resource polymorphism through serializer discriminator maps is opt-in (api-platform.serializer.discriminator_map).
+     */
+    private static function getResourceClassDiscriminatorResolver(Application $app): ?ClassDiscriminatorResolverInterface
+    {
+        return $app['config']->get('api-platform.serializer.discriminator_map', false) ? $app->make(ClassDiscriminatorResolverInterface::class) : null;
     }
 }
