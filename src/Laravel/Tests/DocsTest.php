@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use Illuminate\Foundation\Application;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 
@@ -84,6 +86,31 @@ class DocsTest extends TestCase
 
         $this->assertStringContainsString('init-scalar-ui.js', $content);
         $this->assertStringNotContainsString('id="formats"', $content);
+    }
+
+    public function testHtmlDocsHideGraphiqlLinkWhenGraphQlIsDisabled(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+
+        $this->assertStringNotContainsString('graphiql-link', (string) $res->getContent());
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function useGraphQl($app): void
+    {
+        $app['config']->set('api-platform.graphql.enabled', true);
+    }
+
+    #[DefineEnvironment('useGraphQl')]
+    public function testHtmlDocsShowGraphiqlLinkWhenGraphQlIsEnabled(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+
+        $this->assertStringContainsString('/api/graphiql" class="graphiql-link">GraphiQL</a>', (string) $res->getContent());
     }
 
     public function testSwaggerDataDoesNotContainWithCredentialsByDefault(): void
