@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.name_converter')->ignoreOnInvalid(),
             '%api_platform.serializer.default_context%',
             '%api_platform.enable_entrypoint%',
+            service('api_platform.serializer.class_discriminator_resolver')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -800]);
 

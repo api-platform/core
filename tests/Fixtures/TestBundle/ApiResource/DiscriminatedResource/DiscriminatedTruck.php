@@ -41,9 +41,4 @@ final class DiscriminatedTruck extends DiscriminatedVehicle
 
         return $this->trailer;
     }
-
-    public function getRating(): int
-    {
-        return 4;
-    }
 }

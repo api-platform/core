@@ -27,6 +27,14 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 final class ClassDiscriminatorHelper
 {
     /**
+     * Returns the name identifying a subtype in JSON-LD (its type) and in the Hydra documentation.
+     */
+    public static function getShortName(string $class): string
+    {
+        return false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1);
+    }
+
+    /**
      * Returns the subtypes declared in the given map of a class, indexed by their type value.
      *
      * @return array<string, class-string>

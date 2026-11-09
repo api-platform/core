@@ -23,7 +23,9 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -40,7 +42,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
     public const HYDRA_PREFIX = 'hydra:';
     public const HYDRA_CONTEXT_HAS_PREFIX = 'hydra_prefix';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null, private array $defaultContext = [])
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null, private array $defaultContext = [], private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
     }
 
@@ -234,40 +236,57 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
             $propertyNameCollectionContext = $serializerGroups ? ['serializer_groups' => $serializerGroups] : [];
         }
 
+        $propertyNames = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $propertyNameCollectionContext) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
+            $propertyNames[$propertyName] = true;
+            $this->addPropertyContext($context, $resourceClass, $propertyName, $shortName, $propertyContext);
+        }
 
-            if ($propertyMetadata->isIdentifier() && true !== $propertyMetadata->isWritable()) {
-                continue;
-            }
-
-            $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT) : $propertyName;
-            $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
-
-            if ($id = $propertyMetadata->getIris()) {
-                $id = 1 === (is_countable($id) ? \count($id) : 0) ? $id[0] : $id;
-            }
-
-            if (!$id) {
-                $id = \sprintf('%s/%s', $shortName, $convertedName);
-            }
-
-            if (false === $propertyMetadata->isReadableLink()) {
-                $jsonldContext += [
-                    '@id' => $id,
-                    '@type' => '@id',
-                ];
-            }
-
-            if (empty($jsonldContext)) {
-                $context[$convertedName] = $id;
-            } else {
-                $context[$convertedName] = $jsonldContext + [
-                    '@id' => $id,
-                ];
+        // The properties of the subtypes declared in the discriminator map of the resource are defined by their own class
+        foreach (null === $this->classDiscriminatorResolver ? [] : ClassDiscriminatorHelper::getSubtypes($this->classDiscriminatorResolver, $resourceClass) as $subtype) {
+            foreach ($this->propertyNameCollectionFactory->create($subtype, $propertyNameCollectionContext) as $propertyName) {
+                if (!isset($propertyNames[$propertyName])) {
+                    $propertyNames[$propertyName] = true;
+                    $this->addPropertyContext($context, $subtype, $propertyName, ClassDiscriminatorHelper::getShortName($subtype), $propertyContext);
+                }
             }
         }
 
         return $context;
+    }
+
+    private function addPropertyContext(array &$context, string $resourceClass, string $propertyName, string $shortName, array $propertyContext): void
+    {
+        $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
+
+        if ($propertyMetadata->isIdentifier() && true !== $propertyMetadata->isWritable()) {
+            return;
+        }
+
+        $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT) : $propertyName;
+        $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
+
+        if ($id = $propertyMetadata->getIris()) {
+            $id = 1 === (is_countable($id) ? \count($id) : 0) ? $id[0] : $id;
+        }
+
+        if (!$id) {
+            $id = \sprintf('%s/%s', $shortName, $convertedName);
+        }
+
+        if (false === $propertyMetadata->isReadableLink()) {
+            $jsonldContext += [
+                '@id' => $id,
+                '@type' => '@id',
+            ];
+        }
+
+        if (empty($jsonldContext)) {
+            $context[$convertedName] = $id;
+        } else {
+            $context[$convertedName] = $jsonldContext + [
+                '@id' => $id,
+            ];
+        }
     }
 }

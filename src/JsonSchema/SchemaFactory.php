@@ -159,7 +159,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups);
         $this->buildDefinitionProperties($schema, $definition, $definitionName, $inputOrOutputClass, $options, $serializerContext, $format, $type, $isPartialUpdate);
 
-        // Subtypes explicitly declared in a serializer discriminator map are documented using "oneOf" and an OpenAPI "discriminator"
+        // Subtypes explicitly declared in a serializer discriminator map are documented using "oneOf" (and a "discriminator" in OpenAPI)
         $this->buildDiscriminatedDefinitions($schema, $definition, $className, $inputOrOutputClass, $definitionFormat, $operation, $options, $serializerContext, $serializerContext + [
             'schema_type' => $type,
             self::PARTIAL_UPDATE => $isPartialUpdate && !$isJsonMergePatch,
@@ -264,7 +264,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $this->addTypeProperties($definition, [$typeProperty => ['type' => 'string', 'enum' => $ownTypeValues]], $isPartialUpdate || \in_array($mapping->getDefaultType(), $ownTypeValues, true));
         }
 
-        $definition['discriminator'] = ['propertyName' => $typeProperty, 'mapping' => $discriminatorMapping];
+        // "discriminator" is an OpenAPI keyword, plain JSON Schema relies on the "enum" of the type property in every branch
+        if (Schema::VERSION_OPENAPI === $schema->getVersion()) {
+            $definition['discriminator'] = ['propertyName' => $typeProperty, 'mapping' => $discriminatorMapping];
+        }
     }
 
     /**

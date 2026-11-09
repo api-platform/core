@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedBook;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedBookStore;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedFictionBook;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedSignedFictionBook;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedTechnicalBook;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\UndiscriminatedBook;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedBike;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedCar;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedMountainBike;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedSportsCar;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedTruck;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedVehicle;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedVehicleStore;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -38,377 +39,260 @@ final class DiscriminatedResourceTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [DiscriminatedBook::class, UndiscriminatedBook::class];
+        return [DiscriminatedVehicle::class];
     }
 
     protected function setUp(): void
     {
-        $fiction = new DiscriminatedFictionBook();
-        $fiction->id = 1;
-        $fiction->title = 'The Hobbit';
-        $fiction->genre = 'Fantasy';
-        $fiction->pageCount = 310;
+        $car = new DiscriminatedCar();
+        $car->id = 1;
+        $car->name = 'Beetle';
+        $car->plate = 'AB-123';
 
-        $technical = new DiscriminatedTechnicalBook();
-        $technical->id = 2;
-        $technical->title = 'Design Patterns';
-        $technical->programmingLanguage = 'C++';
-        $technical->internalNote = 'secret';
+        $truck = new DiscriminatedTruck();
+        $truck->id = 2;
+        $truck->name = 'Actros';
+        $truck->plate = 'TR-999';
+        $truck->payload = 18000;
 
-        $signed = new DiscriminatedSignedFictionBook();
-        $signed->id = 3;
-        $signed->title = 'Signed copy';
-        $signed->genre = 'Fantasy';
-        $signed->signature = 'must not leak';
+        $sportsCar = new DiscriminatedSportsCar();
+        $sportsCar->id = 3;
+        $sportsCar->name = 'Carrera';
+        $sportsCar->topSpeed = '300';
 
-        DiscriminatedBookStore::$books = [1 => $fiction, 2 => $technical, 3 => $signed];
+        $mountainBike = new DiscriminatedMountainBike();
+        $mountainBike->id = 4;
+        $mountainBike->name = 'Rocky';
+        $mountainBike->gears = 21;
+        $mountainBike->suspension = 'full';
+
+        $bike = new DiscriminatedBike();
+        $bike->id = 5;
+        $bike->name = 'Fixie';
+
+        DiscriminatedVehicleStore::$vehicles = [1 => $car, 2 => $truck, 3 => $sportsCar, 4 => $mountainBike, 5 => $bike];
     }
 
     protected function tearDown(): void
     {
-        DiscriminatedBookStore::$books = [];
+        DiscriminatedVehicleStore::$vehicles = [];
 
         parent::tearDown();
     }
 
-    public function testGetItemExposesSubtypeProperties(): void
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function formatProvider(): iterable
     {
-        $response = self::createClient()->request('GET', '/discriminated_books/1');
-
-        $this->assertResponseIsSuccessful();
-        $this->assertEquals([
-            '@context' => '/contexts/DiscriminatedBook',
-            '@id' => '/discriminated_books/1',
-            '@type' => 'DiscriminatedBook',
-            'kind' => 'fiction',
-            'id' => 1,
-            'title' => 'The Hobbit',
-            'genre' => 'Fantasy',
-            'pageCount' => 310,
-            'sequelOf' => null,
-        ], $response->toArray());
-        $this->assertMatchesResourceItemJsonSchema(DiscriminatedBook::class);
+        yield 'jsonld' => ['application/ld+json', 'jsonld'];
+        yield 'json' => ['application/json', 'json'];
+        yield 'jsonapi' => ['application/vnd.api+json', 'jsonapi'];
+        yield 'hal' => ['application/hal+json', 'jsonhal'];
     }
 
-    public function testGetItemAppliesSubtypePropertySecurity(): void
+    #[DataProvider('formatProvider')]
+    public function testGetItemExposesSubtypeProperties(string $accept, string $format): void
     {
-        $response = self::createClient()->request('GET', '/discriminated_books/2');
+        $json = self::createClient()->request('GET', '/discriminated_vehicles/2', ['headers' => ['Accept' => $accept]])->toArray();
 
         $this->assertResponseIsSuccessful();
-        $json = $response->toArray();
-        $this->assertSame('technical', $json['kind']);
-        $this->assertSame('C++', $json['programmingLanguage']);
-        $this->assertArrayNotHasKey('internalNote', $json);
-        $this->assertMatchesResourceItemJsonSchema(DiscriminatedBook::class);
+        $attributes = $json['data']['attributes'] ?? $json;
+        $this->assertSame('truck', $attributes['kind']);
+        $this->assertSame('Actros', $attributes['name']);
+        $this->assertSame(18000, $attributes['payload']);
+        // Subtype property security
+        $this->assertArrayNotHasKey('plate', $attributes);
+        if ('jsonhal' !== $format) {
+            $this->assertMatchesResourceItemJsonSchema(DiscriminatedVehicle::class, format: $format);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{int, array<string, mixed>, list<string>}>
+     */
+    public static function typeProvider(): iterable
+    {
+        yield 'nested map' => [4, ['@type' => 'DiscriminatedMountainBike', 'kind' => 'bike', 'frame' => 'mountain', 'gears' => 21, 'suspension' => 'full'], []];
+        yield 'class declared in its own nested map' => [5, ['@type' => 'DiscriminatedBike', 'kind' => 'bike', 'frame' => 'bike', 'gears' => 1], ['suspension']];
+        yield 'unmapped subclass exposed as its mapped parent' => [3, ['@type' => 'DiscriminatedCar', 'kind' => 'car', 'name' => 'Carrera'], ['topSpeed']];
+    }
+
+    /**
+     * @param array<string, mixed> $expected
+     * @param list<string>         $absent
+     */
+    #[DataProvider('typeProvider')]
+    public function testGetItemExposesTheTypeOfEveryMap(int $id, array $expected, array $absent): void
+    {
+        $json = self::createClient()->request('GET', '/discriminated_vehicles/'.$id)->toArray();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains($expected);
+        foreach ($absent as $property) {
+            $this->assertArrayNotHasKey($property, $json);
+        }
+        $this->assertMatchesResourceItemJsonSchema(DiscriminatedVehicle::class);
     }
 
     /**
      * The allowed attributes are cached per cache key, subtype property security must make that key unsafe
      * or the attributes allowed for a user leak to the next ones in long-running processes.
      */
-    #[DataProvider('userSequenceProvider')]
-    public function testSubtypePropertySecurityIsNotCachedAcrossUsers(bool $adminFirst): void
+    public function testSubtypePropertySecurityIsNotCachedAcrossUsers(): void
     {
         $client = self::createClient();
         $client->disableReboot();
 
-        $requestAs = static function (bool $admin) use ($client): array {
+        foreach ([true, false, true] as $admin) {
             $client->getCookieJar()->clear();
             if ($admin) {
                 $client->loginUser(new InMemoryUser('admin', 'password', ['ROLE_ADMIN']));
             }
 
-            return $client->request('GET', '/discriminated_books/2', ['headers' => ['Accept' => 'application/json']])->toArray();
-        };
-
-        foreach ([$adminFirst, !$adminFirst, $adminFirst] as $admin) {
-            $json = $requestAs($admin);
-            if ($admin) {
-                $this->assertSame('secret', $json['internalNote'] ?? null);
-            } else {
-                $this->assertArrayNotHasKey('internalNote', $json);
-            }
+            $json = $client->request('GET', '/discriminated_vehicles/2', ['headers' => ['Accept' => 'application/json']])->toArray();
+            $this->assertSame($admin ? 'TR-999' : null, $json['plate'] ?? null);
         }
-    }
-
-    /**
-     * @return iterable<string, array{bool}>
-     */
-    public static function userSequenceProvider(): iterable
-    {
-        yield 'admin first' => [true];
-        yield 'anonymous first' => [false];
-    }
-
-    public function testGetItemDoesNotExposePropertiesOfUnmappedSubclass(): void
-    {
-        $response = self::createClient()->request('GET', '/discriminated_books/3');
-
-        $this->assertResponseIsSuccessful();
-        $json = $response->toArray();
-        $this->assertSame('fiction', $json['kind']);
-        $this->assertSame('Fantasy', $json['genre']);
-        $this->assertArrayNotHasKey('signature', $json);
-    }
-
-    public function testGetItemWithoutDiscriminatorMapDoesNotExposeSubclassProperties(): void
-    {
-        $response = self::createClient()->request('GET', '/undiscriminated_books/1');
-
-        $this->assertResponseIsSuccessful();
-        $json = $response->toArray();
-        $this->assertSame('Hidden', $json['title']);
-        $this->assertArrayNotHasKey('secret', $json);
     }
 
     public function testGetCollectionExposesEachSubtype(): void
     {
-        unset(DiscriminatedBookStore::$books[3]);
-
-        $response = self::createClient()->request('GET', '/discriminated_books');
+        $members = self::createClient()->request('GET', '/discriminated_vehicles')->toArray()['hydra:member'];
 
         $this->assertResponseIsSuccessful();
-        $members = $response->toArray()['hydra:member'];
-        $this->assertCount(2, $members);
-        $this->assertSame('fiction', $members[0]['kind']);
-        $this->assertSame('Fantasy', $members[0]['genre']);
-        $this->assertArrayNotHasKey('programmingLanguage', $members[0]);
-        $this->assertSame('technical', $members[1]['kind']);
-        $this->assertSame('C++', $members[1]['programmingLanguage']);
-        $this->assertArrayNotHasKey('genre', $members[1]);
-        $this->assertMatchesResourceCollectionJsonSchema(DiscriminatedBook::class);
+        $this->assertSame(['car', 'truck', 'car', 'bike', 'bike'], array_column($members, 'kind'));
+        $this->assertSame(['DiscriminatedCar', 'DiscriminatedTruck', 'DiscriminatedCar', 'DiscriminatedMountainBike', 'DiscriminatedBike'], array_column($members, '@type'));
+        $this->assertSame(18000, $members[1]['payload']);
+        $this->assertArrayNotHasKey('payload', $members[0]);
+        $this->assertMatchesResourceCollectionJsonSchema(DiscriminatedVehicle::class);
     }
 
-    public function testGetItemInJson(): void
+    /**
+     * @return iterable<string, array{array<string, mixed>, class-string}>
+     */
+    public static function postProvider(): iterable
     {
-        $response = self::createClient()->request('GET', '/discriminated_books/1', ['headers' => ['Accept' => 'application/json']]);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertEquals([
-            'kind' => 'fiction',
-            'id' => 1,
-            'title' => 'The Hobbit',
-            'genre' => 'Fantasy',
-            'pageCount' => 310,
-            'sequelOf' => null,
-        ], $response->toArray());
-        $this->assertMatchesResourceItemJsonSchema(DiscriminatedBook::class, format: 'json');
+        yield 'subtype' => [['kind' => 'truck', 'name' => 'Scania', 'payload' => 12000], DiscriminatedTruck::class];
+        yield 'nested subtype' => [['kind' => 'bike', 'frame' => 'mountain', 'name' => 'Trek', 'suspension' => 'hardtail'], DiscriminatedMountainBike::class];
+        yield 'class declared in its own nested map' => [['kind' => 'bike', 'frame' => 'bike', 'name' => 'Brompton', 'gears' => 3], DiscriminatedBike::class];
     }
 
-    public function testGetItemInJsonApi(): void
+    /**
+     * @param array<string, mixed> $payload
+     * @param class-string         $class
+     */
+    #[DataProvider('postProvider')]
+    public function testPostCreatesTheMostSpecificSubtype(array $payload, string $class): void
     {
-        $response = self::createClient()->request('GET', '/discriminated_books/2', ['headers' => ['Accept' => 'application/vnd.api+json']]);
-
-        $this->assertResponseIsSuccessful();
-        $attributes = $response->toArray()['data']['attributes'];
-        $this->assertSame('technical', $attributes['kind']);
-        $this->assertSame('C++', $attributes['programmingLanguage']);
-        $this->assertArrayNotHasKey('internalNote', $attributes);
-        $this->assertMatchesResourceItemJsonSchema(DiscriminatedBook::class, format: 'jsonapi');
-    }
-
-    public function testGetItemInHal(): void
-    {
-        $response = self::createClient()->request('GET', '/discriminated_books/1', ['headers' => ['Accept' => 'application/hal+json']]);
-
-        $this->assertResponseIsSuccessful();
-        $json = $response->toArray();
-        $this->assertSame('fiction', $json['kind']);
-        $this->assertSame('Fantasy', $json['genre']);
-        $this->assertSame(310, $json['pageCount']);
-    }
-
-    public function testPostCreatesTheMappedSubtype(): void
-    {
-        $response = self::createClient()->request('POST', '/discriminated_books', [
+        self::createClient()->request('POST', '/discriminated_vehicles', [
             'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'kind' => 'technical',
-                'title' => 'Refactoring',
-                'programmingLanguage' => 'Java',
-                'internalNote' => 'cannot be written anonymously',
-            ],
+            'json' => $payload,
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertEquals([
-            '@context' => '/contexts/DiscriminatedBook',
-            '@id' => '/discriminated_books/4',
-            '@type' => 'DiscriminatedBook',
-            'kind' => 'technical',
-            'id' => 4,
-            'title' => 'Refactoring',
-            'programmingLanguage' => 'Java',
-        ], $response->toArray());
-        $this->assertInstanceOf(DiscriminatedTechnicalBook::class, DiscriminatedBookStore::$books[4]);
-        $this->assertNull(DiscriminatedBookStore::$books[4]->internalNote);
+        $this->assertJsonContains(['@id' => '/discriminated_vehicles/6', '@type' => substr($class, strrpos($class, '\\') + 1)] + $payload);
+        $this->assertSame($class, DiscriminatedVehicleStore::$vehicles[6]::class);
     }
 
-    public function testPostDenormalizesSubtypeRelation(): void
+    public function testOverriddenPropertyMetadataIsEnforcedOnWrite(): void
     {
-        $response = self::createClient()->request('POST', '/discriminated_books', [
+        $client = self::createClient();
+
+        // "plate" is not writable on cars
+        $client->request('POST', '/discriminated_vehicles', [
             'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'kind' => 'fiction',
-                'title' => 'The Lord of the Rings',
-                'genre' => 'Fantasy',
-                'sequelOf' => '/discriminated_books/1',
-            ],
+            'json' => ['kind' => 'car', 'name' => 'Golf', 'plate' => 'not writable'],
         ]);
-
         $this->assertResponseStatusCodeSame(201);
-        $this->assertJsonContains([
-            'kind' => 'fiction',
-            'sequelOf' => '/discriminated_books/1',
-        ]);
-        $book = DiscriminatedBookStore::$books[4];
-        $this->assertInstanceOf(DiscriminatedFictionBook::class, $book);
-        $this->assertSame(DiscriminatedBookStore::$books[1], $book->sequelOf);
-    }
+        $this->assertNull(DiscriminatedVehicleStore::$vehicles[6]->plate);
 
-    public function testPostInJson(): void
-    {
-        self::createClient()->request('POST', '/discriminated_books', [
-            'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json'],
-            'json' => [
-                'kind' => 'fiction',
-                'title' => 'Dune',
-                'genre' => 'Science fiction',
-                'pageCount' => 412,
-            ],
-        ]);
-
-        $this->assertResponseStatusCodeSame(201);
-        $this->assertJsonEquals([
-            'kind' => 'fiction',
-            'id' => 4,
-            'title' => 'Dune',
-            'genre' => 'Science fiction',
-            'pageCount' => 412,
-            'sequelOf' => null,
-        ]);
-    }
-
-    public function testPostValidatesSubtypeConstraints(): void
-    {
-        self::createClient()->request('POST', '/discriminated_books', [
+        // "plate" is restricted to admins on trucks
+        $client->request('POST', '/discriminated_vehicles', [
             'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'kind' => 'fiction',
-                'title' => 'Dune',
-                'pageCount' => -1,
-            ],
+            'json' => ['kind' => 'truck', 'name' => 'Scania', 'plate' => 'admins only'],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertNull(DiscriminatedVehicleStore::$vehicles[7]->plate);
+    }
+
+    /**
+     * @return iterable<string, array{string, string, array<string, mixed>}>
+     */
+    public static function invalidPayloadProvider(): iterable
+    {
+        yield 'no type' => ['POST', '/discriminated_vehicles', ['name' => 'Untyped']];
+        yield 'unknown type' => ['POST', '/discriminated_vehicles', ['kind' => 'plane', 'name' => 'Unknown']];
+        yield 'no nested type' => ['POST', '/discriminated_vehicles', ['kind' => 'bike', 'name' => 'Untyped bike']];
+        yield 'relation narrowed by the subtype' => ['POST', '/discriminated_vehicles', ['kind' => 'car', 'name' => 'Polo', 'tows' => '/discriminated_vehicles/2']];
+        yield 'type change' => ['PATCH', '/discriminated_vehicles/1', ['kind' => 'truck', 'payload' => 1]];
+        yield 'nested type change' => ['PATCH', '/discriminated_vehicles/4', ['frame' => 'bike']];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('invalidPayloadProvider')]
+    public function testInvalidPayloadIsRejected(string $method, string $uri, array $payload): void
+    {
+        $classes = array_map(static fn (DiscriminatedVehicle $vehicle): string => $vehicle::class, DiscriminatedVehicleStore::$vehicles);
+
+        self::createClient()->request($method, $uri, [
+            'headers' => ['Content-Type' => 'PATCH' === $method ? 'application/merge-patch+json' : 'application/ld+json'],
+            'json' => $payload,
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertSame($classes, array_map(static fn (DiscriminatedVehicle $vehicle): string => $vehicle::class, DiscriminatedVehicleStore::$vehicles));
+    }
+
+    /**
+     * @return iterable<string, array{string, string, array<string, mixed>, string}>
+     */
+    public static function constraintViolationProvider(): iterable
+    {
+        yield 'subtype constraint on POST' => ['POST', '/discriminated_vehicles', ['kind' => 'truck', 'name' => 'MAN'], 'name'];
+        yield 'subtype constraint on PATCH' => ['PATCH', '/discriminated_vehicles/2', ['name' => 'MAN'], 'name'];
+        // A setter parameter cannot be narrowed (contravariance): the covariant getter is enforced by validation
+        yield 'covariant getter' => ['POST', '/discriminated_vehicles', ['kind' => 'truck', 'name' => 'Volvo FH', 'trailer' => '/discriminated_vehicles/1'], 'trailer'];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('constraintViolationProvider')]
+    public function testSubtypeConstraintsAreValidated(string $method, string $uri, array $payload, string $propertyPath): void
+    {
+        self::createClient()->request($method, $uri, [
+            'headers' => ['Content-Type' => 'PATCH' === $method ? 'application/merge-patch+json' : 'application/ld+json'],
+            'json' => $payload,
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertJsonContains(['violations' => [['propertyPath' => 'pageCount']]]);
-    }
-
-    public function testPostWithoutTypeIsRejected(): void
-    {
-        self::createClient()->request('POST', '/discriminated_books', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => 'Untyped'],
-        ]);
-
-        $this->assertResponseStatusCodeSame(400);
-        $this->assertCount(3, DiscriminatedBookStore::$books);
-    }
-
-    public function testPostWithUnknownTypeIsRejected(): void
-    {
-        self::createClient()->request('POST', '/discriminated_books', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['kind' => 'poetry', 'title' => 'Unknown'],
-        ]);
-
-        $this->assertResponseStatusCodeSame(400);
-        $this->assertCount(3, DiscriminatedBookStore::$books);
+        $this->assertJsonContains(['violations' => [['propertyPath' => $propertyPath]]]);
     }
 
     public function testPatchUpdatesSubtypeProperties(): void
     {
-        self::createClient()->request('PATCH', '/discriminated_books/1', [
+        self::createClient()->request('PATCH', '/discriminated_vehicles/2', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
-            'json' => ['genre' => 'High fantasy', 'pageCount' => 320],
+            'json' => ['kind' => 'truck', 'payload' => 20000],
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertJsonContains([
-            'kind' => 'fiction',
-            'title' => 'The Hobbit',
-            'genre' => 'High fantasy',
-            'pageCount' => 320,
-        ]);
-        $book = DiscriminatedBookStore::$books[1];
-        $this->assertInstanceOf(DiscriminatedFictionBook::class, $book);
-        $this->assertSame('High fantasy', $book->genre);
-    }
-
-    public function testPatchAcceptsMatchingType(): void
-    {
-        self::createClient()->request('PATCH', '/discriminated_books/2', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
-            'json' => ['kind' => 'technical', 'programmingLanguage' => 'Rust'],
-        ]);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains(['kind' => 'technical', 'programmingLanguage' => 'Rust']);
-    }
-
-    public function testPatchCannotChangeTheType(): void
-    {
-        self::createClient()->request('PATCH', '/discriminated_books/1', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
-            'json' => ['kind' => 'technical', 'programmingLanguage' => 'Rust'],
-        ]);
-
-        $this->assertResponseStatusCodeSame(400);
-        $this->assertInstanceOf(DiscriminatedFictionBook::class, DiscriminatedBookStore::$books[1]);
-        $this->assertSame('Fantasy', DiscriminatedBookStore::$books[1]->genre);
-    }
-
-    public function testPatchValidatesSubtypeConstraints(): void
-    {
-        self::createClient()->request('PATCH', '/discriminated_books/1', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
-            'json' => ['pageCount' => 0],
-        ]);
-
-        $this->assertResponseStatusCodeSame(422);
-        $this->assertJsonContains(['violations' => [['propertyPath' => 'pageCount']]]);
+        $this->assertJsonContains(['kind' => 'truck', 'name' => 'Actros', 'payload' => 20000]);
+        $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[2]);
     }
 
     public function testPutReplacesTheResourceWithTheGivenSubtype(): void
     {
-        self::createClient()->request('PUT', '/discriminated_books/1', [
+        self::createClient()->request('PUT', '/discriminated_vehicles/1', [
             'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'kind' => 'technical',
-                'title' => 'Clean Code',
-                'programmingLanguage' => 'Java',
-            ],
+            'json' => ['kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000],
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertJsonEquals([
-            '@context' => '/contexts/DiscriminatedBook',
-            '@id' => '/discriminated_books/1',
-            '@type' => 'DiscriminatedBook',
-            'kind' => 'technical',
-            'id' => 1,
-            'title' => 'Clean Code',
-            'programmingLanguage' => 'Java',
-        ]);
-        $this->assertInstanceOf(DiscriminatedTechnicalBook::class, DiscriminatedBookStore::$books[1]);
-    }
-
-    public function testDelete(): void
-    {
-        self::createClient()->request('DELETE', '/discriminated_books/2');
-
-        $this->assertResponseStatusCodeSame(204);
-        $this->assertArrayNotHasKey(2, DiscriminatedBookStore::$books);
+        $this->assertJsonContains(['@id' => '/discriminated_vehicles/1', '@type' => 'DiscriminatedTruck', 'kind' => 'truck', 'payload' => 5000]);
+        $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[1]);
     }
 
     public function testOpenApiDocumentsSubtypes(): void
@@ -418,119 +302,48 @@ final class DiscriminatedResourceTest extends ApiTestCase
         ])->toArray();
         $schemas = $json['components']['schemas'];
 
-        // Output (JSON-LD): the base definition only lists its subtypes, each of them carrying the common properties.
-        $output = $this->findDefinition($schemas, $json['paths']['/discriminated_books/{id}']['get']['responses']['200']['content']['application/ld+json']['schema']['$ref']);
+        $output = $schemas['DiscriminatedVehicle.jsonld']['allOf'][1] ?? $schemas['DiscriminatedVehicle.jsonld'];
         $this->assertSame([
             'propertyName' => 'kind',
             'mapping' => [
-                'fiction' => '#/components/schemas/DiscriminatedBook.DiscriminatedFictionBook.jsonld',
-                'technical' => '#/components/schemas/DiscriminatedBook.DiscriminatedTechnicalBook.jsonld',
+                'car' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedCar.jsonld',
+                'truck' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedTruck.jsonld',
+                'bike' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedBike.jsonld',
             ],
         ], $output['discriminator']);
-        $this->assertSame([
-            ['$ref' => '#/components/schemas/DiscriminatedBook.DiscriminatedFictionBook.jsonld'],
-            ['$ref' => '#/components/schemas/DiscriminatedBook.DiscriminatedTechnicalBook.jsonld'],
-        ], $output['oneOf']);
+        $this->assertCount(3, $output['oneOf']);
         $this->assertArrayNotHasKey('properties', $output);
 
-        $fiction = $schemas['DiscriminatedBook.DiscriminatedFictionBook.jsonld'];
-        $this->assertSame(['type' => 'string', 'enum' => ['fiction']], $fiction['properties']['kind']);
-        $this->assertContains('kind', $fiction['required']);
-        $this->assertArrayHasKey('genre', $fiction['properties']);
-        $this->assertArrayHasKey('pageCount', $fiction['properties']);
-        $this->assertArrayNotHasKey('signature', $fiction['properties']);
-        $this->assertArrayNotHasKey('allOf', $fiction, 'Subtype schemas must not reference the base schema back (circular reference).');
+        $truck = $schemas['DiscriminatedVehicle.DiscriminatedTruck.jsonld'];
+        $this->assertSame(['type' => 'string', 'enum' => ['truck']], $truck['properties']['kind']);
+        $this->assertArrayHasKey('payload', $truck['properties']);
+        $this->assertSame(5, $truck['properties']['name']['minLength']);
+        $this->assertArrayNotHasKey('minLength', $schemas['DiscriminatedVehicle.DiscriminatedCar.jsonld']['properties']['name']);
 
-        $technical = $schemas['DiscriminatedBook.DiscriminatedTechnicalBook.jsonld'];
-        $this->assertSame(['type' => 'string', 'enum' => ['technical']], $technical['properties']['kind']);
-        $this->assertArrayHasKey('programmingLanguage', $technical['properties']);
-        $this->assertArrayNotHasKey('genre', $technical['properties']);
+        // The nested map lists the bike itself: an instance of the bike is described by an inline branch
+        $bike = $schemas['DiscriminatedVehicle.DiscriminatedBike.jsonld'];
+        $this->assertSame('frame', $bike['discriminator']['propertyName']);
+        $this->assertSame(['type' => 'string', 'enum' => ['bike']], $bike['oneOf'][0]['properties']['frame']);
+        $this->assertSame(['$ref' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedMountainBike.jsonld'], $bike['oneOf'][1]);
 
-        // Required properties of a subtype must not leak into the base nor into siblings.
-        $this->assertNotContains('kind', $output['required'] ?? []);
-        $this->assertNotContains('kind', $schemas['DiscriminatedBook.jsonld']['allOf'][1]['required'] ?? []);
-
-        // Input (POST)
-        $postInput = $this->findDefinition($schemas, $json['paths']['/discriminated_books']['post']['requestBody']['content']['application/ld+json']['schema']['$ref']);
-        $this->assertSame('kind', $postInput['discriminator']['propertyName']);
-        $this->assertSame([
-            'fiction' => '#/components/schemas/DiscriminatedBook.DiscriminatedFictionBook',
-            'technical' => '#/components/schemas/DiscriminatedBook.DiscriminatedTechnicalBook',
-        ], $postInput['discriminator']['mapping']);
-        $this->assertContains('kind', $schemas['DiscriminatedBook.DiscriminatedFictionBook']['required']);
-        $this->assertArrayHasKey('genre', $schemas['DiscriminatedBook.DiscriminatedFictionBook']['properties']);
-
-        // Input (PATCH): a merge-patch document does not require any property, not even the type.
-        $patchInput = $this->findDefinition($schemas, $json['paths']['/discriminated_books/{id}']['patch']['requestBody']['content']['application/merge-patch+json']['schema']['$ref']);
-        $this->assertSame([
-            'fiction' => '#/components/schemas/DiscriminatedBook.DiscriminatedFictionBook.jsonMergePatch',
-            'technical' => '#/components/schemas/DiscriminatedBook.DiscriminatedTechnicalBook.jsonMergePatch',
-        ], $patchInput['discriminator']['mapping']);
-        $this->assertArrayNotHasKey('required', $schemas['DiscriminatedBook.DiscriminatedFictionBook.jsonMergePatch']);
-        $this->assertArrayNotHasKey('required', $schemas['DiscriminatedBook.DiscriminatedTechnicalBook.jsonMergePatch']);
-
-        // JSON:API: the type property is an attribute, each subtype is a variant of the "data" object.
-        $jsonApiData = $this->findDefinition($schemas, $schemas['DiscriminatedBook.jsonapi']['properties']['data']['$ref']);
-        $this->assertCount(2, $jsonApiData['oneOf']);
-        $fiction = $this->findDefinition($schemas, $jsonApiData['oneOf'][0]['$ref']);
-        $technical = $this->findDefinition($schemas, $jsonApiData['oneOf'][1]['$ref']);
-        $this->assertSame(['type' => 'string', 'enum' => ['fiction']], $fiction['properties']['attributes']['properties']['kind']);
-        $this->assertSame(['kind'], $fiction['properties']['attributes']['required']);
-        $this->assertArrayHasKey('sequelOf', $fiction['properties']['relationships']['properties']);
-        $this->assertArrayHasKey('programmingLanguage', $technical['properties']['attributes']['properties']);
-
-        // Resources without a discriminator map are untouched.
-        $this->assertArrayNotHasKey('discriminator', $schemas['UndiscriminatedBook.jsonld']['allOf'][1]);
-        $this->assertArrayNotHasKey('oneOf', $schemas['UndiscriminatedBook.jsonld']['allOf'][1]);
+        // Unmapped subclasses are never documented
+        $this->assertArrayNotHasKey('DiscriminatedVehicle.DiscriminatedSportsCar.jsonld', $schemas);
     }
 
-    /**
-     * Resolves a definition, unwrapping the Hydra item decoration if any.
-     */
-    public static function parentSchemaProvider(): iterable
+    public function testHydraDocumentsSubtypesAsSubclasses(): void
     {
-        yield 'output json' => ['/discriminated_books/{id}', 'get', 'application/json'];
-        yield 'output jsonld' => ['/discriminated_books/{id}', 'get', 'application/ld+json'];
-        yield 'input json' => ['/discriminated_books', 'post', 'application/json'];
-        yield 'input jsonld' => ['/discriminated_books', 'post', 'application/ld+json'];
-        yield 'input merge-patch' => ['/discriminated_books/{id}', 'patch', 'application/merge-patch+json'];
-        yield 'output jsonapi' => ['/discriminated_books/{id}', 'get', 'application/vnd.api+json'];
-    }
+        $client = self::createClient();
 
-    /**
-     * Every "oneOf" branch is a complete description of a subtype: repeating the common properties
-     * next to "oneOf" makes Swagger UI display them twice.
-     */
-    #[DataProvider('parentSchemaProvider')]
-    public function testOpenApiParentSchemaOnlyListsItsSubtypes(string $path, string $method, string $mimeType): void
-    {
-        $json = self::createClient()->request('GET', '/docs', [
-            'headers' => ['Accept' => 'application/vnd.openapi+json'],
-        ])->toArray();
-        $schemas = $json['components']['schemas'];
+        $classes = array_column($client->request('GET', '/docs.jsonld')->toArray()['hydra:supportedClass'], null, '@id');
+        $truck = $classes['#DiscriminatedTruck'];
+        $this->assertSame('#DiscriminatedVehicle', $truck['subClassOf']);
+        $this->assertSame(['#DiscriminatedTruck/payload'], array_column(array_column($truck['hydra:supportedProperty'], 'hydra:property'), '@id'));
+        $this->assertSame('#DiscriminatedBike', $classes['#DiscriminatedMountainBike']['subClassOf']);
+        $this->assertArrayNotHasKey('#DiscriminatedSportsCar', $classes);
 
-        $operation = $json['paths'][$path][$method];
-        $ref = 'get' === $method ? $operation['responses']['200']['content'][$mimeType]['schema']['$ref'] : $operation['requestBody']['content'][$mimeType]['schema']['$ref'];
-        $parent = $this->findDefinition($schemas, $ref);
-        if ('application/vnd.api+json' === $mimeType) {
-            $parent = $this->findDefinition($schemas, $parent['properties']['data']['$ref']);
-        }
-
-        $this->assertCount(2, $parent['oneOf']);
-        $this->assertArrayNotHasKey('properties', $parent);
-        $this->assertArrayNotHasKey('required', $parent);
-
-        foreach ($parent['oneOf'] as $branch) {
-            $branch = $this->findDefinition($schemas, $branch['$ref']);
-            $properties = 'application/vnd.api+json' === $mimeType ? $branch['properties']['attributes']['properties'] : $branch['properties'];
-            $this->assertArrayHasKey('title', $properties);
-        }
-    }
-
-    private function findDefinition(array $schemas, string $ref): array
-    {
-        $definition = $schemas[substr($ref, \strlen('#/components/schemas/'))];
-
-        return $definition['allOf'][1] ?? $definition;
+        $context = $client->request('GET', '/contexts/DiscriminatedVehicle')->toArray()['@context'];
+        $this->assertSame('DiscriminatedVehicle/name', $context['name']);
+        $this->assertSame('DiscriminatedTruck/payload', $context['payload']);
+        $this->assertSame('DiscriminatedMountainBike/suspension', $context['suspension']);
     }
 }

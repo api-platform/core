@@ -173,6 +173,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hydra_prefix')->defaultFalse()->info('Use the "hydra:" prefix.')->end()
+                        ->booleanNode('discriminator_map')->defaultFalse()->info('Expose the subtypes declared in the serializer discriminator map of a resource (polymorphic resources): subtype properties are readable, writable and documented. Always enabled when "doctrine.discriminator_map" or "doctrine_mongodb_odm.discriminator_map" is.')->end()
                     ->end()
                 ->end()
             ->end();

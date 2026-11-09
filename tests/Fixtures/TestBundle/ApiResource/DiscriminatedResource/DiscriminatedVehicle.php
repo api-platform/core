@@ -26,7 +26,8 @@ use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Discriminated resource whose subtypes override inherited properties (narrowed types, metadata, constraints).
+ * Polymorphic resource: its subtypes override inherited properties (narrowed types, metadata, constraints),
+ * bikes are discriminated by a nested map listing the bike itself.
  */
 #[ApiResource(
     operations: [
@@ -43,6 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[DiscriminatorMap(typeProperty: 'kind', mapping: [
     'car' => DiscriminatedCar::class,
     'truck' => DiscriminatedTruck::class,
+    'bike' => DiscriminatedBike::class,
 ])]
 abstract class DiscriminatedVehicle
 {
@@ -66,11 +68,6 @@ abstract class DiscriminatedVehicle
     public function setTrailer(?self $trailer): void
     {
         $this->trailer = $trailer;
-    }
-
-    public function getRating(): int|float
-    {
-        return 4.5;
     }
 
     public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self|array|null
