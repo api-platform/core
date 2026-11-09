@@ -192,6 +192,8 @@ return [
 
     'serializer' => [
         'hydra_prefix' => false,
+        // Read, write and document the subtypes declared in the serializer discriminator map of a resource
+        'discriminator_map' => false,
         // 'datetime_format' => \DateTimeInterface::RFC3339,
     ],
 
