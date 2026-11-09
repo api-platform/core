@@ -36,6 +36,15 @@ class DocsTest extends TestCase
         $this->assertSame('application/vnd.openapi+json', $res->headers->get('content-type'));
     }
 
+    public function testOpenApiFilterTags(): void
+    {
+        $res = $this->get('/api/docs.jsonopenapi?filter_tags[]=internal');
+        $paths = $res->json()['paths'];
+
+        $this->assertArrayHasKey('/api/tagged_operations', $paths);
+        $this->assertArrayNotHasKey('/api/tagged_operations/{id}', $paths);
+    }
+
     public function testJsonLd(): void
     {
         $res = $this->get('/api/docs.jsonld');
