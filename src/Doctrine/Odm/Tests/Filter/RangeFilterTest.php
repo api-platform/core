@@ -16,6 +16,8 @@ namespace ApiPlatform\Doctrine\Odm\Tests\Filter;
 use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -560,5 +562,18 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 ],
             ]
         );
+    }
+
+    public function testGetOpenApiParameters(): void
+    {
+        $filter = $this->buildFilter();
+        $this->assertInstanceOf(RangeFilter::class, $filter);
+
+        $names = array_map(
+            static fn (OpenApiParameter $parameter): string => $parameter->getName(),
+            $filter->getOpenApiParameters(new QueryParameter(key: 'price')),
+        );
+
+        $this->assertSame(['price[gt]', 'price[lt]', 'price[gte]', 'price[lte]', 'price[between]'], $names);
     }
 }
