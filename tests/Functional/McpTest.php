@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpAppExample;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpResourceExample;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpToolAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpTools;
@@ -21,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpWithMarkdown;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\McpBook;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Mcp\Schema\Extension\Apps\McpApps;
 use Symfony\AI\McpBundle\McpBundle;
 
 class McpTest extends ApiTestCase
@@ -41,6 +43,7 @@ class McpTest extends ApiTestCase
             McpTools::class,
             McpWithMarkdown::class,
             McpResourceExample::class,
+            McpAppExample::class,
         ];
     }
 
@@ -105,6 +108,47 @@ class McpTest extends ApiTestCase
         self::assertNotNull($content);
         self::assertStringContainsString('API Platform Guide', $content);
         self::assertStringContainsString('978-1234567890', $content);
+    }
+
+    public function testInitializeAdvertisesMcpAppsExtension(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
+        }
+
+        if (!$this->isPsr17FactoryAvailable()) {
+            $this->markTestSkipped('PSR-17 HTTP factory implementation not available (required for MCP)');
+        }
+
+        $res = self::createClient()->request('POST', '/mcp', [
+            'headers' => [
+                'Accept' => 'application/json, text/event-stream',
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'jsonrpc' => '2.0',
+                'id' => 1,
+                'method' => 'initialize',
+                'params' => [
+                    'protocolVersion' => '2024-11-05',
+                    'clientInfo' => [
+                        'name' => 'ApiPlatform Test Suite',
+                        'version' => '1.0',
+                    ],
+                    'capabilities' => [],
+                ],
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(
+            ['mimeTypes' => [McpApps::MIME_TYPE]],
+            $res->toArray()['result']['capabilities']['extensions'][McpApps::EXTENSION_ID] ?? null
+        );
     }
 
     public function testBasicProcessor(): void

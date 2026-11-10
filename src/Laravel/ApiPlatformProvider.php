@@ -122,6 +122,7 @@ use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOp
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
 use ApiPlatform\Mcp\Security\PolicyAccessChecker;
 use ApiPlatform\Mcp\Server\Handler;
+use ApiPlatform\Mcp\Server\McpAppsConfigurator;
 use ApiPlatform\Mcp\State\StructuredContentProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -1274,6 +1275,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
 
+        $this->app->singleton(McpAppsConfigurator::class, static function (Application $app) {
+            return new McpAppsConfigurator(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+        });
+
         $this->app->singleton(PolicyAccessChecker::class, static function (Application $app) {
             return new PolicyAccessChecker(
                 $app->make(McpOperationMetadataFactory::class),
@@ -1314,6 +1322,8 @@ class ApiPlatformProvider extends ServiceProvider
             }
 
             $builder->addRequestHandler($app->make(Handler::class));
+
+            $app->make(McpAppsConfigurator::class)($builder);
 
             return $builder;
         });
