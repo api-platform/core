@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use Illuminate\Foundation\Application;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 
@@ -99,5 +101,20 @@ class DocsTest extends TestCase
     {
         $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
         $this->assertStringNotContainsString('"withCredentials":true', (string) $res->getContent());
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function usePersistAuthorization($app): void
+    {
+        $app['config']->set('api-platform.swagger_ui.persist_authorization', true);
+    }
+
+    #[DefineEnvironment('usePersistAuthorization')]
+    public function testSwaggerDataContainsPersistAuthorization(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $this->assertStringContainsString('"persistAuthorization":true', (string) $res->getContent());
     }
 }
