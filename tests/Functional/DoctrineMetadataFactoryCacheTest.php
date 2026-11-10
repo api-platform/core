@@ -20,10 +20,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-/**
- * The Doctrine resource metadata collection factory must be decorated by the
- * metadata cache, otherwise it runs again on every ResourceMetadataCollectionFactoryInterface::create() call.
- */
 final class DoctrineMetadataFactoryCacheTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
