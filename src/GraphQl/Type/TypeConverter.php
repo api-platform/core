@@ -30,7 +30,9 @@ use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\NullableType as TypeInfoNullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -71,7 +73,7 @@ final class TypeConverter implements TypeConverterInterface
                 return $resourceType;
             }
 
-            return 'Iterable';
+            return $this->getScalarListType($type) ?? 'Iterable';
         }
 
         if ($type->isIdentifiedBy(TypeIdentifier::OBJECT)) {
@@ -97,6 +99,39 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         throw new InvalidArgumentException(\sprintf('The type "%s" was not resolved.', $type));
+    }
+
+    private function getScalarListType(Type $type): ?GraphQLType
+    {
+        if ($type instanceof TypeInfoNullableType) {
+            $type = $type->getWrappedType();
+        }
+
+        if (!$type instanceof CollectionType) {
+            return null;
+        }
+
+        $keyType = $type->getCollectionKeyType();
+        if ($keyType->isIdentifiedBy(TypeIdentifier::STRING) && !$keyType->isIdentifiedBy(TypeIdentifier::INT)) {
+            return null;
+        }
+
+        $valueType = $type->getCollectionValueType();
+        if ($valueType instanceof TypeInfoNullableType) {
+            $valueType = $valueType->getWrappedType();
+        }
+
+        if (!$valueType instanceof BuiltinType) {
+            return null;
+        }
+
+        return match ($valueType->getTypeIdentifier()) {
+            TypeIdentifier::BOOL => GraphQLType::listOf(GraphQLType::boolean()),
+            TypeIdentifier::INT => GraphQLType::listOf(GraphQLType::int()),
+            TypeIdentifier::FLOAT => GraphQLType::listOf(GraphQLType::float()),
+            TypeIdentifier::STRING => GraphQLType::listOf(GraphQLType::string()),
+            default => null,
+        };
     }
 
     private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
