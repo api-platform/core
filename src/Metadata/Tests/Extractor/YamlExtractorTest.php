@@ -112,6 +112,7 @@ class YamlExtractorTest extends TestCase
                     'jsonldContext' => null,
 
                     'throwOnNotFound' => null,
+                    'canonicalUriTemplate' => null,
                 ],
             ],
             Program::class => [
@@ -190,6 +191,7 @@ class YamlExtractorTest extends TestCase
                     'jsonldContext' => null,
 
                     'throwOnNotFound' => null,
+                    'canonicalUriTemplate' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs{._format}',
@@ -342,6 +344,7 @@ class YamlExtractorTest extends TestCase
                             'jsonldContext' => null,
 
                             'throwOnNotFound' => null,
+                            'canonicalUriTemplate' => null,
                         ],
                         [
                             'name' => null,
@@ -435,6 +438,7 @@ class YamlExtractorTest extends TestCase
                             'jsonldContext' => null,
 
                             'throwOnNotFound' => null,
+                            'canonicalUriTemplate' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -451,6 +455,7 @@ class YamlExtractorTest extends TestCase
                     'jsonldContext' => null,
 
                     'throwOnNotFound' => null,
+                    'canonicalUriTemplate' => null,
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -529,6 +534,7 @@ class YamlExtractorTest extends TestCase
                     'jsonldContext' => null,
 
                     'throwOnNotFound' => null,
+                    'canonicalUriTemplate' => null,
                 ],
             ],
         ], $extractor->getResources());

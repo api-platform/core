@@ -110,6 +110,7 @@ final class Query extends HttpOperation implements CollectionOperationInterface
         ?bool $throwOnNotFound = null,
         private ?string $itemUriTemplate = null,
         ?bool $map = null,
+        ?string $canonicalUriTemplate = null,
     ) {
         parent::__construct(
             method: self::METHOD_QUERY,
@@ -195,13 +196,15 @@ final class Query extends HttpOperation implements CollectionOperationInterface
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
-            map: $map
+            map: $map,
+            canonicalUriTemplate: $canonicalUriTemplate
         );
     }
 
     public function getItemUriTemplate(): ?string
     {
-        return $this->itemUriTemplate;
+        // the items fall back to the canonical URI template of the resource when none is given for them
+        return $this->itemUriTemplate ?? $this->canonicalUriTemplate;
     }
 
     public function withItemUriTemplate(string $itemUriTemplate): self
