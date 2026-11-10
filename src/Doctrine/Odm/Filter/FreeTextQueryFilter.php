@@ -91,7 +91,7 @@ final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAware
                 $newContext,
             );
 
-            if (isset($newContext['match'])) {
+            if (isset($newContext['match']) && [] !== $newContext['match']->getQuery()) {
                 $context['match'] = $newContext['match'];
             }
         }
