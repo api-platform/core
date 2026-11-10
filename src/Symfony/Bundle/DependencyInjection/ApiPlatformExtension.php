@@ -352,6 +352,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->hasParameter('serializer.default_context')) {
             $container->setParameter('serializer.default_context', $container->getParameter('api_platform.serializer.default_context'));
         }
+        $container->setParameter('api_platform.controller_operations', []);
+        $container->setParameter('api_platform.controller_operation_resources', []);
+        $loader->load('symfony/controller_operation.php');
         if ($config['use_symfony_listeners']) {
             $loader->load('symfony/events.php');
         } else {

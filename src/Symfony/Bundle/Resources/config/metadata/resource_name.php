@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceNameCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceNameCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Symfony\Metadata\Resource\Factory\ControllerApiOperationResourceNameCollectionFactory;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -68,5 +69,12 @@ return function (ContainerConfigurator $container) {
         ->args([
             '%api_platform.class_name_resources%',
             service('api_platform.metadata.resource.name_collection_factory.class_name.inner'),
+        ]);
+
+    $services->set('api_platform.metadata.resource.name_collection_factory.controller_api_operation', ControllerApiOperationResourceNameCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.name_collection_factory', null, 0)
+        ->args([
+            service('api_platform.metadata.resource.name_collection_factory.controller_api_operation.inner'),
+            '%api_platform.controller_operation_resources%',
         ]);
 };
