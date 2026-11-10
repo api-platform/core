@@ -123,6 +123,31 @@ class DocsTest extends TestCase
         $this->assertStringNotContainsString('id="formats"', $content);
     }
 
+    public function testHtmlDocsHideGraphiqlLinkWhenGraphQlIsDisabled(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+
+        $this->assertStringNotContainsString('graphiql-link', (string) $res->getContent());
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function useGraphQl($app): void
+    {
+        $app['config']->set('api-platform.graphql.enabled', true);
+    }
+
+    #[DefineEnvironment('useGraphQl')]
+    public function testHtmlDocsShowGraphiqlLinkWhenGraphQlIsEnabled(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+
+        $this->assertStringContainsString('/api/graphiql" class="graphiql-link">GraphiQL</a>', (string) $res->getContent());
+    }
+
     public function testSwaggerDataDoesNotContainWithCredentialsByDefault(): void
     {
         $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
