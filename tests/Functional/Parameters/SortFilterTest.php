@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterEmploy
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest\FilterCompany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest\FilterDepartment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest\FilterEmployee;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SortFilterWithoutProperty;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -35,7 +36,7 @@ final class SortFilterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [FilterCompany::class, FilterDepartment::class, FilterEmployee::class];
+        return [FilterCompany::class, FilterDepartment::class, FilterEmployee::class, SortFilterWithoutProperty::class];
     }
 
     protected function setUp(): void
@@ -207,6 +208,17 @@ final class SortFilterTest extends ApiTestCase
         sort($names);
 
         $this->assertSame(['Alice', 'Bob'], $names);
+    }
+
+    public function testSortFilterThrowsExceptionWhenPropertyIsMissing(): void
+    {
+        $response = self::createClient()->request('GET', '/sort_filter_without_properties?sortNoProperty=asc');
+        $this->assertResponseStatusCodeSame(400);
+
+        $this->assertStringContainsString(
+            'The filter parameter with key "sortNoProperty" must specify a property',
+            $response->toArray(false)['detail']
+        );
     }
 
     private function loadFixtures(): void
