@@ -68,8 +68,9 @@ trait PropertyHelperTrait
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $alias = '';
+        $parts = explode('.', $property);
 
-        foreach ($propertyParts['associations'] as $association) {
+        foreach ($propertyParts['associations'] as $i => $association) {
             $classMetadata = $this->getClassMetadata($resourceClass);
 
             if (!$classMetadata instanceof MongoDbOdmClassMetadata) {
@@ -106,7 +107,7 @@ trait PropertyHelperTrait
                     ->preserveNullAndEmptyArrays($preserveNullAndEmptyArrays);
 
                 // association.property => association_lkup.property
-                $property = substr_replace($property, $propertyAlias, strpos($property, (string) $association), \strlen((string) $association));
+                $parts[$i] = $propertyAlias;
                 $resourceClass = $classMetadata->getAssociationTargetClass($association);
                 $alias .= '.';
             } elseif ($classMetadata->hasEmbed($association)) {
@@ -119,6 +120,6 @@ trait PropertyHelperTrait
             throw new InvalidArgumentException(\sprintf('Cannot add lookups for property "%s" - property is not nested.', $property));
         }
 
-        return [$property, $propertyParts['field'], $propertyParts['associations']];
+        return [implode('.', $parts), $propertyParts['field'], $propertyParts['associations']];
     }
 }
