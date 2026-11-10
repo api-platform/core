@@ -217,6 +217,23 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->autoconfigure($classes, ProviderInterface::class, $providers);
 
+        $this->app->singleton('api_platform.metadata.resource.metadata_collection_factory.attributes', static function (Application $app) {
+            /** @var ConfigRepository $config */
+            $config = $app['config'];
+
+            return new AttributesResourceMetadataCollectionFactory(
+                new ConcernsResourceMetadataCollectionFactory(
+                    null,
+                    $app->make(LoggerInterface::class),
+                    $config->get('api-platform.defaults', []),
+                    $config->get('api-platform.graphql.enabled'),
+                ),
+                $app->make(LoggerInterface::class),
+                $config->get('api-platform.defaults', []),
+                $config->get('api-platform.graphql.enabled'),
+            );
+        });
+
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
@@ -245,17 +262,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                                                             $app->make(PathSegmentNameGeneratorInterface::class),
                                                             new NotExposedOperationResourceMetadataCollectionFactory(
                                                                 $app->make(LinkFactoryInterface::class),
-                                                                new AttributesResourceMetadataCollectionFactory(
-                                                                    new ConcernsResourceMetadataCollectionFactory(
-                                                                        null,
-                                                                        $app->make(LoggerInterface::class),
-                                                                        $config->get('api-platform.defaults', []),
-                                                                        $config->get('api-platform.graphql.enabled'),
-                                                                    ),
-                                                                    $app->make(LoggerInterface::class),
-                                                                    $config->get('api-platform.defaults', []),
-                                                                    $config->get('api-platform.graphql.enabled'),
-                                                                ),
+                                                                $app->make('api_platform.metadata.resource.metadata_collection_factory.attributes'),
                                                             )
                                                         ),
                                                         $config->get('api-platform.graphql.enabled')
@@ -395,6 +402,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             ParameterProvider::class,
             FilterQueryExtension::class,
             'filters',
+            'api_platform.metadata.resource.metadata_collection_factory.attributes',
             ResourceMetadataCollectionFactoryInterface::class,
             'api_platform.graphql.state_provider.parameter',
             FieldsBuilderEnumInterface::class,

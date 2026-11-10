@@ -55,7 +55,7 @@ final class DoctrineOrmLinkFactory implements LinkFactoryInterface, PropertyLink
         $links = $this->linkFactory->createLinksFromRelations($operation);
 
         $resourceClass = $operation->getClass();
-        if (!($manager = $this->managerRegistry->getManagerForClass($resourceClass)) instanceof EntityManagerInterface) {
+        if ((!class_exists($resourceClass) && !interface_exists($resourceClass)) || !($manager = $this->managerRegistry->getManagerForClass($resourceClass)) instanceof EntityManagerInterface) {
             return $links;
         }
 
