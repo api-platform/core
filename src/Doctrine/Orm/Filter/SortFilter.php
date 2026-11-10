@@ -19,6 +19,7 @@ use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\BCHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
@@ -66,6 +67,10 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
         $direction = strtoupper($value);
         if (!\in_array($direction, ['ASC', 'DESC'], true)) {
             return;
+        }
+
+        if (null === $parameter->getProperty()) {
+            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
         $property = $parameter->getProperty();

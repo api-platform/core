@@ -18,6 +18,7 @@ use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\RelatedDummy;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\ThirdLevel;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -135,6 +136,24 @@ class SortFilterTest extends TestCase
         }
 
         $this->assertEmpty($pipeline);
+    }
+
+    public function testMissingProperty(): void
+    {
+        $filter = new SortFilter();
+
+        $parameter = new QueryParameter(key: 'sortNoProperty');
+        $parameter = $parameter->setValue('asc');
+        $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
+
+        $context = [
+            'parameter' => $parameter,
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The filter parameter with key "sortNoProperty" must specify a property');
+
+        $filter->apply($aggregationBuilder, Dummy::class, null, $context);
     }
 
     public function testNestedPropertySort(): void

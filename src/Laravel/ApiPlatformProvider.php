@@ -123,6 +123,7 @@ use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOp
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
 use ApiPlatform\Mcp\Security\PolicyAccessChecker;
 use ApiPlatform\Mcp\Server\Handler;
+use ApiPlatform\Mcp\Server\McpAppsConfigurator;
 use ApiPlatform\Mcp\State\StructuredContentProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -832,11 +833,11 @@ class ApiPlatformProvider extends ServiceProvider
                 oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl', null),
                 oAuthScopes: $config->get('api-platform.swagger_ui.oauth.scopes', []),
                 apiKeys: $config->get('api-platform.swagger_ui.apiKeys', []),
-                contactName: $config->get('api-platform.swagger_ui.contact.name', ''),
-                contactUrl: $config->get('api-platform.swagger_ui.contact.url', ''),
-                contactEmail: $config->get('api-platform.swagger_ui.contact.email', ''),
-                licenseName: $config->get('api-platform.swagger_ui.license.name', ''),
-                licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
+                contactName: $config->get('api-platform.swagger_ui.contact.name'),
+                contactUrl: $config->get('api-platform.swagger_ui.contact.url'),
+                contactEmail: $config->get('api-platform.swagger_ui.contact.email'),
+                licenseName: $config->get('api-platform.swagger_ui.license.name'),
+                licenseUrl: $config->get('api-platform.swagger_ui.license.url'),
                 persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
                 tags: $config->get('api-platform.openapi.tags', []),
@@ -1298,6 +1299,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
 
+        $this->app->singleton(McpAppsConfigurator::class, static function (Application $app) {
+            return new McpAppsConfigurator(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+        });
+
         $this->app->singleton(PolicyAccessChecker::class, static function (Application $app) {
             return new PolicyAccessChecker(
                 $app->make(McpOperationMetadataFactory::class),
@@ -1338,6 +1346,8 @@ class ApiPlatformProvider extends ServiceProvider
             }
 
             $builder->addRequestHandler($app->make(Handler::class));
+
+            $app->make(McpAppsConfigurator::class)($builder);
 
             return $builder;
         });
