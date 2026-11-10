@@ -54,6 +54,32 @@ class DocsTest extends TestCase
         $this->assertSame('application/ld+json', $res->headers->get('content-type'));
     }
 
+    public function testOpenApiInfoWithoutContactAndLicense(): void
+    {
+        $info = $this->get('/api/docs.jsonopenapi')->json()['info'];
+
+        $this->assertArrayNotHasKey('contact', $info);
+        $this->assertArrayNotHasKey('license', $info);
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function useContactAndLicense($app): void
+    {
+        $app['config']->set('api-platform.swagger_ui.contact', ['name' => 'API Support', 'url' => 'https://example.com/support', 'email' => 'support@example.com']);
+        $app['config']->set('api-platform.swagger_ui.license', ['name' => 'MIT']);
+    }
+
+    #[DefineEnvironment('useContactAndLicense')]
+    public function testOpenApiInfoWithContactAndLicense(): void
+    {
+        $info = $this->get('/api/docs.jsonopenapi')->json()['info'];
+
+        $this->assertSame(['name' => 'API Support', 'url' => 'https://example.com/support', 'email' => 'support@example.com'], $info['contact']);
+        $this->assertSame(['name' => 'MIT'], $info['license']);
+    }
+
     public function testJsonLdAccept(): void
     {
         $res = $this->get('/api/docs', headers: ['accept' => 'application/ld+json']);
