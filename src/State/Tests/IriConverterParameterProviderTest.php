@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
@@ -22,6 +23,29 @@ use Psr\Log\NullLogger;
 
 final class IriConverterParameterProviderTest extends TestCase
 {
+    public function testNotFoundAndInvalidIriOptionsAreIndependent(): void
+    {
+        foreach (['/missing', ['/missing']] as $value) {
+            $converter = $this->createStub(IriConverterInterface::class);
+            $exception = new ItemNotFoundException('Missing resource');
+            $converter->method('getResourceFromIri')->willThrowException($exception);
+            $provider = new IriConverterParameterProvider($converter, new NullLogger());
+            $parameter = new QueryParameter(extraProperties: ['throw_invalid_argument' => true]);
+            $parameter->setValue($value);
+            $provider->provide($parameter);
+            self::assertSame(\is_array($value) ? [] : $value, $parameter->getValue());
+
+            $parameter = new QueryParameter(extraProperties: ['throw_not_found' => true]);
+            $parameter->setValue($value);
+            try {
+                $provider->provide($parameter);
+                self::fail('The not-found exception should be propagated.');
+            } catch (ItemNotFoundException $caught) {
+                self::assertSame($exception, $caught);
+            }
+        }
+    }
+
     public function testInvalidIriCanBeThrownForScalarAndArrayValues(): void
     {
         foreach (['/invalid', ['/invalid']] as $value) {
