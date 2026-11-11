@@ -32,6 +32,10 @@ final class Issue8834InvalidIriTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ('mongodb' === ($_SERVER['APP_ENV'] ?? null)) {
+            $this->markTestSkipped('This test uses a Doctrine ORM fixture.');
+        }
+
         $this->recreateSchema(self::getResources());
     }
 
