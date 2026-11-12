@@ -19,6 +19,11 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\ChildAttributeDummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\OverriddenOperationDummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\ParentAttributeDummy;
+use ApiPlatform\JsonSchema\Tests\Fixtures\Discriminator\DiscriminatedAnimal;
+use ApiPlatform\JsonSchema\Tests\Fixtures\Discriminator\DiscriminatedCat;
+use ApiPlatform\JsonSchema\Tests\Fixtures\Discriminator\DiscriminatedDog;
+use ApiPlatform\JsonSchema\Tests\Fixtures\Discriminator\DiscriminatedGadget;
+use ApiPlatform\JsonSchema\Tests\Fixtures\Discriminator\DiscriminatedPhone;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\GenericChild;
@@ -41,6 +46,9 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
 
@@ -432,6 +440,115 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
         $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
+    }
+
+    public function testBuildSchemaDocumentsDiscriminatorMapSubtypes(): void
+    {
+        $schemaFactory = $this->createDiscriminatorSchemaFactory();
+        $schema = $schemaFactory->buildSchema(DiscriminatedAnimal::class, 'json', Schema::TYPE_OUTPUT, null, new Schema(Schema::VERSION_OPENAPI));
+        $definitions = $schema->getDefinitions();
+
+        $base = $definitions['DiscriminatedAnimal'];
+        $this->assertArrayNotHasKey('properties', $base);
+        $this->assertSame([
+            ['$ref' => '#/components/schemas/DiscriminatedAnimal.DiscriminatedCat'],
+            ['$ref' => '#/components/schemas/DiscriminatedAnimal.DiscriminatedDog'],
+        ], $base['oneOf']);
+        $this->assertSame([
+            'propertyName' => 'species',
+            'mapping' => [
+                'cat' => '#/components/schemas/DiscriminatedAnimal.DiscriminatedCat',
+                'dog' => '#/components/schemas/DiscriminatedAnimal.DiscriminatedDog',
+            ],
+        ], $base['discriminator']);
+
+        $cat = $definitions['DiscriminatedAnimal.DiscriminatedCat'];
+        $this->assertSame(['lives', 'name', 'species'], array_keys($cat['properties']));
+        $this->assertSame(['type' => 'string', 'enum' => ['cat']], $cat['properties']['species']);
+        $this->assertSame(['species'], $cat['required']);
+        $this->assertArrayNotHasKey('allOf', $cat);
+
+        $dog = $definitions['DiscriminatedAnimal.DiscriminatedDog'];
+        $this->assertSame(['goodBoy', 'name', 'species'], array_keys($dog['properties']));
+        $this->assertSame(['type' => 'string', 'enum' => ['dog']], $dog['properties']['species']);
+    }
+
+    public function testBuildJsonSchemaDocumentsDiscriminatorMapSubtypesWithoutOpenApiDiscriminator(): void
+    {
+        $definitions = $this->createDiscriminatorSchemaFactory()->buildSchema(DiscriminatedAnimal::class)->getDefinitions();
+
+        $this->assertSame([
+            ['$ref' => '#/definitions/DiscriminatedAnimal.DiscriminatedCat'],
+            ['$ref' => '#/definitions/DiscriminatedAnimal.DiscriminatedDog'],
+        ], $definitions['DiscriminatedAnimal']['oneOf']);
+        $this->assertArrayNotHasKey('discriminator', $definitions['DiscriminatedAnimal']);
+        $this->assertSame(['type' => 'string', 'enum' => ['cat']], $definitions['DiscriminatedAnimal.DiscriminatedCat']['properties']['species']);
+    }
+
+    public function testBuildSchemaDocumentsClassDeclaredInItsOwnDiscriminatorMap(): void
+    {
+        $schemaFactory = $this->createDiscriminatorSchemaFactory();
+        $schema = $schemaFactory->buildSchema(DiscriminatedGadget::class, 'json', Schema::TYPE_INPUT, null, new Schema(Schema::VERSION_OPENAPI), [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
+        $definitions = $schema->getDefinitions();
+        $rootDefinitionKey = $schema->getRootDefinitionKey();
+
+        $base = $definitions[$rootDefinitionKey];
+        $this->assertArrayNotHasKey('properties', $base);
+        $this->assertArrayNotHasKey('additionalProperties', $base);
+        $this->assertSame([
+            'type' => 'object',
+            'properties' => [
+                'name' => ['type' => 'string'],
+                'kind' => ['type' => 'string', 'enum' => ['gadget']],
+            ],
+            'additionalProperties' => false,
+            'required' => ['kind'],
+        ], json_decode(json_encode($base['oneOf'][0]), true));
+        $this->assertSame(['$ref' => '#/components/schemas/'.$rootDefinitionKey.'.DiscriminatedPhone'], $base['oneOf'][1]);
+        $this->assertSame('#/components/schemas/'.$rootDefinitionKey, $base['discriminator']['mapping']['gadget']);
+
+        $phone = $definitions[$rootDefinitionKey.'.DiscriminatedPhone'];
+        $this->assertSame(['type' => 'string', 'enum' => ['phone']], $phone['properties']['kind']);
+        $this->assertFalse($phone['additionalProperties']);
+    }
+
+    public function testBuildSchemaWithoutClassDiscriminatorResolverIgnoresDiscriminatorMap(): void
+    {
+        $schemaFactory = $this->createDiscriminatorSchemaFactory(false);
+        $definitions = $schemaFactory->buildSchema(DiscriminatedAnimal::class)->getDefinitions();
+
+        $this->assertSame(['DiscriminatedAnimal'], array_keys($definitions->getArrayCopy()));
+        $this->assertArrayNotHasKey('oneOf', $definitions['DiscriminatedAnimal']);
+        $this->assertArrayNotHasKey('discriminator', $definitions['DiscriminatedAnimal']);
+    }
+
+    private function createDiscriminatorSchemaFactory(bool $withClassDiscriminatorResolver = true): SchemaFactory
+    {
+        $propertyNames = [
+            DiscriminatedAnimal::class => ['name'],
+            DiscriminatedCat::class => ['lives', 'name'],
+            DiscriminatedDog::class => ['goodBoy', 'name'],
+            DiscriminatedGadget::class => ['name'],
+            DiscriminatedPhone::class => ['name', 'number'],
+        ];
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
+
+        $schemas = ['name' => [Type::string(), 'string'], 'lives' => [Type::int(), 'integer'], 'number' => [Type::string(), 'string'], 'goodBoy' => [Type::bool(), 'boolean']];
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => (new ApiProperty())->withNativeType($schemas[$property][0])->withReadable(true)->withWritable(true)->withSchema(['type' => $schemas[$property][1]]));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
+
+        return new SchemaFactory(
+            resourceMetadataFactory: $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            resourceClassResolver: $resourceClassResolver,
+            definitionNameFactory: new DefinitionNameFactory(),
+            classDiscriminatorResolver: $withClassDiscriminatorResolver ? new ClassDiscriminatorFromClassMetadata(new ClassMetadataFactory(new AttributeLoader())) : null,
+        );
     }
 
     public function testPartialUpdateRequiredPropertiesUseDistinctDefinitions(): void

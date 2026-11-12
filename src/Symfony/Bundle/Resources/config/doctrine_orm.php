@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Doctrine\Common\Metadata\Property\DoctrineDiscriminatorSerializerPropertyMetadataFactory;
+use ApiPlatform\Doctrine\Common\Serializer\Mapping\Loader\DoctrineDiscriminatorMappingLoader;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
@@ -212,6 +213,12 @@ return function (ContainerConfigurator $container) {
         ->args([
             service('doctrine'),
             service('api_platform.doctrine.orm.metadata.property.metadata_factory.inner'),
+        ]);
+
+    $services->set('api_platform.doctrine.orm.serializer.discriminator_mapping_loader', DoctrineDiscriminatorMappingLoader::class)
+        ->args([
+            service('doctrine'),
+            service('api_platform.resource_class_resolver'),
         ]);
 
     $services->set('api_platform.doctrine.orm.metadata.property.metadata_factory.discriminator_serializer', DoctrineDiscriminatorSerializerPropertyMetadataFactory::class)

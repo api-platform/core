@@ -643,4 +643,49 @@ class ApiPlatformExtensionTest extends TestCase
         $tags = $this->container->getDefinition('api_platform.doctrine_mongodb.odm.listener.http_cache.purge')->getTags();
         $this->assertSame([['event' => 'onFlush'], ['event' => 'postFlush']], $tags['doctrine_mongodb.odm.event_listener']);
     }
+
+    public function testDoctrineDiscriminatorMappingLoadersAreNotRegisteredByDefault(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.doctrine.orm.state.item_provider');
+        $this->assertNotContainerHasService('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        $this->assertContainerHasService('api_platform.doctrine_mongodb.odm.state.item_provider');
+        $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
+    }
+
+    public function testDoctrineDiscriminatorMappingLoadersCanBeEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine'] = ['enabled' => true, 'discriminator_map' => true];
+        $config['api_platform']['doctrine_mongodb_odm'] = ['enabled' => true, 'discriminator_map' => true];
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        $this->assertContainerHasService('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
+        // Doctrine discriminator maps need resource polymorphism
+        $this->assertTrue($this->container->getParameter('api_platform.serializer.discriminator_map'));
+    }
+
+    public function testResourcePolymorphismIsDisabledByDefault(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $this->assertFalse($this->container->getParameter('api_platform.serializer.discriminator_map'));
+        $this->assertFalse($this->container->getParameter('api_platform.serializer.default_context')['discriminator_map']);
+        $this->assertFalse($this->container->hasAlias('api_platform.serializer.class_discriminator_resolver'));
+    }
+
+    public function testResourcePolymorphismCanBeEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['serializer']['discriminator_map'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->getParameter('api_platform.serializer.default_context')['discriminator_map']);
+        $this->assertSame('serializer.mapping.class_discriminator_resolver', (string) $this->container->getAlias('api_platform.serializer.class_discriminator_resolver'));
+    }
 }

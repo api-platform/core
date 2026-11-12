@@ -172,7 +172,7 @@ return function (ContainerConfigurator $container) {
             null,
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
-            [],
+            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
@@ -190,7 +190,7 @@ return function (ContainerConfigurator $container) {
             null,
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
-            [],
+            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])

@@ -36,6 +36,8 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\TypeInfo\Type;
 
 use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
@@ -1212,4 +1214,81 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertSame('#dummy', $doc['hydra:supportedClass'][0]['@id']);
         $this->assertNotEmpty($doc['hydra:supportedClass'][0]['hydra:supportedProperty']);
     }
+
+    public function testSubtypeDoesNotRedefineTheClassOfAResourceWithTheSameShortName(): void
+    {
+        $documentation = new Documentation(new ResourceNameCollection([HydraDiscriminatedVehicle::class, HydraDiscriminatedOther::class]), 'Test Api', 'test', '0.0.0');
+
+        $propertyNames = [
+            HydraDiscriminatedVehicle::class => ['name'],
+            HydraDiscriminatedCar::class => ['name', 'doors'],
+            HydraDiscriminatedTruck::class => ['name', 'payload'],
+            HydraDiscriminatedHeavyTruck::class => ['name', 'payload', 'axles'],
+            HydraDiscriminatedOther::class => ['title'],
+        ];
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+
+        $resourceMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->method('create')->willReturnCallback(static function (string $class): ResourceMetadataCollection {
+            // An unrelated resource is named after a subtype of the discriminated resource
+            $shortName = HydraDiscriminatedOther::class === $class ? 'HydraDiscriminatedTruck' : 'HydraDiscriminatedVehicle';
+
+            return new ResourceMetadataCollection($class, [(new ApiResource())->withShortName($shortName)->withOperations(new Operations(['get' => (new Get())->withShortName($shortName)]))]);
+        });
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
+
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturn('/doc');
+
+        $mappings = [
+            HydraDiscriminatedVehicle::class => new ClassDiscriminatorMapping('kind', ['car' => HydraDiscriminatedCar::class, 'truck' => HydraDiscriminatedTruck::class]),
+            HydraDiscriminatedTruck::class => new ClassDiscriminatorMapping('size', ['heavy' => HydraDiscriminatedHeavyTruck::class]),
+        ];
+        $classDiscriminatorResolver = $this->createStub(ClassDiscriminatorResolverInterface::class);
+        $classDiscriminatorResolver->method('getMappingForClass')->willReturnCallback(static fn (string $class): ?ClassDiscriminatorMapping => $mappings[$class] ?? null);
+
+        $documentationNormalizer = new DocumentationNormalizer($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $urlGenerator, null, [], true, $classDiscriminatorResolver);
+
+        $classes = array_values(array_filter($documentationNormalizer->normalize($documentation)['hydra:supportedClass'], static fn (array $class): bool => str_starts_with($class['@id'], '#HydraDiscriminated')));
+        $properties = static fn (array $class): array => array_column(array_column($class['hydra:supportedProperty'], 'hydra:property'), '@id');
+
+        $this->assertSame(['#HydraDiscriminatedVehicle', '#HydraDiscriminatedTruck', '#HydraDiscriminatedCar', '#HydraDiscriminatedHeavyTruck'], array_column($classes, '@id'));
+
+        // The class of the resource is left untouched
+        $this->assertArrayNotHasKey('subClassOf', $classes[1]);
+        $this->assertSame(['#HydraDiscriminatedTruck/title'], $properties($classes[1]));
+
+        $this->assertSame('#HydraDiscriminatedVehicle', $classes[2]['subClassOf']);
+        $this->assertSame(['#HydraDiscriminatedCar/doors'], $properties($classes[2]));
+
+        // The subtypes of the undocumented subtype extend the resource and support its properties
+        $this->assertSame('#HydraDiscriminatedVehicle', $classes[3]['subClassOf']);
+        $this->assertSame(['#HydraDiscriminatedHeavyTruck/payload', '#HydraDiscriminatedHeavyTruck/axles'], $properties($classes[3]));
+    }
+}
+
+class HydraDiscriminatedVehicle
+{
+}
+
+class HydraDiscriminatedCar extends HydraDiscriminatedVehicle
+{
+}
+
+class HydraDiscriminatedTruck extends HydraDiscriminatedVehicle
+{
+}
+
+class HydraDiscriminatedHeavyTruck extends HydraDiscriminatedTruck
+{
+}
+
+class HydraDiscriminatedOther
+{
 }
