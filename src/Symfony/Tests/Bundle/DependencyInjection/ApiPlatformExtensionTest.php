@@ -29,14 +29,19 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\AI\McpBundle\McpBundle;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 class ApiPlatformExtensionTest extends TestCase
@@ -184,6 +189,24 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testObjectMapperGateDoesNotAutoloadTranslationCommands(): void
+    {
+        spl_autoload_register(static function (string $class): void {
+            if ('Symfony\\Component\\Translation\\Command\\TranslationExtractCommand' === $class || FrameworkTranslationExtractCommand::class === $class) {
+                throw new \Error(\sprintf('Class "%s" must not be autoloaded.', $class));
+            }
+        }, true, true);
+
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        self::assertSame(
+            class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle']),
+            $this->container->hasDefinition('api_platform.object_mapper.metadata_factory')
+        );
+    }
+
     public function testCommonConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
@@ -251,6 +274,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertServiceHasTags('api_platform.cache.route_name_resolver', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.symfony.iri_converter.skolem', ['kernel.reset']);
         $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
@@ -451,6 +475,16 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHasService('api_platform.mcp.state_provider.parameter_validator');
     }
 
+    public function testMercurePublisherIsReset(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['mercure']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('kernel.reset'));
+    }
+
     public function testItRegistersMetadataConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
@@ -593,5 +627,20 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHasService('api_platform.doctrine.listener.http_cache.purge');
         $this->assertContainerHasService('api_platform.http_cache_purger.processor.add_tags');
         $this->assertContainerHasAlias('api_platform.http_cache.purger');
+    }
+
+    public function testHttpCachePurgeListenerRegisteredForMongoDbOdmWhenInvalidationEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        $config['api_platform']['doctrine']['enabled'] = false;
+        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.doctrine_mongodb.odm.listener.http_cache.purge');
+        $this->assertNotContainerHasService('api_platform.doctrine.listener.http_cache.purge');
+
+        $tags = $this->container->getDefinition('api_platform.doctrine_mongodb.odm.listener.http_cache.purge')->getTags();
+        $this->assertSame([['event' => 'onFlush'], ['event' => 'postFlush']], $tags['doctrine_mongodb.odm.event_listener']);
     }
 }

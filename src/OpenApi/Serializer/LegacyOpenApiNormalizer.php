@@ -41,13 +41,20 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         }
 
         $openapi['openapi'] = '3.0.0';
+        unset($openapi['jsonSchemaDialect'], $openapi['webhooks']);
 
         foreach ($openapi['components']['schemas'] ?? [] as $name => $component) {
             $openapi['components']['schemas'][$name] = $this->downgradeSchema($component);
         }
 
         foreach ($openapi['paths'] ?? [] as $path => $operations) {
-            $openapi['paths'][$path] = $this->downgradePathItem($operations);
+            if ([] === $pathItem = $this->downgradePathItem($operations)) {
+                unset($openapi['paths'][$path]);
+
+                continue;
+            }
+
+            $openapi['paths'][$path] = $pathItem;
         }
 
         return $openapi;
@@ -68,6 +75,8 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         if (!\is_array($pathItem)) {
             return $pathItem;
         }
+
+        unset($pathItem['query']);
 
         foreach ($pathItem as $method => $operation) {
             if (!\is_array($operation)) {
@@ -126,6 +135,25 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
             if ($nullable) {
                 $schema['nullable'] = true;
             }
+        }
+
+        foreach (['oneOf', 'anyOf'] as $key) {
+            if (!\is_array($schema[$key] ?? null)) {
+                continue;
+            }
+
+            $members = array_values(array_filter($schema[$key], static fn ($member) => ['type' => 'null'] !== $member));
+            if (\count($members) === \count($schema[$key])) {
+                continue;
+            }
+
+            unset($schema[$key]);
+            if (1 === \count($members) && !isset($members[0]['$ref'])) {
+                $schema += $members[0];
+            } elseif ([] !== $members) {
+                $schema[$key] = $members;
+            }
+            $schema['nullable'] = true;
         }
 
         if (\array_key_exists('examples', $schema)) {

@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\Exception;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\StatusAwareExceptionInterface;
@@ -32,6 +33,7 @@ use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 class ErrorRenderer
@@ -192,6 +194,10 @@ class ErrorRenderer
         }
 
         if ($exception instanceof RequestExceptionInterface || $exception instanceof InvalidUriVariableException) {
+            return 400;
+        }
+
+        if ($exception instanceof SerializerExceptionInterface || $exception instanceof InvalidArgumentException) {
             return 400;
         }
 

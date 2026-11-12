@@ -36,6 +36,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SubresourceOrganization;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Doctrine\Deprecations\Deprecation;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SubResourceTest extends ApiTestCase
@@ -171,6 +172,28 @@ final class SubResourceTest extends ApiTestCase
             'content' => '42',
             'relatedQuestions' => ['/questions/1'],
         ]);
+    }
+
+    public function testOneToOneSubresourceDoesNotTriggerArbitraryJoinDeprecation(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('OneToOneSubresource fixtures are ORM-only.');
+        }
+
+        $this->seedOneToOneSubresource();
+
+        Deprecation::enableTrackingDeprecations();
+
+        try {
+            self::createClient()->request('GET', '/one_to_one_subresource_questions/1/answer', [
+                'headers' => ['Accept' => 'application/ld+json'],
+            ]);
+
+            $this->assertResponseStatusCodeSame(200);
+            $this->assertSame(0, Deprecation::getTriggeredDeprecations()['https://github.com/doctrine/orm/issues/12192'] ?? 0);
+        } finally {
+            Deprecation::disable();
+        }
     }
 
     public function testOneToOneSubresourceExposesInverseSideBackIri(): void

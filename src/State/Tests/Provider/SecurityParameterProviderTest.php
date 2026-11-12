@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
@@ -83,5 +84,47 @@ final class SecurityParameterProviderTest extends TestCase
             $this->assertSame('You are not admin.', $exception->getMessage());
             $this->assertSame('You are not admin.', $exception->getDetail());
         }
+    }
+
+    public function testTargetResourceIsNotReusedForTheNextParameter(): void
+    {
+        $operation = new GetCollection(class: \stdClass::class, parameters: [
+            'owner' => new QueryParameter(key: 'owner', security: 'is_granted("filter_owner")', default: '1', extraProperties: ['resource_class' => 'User']),
+            'title' => new QueryParameter(key: 'title', security: 'is_granted("filter_title")', default: 'foo'),
+        ]);
+        $decorated = $this->createStub(ProviderInterface::class);
+
+        $resourceClasses = [];
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturnCallback(static function (string $resourceClass) use (&$resourceClasses): bool {
+            $resourceClasses[] = $resourceClass;
+
+            return true;
+        });
+
+        (new SecurityParameterProvider($decorated, $resourceAccessChecker))->provide($operation, [], ['resource_class' => \stdClass::class]);
+
+        $this->assertSame(['User', \stdClass::class], $resourceClasses);
+    }
+
+    public function testTargetResourceOfALinkIsNotReusedForTheNextParameter(): void
+    {
+        $operation = new GetCollection(class: \stdClass::class, parameters: [
+            'barId' => new Link(key: 'barId', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
+            'title' => new QueryParameter(key: 'title', security: 'is_granted("filter_title")', default: 'foo'),
+        ]);
+        $decorated = $this->createStub(ProviderInterface::class);
+
+        $resourceClasses = [];
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturnCallback(static function (string $resourceClass) use (&$resourceClasses): bool {
+            $resourceClasses[] = $resourceClass;
+
+            return true;
+        });
+
+        (new SecurityParameterProvider($decorated, $resourceAccessChecker))->provide($operation, [], ['resource_class' => \stdClass::class]);
+
+        $this->assertSame([\stdClass::class], $resourceClasses);
     }
 }

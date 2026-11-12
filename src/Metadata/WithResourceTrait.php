@@ -29,7 +29,8 @@ trait WithResourceTrait
                 && null === $self->{$method}()
                 && null !== $val = $resource->{$method}()
             ) {
-                $self = $self->{"with{$matches[1]}"}($val);
+                $wither = 'canNegotiateContent' === $method ? 'withContentNegotiation' : "with{$matches[1]}";
+                $self = $self->{$wither}($val);
             }
         }
 

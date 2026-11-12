@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\EmptyValueParameterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -28,6 +29,7 @@ use Doctrine\ORM\QueryBuilder;
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use EmptyValueParameterTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -41,6 +43,10 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
+        if ($this->ignoreEmptyValue($parameter, $value)) {
+            return;
+        }
+
         if (null === $parameter->getProperty()) {
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
@@ -49,7 +55,7 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $alias = $queryBuilder->getRootAliases()[0];
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
 
         if (ComparisonFilter::OPERATOR_BETWEEN === ($context['operator'] ?? null)) {
             $whereClause = $context['whereClause'] ?? 'andWhere';

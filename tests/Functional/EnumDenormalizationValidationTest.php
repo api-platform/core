@@ -65,6 +65,26 @@ final class EnumDenormalizationValidationTest extends ApiTestCase
         $this->assertNotNull($genderViolation, 'Expected a constraint violation on "gender" property.');
     }
 
+    /**
+     * A backed enum property without any validation constraint still answers 422 (not 400) on an
+     * invalid value: the enum type restricts the accepted values on its own.
+     *
+     * @see https://github.com/api-platform/core/issues/8641
+     */
+    public function testInvalidBackedEnumValueWithoutConstraintProducesValidationViolation(): void
+    {
+        $response = static::createClient()->request('POST', '/enum_validation_resources_without_constraint', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['genderWithoutConstraint' => 'unknown'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
+
+        $content = $response->toArray(false);
+        $this->assertNotNull($this->findViolation($content['violations'] ?? [], 'genderWithoutConstraint'));
+    }
+
     public function testInvalidBackedEnumValueWithCollectDenormalizationErrors(): void
     {
         $response = static::createClient()->request('POST', '/enum_validation_resources_collect', [

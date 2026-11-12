@@ -118,10 +118,12 @@ use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Mcp\Capability\Registry\Loader as McpLoader;
 use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory as McpSchemaFactory;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
 use ApiPlatform\Mcp\Security\PolicyAccessChecker;
 use ApiPlatform\Mcp\Server\Handler;
+use ApiPlatform\Mcp\Server\McpAppsConfigurator;
 use ApiPlatform\Mcp\State\StructuredContentProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -831,11 +833,11 @@ class ApiPlatformProvider extends ServiceProvider
                 oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl', null),
                 oAuthScopes: $config->get('api-platform.swagger_ui.oauth.scopes', []),
                 apiKeys: $config->get('api-platform.swagger_ui.apiKeys', []),
-                contactName: $config->get('api-platform.swagger_ui.contact.name', ''),
-                contactUrl: $config->get('api-platform.swagger_ui.contact.url', ''),
-                contactEmail: $config->get('api-platform.swagger_ui.contact.email', ''),
-                licenseName: $config->get('api-platform.swagger_ui.license.name', ''),
-                licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
+                contactName: $config->get('api-platform.swagger_ui.contact.name'),
+                contactUrl: $config->get('api-platform.swagger_ui.contact.url'),
+                contactEmail: $config->get('api-platform.swagger_ui.contact.email'),
+                licenseName: $config->get('api-platform.swagger_ui.license.name'),
+                licenseUrl: $config->get('api-platform.swagger_ui.license.url'),
                 persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
                 tags: $config->get('api-platform.openapi.tags', []),
@@ -976,6 +978,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
@@ -1052,14 +1055,14 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app) {
-            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
+            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class), (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false));
         });
 
         if (interface_exists(FieldsBuilderEnumInterface::class)) {
             $this->registerGraphQl();
         }
 
-        if (class_exists(McpController::class)) {
+        if (class_exists(McpController::class) && $this->app['config']->get('api-platform.mcp.enabled', true)) {
             $this->registerMcp();
         }
 
@@ -1086,6 +1089,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
             $defaultContext[JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID] = (bool) $config->get('api-platform.jsonapi.allow_client_generated_id', false);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
             $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', false);
 
             return new JsonApiItemNormalizer(
@@ -1109,6 +1113,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(JsonApiItemDenormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
 
             return new JsonApiItemDenormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -1278,14 +1283,28 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ToolInputSchemaFactory::class, static function (Application $app) {
+            return new ToolInputSchemaFactory(
+                $app->make(McpSchemaFactory::class)
+            );
+        });
+
         $this->app->singleton(McpLoader::class, static function (Application $app) {
             return new McpLoader(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(McpSchemaFactory::class)
+                $app->make(McpSchemaFactory::class),
+                $app->make(ToolInputSchemaFactory::class)
             );
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
+
+        $this->app->singleton(McpAppsConfigurator::class, static function (Application $app) {
+            return new McpAppsConfigurator(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+        });
 
         $this->app->singleton(PolicyAccessChecker::class, static function (Application $app) {
             return new PolicyAccessChecker(
@@ -1328,6 +1347,8 @@ class ApiPlatformProvider extends ServiceProvider
 
             $builder->addRequestHandler($app->make(Handler::class));
 
+            $app->make(McpAppsConfigurator::class)($builder);
+
             return $builder;
         });
 
@@ -1367,7 +1388,9 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ProviderInterface::class),
                 $app->make(StructuredContentProcessor::class),
                 $app->make(RequestStack::class),
-                $app->make(LoggerInterface::class)
+                $app->make(ToolInputSchemaFactory::class),
+                $app->make(LoggerInterface::class),
+                $app['config']->get('api-platform.exception_to_status', [])
             );
         });
 

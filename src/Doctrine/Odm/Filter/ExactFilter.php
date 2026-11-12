@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\EmptyValueParameterTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
@@ -32,6 +33,7 @@ use Doctrine\ODM\MongoDB\Mapping\MappingException;
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use EmptyValueParameterTrait;
     use ManagerRegistryAwareTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
@@ -50,6 +52,10 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
+        if ($this->ignoreEmptyValue($parameter, $value)) {
+            return;
+        }
+
         if (null === $parameter->getProperty()) {
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
@@ -65,7 +71,7 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
         $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;

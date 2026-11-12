@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
@@ -34,6 +36,12 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
             filter: new ExactFilter(),
             property: 'quantity',
             nativeType: new BuiltinType(TypeIdentifier::INT),
+            castToNativeType: true,
+        ),
+        'quantities' => new QueryParameter(
+            filter: new ExactFilter(),
+            property: 'quantity',
+            nativeType: new CollectionType(new GenericType(new BuiltinType(TypeIdentifier::ARRAY), new BuiltinType(TypeIdentifier::INT)), true),
             castToNativeType: true,
         ),
         'ratio' => new QueryParameter(

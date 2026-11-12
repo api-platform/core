@@ -15,6 +15,7 @@ namespace Workbench\App\Models;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new Post(
+            normalizationContext: [
+                'groups' => [
+                    'delivery_request:read',
+                ],
+            ],
+            denormalizationContext: [
+                'groups' => [
+                    'delivery_request:write',
+                ],
+            ]
+        ),
+        new Patch(
             normalizationContext: [
                 'groups' => [
                     'delivery_request:read',

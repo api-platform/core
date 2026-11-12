@@ -76,4 +76,24 @@ final class TypeConfusionRelationIriTest extends ApiTestCase
             )
         );
     }
+
+    public function testWrongTypedIriIsRejectedOnFooDeclaredRelationWithJsonApi(): void
+    {
+        $response = self::createClient()->request('POST', '/type-confusion/targets', [
+            'headers' => ['Content-Type' => 'application/vnd.api+json', 'Accept' => 'application/vnd.api+json'],
+            'json' => ['data' => [
+                'type' => 'Target',
+                'attributes' => ['name' => 'attack'],
+                'relationships' => ['relation' => ['data' => ['type' => 'Bar', 'id' => '/type-confusion/bars/1']]],
+            ]],
+        ]);
+
+        $this->assertResponseStatusCodeSame(
+            400,
+            \sprintf(
+                'Type confusion: server accepted a Bar IRI on a Foo-typed relation. Body: %s',
+                $response->getContent(false)
+            )
+        );
+    }
 }

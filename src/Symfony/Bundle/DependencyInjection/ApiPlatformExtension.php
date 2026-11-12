@@ -54,6 +54,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ResourceMutatorInterface;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
@@ -70,7 +71,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
 use Symfony\AI\McpBundle\McpBundle;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -209,10 +209,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLinkSecurityConfiguration($loader, $config);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
-        // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service.
         // willBeAvailable mirrors FrameworkBundle's own gate: when symfony/object-mapper is in dev-only,
         // FrameworkBundle skips object_mapper.php and the "object_mapper" service we alias to does not exist.
-        if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
+        if (class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('state/object_mapper.php');
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }
@@ -275,6 +274,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             QueryCollection::class,
             NotExposed::class,
             HeaderParameter::class,
+            ScalarHeaderParameter::class,
             Post::class,
             GetCollection::class,
             Put::class,
@@ -716,14 +716,24 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('state/jsonapi.php');
 
         $useIriAsId = $config['jsonapi']['use_iri_as_id'];
+        $strictMemberNames = $config['jsonapi']['strict_member_names'] ?? false;
+
+        $container->getDefinition('api_platform.jsonapi.name_converter.reserved_attribute_name')->replaceArgument(1, $strictMemberNames);
+        $container->getDefinition('api_platform.jsonapi.json_schema.schema_factory')->replaceArgument(6, $strictMemberNames);
 
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
-        $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemNormalizer->replaceArgument(7, [
+            JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
+            JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
+        ]);
         $itemNormalizer->addArgument($useIriAsId);
         $itemNormalizer->addArgument(new Reference('api_platform.jsonapi.resource_linkage_resolver'));
 
         $itemDenormalizer = $container->getDefinition('api_platform.jsonapi.denormalizer.item');
-        $itemDenormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemDenormalizer->replaceArgument(7, [
+            JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false,
+            JsonApiItemNormalizer::STRICT_RESOURCE_TYPE => $config['jsonapi']['strict_resource_type'] ?? false,
+        ]);
         $itemDenormalizer->addArgument($useIriAsId);
     }
 
@@ -850,6 +860,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('doctrine_orm.php');
 
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/doctrine_orm.php');
+        }
+
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
         }
@@ -880,6 +894,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.odm.links_handler');
 
         $loader->load('doctrine_mongodb_odm.php');
+
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/doctrine_mongodb_odm.php');
+        }
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
@@ -899,6 +917,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_http_cache_purger.php');
+        }
+
+        if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
+            $loader->load('doctrine_odm_http_cache_purger.php');
         }
 
         $loader->load('state/http_cache_purger.php');

@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -167,8 +168,16 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getPropertyMetadataFactoryContext(ApiResource $resourceMetadata): array
     {
-        $normalizationGroups = $resourceMetadata->getNormalizationContext()[AbstractNormalizer::GROUPS] ?? null;
-        $denormalizationGroups = $resourceMetadata->getDenormalizationContext()[AbstractNormalizer::GROUPS] ?? null;
+        $normalizationGroups = ($resourceMetadata->getNormalizationContext() ?? [])[AbstractNormalizer::GROUPS] ?? null;
+        $denormalizationGroups = ($resourceMetadata->getDenormalizationContext() ?? [])[AbstractNormalizer::GROUPS] ?? null;
+
+        if (\is_string($normalizationGroups)) {
+            $normalizationGroups = [$normalizationGroups];
+        }
+        if (\is_string($denormalizationGroups)) {
+            $denormalizationGroups = [$denormalizationGroups];
+        }
+
         $propertyContext = [
             'normalization_groups' => $normalizationGroups,
             'denormalization_groups' => $denormalizationGroups,
@@ -255,7 +264,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $hydraOperations = [];
         foreach ($resourceMetadata->getOperations() as $operation) {
-            if (true === $operation->getHideHydraOperation()) {
+            if (true === $operation->getHideHydraOperation() || $operation instanceof NotExposed) {
                 continue;
             }
 

@@ -58,4 +58,29 @@ class ReservedAttributeNameConverterTest extends TestCase
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
     }
+
+    public static function strictPropertiesProvider(): array
+    {
+        return [
+            ['id', 'resourceId'],
+            ['type', 'resourceType'],
+            ['links', 'links'],
+            ['relationships', 'relationships'],
+            ['included', 'included'],
+            ['foo', 'foo'],
+            ['nameConverted', 'name_converted'],
+        ];
+    }
+
+    #[DataProvider('strictPropertiesProvider')]
+    public function testStrictMemberNamesNormalize(string $propertyName, string $expectedPropertyName): void
+    {
+        $this->assertSame($expectedPropertyName, (new ReservedAttributeNameConverter(new CustomConverter(), true))->normalize($propertyName));
+    }
+
+    #[DataProvider('strictPropertiesProvider')]
+    public function testStrictMemberNamesDenormalize(string $expectedPropertyName, string $propertyName): void
+    {
+        $this->assertSame($expectedPropertyName, (new ReservedAttributeNameConverter(new CustomConverter(), true))->denormalize($propertyName));
+    }
 }

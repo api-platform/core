@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
+use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationEntity;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
@@ -30,6 +33,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     operations: [
         new Get(),
         new Put(allowCreate: true),
+        new GetCollection(parameters: ['relation' => new QueryParameter(filter: new IriFilter(), property: 'related')]),
     ]
 )]
 #[Map(target: MappedResourceWithRelationEntity::class)]

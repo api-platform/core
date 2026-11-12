@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\FieldMapping;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -47,15 +48,16 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
 
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
 
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
         // Use precomputed ORM leaf metadata when available (nested properties),
         // otherwise resolve at runtime by walking the association chain.
+        // A leaf that is not an association (e.g. a nested backed enum column) has no target class: it is also resolved at runtime.
         $ormLeafMetadata = $this->getOrmLeafMetadata($parameter);
 
-        if (null === $ormLeafMetadata) {
+        if (!isset($ormLeafMetadata['association_target_class'])) {
             $ormLeafMetadata = $this->resolveLeafMetadataAtRuntime($queryBuilder, $resourceClass, $parameter->getProperty(), $property);
         }
 
@@ -68,7 +70,11 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
 
         // Collection associations (OneToMany/ManyToMany) require a JOIN to compare individual elements.
         if ($ormLeafMetadata['is_collection_valued']) {
-            $queryBuilder->join(\sprintf('%s.%s', $alias, $property), $parameterName);
+            if (Join::LEFT_JOIN === $this->joinTypeFor($context)) {
+                $queryBuilder->leftJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
+            } else {
+                $queryBuilder->innerJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
+            }
 
             if (is_iterable($value)) {
                 $queryBuilder
@@ -131,7 +137,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     }
 
     /**
-     * @return array{is_collection_valued: bool, association_target_class: string, identifier_type: ?string}|null
+     * @return array{is_collection_valued: bool, association_target_class: ?string, identifier_type: ?string}|null
      */
     private function getOrmLeafMetadata(mixed $parameter): ?array
     {

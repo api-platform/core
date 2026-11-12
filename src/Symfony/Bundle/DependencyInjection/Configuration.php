@@ -109,6 +109,14 @@ final class Configuration implements ConfigurationInterface
                             ->defaultFalse()
                             ->info('Allow client-generated IDs on JSON:API POST per https://jsonapi.org/format/#crud-creating-client-ids. Off by default to prevent id spoofing on public endpoints.')
                         ->end()
+                        ->booleanNode('strict_resource_type')
+                            ->defaultFalse()
+                            ->info('Require the "type" member of JSON:API request resource objects (400 when missing) and reject a "type" that does not match the endpoint resource on POST, PUT and PATCH (409 Conflict), per https://jsonapi.org/format/#crud-creating-responses-409.')
+                        ->end()
+                        ->booleanNode('strict_member_names')
+                            ->defaultFalse()
+                            ->info('Expose the "id" and "type" properties as "resourceId" and "resourceType" attributes instead of "_id" and "_type", which are not valid member names per https://jsonapi.org/format/#document-member-names. The "links", "relationships" and "included" properties are no longer renamed.')
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')
@@ -665,6 +673,17 @@ final class Configuration implements ConfigurationInterface
                 }
 
                 return $normalizedDefaults;
+            })
+            ->end()
+            ->validate()
+            ->always(static function (array $defaults): array {
+                foreach (['mcp', 'graph_ql_operations', 'state_options', 'links', 'openapi'] as $option) {
+                    if (null !== ($defaults[$option] ?? null) && ('openapi' !== $option || !\is_bool($defaults[$option]))) {
+                        throw new InvalidConfigurationException(\sprintf('The "defaults.%s" option is not supported, it needs objects. Set it on the resources instead.', $option));
+                    }
+                }
+
+                return $defaults;
             });
 
         $this->defineDefault($defaultsNode, new \ReflectionClass(ApiResource::class), $nameConverter);
@@ -676,6 +695,18 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('parameters')
                     ->info('Global parameters applied to all resources and operations.')
                     ->useAttributeAsKey('parameter_class')
+                    ->validate()
+                        ->always(static function (array $parameters): array {
+                            foreach ($parameters as $name => $parameter) {
+                                $class = $parameter['class'] ?? $name;
+                                if ((isset($parameter['class']) || str_contains((string) $name, '\\')) && !is_subclass_of($class, Parameter::class)) {
+                                    throw new InvalidConfigurationException(\sprintf('The default parameter "%s" must reference a class extending "%s", "%s" given.', $name, Parameter::class, $class));
+                                }
+                            }
+
+                            return $parameters;
+                        })
+                    ->end()
                     ->prototype('array')
                         ->ignoreExtraKeys(false)
                         ->children()

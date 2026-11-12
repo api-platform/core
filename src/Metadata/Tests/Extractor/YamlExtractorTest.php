@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -68,6 +69,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
@@ -144,6 +147,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
@@ -218,6 +223,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => ['someirischema'],
@@ -251,6 +258,8 @@ class YamlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => GetCollection::class,
+                            'method' => null,
+                            'routeName' => null,
                             'uriTemplate' => '/users/{author}/programs{._format}',
                             'shortName' => null,
                             'description' => 'User programs',
@@ -337,6 +346,8 @@ class YamlExtractorTest extends TestCase
                         [
                             'name' => null,
                             'class' => Get::class,
+                            'method' => null,
+                            'routeName' => null,
                             'uriTemplate' => '/users/{userId}/programs/{id}{._format}',
                             'shortName' => null,
                             'description' => 'User programs',
@@ -475,6 +486,8 @@ class YamlExtractorTest extends TestCase
                     'securityPostValidation' => null,
                     'securityPostValidationMessage' => null,
                     'queryParameterValidationEnabled' => null,
+                    'strictQueryParameterValidation' => null,
+                    'hideHydraOperation' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
@@ -539,6 +552,15 @@ class YamlExtractorTest extends TestCase
         $this->assertEquals('john-doe', $operation->getParameters()[0]->getExample());
     }
 
+    public function testOpenApiParametersAllowReserved(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/openapi-allow-reserved.yaml']))->getResources();
+        $operation = $resources[Program::class][0]['operations'][0];
+
+        $this->assertTrue($operation['openapi']->getParameters()[0]->getAllowReserved());
+        $this->assertTrue($operation['parameters']['q']->getOpenApi()->getAllowReserved());
+    }
+
     public function testOpenApiParameterWithoutNameThrowsClearException(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -564,6 +586,19 @@ class YamlExtractorTest extends TestCase
         $this->assertFalse($resources[Program::class][0]['operations'][0]['output']);
     }
 
+    public function testHideHydraOperationAndStrictQueryParameterValidation(): void
+    {
+        $resources = (new YamlResourceExtractor([__DIR__.'/yaml/hide-hydra-operation.yaml']))->getResources()[Program::class];
+
+        $this->assertTrue($resources[0]['hideHydraOperation']);
+        $this->assertTrue($resources[0]['strictQueryParameterValidation']);
+        $this->assertTrue($resources[0]['operations'][0]['hideHydraOperation']);
+        $this->assertTrue($resources[0]['operations'][0]['strictQueryParameterValidation']);
+        $this->assertTrue($resources[1]['operations'][0]['hideHydraOperation']);
+        $this->assertFalse($resources[2]['operations'][0]['hideHydraOperation']);
+        $this->assertFalse($resources[2]['operations'][0]['strictQueryParameterValidation']);
+    }
+
     public function testInputAndOutputAreStrings(): void
     {
         $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-strings.yaml']);
@@ -579,6 +614,14 @@ class YamlExtractorTest extends TestCase
 
         $this->assertArrayHasKey('output', $resources[Program::class][0]['operations'][0]);
         $this->assertSame(Program::class.'Output', $resources[Program::class][0]['operations'][0]['output']);
+    }
+
+    public function testScalarTypes(): void
+    {
+        $resource = (new YamlResourceExtractor([__DIR__.'/yaml/scalar-types.yaml']))->getResources()[Program::class][0];
+
+        $this->assertFalse($resource['paginationEnabled']);
+        $this->assertSame(['class' => Program::class, 'name' => 'ProgramInput'], $resource['input']);
     }
 
     public function testExtendingYamlResourcesByMultipleYamlFiles(): void
@@ -602,6 +645,14 @@ class YamlExtractorTest extends TestCase
         $this->assertSame('is_granted("ROLE_ADMIN")', $resources[User::class][1]['security']);
         $this->assertArrayHasKey('operations', $resources[User::class][1]);
         $this->assertCount(1, $resources[User::class][1]['operations']);
+    }
+
+    public function testOperationMethodAndRouteName(): void
+    {
+        $operations = (new YamlResourceExtractor([__DIR__.'/yaml/operation-method-route-name.yaml']))->getResources()[Program::class][0]['operations'];
+
+        $this->assertSame('PATCH', $operations[0]['method']);
+        $this->assertSame('program_post_publication', $operations[1]['routeName']);
     }
 
     public function testContainerParametersAreResolved(): void
@@ -644,5 +695,13 @@ class YamlExtractorTest extends TestCase
         return [
             [__DIR__.'/yaml/invalid/invalid_resources.yaml', '"resources" setting is expected to be null or an array, string given in "'.__DIR__.'/yaml/invalid/invalid_resources.yaml".'],
         ];
+    }
+
+    #[IgnoreDeprecations]
+    public function testQueryParameterValidateIsDeprecated(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: The "queryParameterValidate" option has no effect, it is deprecated and will be removed in 6.0. Use "queryParameterValidationEnabled" instead.');
+
+        (new YamlResourceExtractor([__DIR__.'/yaml/query-parameter-validate.yaml']))->getResources();
     }
 }

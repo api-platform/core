@@ -1,0 +1,10 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   operations:
+                custom_patch:
+                    class: ApiPlatform\Metadata\HttpOperation
+                    method: PATCH
+                    uriTemplate: /programs/{id}/custom
+                post_publication:
+                    class: ApiPlatform\Metadata\Post
+                    routeName: program_post_publication

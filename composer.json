@@ -38,7 +38,7 @@
         "doctrine/orm": "<2.14.0 || 3.0.0",
         "doctrine/mongodb-odm": "<2.4",
         "doctrine/persistence": "<1.3",
-        "symfony/framework-bundle": "6.4.6 || 7.0.6",
+        "symfony/framework-bundle": "<7.4",
         "symfony/object-mapper": "<7.3.4",
         "symfony/var-exporter": "<6.1.1",
         "phpunit/phpunit": "<9.5",
@@ -50,7 +50,8 @@
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev",
             "dev-4.2": "4.2.x-dev",
-            "dev-main": "5.0.x-dev"
+            "dev-5.0": "5.0.x-dev",
+            "dev-main": "5.1.x-dev"
         },
         "symfony": {
             "require": "^7.4 || ^8.0"
@@ -144,7 +145,7 @@
         "jangregor/phpstan-prophecy": "^2.1.11",
         "justinrainbow/json-schema": "^6.5.2",
         "laravel/framework": "^11.0 || ^12.0 || ^13.0",
-        "mcp/sdk": "^0.8",
+        "mcp/sdk": "^0.8 || ^0.9",
         "orchestra/testbench": "^10.9 || ^11.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpstan/extension-installer": "^1.1",
@@ -177,10 +178,10 @@
         "symfony/intl": "^7.4 || ^8.0",
         "symfony/json-streamer": "^7.4 || ^8.0",
         "symfony/maker-bundle": "^1.24",
-        "symfony/mcp-bundle": "^0.13",
+        "symfony/mcp-bundle": "^0.13 || ^0.15",
         "symfony/mercure-bundle": "^0.5",
         "symfony/messenger": "^7.4 || ^8.0",
-        "symfony/object-mapper": "^7.4 || ^8.0",
+        "symfony/object-mapper": "^7.4.4 || ^8.0.4",
         "symfony/routing": "^7.4 || ^8.0",
         "symfony/security-bundle": "^7.4 || ^8.0",
         "symfony/security-core": "^7.4 || ^8.0",
@@ -195,6 +196,7 @@
         "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
+        "ext-deepclone": "To speed up the PHP files metadata cache with symfony/var-exporter 8.1+ (install symfony/deepclone with PIE).",
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "opensearch-project/opensearch-php": "To support OpenSearch (^2.5).",

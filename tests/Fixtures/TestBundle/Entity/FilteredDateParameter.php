@@ -47,6 +47,10 @@ use Doctrine\ORM\Mapping as ORM;
             property: 'createdAt',
             openApi: new Parameter('date_old_way', 'query', allowEmptyValue: true)
         ),
+        'createdAtFormatted' => new QueryParameter(
+            filter: new DateFilter(format: 'd/m/Y'),
+            property: 'createdAt',
+        ),
         'createdAtComparison' => new QueryParameter(
             filter: new ComparisonFilter(new ExactFilter()),
             property: 'createdAt',

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpAppExample;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpResourceExample;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpToolAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpTools;
@@ -21,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpWithMarkdown;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\McpBook;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Mcp\Schema\Extension\Apps\McpApps;
 use Symfony\AI\McpBundle\McpBundle;
 
 class McpTest extends ApiTestCase
@@ -41,6 +43,7 @@ class McpTest extends ApiTestCase
             McpTools::class,
             McpWithMarkdown::class,
             McpResourceExample::class,
+            McpAppExample::class,
         ];
     }
 
@@ -107,6 +110,47 @@ class McpTest extends ApiTestCase
         self::assertStringContainsString('978-1234567890', $content);
     }
 
+    public function testInitializeAdvertisesMcpAppsExtension(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
+        }
+
+        if (!$this->isPsr17FactoryAvailable()) {
+            $this->markTestSkipped('PSR-17 HTTP factory implementation not available (required for MCP)');
+        }
+
+        $res = self::createClient()->request('POST', '/mcp', [
+            'headers' => [
+                'Accept' => 'application/json, text/event-stream',
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'jsonrpc' => '2.0',
+                'id' => 1,
+                'method' => 'initialize',
+                'params' => [
+                    'protocolVersion' => '2024-11-05',
+                    'clientInfo' => [
+                        'name' => 'ApiPlatform Test Suite',
+                        'version' => '1.0',
+                    ],
+                    'capabilities' => [],
+                ],
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(
+            ['mimeTypes' => [McpApps::MIME_TYPE]],
+            $res->toArray()['result']['capabilities']['extensions'][McpApps::EXTENSION_ID] ?? null
+        );
+    }
+
     public function testBasicProcessor(): void
     {
         if (!class_exists(McpBundle::class)) {
@@ -125,7 +169,6 @@ class McpTest extends ApiTestCase
         $sessionId = $this->initializeMcpSession($client);
 
         $res = $this->callTool($client, $sessionId, 'update_book_status', [
-            'id' => null,
             'isbn' => '123',
             'title' => 'Test Book',
             'status' => 'pending',
@@ -240,6 +283,33 @@ class McpTest extends ApiTestCase
         } else {
             self::assertResponseIsSuccessful();
         }
+    }
+
+    public function testToolCallRejectsArgumentsNotMatchingInputSchema(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
+        }
+
+        if (!$this->isPsr17FactoryAvailable()) {
+            $this->markTestSkipped('PSR-17 HTTP factory implementation not available (required for MCP)');
+        }
+
+        $client = self::createClient();
+        $sessionId = $this->initializeMcpSession($client);
+
+        $res = $this->callTool($client, $sessionId, 'validate_input', [
+            'name' => ['not', 'a', 'string'],
+        ]);
+
+        $result = $res->toArray(false);
+        self::assertArrayHasKey('error', $result);
+        self::assertSame(-32602, $result['error']['code']);
+        self::assertStringContainsString("Invalid parameters for tool 'validate_input'", $result['error']['message']);
     }
 
     public function testValidationSuccess(): void

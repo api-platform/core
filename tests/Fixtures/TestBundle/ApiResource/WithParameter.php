@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
@@ -168,6 +169,13 @@ use Webmozart\Assert\Assert as Assertion;
         'Req' => new HeaderParameter(required: true, schema: ['type' => 'string']),
     ],
     provider: [self::class, 'headerProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_scalar_not_blank',
+    parameters: [
+        'Foo' => new ScalarHeaderParameter(required: true, constraints: [new Assert\NotBlank()]),
+    ],
+    provider: [self::class, 'noopProvider']
 )]
 #[GetCollection(
     uriTemplate: 'header_integer',

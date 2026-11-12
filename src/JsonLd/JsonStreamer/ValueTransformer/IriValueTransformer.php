@@ -18,10 +18,9 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
 
-final class IriValueTransformer implements ValueTransformerInterface
+final class IriValueTransformer implements PropertyValueTransformerInterface
 {
     public function __construct(
         private readonly IriConverterInterface $iriConverter,

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Expression;
@@ -54,6 +55,18 @@ use Symfony\Component\Validator\Constraints\Expression;
                     'value.getName() == "Test"',
                 ),
             ]
+        ),
+    ],
+)]
+#[GetCollection(
+    uriTemplate: '/companies-by-resolved-name/{name}/employees',
+    uriVariables: [
+        'name' => new Link(
+            identifiers: ['name'],
+            fromClass: Company::class,
+            toProperty: 'company',
+            provider: ReadLinkParameterProvider::class,
+            extraProperties: ['uri_template' => '/doctrine-company-by-name/{name}', 'write_uri_variable' => true],
         ),
     ],
 )]
