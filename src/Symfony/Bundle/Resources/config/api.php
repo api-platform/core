@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UriVariablesConverter;
+use ApiPlatform\Metadata\UriVariablesFromIriInterface;
 use ApiPlatform\Metadata\UriVariableTransformer\ApiResourceUriVariableTransformer;
 use ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer;
 use ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer;
@@ -303,6 +304,7 @@ return function (ContainerConfigurator $container) {
         ]);
 
     $services->alias(IriConverterInterface::class, 'api_platform.symfony.iri_converter');
+    $services->alias(UriVariablesFromIriInterface::class, 'api_platform.symfony.iri_converter');
 
     $services->set('api_platform.state.error_provider', ErrorProvider::class)
         ->arg('$debug', '%kernel.debug%')

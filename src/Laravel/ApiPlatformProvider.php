@@ -151,6 +151,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UriVariablesFromIriInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\OpenApi\Command\OpenApiCommand;
@@ -661,6 +662,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(IriConverterInterface::class, IriConverter::class);
+        $this->app->bind(UriVariablesFromIriInterface::class, IriConverter::class);
         $this->app->singleton(IriConverter::class, static function (Application $app) {
             return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(SkolemIriConverter::class), null, $app->make(OperationResourceClassResolverInterface::class));
         });

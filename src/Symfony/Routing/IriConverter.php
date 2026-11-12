@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
+use ApiPlatform\Metadata\UriVariablesFromIriInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\AttributesExtractor;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -45,7 +46,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class IriConverter implements IriConverterInterface
+final class IriConverter implements IriConverterInterface, UriVariablesFromIriInterface
 {
     use ClassInfoTrait;
     use ResourceClassInfoTrait;
@@ -64,6 +65,45 @@ final class IriConverter implements IriConverterInterface
      * {@inheritdoc}
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
+    {
+        [$dispatchOperation, $uriVariables] = $this->resolveIri($iri, $context, $operation);
+
+        // If a caller-provided GraphQl operation carries its own provider, dispatch through it
+        // so the user-defined Query(provider: X) wins over the route-matched HTTP operation.
+        if ($operation instanceof GraphQlOperation && null !== $operation->getProvider()) {
+            $dispatchOperation = $operation;
+        }
+
+        if (false === ($context['map_resource'] ?? null)) {
+            $dispatchOperation = $dispatchOperation->withMap(false);
+        }
+
+        if ($item = $this->provider->provide($dispatchOperation, $uriVariables, $context)) {
+            return $item;
+        }
+
+        throw new ItemNotFoundException(\sprintf('Item not found for "%s".', $iri));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUriVariablesFromIri(string $iri, array $context = [], ?Operation $operation = null): array
+    {
+        return $this->resolveIri($iri, $context, $operation)[1];
+    }
+
+    /**
+     * Matches the IRI against the router and resolves the item operation and its URI variables,
+     * without calling the state provider.
+     *
+     * @param array<string, mixed> $context
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return array{0: HttpOperation, 1: array<string, mixed>}
+     */
+    private function resolveIri(string $iri, array $context, ?Operation $operation): array
     {
         try {
             $parameters = $this->router->match($iri);
@@ -118,21 +158,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
-        // If a caller-provided GraphQl operation carries its own provider, dispatch through it
-        // so the user-defined Query(provider: X) wins over the route-matched HTTP operation.
-        if ($operation instanceof GraphQlOperation && null !== $operation->getProvider()) {
-            $dispatchOperation = $operation;
-        }
-
-        if (false === ($context['map_resource'] ?? null)) {
-            $dispatchOperation = $dispatchOperation->withMap(false);
-        }
-
-        if ($item = $this->provider->provide($dispatchOperation, $uriVariables, $context)) {
-            return $item;
-        }
-
-        throw new ItemNotFoundException(\sprintf('Item not found for "%s".', $iri));
+        return [$dispatchOperation, $uriVariables];
     }
 
     /**

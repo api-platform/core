@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Routing\IriConverter;
@@ -37,6 +38,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
 class IriConverterTest extends TestCase
@@ -421,6 +423,134 @@ class IriConverterTest extends TestCase
         $stateProviderProphecy->provide($operation, ['id' => 1], Argument::type('array'))->willReturn(null);
         $iriConverter = $this->getIriConverter($stateProviderProphecy, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
         $iriConverter->getResourceFromIri('/dummies/1');
+    }
+
+    public function testGetUriVariablesFromIri(): void
+    {
+        $operationName = 'operation_name';
+        $operation = (new Get())->withUriVariables(['id' => new Link()])->withName($operationName);
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_operation_name' => $operationName,
+            'id' => '1',
+        ]);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([$operationName => $operation])),
+        ]));
+
+        $stateProviderProphecy = $this->prophesize(ProviderInterface::class);
+        $stateProviderProphecy->provide(Argument::cetera())->shouldNotBeCalled();
+        $iriConverter = $this->getIriConverter($stateProviderProphecy, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
+        $this->assertSame(['id' => '1'], $iriConverter->getUriVariablesFromIri('/dummies/1'));
+    }
+
+    public function testGetUriVariablesFromIriUsesTheUriVariablesConverter(): void
+    {
+        $operationName = 'operation_name';
+        $operation = (new Get())->withUriVariables(['id' => new Link()])->withName($operationName)->withClass(Dummy::class);
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_operation_name' => $operationName,
+            'id' => '1',
+        ]);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([$operationName => $operation])),
+        ]));
+        $uriVariablesConverterProphecy = $this->prophesize(UriVariablesConverterInterface::class);
+        $uriVariablesConverterProphecy->convert(['id' => '1'], Dummy::class, Argument::withEntry('operation', $operation))->shouldBeCalled()->willReturn(['id' => 1]);
+
+        $stateProviderProphecy = $this->prophesize(ProviderInterface::class);
+        $stateProviderProphecy->provide(Argument::cetera())->shouldNotBeCalled();
+        $iriConverter = $this->getIriConverter($stateProviderProphecy, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy, $uriVariablesConverterProphecy->reveal());
+        $this->assertSame(['id' => 1], $iriConverter->getUriVariablesFromIri('/dummies/1'));
+    }
+
+    public function testGetUriVariablesFromIriWithCompositeIdentifiers(): void
+    {
+        $operationName = 'operation_name';
+        $operation = (new Get())->withUriVariables(['id' => (new Link())->withIdentifiers(['first', 'second'])->withCompositeIdentifier(true)])->withName($operationName);
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/composites/first=1;second=2')->shouldBeCalled()->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_operation_name' => $operationName,
+            'id' => 'first=1;second=2',
+        ]);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([$operationName => $operation])),
+        ]));
+
+        $stateProviderProphecy = $this->prophesize(ProviderInterface::class);
+        $stateProviderProphecy->provide(Argument::cetera())->shouldNotBeCalled();
+        $iriConverter = $this->getIriConverter($stateProviderProphecy, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
+        $this->assertSame(['first' => '1', 'second' => '2'], $iriConverter->getUriVariablesFromIri('/composites/first=1;second=2'));
+    }
+
+    public function testGetUriVariablesFromCollectionIri(): void
+    {
+        $operationName = 'operation_name';
+        $operation = (new GetCollection())->withName($operationName);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The iri "/dummies" references a collection not an item.');
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/dummies')->shouldBeCalled()->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_operation_name' => $operationName,
+        ]);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([$operationName => $operation])),
+        ]));
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
+        $iriConverter->getUriVariablesFromIri('/dummies');
+    }
+
+    public function testGetUriVariablesFromIriWithNoMatchingRoute(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No route matches "/unknown/1".');
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/unknown/1')->shouldBeCalled()->willThrow(new ResourceNotFoundException());
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy);
+        $iriConverter->getUriVariablesFromIri('/unknown/1');
+    }
+
+    public function testGetUriVariablesFromIriWithAnotherResourceOperation(): void
+    {
+        $operationName = 'operation_name';
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The iri "/dummies/1" does not reference the correct resource.');
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_operation_name' => $operationName,
+            'id' => '1',
+        ]);
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy);
+        $iriConverter->getUriVariablesFromIri('/dummies/1', [], (new Get())->withClass(RelatedDummy::class));
+    }
+
+    public function testGetUriVariablesFromIriWithMismatchingContextUriVariables(): void
+    {
+        $operationName = 'operation_name';
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The iri "/dummies/1" does not reference the correct resource.');
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_operation_name' => $operationName,
+            'id' => '1',
+        ]);
+
+        $iriConverter = $this->getIriConverter(null, $routerProphecy);
+        $iriConverter->getUriVariablesFromIri('/dummies/1', ['uri_variables' => ['id' => '2']]);
     }
 
     private function getMockedIriConverter(RouterInterface $router, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?IdentifiersExtractorInterface $identifiersExtractor = null, ?ResourceClassResolverInterface $resourceClassResolver = null, ?OperationMetadataFactoryInterface $operationMetadataFactory = null): IriConverter
