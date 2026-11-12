@@ -38,8 +38,8 @@ use ApiPlatform\Metadata\Link;
             uriTemplate: '/link_schema_parents_by_code/{parentCode}/children/{id}',
             uriVariables: [
                 'parentCode' => new Link(
-                    fromProperty: 'code',
-                    fromClass: LinkSchemaParent::class
+                    fromClass: LinkSchemaParent::class,
+                    identifiers: ['code'],
                 ),
                 'id' => new Link(
                     fromClass: LinkSchemaChild::class,

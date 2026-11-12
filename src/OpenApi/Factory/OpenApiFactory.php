@@ -1287,11 +1287,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             return $defaultSchema;
         }
 
-        $class = $link->getFromClass() ?? $link->getToClass();
-        $property = $link->getFromProperty() ?? $link->getToProperty() ?? $link->getParameterName();
-
         try {
-            $schema = $this->propertyMetadataFactory->create($class, $property)->getSchema();
+            $schema = $this->propertyMetadataFactory->create($link->getFromClass(), $identifiers[0])->getSchema();
         } catch (\Throwable) {
             return $defaultSchema;
         }

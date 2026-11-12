@@ -787,7 +787,7 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves a Dummy resource.',
             'Retrieves a Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])]
         ), $dummyPath->getGet());
 
         $this->assertEquals(new Operation(
@@ -821,7 +821,7 @@ class OpenApiFactoryTest extends TestCase
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])],
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
@@ -845,7 +845,7 @@ class OpenApiFactoryTest extends TestCase
             'Removes the Dummy resource.',
             'Removes the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])]
         ), $dummyPath->getDelete());
 
         $customPath = $paths->getPath('/foo/{id}');
@@ -929,7 +929,7 @@ class OpenApiFactoryTest extends TestCase
             'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
-            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            [new Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'integer'])],
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
