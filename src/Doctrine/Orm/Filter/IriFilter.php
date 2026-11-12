@@ -68,6 +68,16 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             return;
         }
 
+        if (is_iterable($value)) {
+            $value = array_values(array_filter(\is_array($value) ? $value : iterator_to_array($value), is_object(...)));
+        }
+
+        if ([] === $value || (!\is_array($value) && !\is_object($value))) {
+            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}('1 = 0');
+
+            return;
+        }
+
         // Collection associations (OneToMany/ManyToMany) require a JOIN to compare individual elements.
         if ($ormLeafMetadata['is_collection_valued']) {
             if (Join::LEFT_JOIN === $this->joinTypeFor($context)) {

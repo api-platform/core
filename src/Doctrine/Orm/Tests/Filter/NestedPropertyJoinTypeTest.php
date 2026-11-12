@@ -63,7 +63,7 @@ final class NestedPropertyJoinTypeTest extends TestCase
         $queryBuilder = (new QueryBuilder($entityManager))->select('o')->from(Dummy::class, 'o');
         $parameter = (new QueryParameter(key: 'relatedDummies', property: 'relatedDummies'))
             ->withExtraProperties([
-                '_api_values' => 'x',
+                '_api_values' => new RelatedDummy(),
                 'nested_properties_info' => ['relatedDummies' => [
                     'relation_classes' => [],
                     'converted_relation_segments' => [],
