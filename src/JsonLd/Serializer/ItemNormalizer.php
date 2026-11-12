@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\ResourceAwareInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -91,8 +92,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass);
         if ($isResourceClass && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
-            if (isset($context['operation']) && $context['operation'] instanceof HttpOperation && $context['operation']->getClass() !== $resourceClass) {
-                $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
+            if (
+                ($data instanceof ResourceAwareInterface && !isset($context['operation']))
+                || (isset($context['operation']) && $context['operation'] instanceof HttpOperation && $context['operation']->getClass() !== $resourceClass)
+            ) {
+                $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperationForObject($data, false, true);
             }
             $context = $this->initContext($resourceClass, $context);
             $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);

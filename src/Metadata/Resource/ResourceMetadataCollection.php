@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\ResourceAwareInterface;
 use ApiPlatform\Metadata\Util\UriTemplateHelper;
 
 /**
@@ -34,6 +35,20 @@ final class ResourceMetadataCollection extends \ArrayObject
     public function __construct(private readonly string $resourceClass, array $input = [])
     {
         parent::__construct($input);
+    }
+
+    public function getOperationForObject(object $object, bool $forceCollection = false, bool $httpOperation = false): Operation
+    {
+        if ($object instanceof ResourceAwareInterface) {
+            $shortName = $object->getResource();
+            foreach ($this as $resource) {
+                if ($shortName === $resource->getShortName()) {
+                    return (new self($this->resourceClass, [$resource]))->getOperation(null, $forceCollection, $httpOperation);
+                }
+            }
+        }
+
+        return $this->getOperation(null, $forceCollection, $httpOperation);
     }
 
     public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false, bool $forceGraphQl = false): Operation

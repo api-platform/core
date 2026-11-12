@@ -154,7 +154,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
-        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups);
+        $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups, $operation);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
 
@@ -387,7 +387,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     /**
      * Gets the options for the property name collection / property metadata factories.
      */
-    private function getFactoryOptions(array $serializerContext, array $validationGroups): array
+    private function getFactoryOptions(array $serializerContext, array $validationGroups, ?Operation $operation = null): array
     {
         $options = [
             /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
@@ -401,6 +401,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
             $options['serializer_attributes'] = (array) $serializerContext[AbstractNormalizer::ATTRIBUTES];
+        }
+
+        if ($operationName = $operation?->getName()) {
+            $options['operation_name'] = $operationName;
         }
 
         if ($validationGroups) {
