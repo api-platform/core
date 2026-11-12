@@ -52,7 +52,7 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
                 try {
                     $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
                 } catch (InvalidArgumentException|ItemNotFoundException $exception) {
-                    if ($exception instanceof ItemNotFoundException ? true === ($extraProperties['throw_not_found'] ?? false) : true === ($extraProperties['throw_invalid_argument'] ?? false)) {
+                    if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
                         throw $exception;
                     }
 
@@ -75,7 +75,7 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
         try {
             $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
         } catch (InvalidArgumentException|ItemNotFoundException $exception) {
-            if ($exception instanceof ItemNotFoundException ? true === ($extraProperties['throw_not_found'] ?? false) : true === ($extraProperties['throw_invalid_argument'] ?? false)) {
+            if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
                 throw $exception;
             }
 
