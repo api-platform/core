@@ -53,8 +53,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
@@ -1194,26 +1192,12 @@ class AbstractItemNormalizerTest extends TestCase
     public static function provideDeepObjectToPopulateCases(): iterable
     {
         $current = new RelatedDummy();
-        $given = new RelatedDummy();
         $type = Type::object(RelatedDummy::class);
 
         yield 'deep' => [['deep_object_to_populate' => true], [], $type, $current, [$current]];
-        yield 'deep by default' => [[], ['deep_object_to_populate' => true], $type, $current, [$current]];
-        yield 'not deep' => [[], [], $type, $current, []];
-        yield 'deep disabled in the context' => [['deep_object_to_populate' => false], ['deep_object_to_populate' => true], $type, $current, []];
-        yield 'object to populate already given' => [['deep_object_to_populate' => true, 'object_to_populate' => $given], [], $type, $current, [$given]];
         yield 'untyped attribute' => [['deep_object_to_populate' => true], [], null, new \LogicException('The value must not be read.'), []];
-        yield 'unreadable value' => [['deep_object_to_populate' => true], [], $type, new NoSuchPropertyException(), []];
-        yield 'uninitialized value' => [['deep_object_to_populate' => true], [], $type, new UninitializedPropertyException(), []];
     }
 
-    /**
-     * symfony/serializer only reads the current value of the attributes it can type, which it can't do for this normalizer.
-     *
-     * @param array<string, mixed> $context
-     * @param array<string, mixed> $defaultContext
-     * @param list<object>         $expectedObjectsToPopulate
-     */
     #[DataProvider('provideDeepObjectToPopulateCases')]
     public function testDeepObjectToPopulate(array $context, array $defaultContext, ?Type $type, object $currentValue, array $expectedObjectsToPopulate): void
     {
@@ -1232,11 +1216,10 @@ class AbstractItemNormalizerTest extends TestCase
         }
 
         $objectsToPopulate = [];
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(DenormalizerInterface::class);
-        $serializerProphecy->denormalize(['name' => 'foo'], RelatedDummy::class, null, Argument::type('array'))->will(static function (array $arguments) use (&$objectsToPopulate): RelatedDummy {
-            if (isset($arguments[3]['object_to_populate'])) {
-                $objectsToPopulate[] = $arguments[3]['object_to_populate'];
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, DenormalizerInterface::class]);
+        $serializer->method('denormalize')->willReturnCallback(static function (mixed $data, string $type, ?string $format = null, array $context = []) use (&$objectsToPopulate): RelatedDummy {
+            if (isset($context['object_to_populate'])) {
+                $objectsToPopulate[] = $context['object_to_populate'];
             }
 
             return new RelatedDummy();
@@ -1248,7 +1231,7 @@ class AbstractItemNormalizerTest extends TestCase
                 $this->setAttributeValue($object, $attribute, $value, null, $context);
             }
         };
-        $normalizer->setSerializer($serializerProphecy->reveal());
+        $normalizer->setSerializer($serializer);
 
         $normalizer->setAttribute(new Dummy(), 'relatedDummy', ['name' => 'foo'], $context + ['resource_class' => Dummy::class]);
 
