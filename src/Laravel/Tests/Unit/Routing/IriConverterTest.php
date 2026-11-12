@@ -263,4 +263,59 @@ class IriConverterTest extends TestCase
 
         $iriConverter->getResourceFromIri('/api/only_posts');
     }
+
+    public function testGetUriVariablesFromIriDoesNotCallTheProvider(): void
+    {
+        $itemOpName = 'item_op';
+        $itemOp = (new Get())->withName($itemOpName)->withClass(Book::class);
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->once())->method('match')->with('/api/books/1')->willReturn([
+            '_api_resource_class' => Book::class,
+            '_api_operation_name' => $itemOpName,
+            'uri_variables' => ['id' => '1'],
+        ]);
+
+        $resourceMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->method('create')->willReturn(new ResourceMetadataCollection(Book::class, [
+            (new ApiResource())->withOperations(new Operations([$itemOpName => $itemOp])),
+        ]));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->never())->method('provide');
+
+        $iriConverter = new IriConverter(
+            $provider,
+            $this->createStub(OperationMetadataFactoryInterface::class),
+            $router,
+            $this->createStub(IdentifiersExtractorInterface::class),
+            $this->createStub(ResourceClassResolverInterface::class),
+            $resourceMetadataFactory,
+        );
+
+        $this->assertSame(['id' => '1'], $iriConverter->getUriVariablesFromIri('/api/books/1'));
+    }
+
+    public function testGetUriVariablesFromIriWithAnotherResourceOperation(): void
+    {
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('match')->willReturn([
+            '_api_resource_class' => Book::class,
+            '_api_operation_name' => 'item_op',
+            'uri_variables' => ['id' => '1'],
+        ]);
+
+        $iriConverter = new IriConverter(
+            $this->createStub(ProviderInterface::class),
+            $this->createStub(OperationMetadataFactoryInterface::class),
+            $router,
+            $this->createStub(IdentifiersExtractorInterface::class),
+            $this->createStub(ResourceClassResolverInterface::class),
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The iri "/api/books/1" does not reference the correct resource.');
+        $iriConverter->getUriVariablesFromIri('/api/books/1', [], (new Get())->withClass(BookVariant::class));
+    }
 }

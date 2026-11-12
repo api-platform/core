@@ -14,12 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Mcp\Tests\Routing;
 
 use ApiPlatform\Mcp\Routing\IriConverter;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\UriVariablesFromIriInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +42,30 @@ class IriConverterTest extends TestCase
         $iriConverter = new IriConverter($inner);
 
         $this->assertSame($expected, $iriConverter->getResourceFromIri('/dummies/1', ['foo' => 'bar'], $operation));
+    }
+
+    public function testGetUriVariablesFromIriIsDelegated(): void
+    {
+        $operation = new Get();
+
+        $inner = $this->createMockForIntersectionOfInterfaces([IriConverterInterface::class, UriVariablesFromIriInterface::class]);
+        $inner->expects($this->once())
+            ->method('getUriVariablesFromIri')
+            ->with('/dummies/1', ['foo' => 'bar'], $operation)
+            ->willReturn(['id' => 1]);
+
+        $iriConverter = new IriConverter($inner);
+
+        $this->assertSame(['id' => 1], $iriConverter->getUriVariablesFromIri('/dummies/1', ['foo' => 'bar'], $operation));
+    }
+
+    public function testGetUriVariablesFromIriThrowsWhenTheDecoratedConverterDoesNotSupportIt(): void
+    {
+        $iriConverter = new IriConverter($this->createStub(IriConverterInterface::class));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('does not implement "%s".', UriVariablesFromIriInterface::class));
+        $iriConverter->getUriVariablesFromIri('/dummies/1');
     }
 
     /**
