@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\ResourceAwareInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -170,6 +171,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
             $context = $this->initContext($resourceClass, $context);
+        }
+
+        if ($data instanceof ResourceAwareInterface && !isset($context['operation']) && $this->resourceMetadataCollectionFactory && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperationForObject($data, false, true);
         }
 
         $context['api_normalize'] = true;
@@ -813,7 +818,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        $operationCacheKey = ($context['resource_class'] ?? '').($context['operation_name'] ?? '').($context['root_operation_name'] ?? '');
+        $operationName = ($context['operation'] ?? null)?->getName() ?? $context['operation_name'] ?? null;
+        $rootOperationName = $context['root_operation_name'] ?? $operationName;
+
+        $operationCacheKey = ($context['resource_class'] ?? '').$operationName.$rootOperationName;
         $suffix = ($context['api_normalize'] ?? '') ? 'n' : '';
         if ($operationCacheKey && isset($this->localFactoryOptionsCache[$operationCacheKey.$suffix])) {
             return $options + $this->localFactoryOptionsCache[$operationCacheKey.$suffix];
@@ -821,11 +829,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         // This is a hot spot
         if (isset($context['resource_class'])) {
+            if (null !== $operationName) {
+                $options['operation_name'] = $operationName;
+                $options['root_operation_name'] = $rootOperationName;
+            }
+
             // Note that the groups need to be read on the root operation
             if ($operation = ($context['root_operation'] ?? null)) {
                 $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
                 $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
-                $options['operation_name'] = $operation->getName();
+                $options['root_operation_name'] = $operation->getName();
             }
         }
 
@@ -995,7 +1008,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $objResourceClass = $this->resourceClassResolver->getResourceClass($obj, $resourceClass);
             $context['resource_class'] = $objResourceClass;
             if ($this->resourceMetadataCollectionFactory) {
-                $context['operation'] = $this->resourceMetadataCollectionFactory->create($objResourceClass)->getOperation();
+                $context['operation'] = $this->resourceMetadataCollectionFactory->create($objResourceClass)->getOperationForObject($obj);
             }
 
             $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);

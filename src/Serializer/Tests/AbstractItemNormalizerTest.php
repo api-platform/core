@@ -2207,7 +2207,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $operationCacheKey = (new \ReflectionClass($normalizer))->getProperty('localFactoryOptionsCache')->getValue($normalizer);
         $this->assertEquals(array_keys($operationCacheKey), [\sprintf('%s%s%s%s', Dummy::class, 'operation_name', 'root_operation_name', 'n')]);
-        $this->assertEquals(current($operationCacheKey), ['serializer_groups' => ['group'], 'api_allow_update' => false]);
+        $this->assertEquals(current($operationCacheKey), ['serializer_groups' => ['group'], 'api_allow_update' => false, 'operation_name' => 'operation_name', 'root_operation_name' => 'root_operation_name']);
     }
 
     public function testSupportsDenormalizationWithApiPlatformInputContext(): void
