@@ -39,15 +39,19 @@ final class Issue8834InvalidIriTest extends ApiTestCase
         $this->recreateSchema(self::getResources());
     }
 
-    public function testInvalidScalarIriReturnsBadRequest(): void
+    public function testInvalidIriIsIgnored(): void
     {
-        self::createClient()->request('GET', '/issue8834_resources?related=/invalid/iri');
-        self::assertResponseStatusCodeSame(400);
-    }
+        $manager = $this->getContainer()->get('doctrine')->getManager();
+        $related = new Issue8834Resource();
+        $manager->persist($related);
+        $resource = new Issue8834Resource();
+        $resource->related = $related;
+        $manager->persist($resource);
+        $manager->flush();
 
-    public function testInvalidArrayIriReturnsBadRequest(): void
-    {
-        self::createClient()->request('GET', '/issue8834_resources?related[]=/invalid/iri');
-        self::assertResponseStatusCodeSame(400);
+        self::createClient()->request('GET', '/issue8834_resources?related=/invalid/iri');
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertJsonContains(['hydra:totalItems' => 0]);
     }
 }

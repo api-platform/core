@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ApiResource(operations: [new Get(), new GetCollection(parameters: [
-    'related' => new QueryParameter(filter: new IriFilter(), extraProperties: ['throw_invalid_argument' => true]),
+    'related' => new QueryParameter(filter: new IriFilter()),
 ])])]
 class Issue8834Resource
 {
