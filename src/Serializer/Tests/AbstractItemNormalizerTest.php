@@ -48,6 +48,7 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnlyR
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -1186,6 +1187,55 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'relatedDummy', $relatedDummy1)->shouldHaveBeenCalled();
         $propertyAccessorProphecy->setValue($actual, 'relatedDummies', [$relatedDummy2])->shouldHaveBeenCalled();
         $propertyAccessorProphecy->setValue($actual, 'relatedDummiesWithUnionTypes', [0 => $relatedDummy3, 1 => $relatedDummy4])->shouldHaveBeenCalled();
+    }
+
+    public static function provideDeepObjectToPopulateCases(): iterable
+    {
+        $current = new RelatedDummy();
+        $type = Type::object(RelatedDummy::class);
+
+        yield 'deep' => [['deep_object_to_populate' => true], [], $type, $current, [$current]];
+        yield 'untyped attribute' => [['deep_object_to_populate' => true], [], null, new \LogicException('The value must not be read.'), []];
+    }
+
+    #[DataProvider('provideDeepObjectToPopulateCases')]
+    public function testDeepObjectToPopulate(array $context, array $defaultContext, ?Type $type, object $currentValue, array $expectedObjectsToPopulate): void
+    {
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType($type)->withWritable(true)->withWritableLink(true));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+        $resourceClassResolver->method('getResourceClass')->willReturn(RelatedDummy::class);
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        if ($currentValue instanceof \Throwable) {
+            $propertyAccessor->method('getValue')->willThrowException($currentValue);
+        } else {
+            $propertyAccessor->method('getValue')->willReturn($currentValue);
+        }
+
+        $objectsToPopulate = [];
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, DenormalizerInterface::class]);
+        $serializer->method('denormalize')->willReturnCallback(static function (mixed $data, string $type, ?string $format = null, array $context = []) use (&$objectsToPopulate): RelatedDummy {
+            if (isset($context['object_to_populate'])) {
+                $objectsToPopulate[] = $context['object_to_populate'];
+            }
+
+            return new RelatedDummy();
+        });
+
+        $normalizer = new class($this->createStub(PropertyNameCollectionFactoryInterface::class), $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $propertyAccessor, null, null, $defaultContext) extends AbstractItemNormalizer {
+            public function setAttribute(object $object, string $attribute, mixed $value, array $context): void
+            {
+                $this->setAttributeValue($object, $attribute, $value, null, $context);
+            }
+        };
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->setAttribute(new Dummy(), 'relatedDummy', ['name' => 'foo'], $context + ['resource_class' => Dummy::class]);
+
+        $this->assertSame($expectedObjectsToPopulate, $objectsToPopulate);
     }
 
     public function testUnionTypeDenormalizationFallsThroughAfterTypeConfusionGuardMismatch(): void
