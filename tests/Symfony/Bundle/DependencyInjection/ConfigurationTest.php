@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -101,12 +103,12 @@ class ConfigurationTest extends TestCase
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
+                UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
             ],
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
             'inflector' => 'api_platform.metadata.inflector',
             'validator' => [
                 'serialize_payload_fields' => [],
-                'query_parameter_validation' => true,
             ],
             'name_converter' => null,
             'enable_swagger' => true,
@@ -131,9 +133,6 @@ class ConfigurationTest extends TestCase
                     'pagination' => [
                         'enabled' => true,
                     ],
-                ],
-                'graphql_playground' => [
-                    'enabled' => false,
                 ],
             ],
             'elasticsearch' => [
@@ -189,11 +188,9 @@ class ConfigurationTest extends TestCase
             'http_cache' => [
                 'invalidation' => [
                     'enabled' => false,
-                    'varnish_urls' => [],
                     'request_options' => [],
                     'max_header_length' => 7500,
                     'purger' => 'api_platform.http_cache.purger.varnish',
-                    'xkey' => ['glue' => ' '],
                     'urls' => [],
                     'scoped_clients' => [],
                 ],
@@ -213,7 +210,6 @@ class ConfigurationTest extends TestCase
                 'hub_url' => null,
                 'include_type' => false,
             ],
-            'resource_class_directories' => [],
             'asset_package' => null,
             'openapi' => [
                 'contact' => [
@@ -240,8 +236,6 @@ class ConfigurationTest extends TestCase
             ],
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
-            // TODO: remove in 5.0
-            'enable_link_security' => true,
             'serializer' => [
                 'hydra_prefix' => null,
             ],
@@ -251,7 +245,7 @@ class ConfigurationTest extends TestCase
                 'format' => 'jsonld',
             ],
             'jsonapi' => [
-                'use_iri_as_id' => null,
+                'use_iri_as_id' => false,
                 'allow_client_generated_id' => false,
             ],
             'enable_scalar' => true,
@@ -282,6 +276,51 @@ class ConfigurationTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    public static function objectDefaultProvider(): iterable
+    {
+        yield 'mcp' => ['mcp', ['tool' => ['description' => 'Get a book']]];
+        yield 'graph_ql_operations' => ['graph_ql_operations', [['class' => 'ApiPlatform\Metadata\GraphQl\Query']]];
+        yield 'state_options' => ['state_options', ['entity_class' => 'App\Entity\Book']];
+        yield 'links' => ['links', [['rel' => 'preload', 'href' => '/books']]];
+        yield 'openapi' => ['openapi', ['summary' => 'A book']];
+    }
+
+    #[DataProvider('objectDefaultProvider')]
+    public function testDefaultsThatNeedObjects(string $key, array $value): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(\sprintf('The "defaults.%s" option is not supported, it needs objects. Set it on the resources instead.', $key));
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [$key => $value],
+            ],
+        ]);
+    }
+
+    public function testDefaultsThatNeedObjectsInCamelCase(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "defaults.state_options" option is not supported, it needs objects. Set it on the resources instead.');
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => ['stateOptions' => ['entity_class' => 'App\\Entity\\Book']],
+            ],
+        ]);
+    }
+
+    public function testOpenapiDefaultCanBeABoolean(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => ['openapi' => false],
+            ],
+        ]);
+
+        $this->assertFalse($config['defaults']['openapi']);
     }
 
     public static function invalidHttpStatusCodeValueProvider(): array
@@ -546,5 +585,44 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertEquals(['resource:read-write' => 'Read and write resource data'], $config['oauth']['scopes']);
+    }
+
+    public function testDefaultParameters(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [
+                        HeaderParameter::class => ['key' => 'API-Token'],
+                        'request_id' => ['class' => HeaderParameter::class, 'key' => 'Request-ID'],
+                        'api_version' => ['key' => 'api_version'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(3, $config['defaults']['parameters']);
+    }
+
+    public static function invalidDefaultParameterProvider(): iterable
+    {
+        yield 'unknown class option' => ['api_token', ['class' => 'ApiPlatform\Metadata\HeaderParamter'], 'ApiPlatform\Metadata\HeaderParamter'];
+        yield 'unknown class as key' => ['ApiPlatform\Metadata\HeaderParamter', ['key' => 'API-Token'], 'ApiPlatform\Metadata\HeaderParamter'];
+        yield 'not a parameter' => ['api_token', ['class' => \stdClass::class], \stdClass::class];
+    }
+
+    #[DataProvider('invalidDefaultParameterProvider')]
+    public function testDefaultParametersWithInvalidClass(string $name, array $parameter, string $class): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(\sprintf('The default parameter "%s" must reference a class extending "ApiPlatform\Metadata\Parameter", "%s" given.', $name, $class));
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'parameters' => [$name => $parameter],
+                ],
+            ],
+        ]);
     }
 }

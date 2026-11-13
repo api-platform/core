@@ -25,6 +25,13 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 class ObjectMapperProviderTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (!interface_exists(ObjectMapperInterface::class)) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+    }
+
     public function testProvideBypassesWhenNoObjectMapper(): void
     {
         $data = new SourceEntity();

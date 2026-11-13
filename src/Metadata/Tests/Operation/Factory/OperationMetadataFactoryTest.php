@@ -45,4 +45,62 @@ class OperationMetadataFactoryTest extends TestCase
         $this->assertEquals($operation, $operationMetadata->create('/one'));
         $this->assertNull($operationMetadata->create('none'));
     }
+
+    public function testCreateResolvesUriTemplateWithoutFormatSuffix(): void
+    {
+        $operation = new Get('/one{._format}', name: 'one');
+
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection(['one']));
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection('one', [
+            new ApiResource(operations: ['one' => $operation]),
+        ]));
+
+        $operationMetadata = new OperationMetadataFactory($resourceNameCollectionFactory, $resourceMetadataCollectionFactory);
+        $this->assertSame($operation, $operationMetadata->create('/one'));
+        $this->assertSame($operation, $operationMetadata->create('/one.{_format}'));
+    }
+
+    public function testCreateExactMatchWinsOverLenientMatchRegardlessOfOrder(): void
+    {
+        $exact = new Get('/one', name: 'exact');
+        $lenient = new Get('/one{._format}', name: 'lenient');
+
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection(['one']));
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection('one', [
+            new ApiResource(operations: ['exact' => $exact, 'lenient' => $lenient]),
+        ]));
+
+        $operationMetadata = new OperationMetadataFactory($resourceNameCollectionFactory, $resourceMetadataCollectionFactory);
+        $this->assertSame($exact, $operationMetadata->create('/one'));
+
+        $resourceMetadataCollectionFactoryReversed = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryReversed->method('create')->willReturn(new ResourceMetadataCollection('one', [
+            new ApiResource(operations: ['lenient' => $lenient, 'exact' => $exact]),
+        ]));
+
+        $operationMetadataReversed = new OperationMetadataFactory($resourceNameCollectionFactory, $resourceMetadataCollectionFactoryReversed);
+        $this->assertSame($exact, $operationMetadataReversed->create('/one'));
+    }
+
+    public function testCreateReturnsNullForUnrelatedTemplate(): void
+    {
+        $operation = new Get('/one{._format}', name: 'one');
+
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection(['one']));
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection('one', [
+            new ApiResource(operations: ['one' => $operation]),
+        ]));
+
+        $operationMetadata = new OperationMetadataFactory($resourceNameCollectionFactory, $resourceMetadataCollectionFactory);
+        $this->assertNull($operationMetadata->create('/unrelated'));
+    }
 }

@@ -27,15 +27,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Checks if the linked resources have security attributes and prepares them for access checking.
  */
-final class ReadLinkParameterProvider implements ParameterProviderInterface
+final class ReadLinkParameterProvider implements ParameterProviderInterface, PreservesUriVariableInterface
 {
     /**
      * @param ProviderInterface<object> $locator
+     * @param bool                      $writeUriVariable whether the resolved resource replaces the uri variable it was
+     *                                                    resolved from, which lets a custom provider work on the resource
+     *                                                    instead of the identifier. Doctrine-backed resources need the
+     *                                                    identifier, so this is opt-in; it can also be set per link
+     *                                                    through the `write_uri_variable` extra property.
      */
     public function __construct(
         private readonly ProviderInterface $locator,
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly bool $writeUriVariable = false,
     ) {
+    }
+
+    public function preservesUriVariable(Parameter $parameter): bool
+    {
+        return !($parameter->getExtraProperties()['write_uri_variable'] ?? $this->writeUriVariable);
     }
 
     public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Serializer;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\VoDummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\VoDummyDriver;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\VoDummyInspection;

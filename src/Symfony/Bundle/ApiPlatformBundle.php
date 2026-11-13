@@ -16,13 +16,14 @@ namespace ApiPlatform\Symfony\Bundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ErrorResourceAttributeLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ItemNormalizerDecorationBcPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\JsonStreamerTransformerPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\McpAppsExtensionPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\McpRegistryPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
@@ -48,8 +49,6 @@ final class ApiPlatformBundle extends Bundle
     {
         parent::build($container);
 
-        // TODO: remove in 5.x
-        $container->addCompilerPass(new DataProviderPass());
         // Run the compiler pass before the {@see ResolveInstanceofConditionalsPass} to allow autoconfiguration of generated filter definitions.
         $container->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
         $container->addCompilerPass(new AttributeResourcePass());
@@ -65,7 +64,10 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new ErrorResourceAttributeLoaderPass());
         $container->addCompilerPass(new MutatorPass());
         $container->addCompilerPass(new McpRegistryPass());
+        $container->addCompilerPass(new McpAppsExtensionPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new PropertyInfoTagPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
+        // Runs after AutowireAsDecoratorPass (100) and before FrameworkBundle's SerializerPass (0), which reads the serializer.normalizer tag.
+        $container->addCompilerPass(new ItemNormalizerDecorationBcPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         // Must run after Symfony's TransformerPass so we can rely on the value_object_transformer tag being processed.
         $container->addCompilerPass(new JsonStreamerTransformerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
     }

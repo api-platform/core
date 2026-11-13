@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Filter;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ArrayFilterValidator;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterValidator;
 use ApiPlatform\Tests\RecreateSchemaTrait;

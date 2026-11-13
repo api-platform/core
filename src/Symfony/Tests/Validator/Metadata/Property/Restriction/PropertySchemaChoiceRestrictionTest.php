@@ -16,10 +16,8 @@ namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -39,32 +37,6 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
         $this->propertySchemaChoiceRestriction = new PropertySchemaChoiceRestriction();
     }
 
-    #[IgnoreDeprecations]
-    public function testSupports(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'supported string' => [new Choice(choices: ['a', 'b']), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), true],
-            'supported int' => [new Choice(choices: [1, 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
-            'supported float' => [new Choice(choices: [1.1, 2.2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
-            'supported string/int/float with union types' => [new Choice(choices: [1, 2, 1.1, 2.2, 'a', 'b']), (new ApiProperty())->withBuiltinTypes([
-                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
-            ]), true],
-
-            'not supported constraint' => [new Positive(), new ApiProperty(), false],
-            'not supported type' => [new Choice(choices: [new \stdClass(), new \stdClass()]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)]), false],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaChoiceRestriction->supports($constraint, $propertyMetadata));
-        }
-    }
-
     #[DataProvider('supportsNativeProvider')]
     public function testSupportsNative(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
@@ -82,67 +54,6 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
 
         yield 'not supported constraint' => [new Positive(), new ApiProperty(), false];
         yield 'not supported type' => [new Choice(choices: [new \stdClass(), new \stdClass()]), (new ApiProperty())->withNativeType(Type::object()), false];
-    }
-
-    #[IgnoreDeprecations]
-    public function testCreate(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'single string choice' => [new Choice(choices: ['a', 'b']), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b']]],
-            'multi string choice' => [new Choice(choices: ['a', 'b'], multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]],
-            'multi string choice min' => [new Choice(choices: ['a', 'b'], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']], 'minItems' => 2]],
-            'multi string choice max' => [new Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]],
-            'multi string choice min/max' => [new Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]],
-
-            'single int choice' => [new Choice(choices: [1, 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['enum' => [1, 2]]],
-            'multi int choice' => [new Choice(choices: [1, 2], multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]]]],
-            'multi int choice min' => [new Choice(choices: [1, 2], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]], 'minItems' => 2]],
-            'multi int choice max' => [new Choice(choices: [1, 2, 3, 4], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'maxItems' => 4]],
-            'multi int choice min/max' => [new Choice(choices: [1, 2, 3, 4], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'minItems' => 2, 'maxItems' => 4]],
-
-            'single float choice' => [new Choice(choices: [1.1, 2.2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['enum' => [1.1, 2.2]]],
-            'multi float choice' => [new Choice(choices: [1.1, 2.2], multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]]]],
-            'multi float choice min' => [new Choice(choices: [1.1, 2.2], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]], 'minItems' => 2]],
-            'multi float choice max' => [new Choice(choices: [1.1, 2.2, 3.3, 4.4], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]],
-            'multi float choice min/max' => [new Choice(choices: [1.1, 2.2, 3.3, 4.4], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]],
-
-            'single string/int/float choice with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2]), (new ApiProperty())->withBuiltinTypes([
-                new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
-                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
-            ]), ['enum' => [1, 2, 'a', 'b', 1.1, 2.2]]],
-            'multi string/int/float choice with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2], multiple: true), (new ApiProperty())->withBuiltinTypes([
-                new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
-                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
-            ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]]]],
-            'multi string/int/float choice min with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([
-                new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
-                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
-            ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]], 'minItems' => 2]],
-            'multi string/int/float choice max with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([
-                new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
-                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
-            ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]],
-            'multi string/int/float choice min/max with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([
-                new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
-                new LegacyType(LegacyType::BUILTIN_TYPE_INT),
-                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
-            ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]],
-
-            'single choice callback' => [new Choice(callback: ChoiceCallback::getChoices(...)), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b', 'c', 'd']]],
-            'multi choice callback' => [new Choice(callback: ChoiceCallback::getChoices(...), multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaChoiceRestriction->create($constraint, $propertyMetadata));
-        }
     }
 
     #[DataProvider('createNativeProvider')]

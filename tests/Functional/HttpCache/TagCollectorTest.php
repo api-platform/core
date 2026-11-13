@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\HttpCache;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExtraPropertiesOnProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Relation2;
@@ -66,7 +66,7 @@ final class TagCollectorTest extends ApiTestCase
      * Returns a client that keeps the kernel alive between HTTP requests so the
      * tag_collector override registered in setUp survives across calls.
      */
-    private function disableRebootClient(): \ApiPlatform\Symfony\Bundle\Test\Client
+    private function disableRebootClient(): \ApiPlatform\Test\Client
     {
         $client = self::createClient();
         $client->getKernelBrowser()->disableReboot();

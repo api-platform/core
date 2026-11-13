@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumIntegerResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\Availability;

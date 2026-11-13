@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * Helpers for functional GraphQL tests.
  *
  * Designed to be mixed into a class that exposes a static `createClient()` returning
- * an HTTP client with a `request()` method (e.g. ApiPlatform\Symfony\Bundle\Test\ApiTestCase).
+ * an HTTP client with a `request()` method (e.g. ApiPlatform\Test\ApiTestCase).
  */
 trait GraphQlTestTrait
 {

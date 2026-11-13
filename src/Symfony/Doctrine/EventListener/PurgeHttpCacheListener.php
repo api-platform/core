@@ -14,10 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Doctrine\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -50,7 +54,8 @@ final class PurgeHttpCacheListener
         private readonly ResourceClassResolverInterface $resourceClassResolver,
         ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ObjectMapperInterface $objectMapper = null,
-        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null)
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -128,13 +133,41 @@ final class PurgeHttpCacheListener
 
         foreach ($resources as $resource) {
             try {
-                $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, new GetCollection());
-                $this->tags[$iri] = $iri;
+                foreach ($this->getCollectionOperations($resource) as $operation) {
+                    $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, $operation);
+                    $this->tags[$iri] = $iri;
+                }
 
                 if ($purgeItem) {
                     $this->addTagForItem($entity);
                 }
             } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+        }
+    }
+
+    /**
+     * @return iterable<Operation&CollectionOperationInterface>
+     */
+    private function getCollectionOperations(object $resource): iterable
+    {
+        if (!$this->resourceMetadataCollectionFactory) {
+            yield new GetCollection();
+
+            return;
+        }
+
+        foreach ($this->resourceMetadataCollectionFactory->create($this->getObjectClass($resource)) as $apiResource) {
+            foreach ($apiResource->getOperations() ?? [] as $operation) {
+                if (!$operation instanceof CollectionOperationInterface || !$operation instanceof HttpOperation) {
+                    continue;
+                }
+
+                if (!empty($operation->getUriVariables())) {
+                    continue;
+                }
+
+                yield $operation;
             }
         }
     }
@@ -146,10 +179,10 @@ final class PurgeHttpCacheListener
         /** @var array|AssociationMapping $associationMapping according to the version of doctrine orm */
         foreach ($associationMappings as $property => $associationMapping) {
             if ($associationMapping instanceof AssociationMapping && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
-                return;
+                continue;
             }
             if (!$this->propertyAccessor->isReadable($entity, $property)) {
-                return;
+                continue;
             }
 
             if (
@@ -159,16 +192,16 @@ final class PurgeHttpCacheListener
                 && !$this->resourceClassResolver->isResourceClass($targetEntity)
             ) {
                 if (!$this->objectMapper) {
-                    return;
+                    continue;
                 }
 
                 $targetRefl = new \ReflectionClass($targetEntity);
                 if ($this->objectMapperMetadata) {
                     if (!$this->objectMapperMetadata->create($targetRefl->newInstanceWithoutConstructor())) {
-                        return;
+                        continue;
                     }
                 } elseif (!$targetRefl->getAttributes(Map::class)) {
-                    return;
+                    continue;
                 }
             }
 

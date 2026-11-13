@@ -16,10 +16,8 @@ namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRangeRestriction;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Length;
@@ -39,27 +37,6 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
         $this->propertySchemaRangeRestriction = new PropertySchemaRangeRestriction();
     }
 
-    #[IgnoreDeprecations]
-    public function testSupports(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'supported int/float with union types' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
-            'supported int' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
-            'supported float' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
-
-            'not supported constraint' => [new Length(min: 1), new ApiProperty(), false],
-            'not supported type' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), false],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->supports($constraint, $propertyMetadata));
-        }
-    }
-
     #[DataProvider('supportsProviderWithNativeType')]
     public function testSupportsWithNativeType(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
@@ -74,28 +51,6 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
 
         yield 'native type: not supported constraint' => [new Length(min: 1), (new ApiProperty())->withNativeType(Type::string()), false];
         yield 'native type: not supported type' => [new Range(min: 1), (new ApiProperty())->withNativeType(Type::string()), false];
-    }
-
-    #[IgnoreDeprecations]
-    public function testCreate(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'int min' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1]],
-            'int max' => [new Range(max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['maximum' => 10]],
-            'int min max' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1, 'maximum' => 10]],
-
-            'float min' => [new Range(min: 1.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5]],
-            'float max' => [new Range(max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['maximum' => 10.5]],
-            'float min max' => [new Range(min: 1.5, max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5, 'maximum' => 10.5]],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->create($constraint, $propertyMetadata));
-        }
     }
 
     #[DataProvider('createProviderWithNativeType')]

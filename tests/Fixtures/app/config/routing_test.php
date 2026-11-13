@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
@@ -18,7 +19,9 @@ return static function (RoutingConfigurator $routes) {
     $routes->import('routing_common.yml');
     $routes->import('@TestBundle/Controller/Orm', 'attribute');
 
-    $routes->import('.', 'mcp');
+    if (class_exists(McpBundle::class)) {
+        $routes->import('.', 'mcp');
+    }
 
     if (class_exists(WebProfilerBundle::class)) {
         $reflection = new ReflectionClass(WebProfilerBundle::class);

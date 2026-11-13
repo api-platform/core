@@ -42,7 +42,7 @@ class GraphQlResolverPassTest extends TestCase
             [],
             ['foo' => [], 'bar' => [['id' => 'bar']]]
         );
-        $containerBuilder->method('getDefinition')->with('api_platform.graphql.resolver_locator')->willReturn($typeLocatorDefinition);
+        $containerBuilder->expects($this->once())->method('getDefinition')->with('api_platform.graphql.resolver_locator')->willReturn($typeLocatorDefinition);
 
         $filterPass->process($containerBuilder);
     }

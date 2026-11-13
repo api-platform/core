@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonLd;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\JsonLdContextDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\JsonLdContextRelation;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -120,5 +120,23 @@ final class ContextTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertSame('http://purl.org/dc/terms/', $body['@context']['dct']);
         $this->assertSame('dct:title', $body['@context']['title']);
+    }
+
+    public function testErrorContextIsResolvedThroughItsResource(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/Error');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertArrayHasKey('@context', $body);
+        $this->assertSame('http://www.w3.org/ns/hydra/core#', $body['@context']['hydra']);
+    }
+
+    public function testConstraintViolationContextIsResolvedThroughItsResource(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/ConstraintViolation');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertArrayHasKey('@context', $body);
+        $this->assertSame('http://www.w3.org/ns/hydra/core#', $body['@context']['hydra']);
     }
 }

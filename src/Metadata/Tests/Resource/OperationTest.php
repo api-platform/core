@@ -40,6 +40,13 @@ final class OperationTest extends TestCase
         $this->assertInstanceOf(CollectionOperationInterface::class, $operation);
     }
 
+    public function testWithOperationCopiesContentNegotiation(): void
+    {
+        $operation = (new Get())->withOperation(new Get(contentNegotiation: false));
+
+        $this->assertFalse($operation->canNegotiateContent());
+    }
+
     #[DataProvider('operationProvider')]
     public function testOperationConstructor(Operation $operation): void
     {

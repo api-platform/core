@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Owner as DocumentOwner;
@@ -84,6 +84,12 @@ final class ExactFilterTest extends ApiTestCase
 
         yield 'filter by a non-existent name' => [
             '/chickens?name=Kevin',
+            0,
+            [],
+        ];
+
+        yield 'filter by an empty string-typed name still filters' => [
+            '/chickens?name=',
             0,
             [],
         ];

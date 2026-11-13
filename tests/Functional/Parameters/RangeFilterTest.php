@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredRangeParameter as FilteredRangeParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredRangeParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;

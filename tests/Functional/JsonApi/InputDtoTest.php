@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiRequiredFieldsResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;

@@ -13,11 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\QueryMethodDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
+/**
+ * The HTTP QUERY method (RFC 10008): a safe collection operation reading its
+ * parameters from the request body, fed to the Parameter API.
+ */
 final class HttpQueryMethodTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
@@ -158,6 +162,7 @@ final class HttpQueryMethodTest extends ApiTestCase
         $this->assertArrayHasKey('query', $json['paths']['/query_method_dummies'], 'The QUERY operation must be emitted under the OpenAPI 3.2 "query" path item field.');
         $query = $json['paths']['/query_method_dummies']['query'];
 
+        // RFC 10008: parameters are carried in the request body, not the URI query string.
         $this->assertArrayHasKey('requestBody', $query);
         $content = $query['requestBody']['content'];
         $this->assertArrayHasKey('application/x-www-form-urlencoded', $content);
@@ -168,10 +173,12 @@ final class HttpQueryMethodTest extends ApiTestCase
         $this->assertArrayHasKey('name', $schema['properties']);
         $this->assertSame(['type' => 'string'], $schema['properties']['name']);
 
+        // The filter must not leak into the URI query string as an "in: query" parameter.
         foreach ($query['parameters'] ?? [] as $parameter) {
             $this->assertNotSame('name', $parameter['name'] ?? null, 'QUERY filters must live in the request body, not as query parameters.');
         }
 
+        // It is a safe collection read: a 200 collection response is documented.
         $this->assertArrayHasKey('200', $query['responses']);
     }
 }

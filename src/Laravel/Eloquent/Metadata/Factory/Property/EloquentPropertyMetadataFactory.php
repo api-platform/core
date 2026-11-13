@@ -118,6 +118,8 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             $type = Type::object($relation['related']);
             if ($collection) {
                 $type = Type::iterable($type);
+            } elseif (true === ($relation['nullable'] ?? false)) {
+                $type = Type::nullable($type);
             }
 
             return $propertyMetadata

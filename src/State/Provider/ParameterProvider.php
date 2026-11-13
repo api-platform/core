@@ -21,6 +21,7 @@ use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterNotFound;
+use ApiPlatform\State\ParameterProvider\PreservesUriVariableInterface;
 use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\StopwatchAwareInterface;
@@ -51,6 +52,8 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         $this->stopwatch?->start('api_platform.provider.parameter');
         $request = $context['request'] ?? null;
         if ($request && null === $request->attributes->get('_api_query_parameters')) {
+            // RFC 10008: the HTTP QUERY method carries its parameters in the request body
+            // rather than in the URI query string.
             if ($operation instanceof HttpOperation && HttpOperation::METHOD_QUERY === $operation->getMethod()) {
                 $request->attributes->set('_api_query_parameters', $this->parseQueryParametersFromBody($request));
             } else {
@@ -115,7 +118,13 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         return $this->decorated?->provide($operation, $uriVariables, $context);
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * Reads the parameters of an HTTP QUERY request (RFC 10008) from its body, negotiated
+     * by content type: "application/x-www-form-urlencoded" shares the query-string grammar,
+     * any JSON-based media type decodes to an associative array.
+     *
+     * @return array<string, mixed>
+     */
     private function parseQueryParametersFromBody(Request $request): array
     {
         $content = (string) $request->getContent();
@@ -182,7 +191,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
-    private function handlePathParameters(HttpOperation $operation, array $uriVariables, array $context): HttpOperation
+    private function handlePathParameters(HttpOperation $operation, array &$uriVariables, array $context): HttpOperation
     {
         foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
             $uriVariable = $uriVariable->withKey($key);
@@ -210,9 +219,37 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             if (($op = $this->callParameterProvider($operation, $uriVariable, $values, $context)) instanceof HttpOperation) {
                 $context['operation'] = $operation = $op;
             }
+
+            if (!$uriVariable->getValue() instanceof ParameterNotFound && !$this->preservesUriVariable($operation, $uriVariable)) {
+                $uriVariables[$key] = $uriVariable->getValue();
+            }
         }
 
         return $operation;
+    }
+
+    /**
+     * A provider may resolve the parameter to a resource, leaving an object in the value where the
+     * resource is queried with an identifier.
+     */
+    private function preservesUriVariable(Operation $operation, Parameter $parameter): bool
+    {
+        $provider = $this->resolveProvider($operation, $parameter->getProvider());
+
+        return $provider instanceof PreservesUriVariableInterface && $provider->preservesUriVariable($parameter);
+    }
+
+    private function resolveProvider(Operation $operation, mixed $provider): mixed
+    {
+        if (!\is_string($provider)) {
+            return $provider;
+        }
+
+        if (!$this->locator->has($provider)) {
+            throw new ProviderNotFoundException(\sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
+        }
+
+        return $this->locator->get($provider);
     }
 
     /**
@@ -236,13 +273,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             return $operation;
         }
 
-        if (\is_string($provider)) {
-            if (!$this->locator->has($provider)) {
-                throw new ProviderNotFoundException(\sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
-            }
-
-            $provider = $this->locator->get($provider);
-        }
+        $provider = $this->resolveProvider($operation, $provider);
 
         if (($op = $provider->provide($parameter, $values, $context)) instanceof Operation) {
             $operation = $op;

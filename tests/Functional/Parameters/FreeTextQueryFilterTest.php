@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Owner as DocumentOwner;
@@ -23,6 +23,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Owner;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
+use PHPUnit\Framework\Attributes\TestWith;
 
 final class FreeTextQueryFilterTest extends ApiTestCase
 {
@@ -44,6 +45,16 @@ final class FreeTextQueryFilterTest extends ApiTestCase
         $client = $this->createClient();
         $client->request('GET', '/chickens?q=9780')->toArray();
         $this->assertJsonContains(['totalItems' => 1]);
+    }
+
+    #[TestWith(['/chickens?q[foo]=bar'])]
+    #[TestWith(['/chickens?q[][foo]=bar'])]
+    public function testFreeTextQueryFilterWithoutCondition(string $uri): void
+    {
+        $this->createClient()->request('GET', $uri);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains(['totalItems' => 4]);
     }
 
     public function testFreeTextQueryFilterWithOneToManyRelation(): void

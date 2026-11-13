@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -29,8 +30,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -169,8 +168,16 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getPropertyMetadataFactoryContext(ApiResource $resourceMetadata): array
     {
-        $normalizationGroups = $resourceMetadata->getNormalizationContext()[AbstractNormalizer::GROUPS] ?? null;
-        $denormalizationGroups = $resourceMetadata->getDenormalizationContext()[AbstractNormalizer::GROUPS] ?? null;
+        $normalizationGroups = ($resourceMetadata->getNormalizationContext() ?? [])[AbstractNormalizer::GROUPS] ?? null;
+        $denormalizationGroups = ($resourceMetadata->getDenormalizationContext() ?? [])[AbstractNormalizer::GROUPS] ?? null;
+
+        if (\is_string($normalizationGroups)) {
+            $normalizationGroups = [$normalizationGroups];
+        }
+        if (\is_string($denormalizationGroups)) {
+            $denormalizationGroups = [$denormalizationGroups];
+        }
+
         $propertyContext = [
             'normalization_groups' => $normalizationGroups,
             'denormalization_groups' => $denormalizationGroups,
@@ -257,7 +264,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $hydraOperations = [];
         foreach ($resourceMetadata->getOperations() as $operation) {
-            if (true === $operation->getHideHydraOperation()) {
+            if (true === $operation->getHideHydraOperation() || $operation instanceof NotExposed) {
                 continue;
             }
 
@@ -363,108 +370,53 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $types = [];
 
-        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $nativeType = $propertyMetadata->getNativeType();
-            if (null === $nativeType) {
-                return null;
-            }
+        $nativeType = $propertyMetadata->getNativeType();
+        if (null === $nativeType) {
+            return null;
+        }
 
-            if ($nativeType->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
-                $nativeType = TypeHelper::getCollectionValueType($nativeType);
-            }
+        if ($nativeType->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
+            $nativeType = TypeHelper::getCollectionValueType($nativeType);
+        }
 
-            // Check for specific types after potentially unwrapping the collection
-            if (null === $nativeType) {
-                return null; // Should not happen if collection had a value type, but safety check
-            }
+        // Check for specific types after potentially unwrapping the collection
+        if (null === $nativeType) {
+            return null; // Should not happen if collection had a value type, but safety check
+        }
 
-            if ($nativeType->isIdentifiedBy(TypeIdentifier::STRING)) {
-                $types[] = 'xsd:string';
-            }
+        if ($nativeType->isIdentifiedBy(TypeIdentifier::STRING)) {
+            $types[] = 'xsd:string';
+        }
 
-            if ($nativeType->isIdentifiedBy(TypeIdentifier::INT)) {
-                $types[] = 'xsd:integer';
-            }
+        if ($nativeType->isIdentifiedBy(TypeIdentifier::INT)) {
+            $types[] = 'xsd:integer';
+        }
 
-            if ($nativeType->isIdentifiedBy(TypeIdentifier::FLOAT)) {
-                $types[] = 'xsd:decimal';
-            }
+        if ($nativeType->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+            $types[] = 'xsd:decimal';
+        }
 
-            if ($nativeType->isIdentifiedBy(TypeIdentifier::BOOL)) {
-                $types[] = 'xsd:boolean';
-            }
+        if ($nativeType->isIdentifiedBy(TypeIdentifier::BOOL)) {
+            $types[] = 'xsd:boolean';
+        }
 
-            if ($nativeType->isIdentifiedBy(\DateTimeInterface::class)) {
-                $types[] = 'xsd:dateTime';
-            }
+        if ($nativeType->isIdentifiedBy(\DateTimeInterface::class)) {
+            $types[] = 'xsd:dateTime';
+        }
 
-            /** @var class-string|null $className */
-            $className = null;
+        /** @var class-string|null $className */
+        $className = null;
 
-            $typeIsResourceClass = function (Type $type) use (&$className): bool {
-                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
-            };
+        $typeIsResourceClass = function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
+        };
 
-            if ($nativeType->isSatisfiedBy($typeIsResourceClass) && $className) {
-                $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                $operation = $resourceMetadata->getOperation();
+        if ($nativeType->isSatisfiedBy($typeIsResourceClass) && $className) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($className);
+            $operation = $resourceMetadata->getOperation();
 
-                if (!\in_array("#{$operation->getShortName()}", $types, true)) {
-                    $types[] = "#{$operation->getShortName()}";
-                }
-            }
-        // TODO: remove in 5.x
-        } else {
-            $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
-
-            foreach ($builtInTypes as $type) {
-                if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
-                    $type = $collectionType;
-                }
-
-                switch ($type->getBuiltinType()) {
-                    case LegacyType::BUILTIN_TYPE_STRING:
-                        if (!\in_array('xsd:string', $types, true)) {
-                            $types[] = 'xsd:string';
-                        }
-                        break;
-                    case LegacyType::BUILTIN_TYPE_INT:
-                        if (!\in_array('xsd:integer', $types, true)) {
-                            $types[] = 'xsd:integer';
-                        }
-                        break;
-                    case LegacyType::BUILTIN_TYPE_FLOAT:
-                        if (!\in_array('xsd:decimal', $types, true)) {
-                            $types[] = 'xsd:decimal';
-                        }
-                        break;
-                    case LegacyType::BUILTIN_TYPE_BOOL:
-                        if (!\in_array('xsd:boolean', $types, true)) {
-                            $types[] = 'xsd:boolean';
-                        }
-                        break;
-                    case LegacyType::BUILTIN_TYPE_OBJECT:
-                        if (null === $className = $type->getClassName()) {
-                            continue 2;
-                        }
-
-                        if (is_a($className, \DateTimeInterface::class, true)) {
-                            if (!\in_array('xsd:dateTime', $types, true)) {
-                                $types[] = 'xsd:dateTime';
-                            }
-                            break;
-                        }
-
-                        if ($this->resourceClassResolver->isResourceClass($className)) {
-                            $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                            $operation = $resourceMetadata->getOperation();
-
-                            if (!\in_array("#{$operation->getShortName()}", $types, true)) {
-                                $types[] = "#{$operation->getShortName()}";
-                            }
-                            break;
-                        }
-                }
+            if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                $types[] = "#{$operation->getShortName()}";
             }
         }
 
@@ -479,38 +431,20 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     private function isSingleRelation(ApiProperty $propertyMetadata): bool
     {
-        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $nativeType = $propertyMetadata->getNativeType();
-            if (null === $nativeType) {
-                return false;
-            }
-
-            if ($nativeType instanceof CollectionType) {
-                return false;
-            }
-
-            $typeIsResourceClass = function (Type $type) use (&$className): bool {
-                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
-            };
-
-            return $nativeType->isSatisfiedBy($typeIsResourceClass);
+        $nativeType = $propertyMetadata->getNativeType();
+        if (null === $nativeType) {
+            return false;
         }
 
-        // TODO: remove in 5.x
-        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
-
-        foreach ($builtInTypes as $type) {
-            $className = $type->getClassName();
-            if (
-                !$type->isCollection()
-                && null !== $className
-                && $this->resourceClassResolver->isResourceClass($className)
-            ) {
-                return true;
-            }
+        if ($nativeType instanceof CollectionType) {
+            return false;
         }
 
-        return false;
+        $typeIsResourceClass = function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
+        };
+
+        return $nativeType->isSatisfiedBy($typeIsResourceClass);
     }
 
     /**

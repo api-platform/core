@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\GraphQl\Test\GraphQlTestTrait;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\ActivityLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomMutation as DummyCustomMutationDocument;
@@ -767,6 +767,38 @@ final class MutationTest extends ApiTestCase
         $this->assertSame('updateRelatedToDummyFriendNestedPayloadCursorConnection', $rel['relatedToDummyFriend']['__typename']);
         $this->assertSame('Relation-1', $rel['relatedToDummyFriend']['edges'][0]['node']['name']);
         $this->assertSame('Relation-2', $rel['relatedToDummyFriend']['edges'][1]['node']['name']);
+    }
+
+    public function testModifyItemWithNestedInputIdUpdatesExistingObject(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('ThirdLevel @!mongodb.');
+        }
+
+        $this->recreateSchema([Dummy::class, RelatedDummy::class, ThirdLevel::class, FourthLevel::class]);
+        $this->seedDummyWithRelatedDummyAndThirdLevel();
+        $manager = $this->getManager();
+        $manager->persist(new FourthLevel());
+        $manager->flush();
+
+        $response = $this->executeGraphQl(<<<'QUERY'
+            mutation {
+              updateRelatedDummy(input: {
+                id: "/related_dummies/1",
+                thirdLevel: { id: "/third_levels/1", fourthLevel: "/fourth_levels/1" }
+              }) {
+                relatedDummy {
+                  thirdLevel { id fourthLevel { id } }
+                }
+              }
+            }
+            QUERY);
+
+        $this->assertResponseIsSuccessful();
+        $thirdLevel = $response->toArray()['data']['updateRelatedDummy']['relatedDummy']['thirdLevel'];
+        $this->assertSame('/third_levels/1', $thirdLevel['id']);
+        $this->assertSame('/fourth_levels/1', $thirdLevel['fourthLevel']['id']);
+        $this->assertCount(1, $this->getManager()->getRepository(ThirdLevel::class)->findAll());
     }
 
     public function testMutationRunsBeforeValidation(): void

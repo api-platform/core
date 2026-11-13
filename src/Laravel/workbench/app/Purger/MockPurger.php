@@ -46,6 +46,6 @@ class MockPurger implements PurgerInterface
 
     public function getResponseHeaders(array $iris): array
     {
-        return [];
+        return ['Cache-Tags' => implode(',', $iris)];
     }
 }

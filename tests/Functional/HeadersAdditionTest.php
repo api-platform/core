@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Headers;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -41,7 +41,7 @@ final class HeadersAdditionTest extends ApiTestCase
         self::createClient()->request('GET', '/dummy_cars');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Sunset', 'Sat, 01 Jan 2050 00:00:00 +0000');
+        $this->assertResponseHeaderSame('Sunset', 'Sat, 01 Jan 2050 00:00:00 GMT');
     }
 
     public function testDeclareHeadersFromResource(): void

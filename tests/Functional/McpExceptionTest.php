@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\McpExceptionTools;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -60,6 +60,17 @@ final class McpExceptionTest extends ApiTestCase
 
         self::assertArrayNotHasKey('result', $result, \sprintf('Tool "%s" returned a result instead of an error.', $tool));
         self::assertSame($expectedMessage, $result['error']['message'] ?? null);
+    }
+
+    public function testExceptionMappedByExceptionToStatusReachesTheCaller(): void
+    {
+        $this->skipUnlessMcpIsAvailable();
+
+        $client = self::createClient();
+        $result = $this->callTool($client, $this->initializeMcpSession($client), 'mapped_domain_exception_tool', ['text' => 'hello'])->toArray(false);
+
+        self::assertArrayNotHasKey('result', $result);
+        self::assertSame('Contact 42 not found.', $result['error']['message'] ?? null);
     }
 
     private function skipUnlessMcpIsAvailable(): void

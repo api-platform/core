@@ -88,7 +88,9 @@ resources:
                     paginationClientItemsPerPage: false
                     paginationClientPartial: false
                     paginationViaCursor:
-                        userId: DESC
+                        -
+                            field: userId
+                            direction: DESC
                     paginationEnabled: false
                     paginationFetchJoinCollection: false
                     paginationUseOutputWalkers: false
@@ -215,7 +217,9 @@ resources:
             paginationClientItemsPerPage: true
             paginationClientPartial: true
             paginationViaCursor:
-                id: DESC
+                -
+                    field: id
+                    direction: DESC
             paginationEnabled: true
             paginationFetchJoinCollection: true
             paginationUseOutputWalkers: true

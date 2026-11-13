@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 final readonly class OrFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
@@ -33,7 +34,7 @@ final readonly class OrFilter implements FilterInterface, JsonSchemaFilterInterf
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
         return $builder->where(function ($builder) use ($values, $parameter, $context): void {
-            foreach ($values as $value) {
+            foreach (Arr::wrap($values) as $value) {
                 $this->filter->apply($builder, $value, $parameter, ['whereClause' => 'orWhere'] + $context);
             }
         });

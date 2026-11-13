@@ -31,6 +31,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     provider: [self::class, 'provideCompanyByName'],
     uriVariables: ['name']
 )]
+#[NotExposed(
+    uriTemplate: '/doctrine-company-by-name/{name}',
+    uriVariables: ['name' => new Link(fromClass: self::class, identifiers: ['name'])]
+)]
 #[Post]
 #[ApiResource(
     uriTemplate: '/employees/{employeeId}/company',

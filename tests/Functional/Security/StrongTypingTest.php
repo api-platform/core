@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Security;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
@@ -86,12 +86,12 @@ final class StrongTypingTest extends ApiTestCase
             ],
         );
 
-        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
-            '@context' => '/contexts/Error',
-            '@type' => 'hydra:Error',
-            'detail' => 'The type of the "name" attribute must be "string", "NULL" given.',
+            '@context' => '/contexts/ConstraintViolation',
+            '@type' => 'ConstraintViolation',
+            'detail' => 'name: This value should not be blank.',
         ]);
     }
 
@@ -198,12 +198,12 @@ final class StrongTypingTest extends ApiTestCase
             ],
         );
 
-        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
-            '@context' => '/contexts/Error',
-            '@type' => 'hydra:Error',
-            'detail' => 'The type of the "name" attribute must be "string", "integer" given.',
+            '@context' => '/contexts/ConstraintViolation',
+            '@type' => 'ConstraintViolation',
+            'detail' => 'name: This value should be of type string.',
         ]);
     }
 

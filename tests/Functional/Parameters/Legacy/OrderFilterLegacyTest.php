@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters\Legacy;
 
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy\FilteredOrderParameter as FilteredOrderParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\FilteredOrderParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;

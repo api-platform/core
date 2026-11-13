@@ -146,8 +146,8 @@ final class LinkFactoryTest extends TestCase
     public function testCreateLinksFromAttributesWithExtendedLink(): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
-        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->with(ScopedLinkResource::class, 'dummy')->willReturn((new ApiProperty())->withNativeType(Type::object(Dummy::class)));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnMap([[ScopedLinkResource::class, 'dummy', (new ApiProperty())->withNativeType(Type::object(Dummy::class))]]);
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);
 
@@ -164,13 +164,13 @@ final class LinkFactoryTest extends TestCase
     public function testCompleteLinkDoesNotCacheEmptyIdentifiers(): void
     {
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->method('create')->with(AttributeResource::class)->willReturnOnConsecutiveCalls(
+        $propertyNameCollectionFactory->expects($this->any())->method('create')->with(AttributeResource::class)->willReturnOnConsecutiveCalls(
             new PropertyNameCollection([]),
             new PropertyNameCollection(['uuid']),
         );
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->with(AttributeResource::class, 'uuid')->willReturn((new ApiProperty())->withIdentifier(true));
+        $propertyMetadataFactory->expects($this->any())->method('create')->with(AttributeResource::class, 'uuid')->willReturn((new ApiProperty())->withIdentifier(true));
 
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);

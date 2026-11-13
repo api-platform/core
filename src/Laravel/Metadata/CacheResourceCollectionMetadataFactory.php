@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use Illuminate\Support\Facades\Cache;
 
 final class CacheResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use MetadataCacheTrait;
+
     /**
      * @var array<string, ResourceMetadataCollection>
      */
@@ -27,13 +29,12 @@ final class CacheResourceCollectionMetadataFactory implements ResourceMetadataCo
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $decorated,
         private readonly string $cacheStore,
+        private readonly ?ModelMetadata $modelMetadata = null,
     ) {
     }
 
     public function create(string $resourceClass): ResourceMetadataCollection
     {
-        return $this->localCache[$resourceClass] ??= Cache::store($this->cacheStore)->rememberForever($resourceClass, function () use ($resourceClass) {
-            return $this->decorated->create($resourceClass);
-        });
+        return $this->cached($resourceClass, fn (): ResourceMetadataCollection => $this->decorated->create($resourceClass));
     }
 }

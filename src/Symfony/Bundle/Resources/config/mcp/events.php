@@ -44,7 +44,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.mcp.state_provider.deserialize.inner'),
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
-            service('translator')->nullOnInvalid(),
         ]);
 
     $services->set('api_platform.mcp.state_provider.parameter', ParameterProvider::class)
@@ -82,7 +81,9 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.mcp.state_provider'),
             service('api_platform.mcp.state_processor'),
             service('request_stack'),
+            service('api_platform.mcp.json_schema.tool_input_schema_factory'),
             service('logger')->ignoreOnInvalid(),
+            param('api_platform.exception_to_status'),
         ])
         ->tag('mcp.request_handler');
 };

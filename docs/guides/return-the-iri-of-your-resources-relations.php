@@ -173,7 +173,7 @@ namespace App\Playground {
 }
 
 namespace App\Tests {
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+    use ApiPlatform\Test\ApiTestCase;
     use App\ApiResource\Brand;
 
     final class BrandTest extends ApiTestCase

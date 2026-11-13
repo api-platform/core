@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\EventListener\ReadListener;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -145,5 +146,13 @@ class ReadListenerTest extends TestCase
                 HttpKernelInterface::MAIN_REQUEST
             )
         );
+    }
+
+    #[IgnoreDeprecations]
+    public function testDeprecatedParameterProvider(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.0: Passing a "ApiPlatform\State\ProviderInterface" as 4th argument to "ApiPlatform\Symfony\EventListener\ReadListener" is deprecated and will be removed in 6.0, parameters are now provided by "ApiPlatform\State\Provider\ParameterProvider" decorating the read provider chain.');
+
+        new ReadListener($this->createStub(ProviderInterface::class), null, null, $this->createStub(ProviderInterface::class));
     }
 }

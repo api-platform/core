@@ -108,9 +108,11 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'sunset' => $this->phpize($resource, 'sunset', 'string'),
             'acceptPatch' => $this->phpize($resource, 'acceptPatch', 'string'),
             'host' => $this->phpize($resource, 'host', 'string'),
-            'condition' => $this->phpize($resource, 'condition', 'string'),
+            'condition' => $this->resolveExpressionPlaceholder($this->phpize($resource, 'condition', 'string', resolve: false)),
             'controller' => $this->phpize($resource, 'controller', 'string'),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
+            'strictQueryParameterValidation' => $this->phpize($resource, 'strictQueryParameterValidation', 'bool'),
+            'hideHydraOperation' => $this->phpize($resource, 'hideHydraOperation', 'bool'),
             'types' => $this->buildArrayValue($resource, 'types'),
             'cacheHeaders' => $this->buildArrayValue($resource, 'cacheHeaders'),
             'hydraContext' => $this->buildArrayValue($resource, 'hydraContext'),
@@ -155,14 +157,14 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'paginationType' => $this->phpize($resource, 'paginationType', 'string'),
             'processor' => $this->phpize($resource, 'processor', 'string'),
             'provider' => $this->phpize($resource, 'provider', 'string'),
-            'security' => $this->phpize($resource, 'security', 'string'),
+            'security' => $this->resolveExpressionPlaceholder($this->phpize($resource, 'security', 'string', resolve: false)),
             'securityMessage' => $this->phpize($resource, 'securityMessage', 'string'),
-            'securityPostDenormalize' => $this->phpize($resource, 'securityPostDenormalize', 'string'),
+            'securityPostDenormalize' => $this->resolveExpressionPlaceholder($this->phpize($resource, 'securityPostDenormalize', 'string', resolve: false)),
             'securityPostDenormalizeMessage' => $this->phpize($resource, 'securityPostDenormalizeMessage', 'string'),
-            'securityPostValidation' => $this->phpize($resource, 'securityPostValidation', 'string'),
+            'securityPostValidation' => $this->resolveExpressionPlaceholder($this->phpize($resource, 'securityPostValidation', 'string', resolve: false)),
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
-            'input' => $this->phpize($resource, 'input', 'bool|string'),
-            'output' => $this->phpize($resource, 'output', 'bool|string'),
+            'input' => $this->buildInputOutput($resource, 'input'),
+            'output' => $this->buildInputOutput($resource, 'output'),
             'normalizationContext' => $this->buildArrayValue($resource, 'normalizationContext'),
             'denormalizationContext' => $this->buildArrayValue($resource, 'denormalizationContext'),
             'collectDenormalizationErrors' => $this->phpize($resource, 'collectDenormalizationErrors', 'bool'),
@@ -278,7 +280,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                     schema: $parameter['schema'] ?? [],
                     style: $parameter['style'] ?? null,
                     explode: $parameter['explode'] ?? false,
-                    allowReserved: $parameter['allowReserved '] ?? false,
+                    allowReserved: $parameter['allowReserved'] ?? false,
                     example: $parameter['example'] ?? null,
                     examples: isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null,
                     content: isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null
@@ -304,6 +306,18 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $resource['mercure'];
+    }
+
+    /**
+     * @return array{class?: string, name?: string}|bool|string|null
+     */
+    private function buildInputOutput(array $resource, string $key): array|bool|string|null
+    {
+        if (\is_array($resource[$key] ?? null)) {
+            return $resource[$key];
+        }
+
+        return $this->phpize($resource, $key, 'bool|string');
     }
 
     private function buildMessenger(array $resource): bool|array|string|null
@@ -356,15 +370,16 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             }
 
             $data[] = array_merge($datum, [
+                'method' => $this->phpize($operation, 'method', 'string'),
+                'routeName' => $this->phpize($operation, 'routeName', 'string'),
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
                 'validate' => $this->phpize($operation, 'validate', 'bool'),
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
                 'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
-                'strictQueryParameterValidation' => $this->phpize($operation, 'strictQueryParameterValidation', 'bool'),
-                'hideHydraOperation' => $this->phpize($resource, 'hideHydraOperation', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $class,
             ]);
@@ -418,6 +433,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'routePriority' => $this->phpize($operation, 'routePriority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
             ]);
         }
@@ -518,7 +534,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                     schema: $parameter['openapi']['schema'] ?? $parameter['schema'] ?? [],
                     style: $parameter['openapi']['style'] ?? null,
                     explode: $parameter['openapi']['explode'] ?? false,
-                    allowReserved: $parameter['openapi']['allowReserved '] ?? false,
+                    allowReserved: $parameter['openapi']['allowReserved'] ?? false,
                     example: $parameter['openapi']['example'] ?? null,
                     examples: isset($parameter['openapi']['examples']) ? new \ArrayObject($parameter['openapi']['examples']) : null,
                     content: isset($parameter['openapi']['content']) ? new \ArrayObject($parameter['openapi']['content']) : null

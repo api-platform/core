@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Hal;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\CollectionPagedResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -45,6 +45,16 @@ final class CollectionTest extends ApiTestCase
         $this->assertSame(10, $body['totalItems']);
         $this->assertSame(3, $body['itemsPerPage']);
         $this->assertSame([1, 2, 3], array_column($body['_embedded']['item'], 'id'));
+    }
+
+    public function testEmptyCollectionMatchesTheSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/hal_collection_paged?name=nope', [
+            'headers' => ['Accept' => 'application/hal+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertArrayNotHasKey('_embedded', $response->toArray());
+        $this->assertMatchesResourceCollectionJsonSchema(CollectionPagedResource::class, null, 'jsonhal');
     }
 
     public function testMiddlePageHasPrevAndNext(): void

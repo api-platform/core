@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Doctrine;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\EntityClassAndCustomProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithSeparatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResourceOdm\ResourceWithSeparatedDocument;

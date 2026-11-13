@@ -20,6 +20,9 @@ use ApiPlatform\State\OptionsInterface;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class GetCollection extends HttpOperation implements CollectionOperationInterface
 {
+    /**
+     * @param array<string|\SortDirection>|null $order
+     */
     public function __construct(
         ?string $uriTemplate = null,
         ?array $types = null,
@@ -91,6 +94,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?int $priority = null,
+        ?int $routePriority = null,
         ?string $name = null,
         $provider = null,
         $processor = null,
@@ -177,6 +181,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
+            routePriority: $routePriority,
             name: $name,
             provider: $provider,
             processor: $processor,

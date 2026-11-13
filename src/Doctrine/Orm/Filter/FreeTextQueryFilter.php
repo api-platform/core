@@ -98,7 +98,11 @@ final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAware
             );
         }
 
-        $queryBuilder->andWhere($qb->getDQLPart('where'));
+        if (null === $where = $qb->getDQLPart('where')) {
+            return;
+        }
+
+        $queryBuilder->andWhere($where);
 
         foreach ($qb->getDQLPart('join') as $joins) {
             foreach ($joins as $join) {

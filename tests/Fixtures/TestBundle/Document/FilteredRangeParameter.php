@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ComparisonFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -25,11 +26,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
     paginationItemsPerPage: 5,
     parameters: [
         'quantity' => new QueryParameter(
-            filter: new RangeFilter(),
+            filter: new ComparisonFilter(new ExactFilter()),
             openApi: new Parameter('quantity', 'query', allowEmptyValue: true)
         ),
         'amount' => new QueryParameter(
-            filter: new RangeFilter(),
+            filter: new ComparisonFilter(new ExactFilter()),
             property: 'quantity',
             openApi: new Parameter('amount', 'query', allowEmptyValue: true)
         ),

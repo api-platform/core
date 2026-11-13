@@ -120,7 +120,6 @@ class McpTest extends TestCase
 
         $sessionId = $this->initializeMcpSession();
         $response = $this->callTool($sessionId, 'update_book_status', [
-            'id' => null,
             'isbn' => '123',
             'title' => 'Test Book',
             'status' => 'pending',

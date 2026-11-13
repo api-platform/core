@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BookStoreResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7563\BookDto;
@@ -108,7 +108,7 @@ final class MappingTest extends ApiTestCase
 
     /**
      * When an API resource has multiple #[Map] targets (e.g. MappedEntity + AnotherMappedObject),
-     * the ObjectMapperProcessor must resolve the correct target using stateOptions during POST.
+     * the ObjectMapperInputProcessor must resolve the correct target using stateOptions during POST.
      */
     public function testPostWithMultipleMapTargetsResolvesCorrectEntity(): void
     {
@@ -160,6 +160,46 @@ final class MappingTest extends ApiTestCase
         $this->assertJsonContains(['hydra:member' => [
             ['name' => 'foo', 'extra' => 'field'],
         ]]);
+    }
+
+    public function testIriFilterOnMappedRelationFiltersByEntity(): void
+    {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB is not tested');
+        }
+
+        $this->recreateSchema([MappedResourceWithRelationEntity::class, MappedResourceWithRelationRelatedEntity::class]);
+        $manager = $this->getManager();
+
+        $relateds = [];
+        foreach (['first', 'second'] as $name) {
+            $related = new MappedResourceWithRelationRelatedEntity();
+            $related->name = $name;
+            $manager->persist($related);
+            $relateds[] = $related;
+        }
+        $manager->flush();
+
+        foreach ($relateds as $i => $related) {
+            $entity = new MappedResourceWithRelationEntity();
+            $entity->setId($i + 1);
+            $entity->setRelated($related);
+            $manager->persist($entity);
+        }
+        $manager->flush();
+
+        $response = self::createClient()->request('GET', '/mapped_resource_with_relations?relation=/mapped_resource_with_relation_relateds/'.$relateds[0]->getId(), [
+            'headers' => ['accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $members = $response->toArray()['member'];
+        $this->assertCount(1, $members);
+        $this->assertSame('1', $members[0]['id']);
     }
 
     public function testMapPutAllowCreate(): void

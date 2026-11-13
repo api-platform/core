@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
@@ -21,10 +22,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
+use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -43,6 +44,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
         $this->propertySchemaOneOfRestriction = new PropertySchemaOneOfRestriction([
             new PropertySchemaLengthRestriction(),
             new PropertySchemaRegexRestriction(),
+            new PropertySchemaFormat(),
         ]);
     }
 
@@ -80,25 +82,6 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
         yield 'native type: not supported' => [new Positive(), (new ApiProperty())->withNativeType(Type::mixed()), false];
     }
 
-    #[IgnoreDeprecations]
-    public function testCreate(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []],
-            'one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), [
-                'oneOf' => [['minLength' => 3]],
-            ]],
-        ];
-
-        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
-            self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
-        }
-    }
-
     #[DataProvider('createProviderWithNativeType')]
     public function testCreateWithNativeType(AtLeastOneOf $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
@@ -110,6 +93,9 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
         yield 'native type: not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []];
         yield 'native type: one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withNativeType(Type::string()), [
             'oneOf' => [['minLength' => 3]],
+        ]];
+        yield 'native type: ip version all' => [new AtLeastOneOf([new Length(min: 3), new Ip(version: 'all')]), (new ApiProperty())->withNativeType(Type::string()), [
+            'oneOf' => [['minLength' => 3], ['oneOf' => [['format' => 'ipv4'], ['format' => 'ipv6']]]],
         ]];
     }
 }

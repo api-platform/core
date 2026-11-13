@@ -30,11 +30,11 @@ use Psr\Log\LoggerInterface;
 
 final class UnwiredLegacyFilterParameterTest extends TestCase
 {
-    public function testUnwiredRegistryAwareFilterIsLoggedAtDebug(): void
+    public function testUnwiredRegistryAwareFilterIsNotLogged(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->never())->method('alert');
-        $logger->expects($this->once())->method('debug');
+        $logger->expects($this->never())->method('debug');
 
         $this->createFactory($logger)->create(ResourceWithInlineDateFilter::class);
     }

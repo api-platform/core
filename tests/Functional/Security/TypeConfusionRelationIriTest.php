@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Security;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TypeConfusion\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TypeConfusion\Foo;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TypeConfusion\Target;
@@ -68,6 +68,26 @@ final class TypeConfusionRelationIriTest extends ApiTestCase
         // Expected behaviour after the fix: the IRI must be rejected because it points to a Bar
         // while the relation is declared as Foo. Today the request is silently accepted with 201
         // and the Bar IRI appears in the response, proving the type confusion.
+        $this->assertResponseStatusCodeSame(
+            400,
+            \sprintf(
+                'Type confusion: server accepted a Bar IRI on a Foo-typed relation. Body: %s',
+                $response->getContent(false)
+            )
+        );
+    }
+
+    public function testWrongTypedIriIsRejectedOnFooDeclaredRelationWithJsonApi(): void
+    {
+        $response = self::createClient()->request('POST', '/type-confusion/targets', [
+            'headers' => ['Content-Type' => 'application/vnd.api+json', 'Accept' => 'application/vnd.api+json'],
+            'json' => ['data' => [
+                'type' => 'Target',
+                'attributes' => ['name' => 'attack'],
+                'relationships' => ['relation' => ['data' => ['type' => 'Bar', 'id' => '/type-confusion/bars/1']]],
+            ]],
+        ]);
+
         $this->assertResponseStatusCodeSame(
             400,
             \sprintf(

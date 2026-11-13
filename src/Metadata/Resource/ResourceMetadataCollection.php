@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Util\UriTemplateHelper;
 
 /**
  * @extends \ArrayObject<int, ApiResource>
@@ -51,6 +52,8 @@ final class ResourceMetadataCollection extends \ArrayObject
 
         $it = $this->getIterator();
         $metadata = null;
+        $fallback = null;
+        $strippedOperationName = '' !== $operationName ? UriTemplateHelper::withoutFormatSuffix($operationName) : '';
 
         while ($it->valid()) {
             /** @var ApiResource $metadata */
@@ -72,6 +75,10 @@ final class ResourceMetadataCollection extends \ArrayObject
                     if ($operation->getUriTemplate() === $operationName) {
                         return $this->operationCache[$httpCacheKey] = $operation;
                     }
+
+                    if ('' !== $operationName && null === $fallback && null !== ($operationUriTemplate = $operation->getUriTemplate()) && UriTemplateHelper::withoutFormatSuffix($operationUriTemplate) === $strippedOperationName) {
+                        $fallback = $operation;
+                    }
                 }
             }
 
@@ -87,6 +94,10 @@ final class ResourceMetadataCollection extends \ArrayObject
             }
 
             $it->next();
+        }
+
+        if (null !== $fallback) {
+            return $this->operationCache[$httpCacheKey] = $fallback;
         }
 
         // Idea:

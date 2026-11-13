@@ -11,10 +11,12 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 
 return [
@@ -84,10 +86,10 @@ return [
     ],
 
     'jsonapi' => [
-        // When false, the JSON:API `data.id` uses the resource scalar identifier
-        // and a `data.links.self` IRI is added. When true (default), `data.id`
+        // When false (default), the JSON:API `data.id` uses the resource scalar
+        // identifier and a `data.links.self` IRI is added. When true, `data.id`
         // is the resource IRI.
-        'use_iri_as_id' => true,
+        'use_iri_as_id' => false,
 
         // Allow client-generated IDs on JSON:API POST per
         // https://jsonapi.org/format/#crud-creating-client-ids. Off by default
@@ -116,6 +118,8 @@ return [
     'exception_to_status' => [
         AuthenticationException::class => 401,
         AuthorizationException::class => 403,
+        SerializerExceptionInterface::class => 400,
+        InvalidArgumentException::class => 400,
     ],
 
     'redoc' => [
@@ -195,6 +199,7 @@ return [
     // MCP (Model Context Protocol) configuration
     'mcp' => [
         'enabled' => true,
+        'middleware' => [],
     ],
 
     // install `api-platform/http-cache`

@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -29,15 +30,22 @@ use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFa
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeConfigOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeDefaultOperations;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyGraphQlOperationWithShortName;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyMcpToolWithShortName;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperation;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationsWithDifferentShortNames;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithShortName;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\InvalidExceptionToStatusOperation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagationTarget;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameDifferentMethodOperations;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameGraphQlOperationAttributes;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameGraphQlOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
@@ -99,14 +107,14 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class, AttributeResourceProvider::class)
                 ),
                 new ApiResource(
-                    shortName: 'AttributeResource',
+                    shortName: 'AttributeResource2',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
-                            shortName: 'AttributeResource',
+                            shortName: 'AttributeResource2',
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 4,
                             status: 301,
@@ -116,7 +124,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}{._format}_patch' => new Patch(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}{._format}',
-                            shortName: 'AttributeResource',
+                            shortName: 'AttributeResource2',
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 5,
                             status: 301,
@@ -206,6 +214,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]), $attributesResourceMetadataCollectionFactory->create(AttributeConfigOperations::class));
     }
 
+    public function testCreateWithAllowCreateDefault(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: ['allow_create' => true]);
+
+        $operation = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)->getOperation('_api_AttributeResource_put');
+
+        $this->assertInstanceOf(Put::class, $operation);
+        $this->assertTrue($operation->getAllowCreate());
+    }
+
     public function testCreateShouldNotOverrideWithDefault(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(
@@ -233,6 +251,27 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
     }
 
+    public function testCreateWithDefaultsHavingCanGetters(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'read' => false,
+            'deserialize' => false,
+            'validate' => false,
+            'write' => false,
+            'serialize' => false,
+            'map' => true,
+        ]);
+
+        $operation = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)->getOperation('_api_AttributeResource_put');
+
+        $this->assertFalse($operation->canRead());
+        $this->assertFalse($operation->canDeserialize());
+        $this->assertFalse($operation->canValidate());
+        $this->assertFalse($operation->canWrite());
+        $this->assertFalse($operation->canSerialize());
+        $this->assertTrue($operation->canMap());
+    }
+
     public function testExtraProperties(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
@@ -240,6 +279,22 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 
         $this->assertEquals($extraPropertiesResource[0]->getExtraProperties(), ['foo' => 'bar']);
         $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
+    }
+
+    public function testCreateWithListDefaults(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'types' => ['https://schema.org/CreativeWork'],
+            'schemes' => ['https'],
+        ]);
+
+        $resourceMetadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeResource::class);
+        $operation = $resourceMetadataCollection->getOperation('_api_AttributeResource_get');
+
+        $this->assertSame(['https://schema.org/CreativeWork'], $resourceMetadataCollection[0]->getTypes());
+        $this->assertInstanceOf(HttpOperation::class, $operation);
+        $this->assertSame(['https://schema.org/CreativeWork'], $operation->getTypes());
+        $this->assertSame(['https'], $operation->getSchemes());
     }
 
     public function testOverrideNameWithoutOperations(): void
@@ -258,6 +313,60 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperation::class));
     }
 
+    public function testAttributeOnlyOperationUsesOperationShortName(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperationWithShortName::class);
+
+        $this->assertSame('CustomShortName', $metadataCollection[0]->getShortName());
+        foreach ($metadataCollection[0]->getOperations() as $operation) {
+            $this->assertSame('CustomShortName', $operation->getShortName());
+        }
+    }
+
+    public function testAttributeOnlyOperationsWithDifferentShortNamesAreSplit(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeOnlyOperationsWithDifferentShortNames::class);
+
+        $this->assertCount(2, $metadataCollection);
+
+        $this->assertSame('ItemShortName', $metadataCollection[0]->getShortName());
+        $itemOperations = iterator_to_array($metadataCollection[0]->getOperations());
+        $this->assertCount(2, $itemOperations);
+        foreach ($itemOperations as $operation) {
+            $this->assertSame('ItemShortName', $operation->getShortName());
+        }
+        $this->assertInstanceOf(Get::class, array_values($itemOperations)[0]);
+        $this->assertInstanceOf(Post::class, array_values($itemOperations)[1]);
+
+        $this->assertSame('ListShortName', $metadataCollection[1]->getShortName());
+        $listOperations = iterator_to_array($metadataCollection[1]->getOperations());
+        $this->assertCount(1, $listOperations);
+        $this->assertInstanceOf(GetCollection::class, array_values($listOperations)[0]);
+        $this->assertSame('ListShortName', array_values($listOperations)[0]->getShortName());
+    }
+
+    public function testAttributeOnlyGraphQlOperationUsesOperationShortName(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeOnlyGraphQlOperationWithShortName::class);
+
+        $this->assertSame('CustomGraphQlShortName', $metadataCollection[0]->getShortName());
+    }
+
+    public function testAttributeOnlyMcpToolUsesOperationShortName(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+
+        $metadataCollection = $attributeResourceMetadataCollectionFactory->create(AttributeOnlyMcpToolWithShortName::class);
+
+        $this->assertSame('CustomMcpShortName', $metadataCollection[0]->getShortName());
+    }
+
     /**
      * Tests issue #5235.
      */
@@ -272,11 +381,9 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertTrue($operations->has('password_reset'));
     }
 
-    public function testDeduplicateShortNamesWhenEnabled(): void
+    public function testDeduplicateShortNames(): void
     {
-        $factory = new AttributesResourceMetadataCollectionFactory(defaults: [
-            'extra_properties' => ['deduplicate_resource_short_names' => true],
-        ], graphQlEnabled: true);
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
 
         $collection = $factory->create(AttributeResource::class);
 
@@ -292,18 +399,14 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         }
     }
 
-    /** @group legacy */
-    public function testDeduplicateShortNamesTriggersDeprecationWhenDisabled(): void
+    public function testInvalidExceptionToStatusThrows(): void
     {
-        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+        $factory = new AttributesResourceMetadataCollectionFactory();
 
-        $this->expectUserDeprecationMessage('Since api-platform/core 4.2: Having multiple "#[ApiResource]" attributes with the same "shortName" "AttributeResource" on class "ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource" is deprecated and will result in automatic short name deduplication in API Platform 5.x. Set "defaults.extra_properties.deduplicate_resource_short_names" to "true" in the API Platform configuration to enable it now.');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The HTTP status code "999" of operation "_api_InvalidExceptionToStatusOperation_get" of resource "%s" is not valid.', InvalidExceptionToStatusOperation::class));
 
-        $collection = $factory->create(AttributeResource::class);
-
-        // Without the flag, shortNames are NOT deduplicated
-        $this->assertSame('AttributeResource', $collection[0]->getShortName());
-        $this->assertSame('AttributeResource', $collection[1]->getShortName());
+        $factory->create(InvalidExceptionToStatusOperation::class);
     }
 
     public function testWithParameters(): void
@@ -362,9 +465,29 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $factory = new AttributesResourceMetadataCollectionFactory();
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
         $factory->create(SameNameDifferentMethodOperations::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperations::class));
+
+        $factory->create(SameNameGraphQlOperations::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameOnAttributesThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperationAttributes::class));
+
+        $factory->create(SameNameGraphQlOperationAttributes::class);
     }
 }

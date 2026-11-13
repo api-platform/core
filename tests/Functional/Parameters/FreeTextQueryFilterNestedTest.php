@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FreeTextArticle as DocumentFreeTextArticle;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FreeTextTag as DocumentFreeTextTag;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FreeTextArticle;
@@ -61,6 +61,14 @@ final class FreeTextQueryFilterNestedTest extends ApiTestCase
         $this->assertJsonContains(['totalItems' => 0]);
     }
 
+    public function testRootMatchIsReturnedWhenNullableRelationIsNull(): void
+    {
+        $client = $this->createClient();
+
+        $client->request('GET', '/free_text_articles?search=orphan');
+        $this->assertJsonContains(['totalItems' => 1]);
+    }
+
     protected function setUp(): void
     {
         $this->recreateSchema([FreeTextArticle::class, FreeTextTag::class]);
@@ -103,6 +111,10 @@ final class FreeTextQueryFilterNestedTest extends ApiTestCase
         $article3->setContent('nothing-here');
         $article3->setTag($tag3);
 
+        $orphanArticle = new $articleClass();
+        $orphanArticle->setContent('orphan-article');
+
+        $manager->persist($orphanArticle);
         $manager->persist($article1);
         $manager->persist($article2);
         $manager->persist($article3);

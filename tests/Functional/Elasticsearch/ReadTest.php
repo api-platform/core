@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Elasticsearch;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Book;
 use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Genre;
 use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Library;

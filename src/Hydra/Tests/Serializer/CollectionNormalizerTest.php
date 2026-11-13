@@ -149,14 +149,14 @@ class CollectionNormalizerTest extends TestCase
             'bar' => 'bzz',
         ];
 
-        $contextBuilderProphecy = $this->createMock(ContextBuilderInterface::class);
-        $contextBuilderProphecy->method('getResourceContextUri')->with(Foo::class)->willReturn('/contexts/Foo');
+        $contextBuilderProphecy = $this->createStub(ContextBuilderInterface::class);
+        $contextBuilderProphecy->method('getResourceContextUri')->willReturnMap([[Foo::class, '/contexts/Foo']]);
 
-        $resourceClassResolverProphecy = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->method('getResourceClass')->with($data, Foo::class)->willReturn(Foo::class);
+        $resourceClassResolverProphecy = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->method('getResourceClass')->willReturnMap([[$data, Foo::class, Foo::class]]);
 
         $iriConverterProphecy = $this->createMock(IriConverterInterface::class);
-        $iriConverterProphecy->method('getIriFromResource')->with(Foo::class, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/foos');
+        $iriConverterProphecy->expects($this->once())->method('getIriFromResource')->with(Foo::class, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/foos');
 
         $delegateNormalizerProphecy = $this->createMock(NormalizerInterface::class);
         $delegateNormalizerProphecy->method('normalize')->willReturnCallback(

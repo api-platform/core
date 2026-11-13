@@ -1,0 +1,3 @@
+api_platform_iris:
+    resource: .
+    type: api_platform_iris

@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
+use ApiPlatform\Test\ClientTrait as BaseClientTrait;
+
+trigger_deprecation('api-platform/core', '5.0', 'The "%s" trait is deprecated, use "%s" instead.', ClientTrait::class, BaseClientTrait::class);
+
+/**
+ * @deprecated since API Platform 5.0, use {@see BaseClientTrait} instead
+ */
 trait ClientTrait
 {
-    public function withOptions(array $options): static
-    {
-        $clone = clone $this;
-        $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
-
-        return $clone;
-    }
+    use BaseClientTrait;
 }

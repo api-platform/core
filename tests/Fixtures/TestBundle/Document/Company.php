@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -24,8 +25,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource]
 #[GetCollection]
 #[Get]
+#[NotExposed(
+    uriTemplate: '/doctrine-company-by-name/{name}',
+    uriVariables: ['name' => new Link(fromClass: self::class, identifiers: ['name'])]
+)]
 #[Post]
 #[ApiResource(
+    shortName: 'CompanyByRoom',
     uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
     uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']]
 )]

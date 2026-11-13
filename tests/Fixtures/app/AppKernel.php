@@ -110,8 +110,13 @@ class AppKernel extends Kernel
     {
         $c->setParameter('kernel.project_dir', __DIR__);
         $c->setParameter('app.gen_id_default', $this->genIdDefault);
+        $c->setParameter('app.security.admin_only', 'is_granted("ROLE_ADMIN")');
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
+
+        if (class_exists(McpBundle::class)) {
+            $loader->load(__DIR__.'/config/config_mcp.yml');
+        }
 
         $messengerConfig = [
             'default_bus' => 'messenger.bus.default',

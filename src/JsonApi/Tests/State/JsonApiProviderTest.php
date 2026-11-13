@@ -14,13 +14,34 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Tests\State;
 
 use ApiPlatform\JsonApi\State\JsonApiProvider;
+use ApiPlatform\JsonApi\Util\ResourceLinkageResolver;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\ProviderInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class JsonApiProviderTest extends TestCase
 {
+    private function createProvider(ProviderInterface $decorated, string $orderParameterName = 'order'): JsonApiProvider
+    {
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        return new JsonApiProvider(
+            $decorated,
+            $propertyNameCollectionFactory,
+            $this->createStub(PropertyMetadataFactoryInterface::class),
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            new ResourceLinkageResolver($this->createStub(ResourceClassResolverInterface::class)),
+            $orderParameterName,
+        );
+    }
+
     public function testProvide(): void
     {
         $request = new Request(query: ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo']);
@@ -28,7 +49,7 @@ class JsonApiProviderTest extends TestCase
         $operation = new Get(class: \stdClass::class, shortName: 'dummy');
         $context = ['request' => $request];
         $decorated = $this->createMock(ProviderInterface::class);
-        $provider = new JsonApiProvider($decorated);
+        $provider = $this->createProvider($decorated);
         $provider->provide($operation, [], $context);
 
         $this->assertSame(['id', 'name', 'dummyFloat', 'relatedDummy' => ['id', 'name']], $request->attributes->get('_api_filter_property'));
@@ -45,7 +66,7 @@ class JsonApiProviderTest extends TestCase
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
 
-        $provider = new JsonApiProvider($decorated);
+        $provider = $this->createProvider($decorated);
         $provider->provide($operation, [], $context);
 
         $this->assertSame([
@@ -67,7 +88,7 @@ class JsonApiProviderTest extends TestCase
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
 
-        $provider = new JsonApiProvider($decorated);
+        $provider = $this->createProvider($decorated);
         $provider->provide($operation, [], $context);
 
         $filters = $request->attributes->get('_api_filters');
@@ -90,7 +111,7 @@ class JsonApiProviderTest extends TestCase
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
 
-        $provider = new JsonApiProvider($decorated);
+        $provider = $this->createProvider($decorated);
         $provider->provide($operation, [], $context);
 
         $filters = $request->attributes->get('_api_filters');
@@ -109,7 +130,7 @@ class JsonApiProviderTest extends TestCase
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
 
-        $provider = new JsonApiProvider($decorated);
+        $provider = $this->createProvider($decorated);
         $provider->provide($operation, [], $context);
 
         $filters = $request->attributes->get('_api_filters');

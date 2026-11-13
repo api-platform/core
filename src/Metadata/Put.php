@@ -91,6 +91,7 @@ final class Put extends HttpOperation
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?int $priority = null,
+        ?int $routePriority = null,
         ?string $name = null,
         $provider = null,
         $processor = null,
@@ -178,6 +179,7 @@ final class Put extends HttpOperation
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
+            routePriority: $routePriority,
             name: $name,
             provider: $provider,
             processor: $processor,
@@ -195,9 +197,12 @@ final class Put extends HttpOperation
         );
     }
 
-    public function withAllowCreate(bool $allowCreate): void
+    public function withAllowCreate(bool $allowCreate): static
     {
-        $this->allowCreate = $allowCreate;
+        $self = clone $this;
+        $self->allowCreate = $allowCreate;
+
+        return $self;
     }
 
     public function getAllowCreate(): ?bool

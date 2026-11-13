@@ -26,7 +26,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerInterface;
 use SebastianBergmann\Diff\Differ;
-use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use SebastianBergmann\Diff\Output\StrictUnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -212,7 +212,7 @@ final class UpgradeApiFilterCommand extends Command
 
     private function diff(string $from, string $to): string
     {
-        return (new Differ(new UnifiedDiffOutputBuilder("--- original\n+++ upgraded\n")))->diff($from, $to);
+        return (new Differ(new StrictUnifiedDiffOutputBuilder(['fromFile' => 'original', 'toFile' => 'upgraded'])))->diff($from, $to);
     }
 
     private function fix(string $file): void

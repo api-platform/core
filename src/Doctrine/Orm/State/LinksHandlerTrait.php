@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\TokenType;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -62,6 +64,8 @@ trait LinksHandlerTrait
             if (!$this->managerRegistry->getManagerForClass($fromClass)) {
                 $fromClass = $this->getLinkFromClass($link, $operation);
             }
+
+            $identifiers = $this->resolveLinkIdentifiers($identifiers, $link, $fromClass);
 
             $fromClassMetadata = $manager->getClassMetadata($fromClass);
             $identifierProperties = $link->getIdentifiers();
@@ -122,7 +126,7 @@ trait LinksHandlerTrait
                     $queryBuilder->join(
                         $fromClass,
                         $joinAlias,
-                        'WITH',
+                        $this->getArbitraryJoinConditionType(),
                         "$previousAlias.{$previousJoinProperties[0]} = $joinAlias.{$associationMapping['fieldName']}"
                     );
                 }
@@ -179,5 +183,12 @@ trait LinksHandlerTrait
         $operation = $this->resourceMetadataCollectionFactory->create($fromClass)->getOperation();
 
         return $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+    }
+
+    private function getArbitraryJoinConditionType(): string
+    {
+        static $conditionType = null;
+
+        return $conditionType ??= \defined(TokenType::class.'::T_ON') ? Join::ON : Join::WITH;
     }
 }

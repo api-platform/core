@@ -44,7 +44,7 @@ class Person
     /** @var array<AcademicGrade> */
     #[ODM\Field(nullable: true)]
     #[Groups(['people.pets'])]
-    public array $academicGrades = [];
+    public ?array $academicGrades = [];
 
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]

@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -32,8 +33,17 @@ use Symfony\Component\Serializer\Serializer;
  */
 final class ErrorResourceAttributeLoaderPassTest extends TestCase
 {
+    private function skipOnSymfony64(): void
+    {
+        if (class_exists(AnnotationLoader::class)) {
+            $this->markTestSkipped('Symfony 6.4 AttributeLoader has a different constructor.');
+        }
+    }
+
     public function testRegistersAttributeLoaderForErrorClassesInChainLoader(): void
     {
+        $this->skipOnSymfony64();
+
         $container = new ContainerBuilder();
         $container->setDefinition('serializer.mapping.chain_loader', new Definition(LoaderChain::class, [[]]));
         $container->setDefinition('serializer.mapping.cache_warmer', new Definition(\stdClass::class, [[]]));
@@ -58,6 +68,8 @@ final class ErrorResourceAttributeLoaderPassTest extends TestCase
 
     public function testAlsoUpdatesCacheWarmer(): void
     {
+        $this->skipOnSymfony64();
+
         $container = new ContainerBuilder();
         $container->setDefinition('serializer.mapping.chain_loader', new Definition(LoaderChain::class, [[]]));
         $container->setDefinition('serializer.mapping.cache_warmer', new Definition(\stdClass::class, [[]]));
@@ -99,7 +111,7 @@ final class ErrorResourceAttributeLoaderPassTest extends TestCase
      */
     public function testSkipsOnSymfony64SerializerSignature(): void
     {
-        if (!class_exists(\Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader::class)) {
+        if (!class_exists(AnnotationLoader::class)) {
             $this->markTestSkipped('Only relevant when running against symfony/serializer 6.4 (AnnotationLoader still present).');
         }
 
@@ -122,6 +134,8 @@ final class ErrorResourceAttributeLoaderPassTest extends TestCase
      */
     public function testErrorNormalizationStaysPopulatedWhenAttributesAreDisabled(): void
     {
+        $this->skipOnSymfony64();
+
         // Simulates `enable_attributes: false`: Symfony's attribute loader rejects every class.
         $disabledAttributeLoader = new AttributeLoader(allowAnyClass: false, mappedClasses: []);
 
@@ -169,6 +183,8 @@ final class ErrorResourceAttributeLoaderPassTest extends TestCase
 
     public function testTheCompilerPassDefinitionMatchesTheRuntimeExpectation(): void
     {
+        $this->skipOnSymfony64();
+
         $container = new ContainerBuilder();
         $container->setDefinition('serializer.mapping.chain_loader', new Definition(LoaderChain::class, [[]]));
         $container->setDefinition('serializer.mapping.cache_warmer', new Definition(\stdClass::class, [[]]));

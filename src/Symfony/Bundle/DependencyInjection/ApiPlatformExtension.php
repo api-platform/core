@@ -70,7 +70,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
 use Symfony\AI\McpBundle\McpBundle;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -209,10 +208,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLinkSecurityConfiguration($loader, $config);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
-        // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service.
         // willBeAvailable mirrors FrameworkBundle's own gate: when symfony/object-mapper is in dev-only,
         // FrameworkBundle skips object_mapper.php and the "object_mapper" service we alias to does not exist.
-        if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
+        if (class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('state/object_mapper.php');
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }
@@ -325,7 +323,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.php');
         $loader->load('filter.php');
 
-        if (class_exists(\PhpParser\ParserFactory::class)) {
+        if (class_exists(\PhpParser\ParserFactory::class) && interface_exists(\ApiPlatform\Doctrine\Common\Filter\DateFilterInterface::class)) {
             $loader->load('upgrade.php');
         }
 
@@ -409,7 +407,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.stale_while_revalidate', $config['defaults']['cache_headers']['stale_while_revalidate'] ?? null);
         $container->setParameter('api_platform.http_cache.stale_if_error', $config['defaults']['cache_headers']['stale_if_error'] ?? null);
         $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
-        $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
+        $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? ' ');
 
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
         $container->setAlias('api_platform.inflector', $config['inflector']);
@@ -479,13 +477,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('metadata/resource_name.php');
         $loader->load('metadata/property_name.php');
-
-        if (!empty($config['resource_class_directories'])) {
-            $container->setParameter('api_platform.resource_class_directories', array_merge(
-                $config['resource_class_directories'],
-                $container->getParameter('api_platform.resource_class_directories')
-            ));
-        }
 
         // V3 metadata
         $loader->load('metadata/php.php');
@@ -723,10 +714,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('state/jsonapi.php');
 
         $useIriAsId = $config['jsonapi']['use_iri_as_id'];
-        if (null === $useIriAsId) {
-            trigger_deprecation('api-platform/core', '4.4', 'Not setting "api_platform.jsonapi.use_iri_as_id" explicitly is deprecated. Its default value will change from "true" to "false" in API Platform 5.0. Set it to "true" to keep the current behavior or to "false" to use entity identifiers as the "id" field, and silence this deprecation.');
-            $useIriAsId = true;
-        }
 
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
         $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
@@ -861,6 +848,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('doctrine_orm.php');
 
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/doctrine_orm.php');
+        }
+
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
         }
@@ -891,6 +882,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.odm.links_handler');
 
         $loader->load('doctrine_mongodb_odm.php');
+
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql/doctrine_mongodb_odm.php');
+        }
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
@@ -919,9 +914,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $definition->addTag('api_platform.http_cache.http_client');
         }
 
-        if (!($urls = $config['http_cache']['invalidation']['urls'])) {
-            $urls = $config['http_cache']['invalidation']['varnish_urls'];
-        }
+        $urls = $config['http_cache']['invalidation']['urls'];
 
         foreach ($urls as $key => $url) {
             $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);

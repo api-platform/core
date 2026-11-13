@@ -15,6 +15,9 @@ namespace ApiPlatform\Metadata\Operation\Factory;
 
 use ApiPlatform\Metadata\Operation;
 
+/**
+ * Finds the operation that matches a URI template or an operation name.
+ */
 interface OperationMetadataFactoryInterface
 {
     public function create(string $uriTemplate, array $context = []): ?Operation;
