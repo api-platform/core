@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\Pagination\MappedObjectPaginator;
@@ -41,7 +42,9 @@ final class ObjectMapperProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
-        $class = $operation->getOutput()['class'] ?? $operation->getClass();
+        $class = $operation instanceof HttpOperation && !\in_array($operation->getMethod(), [HttpOperation::METHOD_GET, HttpOperation::METHOD_HEAD, HttpOperation::METHOD_OPTIONS, HttpOperation::METHOD_QUERY], true)
+            ? $operation->getClass()
+            : ($operation->getOutput()['class'] ?? $operation->getClass());
 
         if (!$this->objectMapper || !$operation->canMap()) {
             return $data;

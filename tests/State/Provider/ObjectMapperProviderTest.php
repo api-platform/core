@@ -180,7 +180,7 @@ class ObjectMapperProviderTest extends TestCase
     {
         $sourceEntity = new SourceEntity();
         $outputResource = new OutputResource();
-        $operation = new Patch(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
+        $operation = new Get(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->once())
             ->method('map')
