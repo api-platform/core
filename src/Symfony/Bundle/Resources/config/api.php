@@ -50,6 +50,7 @@ use Negotiation\Negotiator;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -107,7 +108,7 @@ return function (ContainerConfigurator $container) {
         ->decorate('api_platform.property_info')
         ->args([
             service('.inner'),
-            service('cache.property_info'),
+            inline_service(ArrayAdapter::class),
         ]);
 
     $services->set('api_platform.negotiator', Negotiator::class);

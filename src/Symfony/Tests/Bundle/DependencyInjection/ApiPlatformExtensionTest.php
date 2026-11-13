@@ -36,8 +36,10 @@ use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\ObjectMapper\ObjectMapper;
@@ -575,10 +577,20 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
-    /**
-     * @see https://github.com/api-platform/core/issues/8332
-     */
-    public function testCachePoolClearerClearsPropertyInfoAndOperationMetadataCaches(): void
+    public function testPropertyInfoUsesInMemoryCache(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $propertyInfoCache = $this->container->getDefinition('api_platform.property_info.cache');
+        $cachePool = $propertyInfoCache->getArgument(1);
+
+        $this->assertInstanceOf(Definition::class, $cachePool);
+        $this->assertSame(ArrayAdapter::class, $cachePool->getClass());
+        $this->assertContainerHasService('api_platform.metadata.property.metadata_factory.cached');
+        $this->assertContainerHasService('api_platform.metadata.property.name_collection_factory.cached');
+    }
+
+    public function testCachePoolClearerClearsOperationMetadataCache(): void
     {
         $this->container->setParameter('kernel.debug', true);
         $config = self::DEFAULT_CONFIG;
@@ -586,7 +598,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHasService('api_platform.cache_warmer.cache_pool_clearer');
         $pools = $this->container->getDefinition('api_platform.cache_warmer.cache_pool_clearer')->getArgument(1);
-        $this->assertContains('cache.property_info', $pools);
+        $this->assertNotContains('cache.property_info', $pools);
         $this->assertContains('api_platform.cache.metadata.operation', $pools);
     }
 
