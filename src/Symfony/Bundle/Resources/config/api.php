@@ -123,11 +123,13 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.name_collection_factory'),
             '%kernel.build_dir%/api_platform_property_info.php',
         ])
-        ->tag('kernel.cache_warmer');
+        ->tag('kernel.cache_warmer', ['priority' => 75]);
 
-    $services->set('api_platform.property_info.symfony_warmup_classes', ResourceNameCollection::class)
+    $services->set('api_platform.metadata.symfony_warmup_classes', ResourceNameCollection::class)
         ->factory([service('api_platform.metadata.resource.name_collection_factory'), 'create'])
-        ->tag('property_info.warmup_class_provider');
+        ->tag('property_info.warmup_class_provider')
+        ->tag('serializer.warmup_class_provider')
+        ->tag('validator.warmup_class_provider');
 
     $services->set('api_platform.negotiator', Negotiator::class);
 

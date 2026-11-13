@@ -604,12 +604,14 @@ class ApiPlatformExtensionTest extends TestCase
 
         $warmer = $this->container->getDefinition('api_platform.property_info.cache_warmer');
         $this->assertSame(PropertyInfoCacheWarmer::class, $warmer->getClass());
-        $this->assertArrayHasKey('kernel.cache_warmer', $warmer->getTags());
+        $this->assertSame([['priority' => 75]], $warmer->getTag('kernel.cache_warmer'));
 
-        $provider = $this->container->getDefinition('api_platform.property_info.symfony_warmup_classes');
+        $provider = $this->container->getDefinition('api_platform.metadata.symfony_warmup_classes');
         $this->assertSame(ResourceNameCollection::class, $provider->getClass());
         $this->assertSame('api_platform.metadata.resource.name_collection_factory', (string) $provider->getFactory()[0]);
         $this->assertArrayHasKey('property_info.warmup_class_provider', $provider->getTags());
+        $this->assertArrayHasKey('serializer.warmup_class_provider', $provider->getTags());
+        $this->assertArrayHasKey('validator.warmup_class_provider', $provider->getTags());
     }
 
     /**
