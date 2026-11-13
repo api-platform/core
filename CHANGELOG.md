@@ -225,6 +225,16 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
 
+## v4.4.8
+
+### Security
+
+* [0dcb5ea52](https://github.com/api-platform/core/commit/0dcb5ea529aec775134524cb2a1efb48dfa8ef78) fix(mcp): support MCP SDK 0.9 on 4.4 (security advisory on 0.8) (#8837)
+
+### Bug fixes
+
+* [cf20162c6](https://github.com/api-platform/core/commit/cf20162c6bb0e63b6da2aaf96932ac874e00a3ff) fix(symfony): register docs and jsonld routes in api_platform_iris mode (#8745)
+
 ## v4.4.7
 
 ### Security
