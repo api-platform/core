@@ -24,6 +24,7 @@ use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\GenericChild;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResource;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResourceWithUnionIntersectTypes;
+use ApiPlatform\JsonSchema\Tests\Fixtures\NullableObjectCollection;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Serializable;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -47,6 +48,54 @@ use Symfony\Component\TypeInfo\Type;
 class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;
+
+    public function testBuildSchemaKeepsNullOnNullableObjectCollections(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(NullableObjectCollection::class, Argument::cetera())->willReturn(new PropertyNameCollection(['optionalChildren', 'requiredChildren', 'optionalMixedChildren']));
+        $propertyNameCollectionFactoryProphecy->create(GenericChild::class, Argument::cetera())->willReturn(new PropertyNameCollection(['property']));
+        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection([]));
+
+        $child = Type::object(GenericChild::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(NullableObjectCollection::class, 'optionalChildren', Argument::cetera())->willReturn(
+            (new ApiProperty())->withNativeType(Type::nullable(Type::list($child)))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+        $propertyMetadataFactoryProphecy->create(NullableObjectCollection::class, 'requiredChildren', Argument::cetera())->willReturn(
+            (new ApiProperty())->withNativeType(Type::list($child))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+        $propertyMetadataFactoryProphecy->create(NullableObjectCollection::class, 'optionalMixedChildren', Argument::cetera())->willReturn(
+            (new ApiProperty())->withNativeType(Type::nullable(Type::list(Type::union($child, Type::object(NotAResource::class)))))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+        $propertyMetadataFactoryProphecy->create(GenericChild::class, 'property', Argument::cetera())->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withSchema(['type' => 'string'])
+        );
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(false);
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
+            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+        $resultSchema = $schemaFactory->buildSchema(NullableObjectCollection::class);
+
+        $properties = $resultSchema->getDefinitions()[$resultSchema->getRootDefinitionKey()]['properties'];
+
+        $this->assertSame(['array', 'null'], $properties['optionalChildren']['type']);
+        $this->assertSame(['$ref' => '#/definitions/GenericChild'], (array) $properties['optionalChildren']['items']);
+
+        $this->assertSame('array', $properties['requiredChildren']['type']);
+        $this->assertSame(['$ref' => '#/definitions/GenericChild'], (array) $properties['requiredChildren']['items']);
+
+        $this->assertSame(['array', 'null'], $properties['optionalMixedChildren']['type']);
+        $this->assertArrayHasKey('anyOf', (array) $properties['optionalMixedChildren']['items']);
+    }
 
     public function testBuildSchemaForNonResourceClass(): void
     {
