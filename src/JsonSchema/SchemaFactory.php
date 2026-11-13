@@ -291,6 +291,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                             $propertySchema['items'] = 1 === \count($unionRefs)
                                 ? $unionRefs[0]
                                 : ['anyOf' => $unionRefs];
+                            if ($isNullable) {
+                                $propertySchema['type'] = $this->withNullType($propertySchema['type']);
+                            }
                         } else {
                             $refs = 1 === \count($unionRefs)
                                 ? [$unionRefs[0]]
@@ -350,6 +353,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                         $propertySchema[$key] = [];
                     }
                     $propertySchema[$key] = ['$ref' => $subSchemaResult['$ref']];
+                    if ($isNullable) {
+                        $propertySchema['type'] = $this->withNullType($propertySchema['type']);
+                    }
                     $refs = [];
                     break;
                 }
@@ -432,6 +438,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['type'], $schema['items'], $schema['allOf'], $schema['anyOf'], $schema['oneOf']);
 
         return $schema;
+    }
+
+    private function withNullType(array|string $type): array
+    {
+        $types = (array) $type;
+
+        return \in_array('null', $types, true) ? $types : [...$types, 'null'];
     }
 
     private function getSchemaValue(array $schema, string $key): array|string|null
