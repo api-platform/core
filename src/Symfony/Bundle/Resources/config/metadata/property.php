@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Property\Factory\IdentifierPropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory;
+use ApiPlatform\Symfony\Bundle\CacheWarmer\PropertyMetadataCacheWarmer;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -51,7 +53,7 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.metadata.property.metadata_factory.cached', CachedPropertyMetadataFactory::class)
         ->decorate('api_platform.metadata.property.metadata_factory', null, -10)
         ->args([
-            service('api_platform.cache.metadata.property'),
+            service('api_platform.cache.metadata.property.php_array'),
             service('api_platform.metadata.property.metadata_factory.cached.inner'),
         ]);
 
@@ -68,6 +70,20 @@ return function (ContainerConfigurator $container) {
 
     $services->set('api_platform.metadata.property.metadata_factory.xml', ExtractorPropertyMetadataFactory::class)
         ->args([service('api_platform.metadata.property_extractor.xml')]);
+
+    $services->set('api_platform.metadata.property.cache_warmer', PropertyMetadataCacheWarmer::class)
+        ->args([
+            service('api_platform.metadata.resource.name_collection_factory'),
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.cache.metadata.property'),
+            '%kernel.build_dir%/api_platform_property_metadata.php',
+        ])
+        ->tag('kernel.cache_warmer', ['priority' => -10]);
+
+    $services->set('api_platform.cache.metadata.property.php_array', PhpArrayAdapter::class)
+        ->factory([PhpArrayAdapter::class, 'create'])
+        ->args(['%kernel.build_dir%/api_platform_property_metadata.php', service('api_platform.cache.metadata.property')]);
 
     $services->set('api_platform.cache.metadata.property')
         ->parent('cache.system')
