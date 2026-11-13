@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UriVariablesConverter;
@@ -42,6 +43,7 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Action\NotExposedAction;
 use ApiPlatform\Symfony\Action\NotFoundAction;
+use ApiPlatform\Symfony\Bundle\CacheWarmer\PropertyInfoCacheWarmer;
 use ApiPlatform\Symfony\Routing\ApiLoader;
 use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Symfony\Routing\Router;
@@ -50,6 +52,7 @@ use Negotiation\Negotiator;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -107,8 +110,26 @@ return function (ContainerConfigurator $container) {
         ->decorate('api_platform.property_info')
         ->args([
             service('.inner'),
-            service('cache.property_info'),
+            service('api_platform.property_info.cache.adapter'),
         ]);
+
+    $services->set('api_platform.property_info.cache.adapter', PhpArrayAdapter::class)
+        ->factory([PhpArrayAdapter::class, 'create'])
+        ->args(['%kernel.build_dir%/api_platform_property_info.php', service('cache.property_info')]);
+
+    $services->set('api_platform.property_info.cache_warmer', PropertyInfoCacheWarmer::class)
+        ->args([
+            service('api_platform.property_info.cache.inner'),
+            service('api_platform.metadata.resource.name_collection_factory'),
+            '%kernel.build_dir%/api_platform_property_info.php',
+        ])
+        ->tag('kernel.cache_warmer', ['priority' => 75]);
+
+    $services->set('api_platform.metadata.symfony_warmup_classes', ResourceNameCollection::class)
+        ->factory([service('api_platform.metadata.resource.name_collection_factory'), 'create'])
+        ->tag('property_info.warmup_class_provider')
+        ->tag('serializer.warmup_class_provider')
+        ->tag('validator.warmup_class_provider');
 
     $services->set('api_platform.negotiator', Negotiator::class);
 

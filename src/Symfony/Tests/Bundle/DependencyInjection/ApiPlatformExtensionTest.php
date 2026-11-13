@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\Filter\GroupFilter;
@@ -25,6 +26,8 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Action\NotFoundAction;
+use ApiPlatform\Symfony\Bundle\CacheWarmer\PropertyInfoCacheWarmer;
+use ApiPlatform\Symfony\Bundle\CacheWarmer\PropertyMetadataCacheWarmer;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -36,6 +39,7 @@ use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -588,6 +592,51 @@ class ApiPlatformExtensionTest extends TestCase
         $pools = $this->container->getDefinition('api_platform.cache_warmer.cache_pool_clearer')->getArgument(1);
         $this->assertContains('cache.property_info', $pools);
         $this->assertContains('api_platform.cache.metadata.operation', $pools);
+    }
+
+    public function testPropertyInfoCacheIsWarmed(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $adapter = $this->container->getDefinition('api_platform.property_info.cache.adapter');
+        $this->assertSame(PhpArrayAdapter::class, $adapter->getClass());
+        $this->assertSame('cache.property_info', (string) $adapter->getArgument(1));
+        $this->assertSame('api_platform.property_info.cache.adapter', (string) $this->container->getDefinition('api_platform.property_info.cache')->getArgument(1));
+
+        $warmer = $this->container->getDefinition('api_platform.property_info.cache_warmer');
+        $this->assertSame(PropertyInfoCacheWarmer::class, $warmer->getClass());
+        $this->assertSame([['priority' => 75]], $warmer->getTag('kernel.cache_warmer'));
+
+        $provider = $this->container->getDefinition('api_platform.metadata.symfony_warmup_classes');
+        $this->assertSame(ResourceNameCollection::class, $provider->getClass());
+        $this->assertSame('api_platform.metadata.resource.name_collection_factory', (string) $provider->getFactory()[0]);
+        $this->assertArrayHasKey('property_info.warmup_class_provider', $provider->getTags());
+        $this->assertArrayHasKey('serializer.warmup_class_provider', $provider->getTags());
+        $this->assertArrayHasKey('validator.warmup_class_provider', $provider->getTags());
+    }
+
+    public function testPropertyMetadataCacheIsWarmed(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $fallback = $this->container->getDefinition('api_platform.cache.metadata.property');
+        $this->assertInstanceOf(ChildDefinition::class, $fallback);
+        $this->assertSame('cache.system', $fallback->getParent());
+        $this->assertTrue($fallback->hasTag('cache.pool'));
+
+        $pool = $this->container->getDefinition('api_platform.cache.metadata.property.php_array');
+        $this->assertSame(PhpArrayAdapter::class, $pool->getClass());
+        $this->assertSame([PhpArrayAdapter::class, 'create'], $pool->getFactory());
+        $this->assertSame('%kernel.build_dir%/api_platform_property_metadata.php', $pool->getArgument(0));
+        $this->assertSame('api_platform.cache.metadata.property', (string) $pool->getArgument(1));
+        $this->assertFalse($pool->hasTag('cache.pool'));
+        $this->assertSame('api_platform.cache.metadata.property.php_array', (string) $this->container->getDefinition('api_platform.metadata.property.name_collection_factory.cached')->getArgument(0));
+        $this->assertSame('api_platform.cache.metadata.property.php_array', (string) $this->container->getDefinition('api_platform.metadata.property.metadata_factory.cached')->getArgument(0));
+
+        $warmer = $this->container->getDefinition('api_platform.metadata.property.cache_warmer');
+        $this->assertSame(PropertyMetadataCacheWarmer::class, $warmer->getClass());
+        $this->assertSame([['priority' => -10]], $warmer->getTag('kernel.cache_warmer'));
+        $this->assertSame('api_platform.cache.metadata.property', (string) $warmer->getArgument(3));
     }
 
     /**

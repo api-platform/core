@@ -32,7 +32,7 @@ return static function (ContainerConfigurator $container) {
     $services->set('api_platform.metadata.property.name_collection_factory.cached', CachedPropertyNameCollectionFactory::class)
         ->decorate('api_platform.metadata.property.name_collection_factory', null, -10)
         ->args([
-            service('api_platform.cache.metadata.property'),
+            service('api_platform.cache.metadata.property.php_array'),
             service('api_platform.metadata.property.name_collection_factory.cached.inner'),
         ]);
 
