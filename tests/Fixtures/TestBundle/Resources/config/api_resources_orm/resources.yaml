@@ -24,6 +24,18 @@ resources:
                             toProperty: author
                         id: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, id]
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7655\Book:
+        shortName: Issue7655Book
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                uriTemplate: /issue7655_books
+                parameters:
+                    title:
+                        filter: app_issue7655_exact_filter
+                    authorName:
+                        property: author.name
+                        filter: app_issue7655_exact_filter
+
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy:
         shortName: single_file_config
         description: File configured resource

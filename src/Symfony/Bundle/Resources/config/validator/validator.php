@@ -33,7 +33,7 @@ return static function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['key' => 'api_platform.validator.state.error_provider']);
 
     $services->set('api_platform.validator.metadata.resource.metadata_collection_factory.parameter', ParameterValidationResourceMetadataCollectionFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1000)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 790)
         ->args([
             service('api_platform.validator.metadata.resource.metadata_collection_factory.parameter.inner'),
             service('api_platform.filter_locator'),
