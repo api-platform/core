@@ -381,7 +381,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     {
         $groups = $operation->getValidationContext()['groups'] ?? [];
 
-        return \is_array($groups) ? $groups : [$groups];
+        if (\is_object($groups) && property_exists($groups, 'groups') && \is_array($groups->groups)) {
+            return [$groups];
+        }
+
+        return \is_array($groups) && !\is_callable($groups) ? $groups : [];
     }
 
     /**
