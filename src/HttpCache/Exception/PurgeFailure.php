@@ -15,9 +15,6 @@ namespace ApiPlatform\HttpCache\Exception;
 
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
-/**
- * A single cache purge request that failed.
- */
 final readonly class PurgeFailure
 {
     public function __construct(
@@ -38,9 +35,6 @@ final readonly class PurgeFailure
         return $this->headerName;
     }
 
-    /**
-     * The tags (or ban regex) sent in the purge request.
-     */
     public function getHeaderValue(): string
     {
         return $this->headerValue;

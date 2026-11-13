@@ -16,12 +16,6 @@ namespace ApiPlatform\HttpCache\Exception;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
 
-/**
- * Thrown once every purge request has been attempted, when at least one of them failed.
- *
- * It implements HttpClient's ExceptionInterface so that code catching the exception
- * the HTTP client used to throw directly still catches it.
- */
 final class PurgeFailedException extends RuntimeException implements HttpClientExceptionInterface
 {
     /**
