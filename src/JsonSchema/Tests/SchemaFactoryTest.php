@@ -51,36 +51,37 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaKeepsNullOnNullableObjectCollections(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(NullableObjectCollection::class, Argument::cetera())->willReturn(new PropertyNameCollection(['optionalChildren', 'requiredChildren', 'optionalMixedChildren']));
-        $propertyNameCollectionFactoryProphecy->create(GenericChild::class, Argument::cetera())->willReturn(new PropertyNameCollection(['property']));
-        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection([]));
-
         $child = Type::object(GenericChild::class);
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NullableObjectCollection::class, 'optionalChildren', Argument::cetera())->willReturn(
-            (new ApiProperty())->withNativeType(Type::nullable(Type::list($child)))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
-        );
-        $propertyMetadataFactoryProphecy->create(NullableObjectCollection::class, 'requiredChildren', Argument::cetera())->willReturn(
-            (new ApiProperty())->withNativeType(Type::list($child))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
-        );
-        $propertyMetadataFactoryProphecy->create(NullableObjectCollection::class, 'optionalMixedChildren', Argument::cetera())->willReturn(
-            (new ApiProperty())->withNativeType(Type::nullable(Type::list(Type::union($child, Type::object(NotAResource::class)))))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
-        );
-        $propertyMetadataFactoryProphecy->create(GenericChild::class, 'property', Argument::cetera())->willReturn(
-            (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withSchema(['type' => 'string'])
+        $types = [
+            'optionalChildren' => Type::nullable(Type::list($child)),
+            'requiredChildren' => Type::list($child),
+            'optionalMixedChildren' => Type::nullable(Type::list(Type::union($child, Type::object(NotAResource::class)))),
+        ];
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(
+            static fn (string $resourceClass): PropertyNameCollection => new PropertyNameCollection(match ($resourceClass) {
+                NullableObjectCollection::class => array_keys($types),
+                GenericChild::class => ['property'],
+                default => [],
+            })
         );
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(false);
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(
+            static fn (string $resourceClass, string $property): ApiProperty => GenericChild::class === $resourceClass
+                ? (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withSchema(['type' => 'string'])
+                : (new ApiProperty())->withNativeType($types[$property])->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
 
         $schemaFactory = new SchemaFactory(
-            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
-            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
+            resourceMetadataFactory: $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            resourceClassResolver: $resourceClassResolver,
             definitionNameFactory: new DefinitionNameFactory(),
         );
         $resultSchema = $schemaFactory->buildSchema(NullableObjectCollection::class);

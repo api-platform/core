@@ -440,11 +440,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         return $schema;
     }
 
-    /**
-     * @param string|list<string> $type
-     *
-     * @return list<string>
-     */
     private function withNullType(array|string $type): array
     {
         $types = (array) $type;
