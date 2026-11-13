@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.4.8
+
+### Security
+
+* [0dcb5ea52](https://github.com/api-platform/core/commit/0dcb5ea529aec775134524cb2a1efb48dfa8ef78) fix(mcp): support MCP SDK 0.9 on 4.4 (security advisory on 0.8) (#8837)
+
+### Bug fixes
+
+* [cf20162c6](https://github.com/api-platform/core/commit/cf20162c6bb0e63b6da2aaf96932ac874e00a3ff) fix(symfony): register docs and jsonld routes in api_platform_iris mode (#8745)
+
 ## v4.4.7
 
 ### Security
