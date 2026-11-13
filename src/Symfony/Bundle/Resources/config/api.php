@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UriVariablesConverter;
@@ -123,6 +124,10 @@ return function (ContainerConfigurator $container) {
             '%kernel.build_dir%/api_platform_property_info.php',
         ])
         ->tag('kernel.cache_warmer');
+
+    $services->set('api_platform.property_info.symfony_warmup_classes', ResourceNameCollection::class)
+        ->factory([service('api_platform.metadata.resource.name_collection_factory'), 'create'])
+        ->tag('property_info.warmup_class_provider');
 
     $services->set('api_platform.negotiator', Negotiator::class);
 

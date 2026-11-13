@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\Filter\GroupFilter;
@@ -604,6 +605,11 @@ class ApiPlatformExtensionTest extends TestCase
         $warmer = $this->container->getDefinition('api_platform.property_info.cache_warmer');
         $this->assertSame(PropertyInfoCacheWarmer::class, $warmer->getClass());
         $this->assertArrayHasKey('kernel.cache_warmer', $warmer->getTags());
+
+        $provider = $this->container->getDefinition('api_platform.property_info.symfony_warmup_classes');
+        $this->assertSame(ResourceNameCollection::class, $provider->getClass());
+        $this->assertSame('api_platform.metadata.resource.name_collection_factory', (string) $provider->getFactory()[0]);
+        $this->assertArrayHasKey('property_info.warmup_class_provider', $provider->getTags());
     }
 
     /**

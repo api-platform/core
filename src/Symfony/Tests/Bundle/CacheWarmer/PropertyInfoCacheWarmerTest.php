@@ -71,6 +71,34 @@ final class PropertyInfoCacheWarmerTest extends TestCase
         $key = rawurlencode('getShortDescription.'.serialize([PropertyInfoUnknownSubject::class, 'name', []]));
         $this->assertTrue($fallback->hasItem($key));
     }
+
+    public function testSkipsWarmupWithoutBuildDirectory(): void
+    {
+        $resourceNames = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceNames->expects($this->never())->method('create');
+        $file = $this->cacheDir.'/build/property_info.php';
+        $warmer = new PropertyInfoCacheWarmer(new PropertyInfoExtractor(), $resourceNames, $file);
+
+        $this->assertTrue($warmer->isOptional());
+        $this->assertSame([], $warmer->warmUp($this->cacheDir));
+        $this->assertFileDoesNotExist($file);
+    }
+
+    public function testMissingResourceDoesNotStopWarmup(): void
+    {
+        $reflection = new ReflectionExtractor();
+        $extractor = new PropertyInfoExtractor([$reflection], [$reflection], [], [$reflection], [$reflection]);
+        $resourceNames = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceNames->expects($this->once())->method('create')->willReturn(new ResourceNameCollection([__NAMESPACE__.'\\PropertyInfoMissingSubject', PropertyInfoWarmupSubject::class]));
+        $file = $this->cacheDir.'/build/property_info.php';
+
+        (new PropertyInfoCacheWarmer($extractor, $resourceNames, $file))->warmUp($this->cacheDir, $this->cacheDir.'/build');
+
+        $fallback = new ArrayAdapter();
+        $cached = new PropertyInfoCacheExtractor($extractor, PhpArrayAdapter::create($file, $fallback));
+        $this->assertContains('name', $cached->getProperties(PropertyInfoWarmupSubject::class));
+        $this->assertSame([], $fallback->getValues());
+    }
 }
 
 final class PropertyInfoWarmupSubject
