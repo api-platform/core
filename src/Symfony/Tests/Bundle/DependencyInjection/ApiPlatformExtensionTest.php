@@ -25,6 +25,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Action\NotFoundAction;
+use ApiPlatform\Symfony\Bundle\CacheWarmer\PropertyInfoCacheWarmer;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -36,6 +37,7 @@ use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -588,6 +590,20 @@ class ApiPlatformExtensionTest extends TestCase
         $pools = $this->container->getDefinition('api_platform.cache_warmer.cache_pool_clearer')->getArgument(1);
         $this->assertContains('cache.property_info', $pools);
         $this->assertContains('api_platform.cache.metadata.operation', $pools);
+    }
+
+    public function testPropertyInfoCacheIsWarmed(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $adapter = $this->container->getDefinition('api_platform.property_info.cache.adapter');
+        $this->assertSame(PhpArrayAdapter::class, $adapter->getClass());
+        $this->assertSame('cache.property_info', (string) $adapter->getArgument(1));
+        $this->assertSame('api_platform.property_info.cache.adapter', (string) $this->container->getDefinition('api_platform.property_info.cache')->getArgument(1));
+
+        $warmer = $this->container->getDefinition('api_platform.property_info.cache_warmer');
+        $this->assertSame(PropertyInfoCacheWarmer::class, $warmer->getClass());
+        $this->assertArrayHasKey('kernel.cache_warmer', $warmer->getTags());
     }
 
     /**
