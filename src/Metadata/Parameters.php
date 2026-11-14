@@ -52,6 +52,13 @@ final class Parameters implements \IteratorAggregate, \Countable
         $this->sort();
     }
 
+    public function __clone()
+    {
+        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
+            $this->parameters[$i] = [$parameterName, clone $parameter];
+        }
+    }
+
     /**
      * @return \ArrayIterator<string, Parameter>
      */

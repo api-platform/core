@@ -169,6 +169,14 @@ abstract class Parameter
         return $this;
     }
 
+    public function withValue(mixed $value): static
+    {
+        $self = clone $this;
+        $self->extraProperties['_api_values'] = $value;
+
+        return $self;
+    }
+
     /**
      * @return array<string, mixed>
      */

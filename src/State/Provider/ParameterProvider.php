@@ -64,6 +64,10 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         }
 
         $parameters = $operation->getParameters();
+        if ($parameters) {
+            $parameters = clone $parameters;
+            $operation = $operation->withParameters($parameters);
+        }
 
         if ($operation instanceof HttpOperation && true === $operation->getStrictQueryParameterValidation()) {
             $keys = [];
@@ -84,19 +88,16 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
 
         $context = ['operation' => $operation] + $context;
 
-        foreach ($parameters ?? [] as $parameter) {
+        foreach ($parameters ?? [] as $parameterKey => $parameter) {
             $values = $this->getParameterValues($parameter, $request, $context);
             $value = $this->extractParameterValues($parameter, $values);
-            // we force API Platform's value extraction, use _api_query_parameters or _api_header_parameters if you need to set a value
-            if (isset($parameter->getExtraProperties()['_api_values'])) {
-                unset($parameter->getExtraProperties()['_api_values']);
-            }
 
             if (null !== ($default = $parameter->getDefault() ?? $parameter->getSchema()['default'] ?? null) && $value instanceof ParameterNotFound) {
                 $value = $default;
             }
 
-            $parameter->setValue($value);
+            $parameter = $parameter->withValue($value);
+            $parameters->add($parameterKey, $parameter);
             $context['operation'] = $operation = $this->callParameterProvider($operation, $parameter, $values, $context);
         }
 
@@ -197,16 +198,12 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             }
 
             $value = $uriVariables[$key];
-            // we force API Platform's value extraction, use _api_query_parameters or _api_header_parameters if you need to set a value
-            if (isset($uriVariable->getExtraProperties()['_api_values'])) {
-                unset($uriVariable->getExtraProperties()['_api_values']);
-            }
 
             if (($default = $uriVariable->getDefault() ?? $uriVariable->getSchema()['default'] ?? false) && ($value instanceof ParameterNotFound || !$value)) {
                 $value = $default;
             }
 
-            $uriVariable->setValue($value);
+            $uriVariable = $uriVariable->withValue($value);
             if (($op = $this->callParameterProvider($operation, $uriVariable, $values, $context)) instanceof HttpOperation) {
                 $context['operation'] = $operation = $op;
             }
