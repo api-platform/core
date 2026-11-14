@@ -196,6 +196,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->isCacheKeySafe($context) ? $this->getCacheKey($format, $context) : false;
+        } elseif (false !== $context['cache_key'] && !$this->isCacheKeySafe($context)) {
+            $context['cache_key'] = false;
         }
 
         $context['object'] = $data;
