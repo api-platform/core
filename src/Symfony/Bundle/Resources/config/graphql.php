@@ -249,7 +249,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
         ])
-        ->tag('serializer.normalizer', ['priority' => -890]);
+        ->tag('serializer.normalizer', ['priority' => -890])
+        ->tag('kernel.reset', ['method' => 'reset']);
 
     $services->set('api_platform.graphql.denormalizer.item', ItemDenormalizer::class)
         ->args([
@@ -264,7 +265,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
         ])
-        ->tag('serializer.normalizer', ['priority' => -889]);
+        ->tag('serializer.normalizer', ['priority' => -889])
+        ->tag('kernel.reset', ['method' => 'reset']);
 
     $services->set('api_platform.graphql.normalizer.object', ObjectNormalizer::class)
         ->args([

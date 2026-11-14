@@ -55,13 +55,14 @@ use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Base item normalizer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
+abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implements ResetInterface
 {
     use CacheKeyTrait;
     use ClassInfoTrait;
@@ -79,6 +80,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
     protected array $safeCacheKeysCache = [];
+    protected array $attributesCache = [];
     protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
 
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, protected ?OperationResourceClassResolverInterface $operationResourceResolver = null)
@@ -586,6 +588,33 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return true;
+    }
+
+    public function reset(): void
+    {
+        $this->attributesCache = [];
+        $this->localCache = [];
+        $this->localFactoryOptionsCache = [];
+        $this->safeCacheKeysCache = [];
+    }
+
+    protected function getAttributes(object $object, ?string $format, array $context): array
+    {
+        $class = $this->getObjectClass($object);
+        $cacheKey = $context['cache_key'] ?? false;
+        $key = $class.'-'.$cacheKey;
+
+        if (isset($this->attributesCache[$key])) {
+            return $this->attributesCache[$key];
+        }
+
+        $attributes = parent::getAttributes($object, $format, ['cache_key' => false] + $context);
+
+        if ($cacheKey && \stdClass::class !== $class) {
+            $this->attributesCache[$key] = $attributes;
+        }
+
+        return $attributes;
     }
 
     /**

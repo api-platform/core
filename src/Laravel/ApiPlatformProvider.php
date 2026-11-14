@@ -1655,6 +1655,12 @@ class ApiPlatformProvider extends ServiceProvider
 
         Event::listen(RequestHandled::class, function (): void {
             $this->app->make(SkolemIriConverter::class)->reset();
+
+            foreach ([ItemNormalizer::class, ItemDenormalizer::class, JsonLdItemNormalizer::class, JsonLdItemDenormalizer::class, JsonApiItemNormalizer::class, JsonApiItemDenormalizer::class, HalItemNormalizer::class, GraphQlItemNormalizer::class, GraphQlItemDenormalizer::class] as $normalizer) {
+                if ($this->app->resolved($normalizer)) {
+                    $this->app->make($normalizer)->reset();
+                }
+            }
         });
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
