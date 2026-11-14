@@ -294,6 +294,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     );
 
                     $components['links'][$attribute] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
+                    $cacheKey = null;
                 }
 
                 $components['relationships'][] = $relation;
@@ -304,7 +305,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
         }
 
-        if (false !== $context['cache_key']) {
+        if ($cacheKey && false !== $context['cache_key']) {
             $this->componentsCache[$cacheKey] = $components;
         }
 
