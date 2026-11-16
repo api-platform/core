@@ -1,5 +1,20 @@
 # Changelog
 
+## v5.0.8
+
+### Security
+
+* [05be3e6e7](https://github.com/api-platform/core/commit/05be3e6e767888ba834de5741192bee4c5bb526f) fix(state): never write request values into cached metadata ([GHSA-xmq6-3c6q-fr8m](https://github.com/api-platform/core/security/advisories/GHSA-xmq6-3c6q-fr8m))
+* [f297e3344](https://github.com/api-platform/core/commit/f297e3344710bb6003323ecc8ffe89ded19b229f) fix(serializer): check cache key safety for embedded resources ([GHSA-w5jw-x8fm-533g](https://github.com/api-platform/core/security/advisories/GHSA-w5jw-x8fm-533g))
+
+### Bug fixes
+
+* [8d745fc81](https://github.com/api-platform/core/commit/8d745fc81ea7622c143c5826a0a8dcec6be56886) fix(serializer): reset normalizer caches between requests (#8852)
+* [f5690affd](https://github.com/api-platform/core/commit/f5690affd790439b205fc81667bea81a0e9b4cac) fix(state): map to the resource on mapped write operations (#8848)
+* [0ed92ea88](https://github.com/api-platform/core/commit/0ed92ea88a594d0da7987d3b6309158b88250ea0) fix(laravel): register ReadLinkParameterProvider (#8853)
+* [3f9a4b8e3](https://github.com/api-platform/core/commit/3f9a4b8e3fdbad940ca2cbaa7d069a4773154594) fix(jsonapi): skip cache for uriTemplate links (#8851)
+* [201b43a13](https://github.com/api-platform/core/commit/201b43a134af0d1868fa4e71002b4a5961f8ae82) fix(doctrine): avoid deprecated Type::hasType() (#8854)
+
 ## v5.0.7
 
 ### Notes
