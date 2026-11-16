@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
@@ -324,6 +325,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameter = $parameter->withProperties($propertyNames);
             }
 
+            $parameter = $this->resolveEnumClass($parameter);
             $parameter = $this->setDefaults($key, $parameter, $filter, $properties, $operation);
             // We don't do any type cast yet, a query parameter or an header is always a string or a list of strings
             if (null === $parameter->getNativeType()) {
@@ -473,6 +475,34 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
                 return $parameter;
             }
+        }
+
+        return $parameter;
+    }
+
+    /**
+     * Fills the schema "type" and "enum" from the backed enum, keeping the keys declared explicitly in the schema.
+     *
+     * The resulting schema behaves like an explicit one: it is resolved before the filter metadata, so a schema
+     * provided by the filter is not merged into it.
+     */
+    private function resolveEnumClass(Parameter $parameter): Parameter
+    {
+        if (null === $enumClass = $parameter->getEnumClass()) {
+            return $parameter;
+        }
+
+        if (!enum_exists($enumClass) || !is_subclass_of($enumClass, \BackedEnum::class)) {
+            throw new InvalidArgumentException(\sprintf('The "enumClass" of the parameter "%s" must be a backed enum, "%s" given.', $parameter->getKey(), $enumClass));
+        }
+
+        $type = 'int' === (new \ReflectionEnum($enumClass))->getBackingType()?->getName() ? 'integer' : 'string';
+        $schema = ($parameter->getSchema() ?? []) + ['type' => $type, 'enum' => array_column($enumClass::cases(), 'value')];
+        $parameter = $parameter->withSchema($schema);
+
+        // Query and header values arrive as strings: cast them so they strictly match the int case values.
+        if ('integer' === $schema['type'] && null === $parameter->getCastToNativeType()) {
+            $parameter = $parameter->withCastToNativeType(true);
         }
 
         return $parameter;

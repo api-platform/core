@@ -43,6 +43,7 @@ abstract class Parameter
      * @param ?callable(mixed): mixed                         $castFn           the closure used to cast your parameter, this gets called only when $castToNativeType is set
      * @param ?string                                         $filterClass      the class to use when resolving filter properties (from stateOptions)
      * @param list<Operation|class-string<Operation>>|null    $operations       a list of operations (instances or class names) this parameter applies to (if null, applies to all operations)
+     * @param class-string<\BackedEnum>|null                  $enumClass        a backed enum whose case values are the allowed values (fills the schema "enum" and "type")
      *
      * @phpstan-param array<string, mixed>|null $schema
      *
@@ -72,6 +73,7 @@ abstract class Parameter
         protected mixed $default = null,
         protected ?string $filterClass = null,
         protected ?array $operations = null,
+        protected ?string $enumClass = null,
     ) {
     }
 
@@ -436,6 +438,25 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->operations = $operations;
+
+        return $self;
+    }
+
+    /**
+     * @return class-string<\BackedEnum>|null
+     */
+    public function getEnumClass(): ?string
+    {
+        return $this->enumClass;
+    }
+
+    /**
+     * @param class-string<\BackedEnum>|null $enumClass
+     */
+    public function withEnumClass(?string $enumClass): static
+    {
+        $self = clone $this;
+        $self->enumClass = $enumClass;
 
         return $self;
     }
