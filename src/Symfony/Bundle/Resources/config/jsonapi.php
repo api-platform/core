@@ -84,7 +84,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.api.identifiers_extractor'),
         ])
         ->tag('serializer.normalizer', ['priority' => -890])
-        ->tag('kernel.reset', ['method' => 'reset']);
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.jsonapi.denormalizer.item', ItemDenormalizer::class)
         ->args([
@@ -102,7 +102,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.serializer.operation_resource_resolver'),
         ])
         ->tag('serializer.normalizer', ['priority' => -889])
-        ->tag('kernel.reset', ['method' => 'reset']);
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
         ->args([

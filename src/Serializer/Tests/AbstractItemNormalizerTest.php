@@ -121,7 +121,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $serializer = $this->createStubForIntersectionOfInterfaces([SerializerInterface::class, NormalizerInterface::class]);
+        $serializer = $this->createStub(Serializer::class);
         $serializer->method('normalize')->willReturnArgument(0);
 
         $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
