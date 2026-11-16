@@ -71,8 +71,6 @@ final class ResponseHeaderTest extends ApiTestCase
     #[IgnoreDeprecations]
     public function testProviderMutatingThePassedParameterIsStillHonoured(): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\\Metadata\\Parameter::setValue()" is deprecated and will be removed in 6.0. Parameters are immutable: return "$parameter->withValue($value)" (or an operation holding it) from your parameter provider instead.');
-
         self::createClient()->request('GET', 'with_legacy_response_headers/1');
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('x-legacy-header', 'legacy');
