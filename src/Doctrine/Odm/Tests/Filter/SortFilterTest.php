@@ -39,7 +39,7 @@ class SortFilterTest extends TestCase
         $filter = new SortFilter();
 
         $parameter = new QueryParameter(property: 'name', key: 'order[name]');
-        $parameter = $parameter->setValue('asc');
+        $parameter = $parameter->withValue('asc');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -59,7 +59,7 @@ class SortFilterTest extends TestCase
         $filter = new SortFilter();
 
         $parameter = new QueryParameter(property: 'name', key: 'order[name]');
-        $parameter = $parameter->setValue('DESC');
+        $parameter = $parameter->withValue('DESC');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -79,7 +79,7 @@ class SortFilterTest extends TestCase
         $filter = new SortFilter();
 
         $parameter = new QueryParameter(property: 'name', key: 'order[name]');
-        $parameter = $parameter->setValue('invalid');
+        $parameter = $parameter->withValue('invalid');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -143,7 +143,7 @@ class SortFilterTest extends TestCase
         $filter = new SortFilter();
 
         $parameter = new QueryParameter(key: 'sortNoProperty');
-        $parameter = $parameter->setValue('asc');
+        $parameter = $parameter->withValue('asc');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -180,7 +180,7 @@ class SortFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter = $parameter->setValue('asc');
+        $parameter = $parameter->withValue('asc');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
@@ -217,7 +217,7 @@ class SortFilterTest extends TestCase
         $filter = new SortFilter(nullsComparison: 'nulls_smallest');
 
         $parameter = new QueryParameter(property: 'dummyDate', key: 'order[dummyDate]');
-        $parameter = $parameter->setValue('asc');
+        $parameter = $parameter->withValue('asc');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -276,7 +276,7 @@ class SortFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter = $parameter->setValue('asc');
+        $parameter = $parameter->withValue('asc');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
@@ -341,7 +341,7 @@ class SortFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter = $parameter->setValue('asc');
+        $parameter = $parameter->withValue('asc');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 

@@ -57,7 +57,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
 
         $parameter = (new QueryParameter(key: 'fields'))
             ->withProperties(['title'])
-            ->setValue(['SparseFieldsetIncludeAuthor' => 'name']);
+            ->withValue(['SparseFieldsetIncludeAuthor' => 'name']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
 
@@ -79,7 +79,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
 
         $parameter = (new QueryParameter(key: 'fields'))
             ->withProperties(['title'])
-            ->setValue(['author' => 'name']);
+            ->withValue(['author' => 'name']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
 

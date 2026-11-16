@@ -64,7 +64,7 @@ final class LikeEscapeTest extends TestCase
         $queryBuilder = new QueryBuilder($entityManager);
         $queryBuilder->select('o')->from('Dummy', 'o');
 
-        $parameter = (new QueryParameter(key: 'name', property: 'name'))->setValue($values);
+        $parameter = (new QueryParameter(key: 'name', property: 'name'))->withValue($values);
         $filter->apply($queryBuilder, new QueryNameGenerator(), 'Dummy', null, ['parameter' => $parameter]);
 
         return $queryBuilder;

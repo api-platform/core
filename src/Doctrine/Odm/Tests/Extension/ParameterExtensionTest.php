@@ -63,11 +63,11 @@ class ParameterExtensionTest extends TestCase
                 (new QueryParameter(
                     key: 'param1',
                     filter: $this->createFilterMock(),
-                ))->setValue(1),
+                ))->withValue(1),
                 (new QueryParameter(
                     key: 'param2',
                     filter: 'filter_service_id' // From the container
-                ))->setValue(2),
+                ))->withValue(2),
                 new QueryParameter(
                     key: 'param3',
                     // Filer not called because no value
@@ -109,7 +109,7 @@ class ParameterExtensionTest extends TestCase
                 (new QueryParameter(
                     key: 'param1',
                     filter: $filter,
-                ))->setValue(1),
+                ))->withValue(1),
             ]);
 
         $extension = new ParameterExtension(
@@ -167,7 +167,7 @@ class ParameterExtensionTest extends TestCase
                 (new QueryParameter(
                     key: 'param1',
                     filter: $filter,
-                ))->setValue(1),
+                ))->withValue(1),
             ]);
 
         $extension = new ParameterExtension(
@@ -201,11 +201,11 @@ class ParameterExtensionTest extends TestCase
                 (new QueryParameter(
                     key: 'param1',
                     filter: $filter,
-                ))->setValue(1),
+                ))->withValue(1),
                 (new QueryParameter(
                     key: 'param2',
                     filter: $filter,
-                ))->setValue(2),
+                ))->withValue(2),
             ]);
 
         $extension = new ParameterExtension($this->createNonCalledFilterLocator());

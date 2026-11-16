@@ -41,7 +41,7 @@ class PartialSearchFilterTest extends TestCase
         $filter = new PartialSearchFilter();
 
         $parameter = new QueryParameter(property: 'name', key: 'name');
-        $parameter->setValue('foo');
+        $parameter = $parameter->withValue('foo');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -80,7 +80,7 @@ class PartialSearchFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter->setValue('bar');
+        $parameter = $parameter->withValue('bar');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
@@ -134,7 +134,7 @@ class PartialSearchFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter->setValue('bar');
+        $parameter = $parameter->withValue('bar');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
@@ -165,7 +165,7 @@ class PartialSearchFilterTest extends TestCase
     public function testNestedArrayValuesAreIgnored(FilterInterface $filter): void
     {
         $parameter = new QueryParameter(property: 'name', key: 'name');
-        $parameter->setValue([['foo' => 'bar']]);
+        $parameter = $parameter->withValue([['foo' => 'bar']]);
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
