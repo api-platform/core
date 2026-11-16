@@ -15,9 +15,12 @@ namespace ApiPlatform\State\ParameterProvider;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use Psr\Log\LoggerInterface;
@@ -65,8 +68,19 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
             }
         }
 
-        $parameter->setValue(\is_array($value) || [] === $resources ? $resources : $resources[0]);
+        if (null === $operation) {
+            return null;
+        }
 
-        return $operation;
+        $resolved = $parameter->withValue(\is_array($value) || [] === $resources ? $resources : $resources[0]);
+
+        if ($resolved instanceof Link && $operation instanceof HttpOperation) {
+            $uriVariables = $operation->getUriVariables() ?? [];
+            $uriVariables[$resolved->getKey()] = $resolved;
+
+            return $operation->withUriVariables($uriVariables);
+        }
+
+        return $operation->withParameters(($operation->getParameters() ?? new Parameters())->with($resolved->getKey(), $resolved));
     }
 }
