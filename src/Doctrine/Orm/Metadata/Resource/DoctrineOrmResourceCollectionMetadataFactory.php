@@ -138,12 +138,13 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
             return $operation;
         }
 
+        $enriched = $parameters;
         foreach ($parameters as $key => $parameter) {
             if (null === $parameter->getFilterClass()) {
-                $parameters->add($key, $parameter->withFilterClass($entityClass));
+                $enriched = $enriched->with($key, $parameter->withFilterClass($entityClass));
             }
         }
 
-        return $operation->withParameters($parameters);
+        return $operation->withParameters($enriched);
     }
 }

@@ -67,7 +67,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                         }
 
                         $extraProperties['nested_properties_info'] = [$property => $nestedInfo];
-                        $parameters = $parameters->add(
+                        $parameters = $parameters->with(
                             $key,
                             $parameter->withProperty($property)->withExtraProperties($extraProperties)
                         );
@@ -86,7 +86,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
                     $nestedPropertiesInfo[$property] = $nestedInfo;
                     $extraProperties['nested_properties_info'] = $nestedPropertiesInfo;
-                    $parameters = $parameters->add($key, $parameter->withExtraProperties($extraProperties));
+                    $parameters = $parameters->with($key, $parameter->withExtraProperties($extraProperties));
                     $modified = true;
                 }
 

@@ -125,12 +125,13 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
             return $operation;
         }
 
+        $enriched = $parameters;
         foreach ($parameters as $key => $parameter) {
             if (null === $parameter->getFilterClass()) {
-                $parameters->add($key, $parameter->withFilterClass($documentClass));
+                $enriched = $enriched->with($key, $parameter->withFilterClass($documentClass));
             }
         }
 
-        return $operation->withParameters($parameters);
+        return $operation->withParameters($enriched);
     }
 }

@@ -24,9 +24,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -91,6 +93,33 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
         yield [(new Get())->withOperation($default), ItemProvider::class, 'api_platform.doctrine.orm.state.persist_processor'];
         yield [(new GetCollection())->withOperation($default), CollectionProvider::class, 'api_platform.doctrine.orm.state.persist_processor'];
         yield [(new Delete())->withOperation($default), ItemProvider::class, 'api_platform.doctrine.orm.state.remove_processor'];
+    }
+
+    public function testParametersFilterClassDoesNotLeakIntoSharedParameters(): void
+    {
+        $objectManager = $this->createStub(EntityManagerInterface::class);
+        $objectManager->method('getClassMetadata')->willReturn(new ClassMetadata(Dummy::class));
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($objectManager);
+
+        $shared = new Parameters(['name' => new QueryParameter(key: 'name')]);
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->method('create')->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withParameters($shared)->withOperations(new Operations([
+                'get' => (new Get())->withClass(Dummy::class)->withName('get')->withParameters($shared),
+                'get_collection' => (new GetCollection())->withClass(Dummy::class)->withName('get_collection')->withParameters($shared),
+            ])),
+        ]));
+
+        $collection = (new DoctrineOrmResourceCollectionMetadataFactory($managerRegistry, $decorated))->create(Dummy::class);
+
+        $get = $collection->getOperation('get')->getParameters();
+        $getCollection = $collection->getOperation('get_collection')->getParameters();
+        $this->assertSame(Dummy::class, $get->get('name')->getFilterClass());
+        $this->assertSame(Dummy::class, $getCollection->get('name')->getFilterClass());
+        $this->assertNotSame($get, $getCollection);
+        $this->assertNull($shared->get('name')->getFilterClass());
+        $this->assertSame($shared, $collection[0]->getParameters());
     }
 
     public function testReadOnlyEntitiesShouldNotIncludeUpdateOperations(): void

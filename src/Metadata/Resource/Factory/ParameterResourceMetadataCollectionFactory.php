@@ -239,14 +239,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     {
         $propertyNames = $properties = [];
         $existingParameters = $operation->getParameters();
-        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
+        $parameters = $existingParameters ?? new Parameters();
 
         foreach ($this->createParametersFromAttributes($operation, $declaredOperationClasses) as $key => $parameter) {
             if (!str_contains($key, ':property') && $parameters->has($key, $parameter::class)) {
                 continue;
             }
 
-            $parameters->add($key, $parameter);
+            $parameters = $parameters->with($key, $parameter);
         }
 
         // Spike (RFC 10008 QUERY): when the operation has a dedicated input DTO, discover the
@@ -270,7 +270,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                         $parameter = $parameter->withProperty($name);
                     }
 
-                    $parameters->add($parameter->getKey(), $parameter);
+                    $parameters = $parameters->with($parameter->getKey(), $parameter);
                 }
             }
         }
@@ -295,13 +295,13 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     $converted = $this->nameConverter?->denormalize($property) ?? $property;
                 }
                 $finalKey = str_replace(':property', $converted, $key);
-                $parameters->add(
+                $parameters = $parameters->with(
                     $finalKey,
                     $parameter->withProperty($converted)->withKey($finalKey)
                 );
             }
 
-            $parameters->remove($key, $parameter::class);
+            $parameters = $parameters->without($key, $parameter::class);
         }
 
         foreach ($parameters as $key => $parameter) {
@@ -366,12 +366,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             }
 
             $priority = $parameter->getPriority() ?? $internalPriority--;
-            $parameters->add($key, $parameter->withPriority($priority));
+            $parameters = $parameters->with($key, $parameter->withPriority($priority));
         }
 
-        $parameters->sort();
-
-        return $parameters;
+        return $parameters->sorted();
     }
 
     private function addFilterMetadata(Parameter $parameter): Parameter
@@ -567,7 +565,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     throw new RuntimeException(\sprintf('Parameter attribute on property "%s" must target itself or have no explicit properties. Got "properties: [%s]" instead.', $propertyName, implode(', ', $parameterProperties)));
                 }
 
-                $parameters->add($key, $parameter);
+                $parameters = $parameters->with($key, $parameter);
             }
         }
 

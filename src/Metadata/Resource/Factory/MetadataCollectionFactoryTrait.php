@@ -77,7 +77,7 @@ trait MetadataCollectionFactoryTrait
                 if (!$k = $metadata->getKey()) {
                     throw new RuntimeException('Parameter "key" is mandatory when used on a class.');
                 }
-                $globalParameters->add($k, $metadata);
+                $globalParameters = $globalParameters->with($k, $metadata);
                 continue;
             }
 
@@ -317,7 +317,7 @@ trait MetadataCollectionFactoryTrait
 
             // `:property` is a template expanded per-property later; multiple templates must coexist.
             if (str_contains((string) $parameterName, ':property') || !$parameters->has($parameterName, $parameter::class)) {
-                $parameters->add($parameterName, $parameter);
+                $parameters = $parameters->with($parameterName, $parameter);
             }
         }
 
