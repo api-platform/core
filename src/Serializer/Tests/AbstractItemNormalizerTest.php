@@ -100,6 +100,40 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertSame(['object' => false], $normalizer->getSupportedTypes('any'));
     }
 
+    public function testResetClearsAttributesCache(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->expects($this->exactly(2))->method('create')->with(Dummy::class, $this->isArray())->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/dummies/1');
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturn('foo');
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $serializer = $this->createStub(Serializer::class);
+        $serializer->method('normalize')->willReturnArgument(0);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $context = ['resources' => [], 'resource_class' => Dummy::class, 'cache_key' => 'explicit'];
+
+        $this->assertSame(['name' => 'foo'], $normalizer->normalize($dummy, null, $context));
+        $normalizer->reset();
+        $this->assertSame(['name' => 'foo'], $normalizer->normalize($dummy, null, $context));
+    }
+
     public function testNormalize(): void
     {
         $relatedDummy = new RelatedDummy();

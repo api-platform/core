@@ -232,6 +232,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Contracts\Service\ResetInterface;
 
 class ApiPlatformProvider extends ServiceProvider
 {
@@ -1655,6 +1656,12 @@ class ApiPlatformProvider extends ServiceProvider
 
         Event::listen(RequestHandled::class, function (): void {
             $this->app->make(SkolemIriConverter::class)->reset();
+
+            foreach ([ItemNormalizer::class, ItemDenormalizer::class, JsonLdItemNormalizer::class, JsonLdItemDenormalizer::class, JsonApiItemNormalizer::class, JsonApiItemDenormalizer::class, HalItemNormalizer::class, GraphQlItemNormalizer::class, GraphQlItemDenormalizer::class] as $normalizer) {
+                if ($this->app->resolved($normalizer) && ($instance = $this->app->make($normalizer)) instanceof ResetInterface) {
+                    $instance->reset();
+                }
+            }
         });
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');

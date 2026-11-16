@@ -186,6 +186,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return $document;
     }
 
+    public function reset(): void
+    {
+        parent::reset();
+        $this->componentsCache = [];
+    }
+
     protected function getAttributes(object $object, ?string $format = null, array $context = []): array
     {
         return $this->getComponents($object, $format, $context)['attributes'];

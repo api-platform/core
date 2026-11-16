@@ -151,6 +151,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
         throw new LogicException(\sprintf('%s is a read-only format.', self::FORMAT));
     }
 
+    public function reset(): void
+    {
+        parent::reset();
+        $this->componentsCache = [];
+        $this->attributesMetadataCache = [];
+    }
+
     /**
      * {@inheritdoc}
      */
