@@ -139,7 +139,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
             return;
         }
 
-        $subParameter = (clone $parameter)->setValue($value);
+        $subParameter = $parameter->withValue($value);
         $this->filter->apply(
             $queryBuilder,
             $queryNameGenerator,
@@ -164,7 +164,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         }
 
         // coerce to int|float so the bound is bound as a number, not a string
-        $subParameter = (clone $parameter)->setValue([$bounds[0] + 0, $bounds[1] + 0]);
+        $subParameter = $parameter->withValue([$bounds[0] + 0, $bounds[1] + 0]);
         $this->filter->apply(
             $queryBuilder,
             $queryNameGenerator,
