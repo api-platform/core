@@ -67,6 +67,13 @@ final class ResponseHeaderTest extends ApiTestCase
         $this->assertResponseHeaderSame('x-empty-header', '');
     }
 
+    public function testProviderMutatingThePassedParameterIsStillHonoured(): void
+    {
+        self::createClient()->request('GET', 'with_response_headers/1');
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('x-legacy-header', 'legacy');
+    }
+
     public function testCustomOpenApiHeaderOverridesTheGeneratedOne(): void
     {
         $response = self::createClient()->request('GET', 'docs', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);

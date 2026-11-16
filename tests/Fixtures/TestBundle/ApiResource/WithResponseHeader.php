@@ -54,6 +54,11 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider;
             description: 'Resolved to an empty value',
             provider: [self::class, 'provideEmptyValue'],
         ),
+        'X-Legacy-Header' => new ResponseHeaderParameter(
+            description: 'Resolved by mutating the passed parameter',
+            provider: [self::class, 'provideLegacyValue'],
+            openApi: false,
+        ),
         'X-Frame-Options' => new ResponseHeaderParameter(
             description: 'Never emitted, the provider resolves no value',
             provider: [self::class, 'provideNoValue'],
@@ -96,9 +101,14 @@ class WithResponseHeader
         return new self($uriVariables['id'] ?? '1');
     }
 
-    public static function provideEmptyValue(Parameter $parameter): null
+    public static function provideEmptyValue(Parameter $parameter): Parameter
     {
-        $parameter->setValue('');
+        return $parameter->withValue('');
+    }
+
+    public static function provideLegacyValue(Parameter $parameter): null
+    {
+        $parameter->setValue('legacy');
 
         return null;
     }

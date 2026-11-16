@@ -24,7 +24,7 @@ use ApiPlatform\State\ParameterProviderInterface;
  * - A static value can be provided through the `$default` argument.
  * - A `$provider` (a callable or a service ID resolving to a
  *   {@see ParameterProviderInterface}) can compute the value at runtime by calling
- *   {@see Parameter::setValue()}.
+ *   returning `$parameter->withValue()`.
  * - A header that resolves to no value is not emitted. Use an empty string to produce
  *   an empty header value.
  * - `$openApiHeader` overrides the generated OpenAPI documentation entirely. It is named

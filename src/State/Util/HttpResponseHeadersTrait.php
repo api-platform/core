@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ResponseHeaderParameter;
@@ -201,15 +202,16 @@ trait HttpResponseHeadersTrait
             $provider = $this->parameterProviderLocator->get($provider);
         }
 
+        $result = null;
         if ($provider instanceof ParameterProviderInterface) {
-            $provider->provide($parameter, [], ['operation' => $operation, 'request' => $request]);
+            $result = $provider->provide($parameter, [], ['operation' => $operation, 'request' => $request]);
         } elseif (\is_callable($provider)) {
-            $provider($parameter, [], ['operation' => $operation, 'request' => $request]);
+            $result = $provider($parameter, [], ['operation' => $operation, 'request' => $request]);
         } elseif (null !== $provider) {
             throw new RuntimeException(\sprintf('Response header "%s" provider is not callable nor a registered "%s" service.', $parameter->getKey() ?? '', ParameterProviderInterface::class));
         }
 
-        return $parameter->getValue();
+        return ($result instanceof Parameter ? $result : $parameter)->getValue();
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void
