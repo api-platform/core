@@ -33,6 +33,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
                 'id' => new Link(fromClass: Comment::class),
             ],
         ),
+        new Get(
+            uriTemplate: '/posts/{post}/secured_comments/{id}{._format}',
+            uriVariables: [
+                'post' => new Link(fromClass: Post::class, toProperty: 'post', security: 'view-secured-comment'),
+                'id' => new Link(fromClass: Comment::class),
+            ],
+        ),
         new GetCollection(
             uriTemplate: '/posts/{post}/comments{._format}',
             uriVariables: ['post' => new Link(fromClass: Post::class, toProperty: 'post')],
