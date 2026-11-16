@@ -106,7 +106,7 @@ class AbstractItemNormalizerTest extends TestCase
         $dummy->setName('foo');
 
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->expects($this->exactly(2))->method('create')->with(Dummy::class, $this->isArray())->willReturn(new PropertyNameCollection(['name']));
+        $propertyNameCollectionFactory->expects($this->exactly(4))->method('create')->with(Dummy::class, $this->isArray())->willReturn(new PropertyNameCollection(['name']));
 
         $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true));
