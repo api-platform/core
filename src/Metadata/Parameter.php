@@ -163,9 +163,13 @@ abstract class Parameter
      * resets this value to extract the correct value on each request.
      * It's also possible to set the `_api_query_parameters` request attribute directly and
      * API Platform will extract the value from there.
+     *
+     * @deprecated since API Platform 5.1, parameters are immutable: return `$parameter->withValue($value)` from your parameter provider instead
      */
     public function setValue(mixed $value): static
     {
+        trigger_deprecation('api-platform/core', '5.1', 'Method "%s::setValue()" is deprecated and will be removed in 6.0. Parameters are immutable: return "$parameter->withValue($value)" (or an operation holding it) from your parameter provider instead.', self::class);
+
         $this->extraProperties['_api_values'] = $value;
 
         return $this;

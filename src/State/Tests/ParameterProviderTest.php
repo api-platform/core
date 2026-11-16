@@ -26,6 +26,7 @@ use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\ProviderInterface;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -169,8 +170,11 @@ final class ParameterProviderTest extends TestCase
         $this->assertSame('from-operation', $operation->getParameters()->get('a')->getValue());
     }
 
+    #[IgnoreDeprecations]
     public function testQueryProviderMutatingThePassedParameter(): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\\Metadata\\Parameter::setValue()" is deprecated and will be removed in 6.0. Parameters are immutable: return "$parameter->withValue($value)" (or an operation holding it) from your parameter provider instead.');
+
         $operation = $this->provideQuery(static function (Parameter $parameter): void {
             $parameter->setValue('legacy');
         });
@@ -217,8 +221,11 @@ final class ParameterProviderTest extends TestCase
         $this->assertSame(7, $uriVariables['id']);
     }
 
+    #[IgnoreDeprecations]
     public function testPathProviderMutatingThePassedParameter(): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\\Metadata\\Parameter::setValue()" is deprecated and will be removed in 6.0. Parameters are immutable: return "$parameter->withValue($value)" (or an operation holding it) from your parameter provider instead.');
+
         $uriVariables = $this->providePath(static function (Parameter $parameter): void {
             $parameter->setValue('legacy');
         });

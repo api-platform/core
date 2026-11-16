@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ScalarHeaderParameter;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 
 class ParametersTest extends TestCase
@@ -71,11 +72,11 @@ class ParametersTest extends TestCase
         $this->assertSame(['field3', 'field4'], $collected[1][1]->getProperties());
     }
 
-    public function testPropertyPlaceholderKeysAreNotDeduplicatedViaAdd(): void
+    public function testPropertyPlaceholderKeysAreNotDeduplicatedViaWith(): void
     {
-        $parameters = new Parameters();
-        $parameters->add(':property', new QueryParameter(key: ':property', properties: ['field1', 'field2']));
-        $parameters->add(':property', new QueryParameter(key: ':property', properties: ['field3', 'field4']));
+        $parameters = (new Parameters())
+            ->with(':property', new QueryParameter(key: ':property', properties: ['field1', 'field2']))
+            ->with(':property', new QueryParameter(key: ':property', properties: ['field3', 'field4']));
 
         $this->assertCount(2, $parameters);
     }
@@ -89,7 +90,7 @@ class ParametersTest extends TestCase
         $this->assertTrue($parameters->has('Foo', HeaderParameter::class));
         $this->assertFalse($parameters->has('Foo'));
 
-        $parameters->remove('Foo', HeaderParameter::class);
+        $parameters = $parameters->without('Foo', HeaderParameter::class);
         $this->assertCount(0, $parameters);
     }
 
@@ -102,7 +103,7 @@ class ParametersTest extends TestCase
         $this->assertSame($header, $parameters->get('Foo', HeaderParameter::class));
         $this->assertSame($scalar, $parameters->get('Foo', ScalarHeaderParameter::class));
 
-        $parameters->remove('Foo', HeaderParameter::class);
+        $parameters = $parameters->without('Foo', HeaderParameter::class);
         $this->assertCount(1, $parameters);
         $this->assertSame($scalar, $parameters->get('Foo', HeaderParameter::class));
     }
@@ -218,5 +219,29 @@ class ParametersTest extends TestCase
         $this->assertNotSame($parameters, $result);
         $this->assertSame(['top', 'mid', 'low'], array_keys(iterator_to_array($result)));
         $this->assertSame(['low', 'top', 'mid'], array_keys(iterator_to_array($parameters)));
+    }
+
+    #[IgnoreDeprecations]
+    public function testAddIsDeprecated(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\Metadata\Parameters::add()" is deprecated and will be removed in 6.0, use "with()" which returns a new instance.');
+
+        (new Parameters())->add('a', new QueryParameter(key: 'a'));
+    }
+
+    #[IgnoreDeprecations]
+    public function testRemoveIsDeprecated(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\Metadata\Parameters::remove()" is deprecated and will be removed in 6.0, use "without()" which returns a new instance.');
+
+        (new Parameters([new QueryParameter(key: 'a')]))->remove('a');
+    }
+
+    #[IgnoreDeprecations]
+    public function testSortIsDeprecated(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\Metadata\Parameters::sort()" is deprecated and will be removed in 6.0, use "sorted()" which returns a new instance.');
+
+        (new Parameters())->sort();
     }
 }
