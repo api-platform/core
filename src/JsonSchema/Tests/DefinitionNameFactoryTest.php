@@ -127,13 +127,13 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Dummy-read_validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a']]), [AbstractNormalizer::GROUPS => ['read']]];
         yield ['Dummy-read_a', Dummy::class, 'json', null, new Post(), [AbstractNormalizer::GROUPS => ['read', 'a']]];
 
-        yield ['Dummy-validation.app.group_generator', Dummy::class, 'json', null, new Post(validationContext: ['groups' => 'app.group_generator'])];
+        yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => 'app.group_generator'])];
 
         yield ['Dummy-validation.seq1_seq2', Dummy::class, 'json', null, new Post(validationContext: ['groups' => self::groupSequence(['seq1', 'seq2'])])];
 
         yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => [self::class, 'callableGroups']])];
 
-        yield ['Dummy-validation.none', Dummy::class, 'json', null, new Post(validationContext: ['groups' => static fn (): array => ['x']])];
+        yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => static fn (): array => ['x']])];
     }
 
     public static function callableGroups(): array

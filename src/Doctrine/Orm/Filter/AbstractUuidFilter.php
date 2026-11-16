@@ -143,12 +143,16 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
      */
     private function convertValuesToTheDatabaseRepresentation(QueryBuilder $queryBuilder, ?string $doctrineFieldType, mixed $value): mixed
     {
-        if (null === $doctrineFieldType || !Type::hasType($doctrineFieldType)) {
+        $connection = $queryBuilder->getEntityManager()->getConnection();
+        $configuration = $connection->getConfiguration();
+        $typeProvider = method_exists($configuration, 'getTypeProvider') ? $configuration->getTypeProvider() : null;
+
+        if (null === $doctrineFieldType || !(null === $typeProvider ? Type::hasType($doctrineFieldType) : $typeProvider->has($doctrineFieldType))) {
             throw new InvalidArgumentException(\sprintf('The Doctrine type "%s" is not valid or not registered.', $doctrineFieldType));
         }
 
-        $doctrineType = Type::getType($doctrineFieldType);
-        $platform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
+        $doctrineType = null === $typeProvider ? Type::getType($doctrineFieldType) : $typeProvider->get($doctrineFieldType);
+        $platform = $connection->getDatabasePlatform();
 
         $convertValue = static function (mixed $value) use ($doctrineType, $platform) {
             try {

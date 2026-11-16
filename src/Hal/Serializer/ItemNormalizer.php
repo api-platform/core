@@ -110,6 +110,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->isCacheKeySafe($context) ? $this->getCacheKey($format, $context) : false;
+        } elseif (false !== $context['cache_key'] && !$this->isCacheKeySafe($context)) {
+            $context['cache_key'] = false;
         }
 
         $normalizedData = parent::normalize($data, $format, $context);
@@ -149,6 +151,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): never
     {
         throw new LogicException(\sprintf('%s is a read-only format.', self::FORMAT));
+    }
+
+    public function reset(): void
+    {
+        parent::reset();
+        $this->componentsCache = [];
+        $this->attributesMetadataCache = [];
     }
 
     /**

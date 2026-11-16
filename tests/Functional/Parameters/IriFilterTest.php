@@ -69,6 +69,13 @@ final class IriFilterTest extends ApiTestCase
         $this->assertCount(0, $res['member']);
     }
 
+    public function testIriFilterWithUnresolvableIri(): void
+    {
+        $res = self::createClient()->request('GET', '/chickens?chickenCoop=/invalid/iri')->toArray(false);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $res['member']);
+    }
+
     public function testIriFilterMultiple(): void
     {
         $iris = $this->getIris();

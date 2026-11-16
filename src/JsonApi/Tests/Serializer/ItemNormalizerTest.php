@@ -183,6 +183,60 @@ class ItemNormalizerTest extends TestCase
         $this->assertSame([], $componentsCacheRef->getValue($normalizer), 'componentsCache must not be populated when a property has security set');
     }
 
+    public function testUriTemplateLinkIsNotCachedAcrossObjects(): void
+    {
+        $first = new Dummy();
+        $first->setId(1);
+        $second = new Dummy();
+        $second->setId(2);
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummy']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::object(RelatedDummy::class))
+                ->withReadable(true)
+                ->withUriTemplate('/related_dummies/{id}')
+        );
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturnCallback(static fn (object $resource): string => \sprintf('/dummies/%d/related', $resource->getId()));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+        $resourceClassResolver->method('getResourceClass')->willReturn(RelatedDummy::class);
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturn(new RelatedDummy());
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+            (new ApiResource())->withOperations(new Operations([
+                new Get(name: '/related_dummies/{id}', uriTemplate: '/related_dummies/{id}', shortName: 'RelatedDummy'),
+            ])),
+        ]));
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $iriConverter,
+            $resourceClassResolver,
+            $propertyAccessor,
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory,
+        );
+
+        $getComponents = new \ReflectionMethod(ItemNormalizer::class, 'getComponents');
+        $context = ['resource_class' => Dummy::class, 'cache_key' => 'shared', 'api_normalize' => true];
+
+        $this->assertSame(['relatedDummy' => '/dummies/1/related'], $getComponents->invoke($normalizer, $first, ItemNormalizer::FORMAT, $context)['links']);
+        $this->assertSame(['relatedDummy' => '/dummies/2/related'], $getComponents->invoke($normalizer, $second, ItemNormalizer::FORMAT, $context)['links']);
+    }
+
     public function testNormalizeCircularReference(): void
     {
         $circularReferenceEntity = new CircularReference();
