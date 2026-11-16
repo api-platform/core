@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
@@ -104,5 +105,118 @@ class ParametersTest extends TestCase
         $parameters->remove('Foo', HeaderParameter::class);
         $this->assertCount(1, $parameters);
         $this->assertSame($scalar, $parameters->get('Foo', HeaderParameter::class));
+    }
+
+    public function testWithReturnsNewInstanceAndLeavesOriginalUntouched(): void
+    {
+        $a = new QueryParameter(key: 'a');
+        $b = new QueryParameter(key: 'b');
+        $parameters = new Parameters([$a]);
+
+        $result = $parameters->with('b', $b);
+
+        $this->assertNotSame($parameters, $result);
+        $this->assertCount(1, $parameters);
+        $this->assertFalse($parameters->has('b'));
+        $this->assertCount(2, $result);
+        $this->assertSame($a, $result->get('a'));
+        $this->assertSame($b, $result->get('b'));
+    }
+
+    public function testWithReplacesSameKeyAndClass(): void
+    {
+        $a = new QueryParameter(key: 'a');
+        $replacement = new QueryParameter(key: 'a');
+        $parameters = new Parameters([$a]);
+
+        $result = $parameters->with('a', $replacement);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($replacement, $result->get('a'));
+        $this->assertSame($a, $parameters->get('a'));
+    }
+
+    public function testWithAppendsOnClassMismatch(): void
+    {
+        $query = new QueryParameter(key: 'a');
+        $header = new HeaderParameter(key: 'a');
+        $parameters = new Parameters([$query]);
+
+        $result = $parameters->with('a', $header);
+
+        $this->assertCount(2, $result);
+        $this->assertSame($query, $result->get('a'));
+        $this->assertSame($header, $result->get('a', HeaderParameter::class));
+        $this->assertCount(1, $parameters);
+    }
+
+    public function testWithUsesPropertyDiscriminatorForTemplates(): void
+    {
+        $first = new QueryParameter(key: ':property', properties: ['field1']);
+        $second = new QueryParameter(key: ':property', properties: ['field2']);
+        $parameters = new Parameters([$first]);
+
+        $this->assertCount(2, $parameters->with(':property', $second));
+
+        $replacement = new QueryParameter(key: ':property', properties: ['field1']);
+        $result = $parameters->with(':property', $replacement);
+        $this->assertCount(1, $result);
+        $this->assertSame($replacement, iterator_to_array($result)[':property']);
+    }
+
+    public function testWithDoesNotCloneParameters(): void
+    {
+        $a = new QueryParameter(key: 'a');
+        $parameters = new Parameters([$a]);
+
+        $this->assertSame($a, $parameters->with('b', new QueryParameter(key: 'b'))->get('a'));
+    }
+
+    public function testWithoutReturnsNewInstanceAndLeavesOriginalUntouched(): void
+    {
+        $a = new QueryParameter(key: 'a');
+        $b = new QueryParameter(key: 'b');
+        $parameters = new Parameters([$a, $b]);
+
+        $result = $parameters->without('a');
+
+        $this->assertNotSame($parameters, $result);
+        $this->assertCount(2, $parameters);
+        $this->assertCount(1, $result);
+        $this->assertFalse($result->has('a'));
+        $this->assertSame($b, $result->get('b'));
+    }
+
+    public function testWithoutHonoursParameterClass(): void
+    {
+        $query = new QueryParameter(key: 'a');
+        $header = new HeaderParameter(key: 'a');
+        $parameters = new Parameters([$query, $header]);
+
+        $result = $parameters->without('a', HeaderParameter::class);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($query, $result->get('a'));
+    }
+
+    public function testWithoutThrowsWhenMissing(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not remove parameter "missing".');
+
+        (new Parameters([new QueryParameter(key: 'a')]))->without('missing');
+    }
+
+    public function testSortedOrdersByPriorityAndLeavesOriginalUntouched(): void
+    {
+        $parameters = (new Parameters([new QueryParameter(key: 'low', priority: 1)]))
+            ->with('top', new QueryParameter(key: 'top', priority: 20))
+            ->with('mid', new QueryParameter(key: 'mid', priority: 5));
+
+        $result = $parameters->sorted();
+
+        $this->assertNotSame($parameters, $result);
+        $this->assertSame(['top', 'mid', 'low'], array_keys(iterator_to_array($result)));
+        $this->assertSame(['low', 'top', 'mid'], array_keys(iterator_to_array($parameters)));
     }
 }

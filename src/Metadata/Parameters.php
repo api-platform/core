@@ -96,6 +96,36 @@ final class Parameters implements \IteratorAggregate, \Countable
         return $this;
     }
 
+    public function with(string $key, Parameter $value): static
+    {
+        $self = new self();
+        $self->parameters = $this->parameters;
+
+        return $self->add($key, $value);
+    }
+
+    public function without(string $key, string $parameterClass = QueryParameter::class): static
+    {
+        if (null === $i = $this->indexOf($key, $parameterClass)) {
+            throw new RuntimeException(\sprintf('Could not remove parameter "%s".', $key));
+        }
+
+        $self = new self();
+        $self->parameters = $this->parameters;
+        unset($self->parameters[$i]);
+        $self->parameters = array_values($self->parameters);
+
+        return $self;
+    }
+
+    public function sorted(): static
+    {
+        $self = new self();
+        $self->parameters = $this->parameters;
+
+        return $self->sort();
+    }
+
     private static function propertyDiscriminator(Parameter $parameter): string
     {
         if ($properties = $parameter->getProperties()) {
