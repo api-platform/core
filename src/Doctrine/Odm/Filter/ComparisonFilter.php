@@ -141,7 +141,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
             return;
         }
 
-        $subParameter = (clone $parameter)->setValue($value);
+        $subParameter = $parameter->withValue($value);
         $newContext = ['comparisonMethod' => $comparisonMethod, 'parameter' => $subParameter] + $context;
         $this->filter->apply($aggregationBuilder, $resourceClass, $operation, $newContext);
         if (isset($newContext['match'])) {

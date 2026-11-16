@@ -50,8 +50,7 @@ final class SecurityParameterProvider implements ProviderInterface
 
         $operation = $request?->attributes->get('_api_operation') ?? $operation;
 
-        $existingParameters = $operation->getParameters();
-        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
+        $parameters = $operation->getParameters() ?? new Parameters();
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
@@ -60,7 +59,7 @@ final class SecurityParameterProvider implements ProviderInterface
                     $link = $link->withValue($uriVariables[$key] ?? new ParameterNotFound());
                 }
 
-                $parameters->add($key, $link);
+                $parameters = $parameters->with($key, $link);
             }
         }
 

@@ -413,21 +413,15 @@ class WithParameter
         return new JsonResponse($values);
     }
 
-    public static function toInt(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
+    public static function toInt(Parameter $parameter, array $parameters = [], array $context = []): Parameter
     {
-        if (null === ($operation = $context['operation'] ?? null)) {
-            return null;
-        }
-
         $value = $parameter->getValue();
 
         if (is_numeric($value)) {
             $value = (int) $value;
         }
 
-        $parameter->setValue($value);
-
-        return $operation;
+        return $parameter->withValue($value);
     }
 
     public static function headerProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse

@@ -14,6 +14,10 @@ API Platform 5.1 contains every change shipped in the v5.0.x releases, plus the 
 * [eb915e2a1](https://github.com/api-platform/core/commit/eb915e2a19a7a53b4d508ebae7cd9e4eea30b57b) fix(jsonapi)!: drop non-spec type member from error objects (#8732)
 * JSON:API error objects no longer carry a top-level `type` member; read `links.type` instead ([#8732](https://github.com/api-platform/core/pull/8732)).
 
+### Deprecations
+
+* Parameters are now immutable: `Parameter::setValue()` and `Parameters::add()`, `remove()` and `sort()` are deprecated and will be removed in 6.0. Use `Parameter::withValue()` and `Parameters::with()`, `without()` and `sorted()`, which return a new instance. A parameter provider returns the resolved `Parameter` (or an operation holding it) instead of mutating the one it receives; `ParameterProviderInterface::provide()` may now return `Operation|Parameter|null`.
+
 ### Features
 
 * [9090a0dbd](https://github.com/api-platform/core/commit/9090a0dbd63571ca2726b228c54b4d4e85870ec4) feat(jsonapi): spec-compliant PATCH conflicts and member names (#8752)

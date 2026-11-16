@@ -83,6 +83,7 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
         }
 
         $operationChanged = false;
+        $enriched = $parameters;
 
         foreach ($parameters as $key => $parameter) {
             $extraProperties = $parameter->getExtraProperties();
@@ -106,13 +107,13 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
             }
 
             if ($parameterChanged) {
-                $parameters->add($key, $parameter->withExtraProperties($extraProperties));
+                $enriched = $enriched->with($key, $parameter->withExtraProperties($extraProperties));
                 $operationChanged = true;
             }
         }
 
         if ($operationChanged) {
-            $operation = $operation->withParameters($parameters);
+            $operation = $operation->withParameters($enriched);
         }
 
         return $operation;

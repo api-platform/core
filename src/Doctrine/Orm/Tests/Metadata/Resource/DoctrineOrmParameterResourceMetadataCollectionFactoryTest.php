@@ -254,8 +254,7 @@ class DoctrineOrmParameterResourceMetadataCollectionFactoryTest extends TestCase
 
     private function createCollectionWithParameter(QueryParameter $parameter, string $resourceClass): ResourceMetadataCollection
     {
-        $parameters = new Parameters();
-        $parameters->add($parameter->getKey(), $parameter);
+        $parameters = (new Parameters())->with($parameter->getKey(), $parameter);
 
         $operation = (new GetCollection())->withClass($resourceClass)->withStateOptions(new Options(entityClass: $resourceClass))->withParameters($parameters);
         $operations = new Operations();

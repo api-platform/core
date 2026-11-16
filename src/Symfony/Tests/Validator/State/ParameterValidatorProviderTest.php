@@ -87,7 +87,7 @@ final class ParameterValidatorProviderTest extends TestCase
         $decorated->expects($this->once())->method('provide')->willReturn(new \stdClass());
 
         $operation = new Get(parameters: new Parameters([
-            'foo' => (new QueryParameter(key: 'foo'))->withConstraints([$constraint])->setValue('bar'),
+            'foo' => (new QueryParameter(key: 'foo'))->withConstraints([$constraint])->withValue('bar'),
         ]));
         $request = new Request();
         $request->attributes->set('_api_operation', $operation);
@@ -112,7 +112,7 @@ final class ParameterValidatorProviderTest extends TestCase
         $decorated->expects($this->never())->method('provide');
 
         $operation = new Get(parameters: new Parameters([
-            'foo' => (new QueryParameter(key: 'foo'))->withConstraints([$constraint])->setValue(new ParameterNotFound()),
+            'foo' => (new QueryParameter(key: 'foo'))->withConstraints([$constraint])->withValue(new ParameterNotFound()),
         ]));
         $request = new Request();
         $request->attributes->set('_api_operation', $operation);
@@ -130,7 +130,7 @@ final class ParameterValidatorProviderTest extends TestCase
         $decorated->expects($this->once())->method('provide')->willReturn(new \stdClass());
 
         $operation = new Get(uriVariables: [
-            'id' => (new Link())->withConstraints([$constraint])->setValue('1'),
+            'id' => (new Link())->withConstraints([$constraint])->withValue('1'),
         ]);
         $request = new Request();
         $request->attributes->set('_api_operation', $operation);
@@ -154,7 +154,7 @@ final class ParameterValidatorProviderTest extends TestCase
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->never())->method('provide');
 
-        $parameter = (new QueryParameter(key: 'foo'))->withConstraints([$constraint])->setValue(new ParameterNotFound());
+        $parameter = (new QueryParameter(key: 'foo'))->withConstraints([$constraint])->withValue(new ParameterNotFound());
         $parameter = $parameter->withOpenApi(new ModelParameter(name: 'foo', in: 'query', style: 'deepObject'));
 
         $operation = new Get(parameters: new Parameters([

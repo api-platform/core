@@ -49,7 +49,7 @@ final class Parameters implements \IteratorAggregate, \Countable
 
         $this->parameters = array_values($this->parameters);
 
-        $this->sort();
+        $this->sortInPlace();
     }
 
     public function __clone()
@@ -71,7 +71,17 @@ final class Parameters implements \IteratorAggregate, \Countable
         })();
     }
 
+    /**
+     * @deprecated since API Platform 5.1, use {@see Parameters::with()} instead
+     */
     public function add(string $key, Parameter $value): self
+    {
+        trigger_deprecation('api-platform/core', '5.1', 'Method "%s::add()" is deprecated and will be removed in 6.0, use "with()" which returns a new instance.', self::class);
+
+        return $this->addInPlace($key, $value);
+    }
+
+    private function addInPlace(string $key, Parameter $value): self
     {
         // `:property` is a template expanded per-property later; templates with disjoint properties coexist, identical ones override.
         $isTemplate = str_contains($key, ':property');
@@ -96,6 +106,36 @@ final class Parameters implements \IteratorAggregate, \Countable
         return $this;
     }
 
+    public function with(string $key, Parameter $value): static
+    {
+        $self = new self();
+        $self->parameters = $this->parameters;
+
+        return $self->addInPlace($key, $value);
+    }
+
+    public function without(string $key, string $parameterClass = QueryParameter::class): static
+    {
+        if (null === $i = $this->indexOf($key, $parameterClass)) {
+            throw new RuntimeException(\sprintf('Could not remove parameter "%s".', $key));
+        }
+
+        $self = new self();
+        $self->parameters = $this->parameters;
+        unset($self->parameters[$i]);
+        $self->parameters = array_values($self->parameters);
+
+        return $self;
+    }
+
+    public function sorted(): static
+    {
+        $self = new self();
+        $self->parameters = $this->parameters;
+
+        return $self->sortInPlace();
+    }
+
     private static function propertyDiscriminator(Parameter $parameter): string
     {
         if ($properties = $parameter->getProperties()) {
@@ -109,9 +149,13 @@ final class Parameters implements \IteratorAggregate, \Countable
      * @template T of Parameter
      *
      * @param class-string<T> $parameterClass
+     *
+     * @deprecated since API Platform 5.1, use {@see Parameters::without()} instead
      */
     public function remove(string $key, string $parameterClass = QueryParameter::class): self
     {
+        trigger_deprecation('api-platform/core', '5.1', 'Method "%s::remove()" is deprecated and will be removed in 6.0, use "without()" which returns a new instance.', self::class);
+
         if (null === $i = $this->indexOf($key, $parameterClass)) {
             throw new RuntimeException(\sprintf('Could not remove parameter "%s".', $key));
         }
@@ -172,7 +216,17 @@ final class Parameters implements \IteratorAggregate, \Countable
         return \count($this->parameters);
     }
 
+    /**
+     * @deprecated since API Platform 5.1, use {@see Parameters::sorted()} instead
+     */
     public function sort(): self
+    {
+        trigger_deprecation('api-platform/core', '5.1', 'Method "%s::sort()" is deprecated and will be removed in 6.0, use "sorted()" which returns a new instance.', self::class);
+
+        return $this->sortInPlace();
+    }
+
+    private function sortInPlace(): self
     {
         usort($this->parameters, static fn (array $a, array $b): int => $b[1]->getPriority() - $a[1]->getPriority());
 

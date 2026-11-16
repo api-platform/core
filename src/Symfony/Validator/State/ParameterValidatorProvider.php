@@ -52,8 +52,7 @@ final class ParameterValidatorProvider implements ProviderInterface
         }
 
         $constraintViolationList = new ConstraintViolationList();
-        $existingParameters = $operation->getParameters();
-        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
+        $parameters = $operation->getParameters() ?? new Parameters();
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
@@ -62,7 +61,7 @@ final class ParameterValidatorProvider implements ProviderInterface
                     $link = $link->withValue($uriVariables[$key] ?? new ParameterNotFound());
                 }
 
-                $parameters->add($key, $link);
+                $parameters = $parameters->with($key, $link);
             }
         }
 

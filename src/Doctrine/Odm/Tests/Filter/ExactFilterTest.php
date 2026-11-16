@@ -44,7 +44,7 @@ class ExactFilterTest extends TestCase
         $filter->setManagerRegistry($this->managerRegistry);
 
         $parameter = new QueryParameter(property: 'name', key: 'name');
-        $parameter->setValue('foo');
+        $parameter = $parameter->withValue('foo');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -84,7 +84,7 @@ class ExactFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter->setValue('bar');
+        $parameter = $parameter->withValue('bar');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
@@ -145,7 +145,7 @@ class ExactFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter->setValue(3);
+        $parameter = $parameter->withValue(3);
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 

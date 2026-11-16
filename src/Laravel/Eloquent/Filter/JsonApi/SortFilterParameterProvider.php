@@ -52,8 +52,6 @@ final readonly class SortFilterParameterProvider implements ParameterProviderInt
             }
         }
 
-        $parameters->add($parameter->getKey(), $parameter->withValue($orderBy));
-
-        return $operation->withParameters($parameters);
+        return $operation->withParameters($parameters->with($parameter->getKey(), $parameter->withValue($orderBy)));
     }
 }

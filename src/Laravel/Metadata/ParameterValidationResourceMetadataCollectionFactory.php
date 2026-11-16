@@ -39,8 +39,8 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
 
             foreach ($operations as $operationName => $operation) {
                 $parameters = $operation->getParameters() ?? new Parameters();
-                foreach ($parameters as $key => $parameter) {
-                    $parameters->add($key, $this->addSchemaValidation($parameter));
+                foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+                    $parameters = $parameters->with($key, $this->addSchemaValidation($parameter));
                 }
 
                 if (\count($parameters) > 0) {
@@ -57,7 +57,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             foreach ($graphQlOperations as $operationName => $operation) {
                 $parameters = $operation->getParameters() ?? new Parameters();
                 foreach ($operation->getParameters() ?? [] as $key => $parameter) {
-                    $parameters->add($key, $this->addSchemaValidation($parameter));
+                    $parameters = $parameters->with($key, $this->addSchemaValidation($parameter));
                 }
 
                 if (\count($parameters) > 0) {

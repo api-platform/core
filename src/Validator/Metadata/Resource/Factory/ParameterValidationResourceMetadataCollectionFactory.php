@@ -49,8 +49,8 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
 
             foreach ($operations as $operationName => $operation) {
                 $parameters = $operation->getParameters() ?? new Parameters();
-                foreach ($parameters as $key => $parameter) {
-                    $parameters->add($key, $this->addSchemaValidation($parameter));
+                foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+                    $parameters = $parameters->with($key, $this->addSchemaValidation($parameter));
                 }
 
                 // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system.
@@ -63,7 +63,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
 
                 if ($operation->getFilters() && 0 === $explicitParametersCount) {
                     foreach ($this->addFilterValidation($operation) as $key => $filterParameter) {
-                        $parameters->add($key, $filterParameter);
+                        $parameters = $parameters->with($key, $filterParameter);
                     }
                 }
 
@@ -81,7 +81,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             foreach ($graphQlOperations as $operationName => $operation) {
                 $parameters = $operation->getParameters() ?? new Parameters();
                 foreach ($operation->getParameters() ?? [] as $key => $parameter) {
-                    $parameters->add($key, $this->addSchemaValidation($parameter));
+                    $parameters = $parameters->with($key, $this->addSchemaValidation($parameter));
                 }
 
                 if (\count($parameters) > 0) {
@@ -139,7 +139,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
                     $openApi = new OpenApiParameter(name: $key, in: 'query', allowEmptyValue: false);
                 }
 
-                $parameters->add($key, $this->addSchemaValidation(
+                $parameters = $parameters->with($key, $this->addSchemaValidation(
                     // we disable openapi and hydra on purpose as their docs comes from filters see the condition for addFilterValidation above
                     new QueryParameter(key: $key, property: $definition['property'] ?? null, priority: $internalPriority--, schema: $schema, openApi: false, hydra: false),
                     $schema,
@@ -254,7 +254,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         $merged = new Parameters($defaultParams);
 
         foreach ($operationParameters as $key => $param) {
-            $merged->add($key, $param);
+            $merged = $merged->with($key, $param);
         }
 
         return $merged;

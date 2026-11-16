@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithResponseHeader;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 final class ResponseHeaderTest extends ApiTestCase
 {
@@ -65,6 +66,14 @@ final class ResponseHeaderTest extends ApiTestCase
         self::createClient()->request('GET', 'with_response_headers/1');
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('x-empty-header', '');
+    }
+
+    #[IgnoreDeprecations]
+    public function testProviderMutatingThePassedParameterIsStillHonoured(): void
+    {
+        self::createClient()->request('GET', 'with_legacy_response_headers/1');
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('x-legacy-header', 'legacy');
     }
 
     public function testCustomOpenApiHeaderOverridesTheGeneratedOne(): void

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -90,7 +91,7 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface, Pre
             }
         }
 
-        $parameter->setValue($relation);
+        $resolved = $parameter->withValue($relation);
 
         if (null === $relation && true === ($extraProperties['throw_not_found'] ?? true)) {
             throw new NotFoundHttpException('Relation for link security not found.');
@@ -104,13 +105,14 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface, Pre
             $context['request']?->attributes->set($securityObjectName, $relation);
         }
 
-        if ($parameter instanceof Link) {
+        if ($resolved instanceof Link) {
             $uriVariables = $operation->getUriVariables();
-            $uriVariables[$parameter->getKey()] = $parameter;
-            $operation = $operation->withUriVariables($uriVariables);
+            $uriVariables[$resolved->getKey()] = $resolved;
+
+            return $operation->withUriVariables($uriVariables);
         }
 
-        return $operation;
+        return $operation->withParameters(($operation->getParameters() ?? new Parameters())->with($resolved->getKey(), $resolved));
     }
 
     /**

@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Tests;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
@@ -24,6 +25,8 @@ use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\ProviderInterface;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -149,6 +152,113 @@ final class ParameterProviderTest extends TestCase
 
         $this->expectException(ParameterNotSupportedException::class);
         $parameterProvider->provide($operation, [], $context);
+    }
+
+    public function testQueryProviderReturningAParameter(): void
+    {
+        $operation = $this->provideQuery(static fn (Parameter $parameter): Parameter => $parameter->withValue('resolved'));
+
+        $this->assertSame('resolved', $operation->getParameters()->get('a')->getValue());
+    }
+
+    public function testQueryProviderReturningAnOperationWithTheReplacedParameter(): void
+    {
+        $operation = $this->provideQuery(static fn (Parameter $parameter, array $values, array $context): Operation => $context['operation']->withParameters(
+            $context['operation']->getParameters()->with('a', $parameter->withValue('from-operation'))
+        ));
+
+        $this->assertSame('from-operation', $operation->getParameters()->get('a')->getValue());
+    }
+
+    #[IgnoreDeprecations]
+    public function testQueryProviderMutatingThePassedParameter(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\\Metadata\\Parameter::setValue()" is deprecated and will be removed in 6.0. Parameters are immutable: return "$parameter->withValue($value)" (or an operation holding it) from your parameter provider instead.');
+
+        $operation = $this->provideQuery(static function (Parameter $parameter): void {
+            $parameter->setValue('legacy');
+        });
+
+        $this->assertSame('legacy', $operation->getParameters()->get('a')->getValue());
+    }
+
+    public function testQueryProviderReturningAnOperationWithNewParametersIsHonoured(): void
+    {
+        $operation = $this->provideQuery(static fn (Parameter $parameter, array $values, array $context): Operation => $context['operation']->withParameters(new Parameters([
+            'a' => $parameter->withValue('resolved'),
+            'extra' => new QueryParameter(key: 'extra'),
+        ])));
+
+        $this->assertSame('resolved', $operation->getParameters()->get('a')->getValue());
+        $this->assertTrue($operation->getParameters()->has('extra'));
+    }
+
+    public function testQueryProviderDoesNotWriteIntoTheOperationParameters(): void
+    {
+        $original = new QueryParameter(key: 'a', provider: static fn (Parameter $parameter): Parameter => $parameter->withValue('resolved'));
+        $operation = new Get(parameters: new Parameters(['a' => $original]));
+        $request = new Request(server: ['QUERY_STRING' => 'a=raw']);
+
+        (new ParameterProvider())->provide($operation, [], ['request' => $request, 'operation' => $operation]);
+
+        $this->assertSame($original, $operation->getParameters()->get('a'));
+        $this->assertInstanceOf(ParameterNotFound::class, $original->getValue());
+    }
+
+    public function testPathProviderReturningAParameter(): void
+    {
+        $uriVariables = $this->providePath(static fn (Parameter $parameter): Parameter => $parameter->withValue(42));
+
+        $this->assertSame(42, $uriVariables['id']);
+    }
+
+    public function testPathProviderReturningAnOperationWithTheReplacedUriVariable(): void
+    {
+        $uriVariables = $this->providePath(static fn (Parameter $parameter, array $values, array $context): Operation => $context['operation']->withUriVariables([
+            'id' => $parameter->withValue(7),
+        ]));
+
+        $this->assertSame(7, $uriVariables['id']);
+    }
+
+    #[IgnoreDeprecations]
+    public function testPathProviderMutatingThePassedParameter(): void
+    {
+        $this->expectUserDeprecationMessage('Since api-platform/core 5.1: Method "ApiPlatform\\Metadata\\Parameter::setValue()" is deprecated and will be removed in 6.0. Parameters are immutable: return "$parameter->withValue($value)" (or an operation holding it) from your parameter provider instead.');
+
+        $uriVariables = $this->providePath(static function (Parameter $parameter): void {
+            $parameter->setValue('legacy');
+        });
+
+        $this->assertSame('legacy', $uriVariables['id']);
+    }
+
+    private function provideQuery(callable $provider): Operation
+    {
+        $operation = new Get(parameters: new Parameters(['a' => new QueryParameter(key: 'a', provider: $provider)]));
+        $request = new Request(server: ['QUERY_STRING' => 'a=raw']);
+
+        (new ParameterProvider())->provide($operation, [], ['request' => $request, 'operation' => $operation]);
+
+        return $request->attributes->get('_api_operation');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function providePath(callable $provider): array
+    {
+        $operation = new Get(uriVariables: ['id' => new Link(parameterName: 'id', provider: $provider)]);
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->willReturnCallback(static function (Operation $operation, array $uriVariables) use (&$captured): null {
+            $captured = $uriVariables;
+
+            return null;
+        });
+
+        (new ParameterProvider($decorated))->provide($operation, ['id' => '1'], ['request' => new Request(), 'operation' => $operation]);
+
+        return $captured;
     }
 
     public static function provide(): void

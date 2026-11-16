@@ -37,7 +37,7 @@ class EndSearchFilterTest extends TestCase
         $filter = new EndSearchFilter();
 
         $parameter = new QueryParameter(property: 'name', key: 'name');
-        $parameter->setValue('foo');
+        $parameter = $parameter->withValue('foo');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -61,7 +61,7 @@ class EndSearchFilterTest extends TestCase
         $filter = new EndSearchFilter(caseSensitive: false);
 
         $parameter = new QueryParameter(property: 'name', key: 'name');
-        $parameter->setValue('foo');
+        $parameter = $parameter->withValue('foo');
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 
         $context = [
@@ -101,7 +101,7 @@ class EndSearchFilterTest extends TestCase
                 ]],
             ],
         );
-        $parameter->setValue('bar');
+        $parameter = $parameter->withValue('bar');
 
         $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
 

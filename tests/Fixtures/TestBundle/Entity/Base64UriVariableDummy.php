@@ -45,8 +45,8 @@ class Base64UriVariableDummy
      * @param array<string, mixed> $parameters
      * @param array<string, mixed> $context
      */
-    public static function decodeName(Parameter $parameter, array $parameters = [], array $context = []): void
+    public static function decodeName(Parameter $parameter, array $parameters = [], array $context = []): Parameter
     {
-        $parameter->setValue(base64_decode((string) $parameter->getValue(), true));
+        return $parameter->withValue(base64_decode((string) $parameter->getValue(), true));
     }
 }

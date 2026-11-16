@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\Pagination\PaginationOptions;
@@ -91,21 +92,34 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
 
         $context = ['operation' => $operation] + $context;
 
+        $snapshot = [];
         foreach ($parameters ?? [] as $parameterKey => $parameter) {
-            $values = $this->getParameterValues($parameter, $request, $context);
-            $value = $this->extractParameterValues($parameter, $values);
+            $snapshot[] = [$parameterKey, $parameter];
+        }
 
-            if (null !== ($default = $parameter->getDefault() ?? $parameter->getSchema()['default'] ?? null) && $value instanceof ParameterNotFound) {
+        foreach ($snapshot as [$parameterKey, $original]) {
+            $current = $this->findParameter($operation->getParameters(), $parameterKey, $original) ?? $original;
+            $values = $this->getParameterValues($current, $request, $context);
+            $value = $this->extractParameterValues($current, $values);
+
+            if (null !== ($default = $current->getDefault() ?? $current->getSchema()['default'] ?? null) && $value instanceof ParameterNotFound) {
                 $value = $default;
             }
 
-            $parameter = $parameter->withValue($value);
-            $parameters->add($parameterKey, $parameter);
-            $context['operation'] = $operation = $this->callParameterProvider($operation, $parameter, $values, $context);
-        }
+            $parameter = $current->withValue($value);
+            $result = $this->callParameterProvider($operation, $parameter, $values, $context);
 
-        if ($parameters) {
-            $operation = $operation->withParameters($parameters);
+            if ($result instanceof Parameter) {
+                $parameter = $result;
+            } elseif ($result instanceof Operation) {
+                $operation = $result;
+                $returned = $this->findParameter($operation->getParameters(), $parameterKey, $parameter);
+                if (null !== $returned && $returned !== $current) {
+                    $parameter = $returned;
+                }
+            }
+
+            $context['operation'] = $operation = $operation->withParameters(($operation->getParameters() ?? new Parameters())->with($parameterKey, $parameter));
         }
 
         if ($operation instanceof HttpOperation) {
@@ -194,8 +208,8 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
      */
     private function handlePathParameters(HttpOperation $operation, array &$uriVariables, array $context): HttpOperation
     {
-        foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
-            $uriVariable = $uriVariable->withKey($key);
+        foreach ($operation->getUriVariables() ?? [] as $key => $original) {
+            $uriVariable = $original->withKey($key);
             if ($uriVariable->getSecurity() && !$uriVariable->getProvider()) {
                 $uriVariable = $uriVariable->withProvider(ReadLinkParameterProvider::class);
             }
@@ -213,8 +227,16 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
             }
 
             $uriVariable = $uriVariable->withValue($value);
-            if (($op = $this->callParameterProvider($operation, $uriVariable, $values, $context)) instanceof HttpOperation) {
-                $context['operation'] = $operation = $op;
+            $result = $this->callParameterProvider($operation, $uriVariable, $values, $context);
+
+            if ($result instanceof Parameter) {
+                $uriVariable = $result;
+            } elseif ($result instanceof HttpOperation) {
+                $context['operation'] = $operation = $result;
+                $returned = $operation->getUriVariables()[$key] ?? null;
+                if (null !== $returned && $returned !== $original) {
+                    $uriVariable = $returned;
+                }
             }
 
             if (!$uriVariable->getValue() instanceof ParameterNotFound && !$this->preservesUriVariable($operation, $uriVariable)) {
@@ -249,33 +271,38 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
         return $this->locator->get($provider);
     }
 
+    private function findParameter(?Parameters $parameters, string $key, Parameter $reference): ?Parameter
+    {
+        foreach ($parameters ?? [] as $name => $parameter) {
+            if ($name === $key
+                && $parameter::class === $reference::class
+                && $parameter->getProperty() === $reference->getProperty()
+                && $parameter->getProperties() === $reference->getProperties()
+            ) {
+                return $parameter;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param array<string,mixed> $context
      */
-    private function callParameterProvider(Operation $operation, Parameter $parameter, mixed $values, array $context): Operation
+    private function callParameterProvider(Operation $operation, Parameter $parameter, mixed $values, array $context): Operation|Parameter|null
     {
         if ($parameter->getValue() instanceof ParameterNotFound) {
-            return $operation;
+            return null;
         }
 
         if (null === ($provider = $parameter->getProvider())) {
-            return $operation;
+            return null;
         }
 
-        if (\is_callable($provider)) {
-            if (($op = $provider($parameter, $values, $context)) instanceof Operation) {
-                $operation = $op;
-            }
+        $result = \is_callable($provider)
+            ? $provider($parameter, $values, $context)
+            : $this->resolveProvider($operation, $provider)->provide($parameter, $values, $context);
 
-            return $operation;
-        }
-
-        $provider = $this->resolveProvider($operation, $provider);
-
-        if (($op = $provider->provide($parameter, $values, $context)) instanceof Operation) {
-            $operation = $op;
-        }
-
-        return $operation;
+        return $result instanceof Operation || $result instanceof Parameter ? $result : null;
     }
 }

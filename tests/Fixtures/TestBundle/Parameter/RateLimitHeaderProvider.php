@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Parameter;
 
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\State\ParameterProviderInterface;
 
 final class RateLimitHeaderProvider implements ParameterProviderInterface
 {
-    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
+    public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Parameter
     {
         $value = match ($parameter->getKey()) {
             'RateLimit-Limit' => '100',
@@ -27,10 +26,6 @@ final class RateLimitHeaderProvider implements ParameterProviderInterface
             default => null,
         };
 
-        if (null !== $value) {
-            $parameter->setValue($value);
-        }
-
-        return $context['operation'] ?? null;
+        return null === $value ? null : $parameter->withValue($value);
     }
 }

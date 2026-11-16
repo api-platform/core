@@ -63,6 +63,17 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\RateLimitHeaderProvider;
     provider: [self::class, 'provide'],
 )]
 #[Get(
+    uriTemplate: 'with_legacy_response_headers/{id}',
+    responseHeaders: [
+        'X-Legacy-Header' => new ResponseHeaderParameter(
+            description: 'Resolved by mutating the passed parameter',
+            provider: [self::class, 'provideLegacyValue'],
+            openApi: false,
+        ),
+    ],
+    provider: [self::class, 'provide'],
+)]
+#[Get(
     uriTemplate: 'with_streamed_response_headers/{id}',
     jsonStream: true,
     responseHeaders: [
@@ -96,9 +107,14 @@ class WithResponseHeader
         return new self($uriVariables['id'] ?? '1');
     }
 
-    public static function provideEmptyValue(Parameter $parameter): null
+    public static function provideEmptyValue(Parameter $parameter): Parameter
     {
-        $parameter->setValue('');
+        return $parameter->withValue('');
+    }
+
+    public static function provideLegacyValue(Parameter $parameter): null
+    {
+        $parameter->setValue('legacy');
 
         return null;
     }
