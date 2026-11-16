@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.4.9
+
+### Security
+
+* [05be3e6e7](https://github.com/api-platform/core/commit/05be3e6e767888ba834de5741192bee4c5bb526f) fix(state): never write request values into cached metadata ([GHSA-xmq6-3c6q-fr8m](https://github.com/api-platform/core/security/advisories/GHSA-xmq6-3c6q-fr8m))
+* [f297e3344](https://github.com/api-platform/core/commit/f297e3344710bb6003323ecc8ffe89ded19b229f) fix(serializer): check cache key safety for embedded resources ([GHSA-w5jw-x8fm-533g](https://github.com/api-platform/core/security/advisories/GHSA-w5jw-x8fm-533g))
+
 ## v4.4.8
 
 ### Security
