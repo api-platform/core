@@ -497,8 +497,15 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         $type = 'int' === (new \ReflectionEnum($enumClass))->getBackingType()?->getName() ? 'integer' : 'string';
-        $schema = ($parameter->getSchema() ?? []) + ['type' => $type, 'enum' => array_column($enumClass::cases(), 'value')];
+        $declaredSchema = $parameter->getSchema() ?? [];
+        $schema = $declaredSchema + ['type' => $type, 'enum' => array_column($enumClass::cases(), 'value')];
         $parameter = $parameter->withSchema($schema);
+
+        // The enum constrains the values a filter receives, not their shape: as without an enum, a filter takes a value or a list of values.
+        if (null !== $parameter->getFilter() && null === $parameter->getNativeType() && !isset($declaredSchema['type']) && false !== $parameter->getCastToArray() && !$parameter instanceof ScalarHeaderParameter) {
+            $valueType = 'integer' === $type ? Type::int() : Type::string();
+            $parameter = $parameter->withNativeType(Type::union($valueType, Type::list($valueType)));
+        }
 
         // Query and header values arrive as strings: cast them so they strictly match the int case values.
         if ('integer' === $schema['type'] && null === $parameter->getCastToNativeType()) {
