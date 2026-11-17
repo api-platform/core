@@ -14,15 +14,33 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8816;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
-#[GetCollection(
-    uriTemplate: 'enum_filtered_activities{._format}',
-    parameters: [
-        'type' => new QueryParameter(filter: new ExactFilter(), property: 'type', enumClass: ActivityType::class),
-        'level' => new QueryParameter(filter: new ExactFilter(), property: 'level', enumClass: ActivityLevel::class),
+#[ApiResource(
+    operations: [
+        new Get(uriTemplate: 'enum_filtered_activities/{id}{._format}'),
+        new GetCollection(
+            uriTemplate: 'enum_filtered_activities{._format}',
+            parameters: [
+                'type' => new QueryParameter(filter: new ExactFilter(), property: 'type', enumClass: ActivityType::class),
+                'level' => new QueryParameter(filter: new ExactFilter(), property: 'level', enumClass: ActivityLevel::class),
+            ],
+        ),
+    ],
+    graphQlOperations: [
+        new Query(),
+        new QueryCollection(
+            parameters: [
+                'type' => new QueryParameter(filter: new ExactFilter(), property: 'type', enumClass: ActivityType::class),
+                'level' => new QueryParameter(filter: new ExactFilter(), property: 'level', enumClass: ActivityLevel::class),
+            ],
+        ),
     ],
 )]
 #[ORM\Entity]

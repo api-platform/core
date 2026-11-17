@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue8816\EnumFilteredActivity as DocumentEnumFilteredActivity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8816\ActivityLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8816\ActivityType;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8816\EnumFilteredActivity;
@@ -43,16 +44,13 @@ final class EnumClassExactFilterTest extends ApiTestCase
 
     protected function setUp(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped('The fixture uses the Doctrine ORM ExactFilter.');
-        }
-
         $this->recreateSchema(self::getResources());
 
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        $manager->persist(new EnumFilteredActivity(ActivityType::Meeting, ActivityLevel::Beginner));
-        $manager->persist(new EnumFilteredActivity(ActivityType::Workshop, ActivityLevel::Advanced));
-        $manager->persist(new EnumFilteredActivity(ActivityType::Webinar, ActivityLevel::Expert));
+        $class = $this->isMongoDB() ? DocumentEnumFilteredActivity::class : EnumFilteredActivity::class;
+        $manager = $this->getManager();
+        $manager->persist(new $class(ActivityType::Meeting, ActivityLevel::Beginner));
+        $manager->persist(new $class(ActivityType::Workshop, ActivityLevel::Advanced));
+        $manager->persist(new $class(ActivityType::Webinar, ActivityLevel::Expert));
         $manager->flush();
     }
 

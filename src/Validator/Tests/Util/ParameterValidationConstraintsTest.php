@@ -17,12 +17,14 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Validator\Util\ParameterValidationConstraints;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Validation;
 
 final class ParameterValidationConstraintsTest extends TestCase
 {
@@ -34,6 +36,36 @@ final class ParameterValidationConstraintsTest extends TestCase
         };
 
         $this->assertContainsEquals($expected, $validation::getParameterValidationConstraints(new QueryParameter(schema: $schema)));
+    }
+
+    /**
+     * The scalar type of a parameter taking a value or a list of values is checked on each value, not on the list.
+     */
+    #[DataProvider('provideTypedValues')]
+    public function testScalarTypeAppliesToEachValueOfAList(mixed $value, int $expectedViolations): void
+    {
+        $validation = new class {
+            use ParameterValidationConstraints;
+        };
+
+        $parameter = new QueryParameter(
+            schema: ['type' => 'integer', 'enum' => [1, 2, 3]],
+            nativeType: Type::union(Type::int(), Type::list(Type::int())),
+            castToNativeType: true,
+        );
+
+        $violations = Validation::createValidator()->validate($value, $validation::getParameterValidationConstraints($parameter));
+
+        $this->assertCount($expectedViolations, $violations, (string) $violations);
+    }
+
+    public static function provideTypedValues(): iterable
+    {
+        yield 'single value' => [1, 0];
+        yield 'list of values' => [[1, 3], 0];
+        yield 'single value outside the enum' => [4, 1];
+        yield 'list with a value outside the enum' => [[1, 4], 1];
+        yield 'list with a value of another type' => [[1, 'foo'], 1];
     }
 
     public static function provideZeroBounds(): iterable
