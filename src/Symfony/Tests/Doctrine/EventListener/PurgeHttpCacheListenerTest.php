@@ -115,6 +115,51 @@ class PurgeHttpCacheListenerTest extends TestCase
         $iriConverterProphecy->getIriFromResource(Argument::type(DummyNoGetOperation::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->shouldHaveBeenCalled();
     }
 
+    public function testResetDropsTheTagsCollectedByAFailedFlush(): void
+    {
+        $failed = new Dummy();
+        $failed->setId(1);
+        $purged = new Dummy();
+        $purged->setId(2);
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/dummies', '/dummies/2'])->shouldBeCalledOnce();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $this->createIriConverter(), $this->createResourceClassResolver(), $this->createStub(PropertyAccessorInterface::class));
+
+        // the commit of the first flush fails: Doctrine dispatches onFlush, but never postFlush
+        $listener->onFlush($this->createOnFlushEventArgs([$failed]));
+        // between two requests (or two messages), the services resetter resets the listener
+        $listener->reset();
+
+        $listener->onFlush($this->createOnFlushEventArgs([$purged]));
+        $listener->postFlush();
+    }
+
+    public function testTagsAreClearedWhenThePurgeFails(): void
+    {
+        $first = new Dummy();
+        $first->setId(1);
+        $second = new Dummy();
+        $second->setId(2);
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/dummies', '/dummies/1'])->willThrow(new \RuntimeException('The cache server is down.'))->shouldBeCalledOnce();
+        $purgerProphecy->purge(['/dummies', '/dummies/2'])->shouldBeCalledOnce();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $this->createIriConverter(), $this->createResourceClassResolver(), $this->createStub(PropertyAccessorInterface::class));
+
+        $listener->onFlush($this->createOnFlushEventArgs([$first]));
+        try {
+            $listener->postFlush();
+            $this->fail('The purge failure must be thrown.');
+        } catch (\RuntimeException) {
+        }
+
+        $listener->onFlush($this->createOnFlushEventArgs([$second]));
+        $listener->postFlush();
+    }
+
     public function testPreUpdate(): void
     {
         $oldRelatedDummy = new RelatedDummy();
@@ -427,5 +472,36 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, null, null, null, $resourceMetadataCollectionFactory);
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
+    }
+
+    private function createIriConverter(): IriConverterInterface
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies');
+        $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class))->will(static fn (array $args): string => '/dummies/'.$args[0]->getId());
+
+        return $iriConverterProphecy->reveal();
+    }
+
+    private function createResourceClassResolver(): ResourceClassResolverInterface
+    {
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        return $resourceClassResolverProphecy->reveal();
+    }
+
+    private function createOnFlushEventArgs(array $updates): OnFlushEventArgs
+    {
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([]);
+        $uowProphecy->getScheduledEntityUpdates()->willReturn($updates);
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([]);
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal());
+        $emProphecy->getClassMetadata(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+
+        return new OnFlushEventArgs($emProphecy->reveal());
     }
 }

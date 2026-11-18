@@ -30,5 +30,6 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('doctrine.event_listener', ['event' => 'preUpdate'])
         ->tag('doctrine.event_listener', ['event' => 'onFlush'])
-        ->tag('doctrine.event_listener', ['event' => 'postFlush']);
+        ->tag('doctrine.event_listener', ['event' => 'postFlush'])
+        ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore']);
 };
