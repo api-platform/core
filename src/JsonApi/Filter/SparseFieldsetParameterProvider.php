@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\State\ParameterProviderInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 final readonly class SparseFieldsetParameterProvider implements ParameterProviderInterface
@@ -31,6 +32,7 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
         private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         private PropertyMetadataFactoryInterface $propertyMetadataFactory,
         private ResourceLinkageResolver $resourceLinkageResolver,
+        private ?NameConverterInterface $nameConverter = null,
     ) {
     }
 
@@ -68,6 +70,8 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             }
 
             foreach (explode(',', $fields) as $f) {
+                // Clients send serialized names; match and whitelist the PHP property name, like PropertyFilter.
+                $f = $this->nameConverter?->denormalize($f) ?? $f;
                 if (\in_array($f, $resourceAllowedProperties, true)) {
                     $p[] = $f;
                 }
