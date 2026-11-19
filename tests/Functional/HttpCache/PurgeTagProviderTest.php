@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\HttpCache;
 
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\NullPurger;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Supplier as SupplierDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DeliveryDay;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Supplier;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -40,15 +41,11 @@ final class PurgeTagProviderTest extends ApiTestCase
 
     public function testSubresourceCollectionIsPurged(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped('Not tested with mongodb.');
-        }
-
         $this->recreateSchema([Supplier::class, DeliveryDay::class]);
 
         $manager = $this->getManager();
         foreach (['First', 'Second'] as $name) {
-            $supplier = new Supplier();
+            $supplier = $this->isMongoDB() ? new SupplierDocument() : new Supplier();
             $supplier->name = $name;
             $manager->persist($supplier);
         }

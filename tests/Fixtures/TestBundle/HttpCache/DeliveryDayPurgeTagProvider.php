@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\HttpCache;
 
 use ApiPlatform\HttpCache\PurgeTagProviderInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DeliveryDay as DeliveryDayDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DeliveryDay;
 
 final class DeliveryDayPurgeTagProvider implements PurgeTagProviderInterface
@@ -39,7 +40,7 @@ final class DeliveryDayPurgeTagProvider implements PurgeTagProviderInterface
      */
     private function getSupplierCollectionTags(object $resource): array
     {
-        if (!$resource instanceof DeliveryDay || null === $resource->supplier?->id) {
+        if (!($resource instanceof DeliveryDay || $resource instanceof DeliveryDayDocument) || null === $resource->supplier?->id) {
             return [];
         }
 
