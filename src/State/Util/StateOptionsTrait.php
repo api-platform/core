@@ -55,4 +55,20 @@ trait StateOptionsTrait
 
         return $defaultClass;
     }
+
+    public function getStateOptionsRepositoryMethod(Operation $operation): ?string
+    {
+        if (!$options = $operation->getStateOptions()) {
+            return null;
+        }
+
+        if (
+            (class_exists(Options::class) && $options instanceof Options)
+            || (class_exists(ODMOptions::class) && $options instanceof ODMOptions)
+        ) {
+            return $options->getRepositoryMethod();
+        }
+
+        return null;
+    }
 }

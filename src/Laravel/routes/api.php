@@ -79,25 +79,6 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
     $prefix = config()->get('api-platform.defaults.route_prefix', '');
 
     Route::group(['prefix' => $prefix], static function (): void {
-        Route::group(['middleware' => ApiPlatformMiddleware::class], static function (): void {
-            Route::get('/contexts/{shortName?}{_format?}', ContextAction::class)
-                ->name('api_jsonld_context');
-
-            Route::get('/validation_errors/{id}', static fn () => throw new NotExposedHttpException('Not exposed.'))
-                ->name('api_validation_errors')
-                ->middleware(ApiPlatformMiddleware::class);
-
-            Route::get('/docs{_format?}', DocumentationController::class)
-                ->name('api_doc');
-
-            Route::get('/.well-known/genid/{id}', static fn () => throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.'))
-                ->name('api_genid');
-
-            Route::get('/{index?}{_format?}', EntrypointController::class)
-                ->where('index', 'index')
-                ->name('api_entrypoint');
-        });
-
         if (config()->get('api-platform.graphql.enabled')) {
             Route::group([
                 'middleware' => config()->get('api-platform.graphql.middleware', []),
@@ -116,11 +97,31 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
                 });
             }
         }
+
+        Route::group(['middleware' => ApiPlatformMiddleware::class], static function (): void {
+            Route::get('/contexts/{shortName?}{_format?}', static function (Request $request, ContextAction $contextAction, string $shortName = 'Entrypoint') {
+                return $contextAction($shortName, $request);
+            })->name('api_jsonld_context');
+
+            Route::get('/validation_errors/{id}', static fn () => throw new NotExposedHttpException('Not exposed.'))
+                ->name('api_validation_errors')
+                ->middleware(ApiPlatformMiddleware::class);
+
+            Route::get('/docs{_format?}', DocumentationController::class)
+                ->name('api_doc');
+
+            Route::get('/.well-known/genid/{id}', static fn () => throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.'))
+                ->name('api_genid');
+
+            Route::get('/{index?}{_format?}', EntrypointController::class)
+                ->where('index', 'index')
+                ->name('api_entrypoint');
+        });
     });
 });
 
 // MCP endpoint (outside the API prefix)
-if (class_exists(McpController::class)) {
+if (class_exists(McpController::class) && config()->get('api-platform.mcp.enabled', true)) {
     Route::match(['GET', 'POST', 'DELETE', 'OPTIONS'], '/mcp', static function (Request $request) {
         $requestStack = app(RequestStack::class);
         $mcpController = app(McpController::class);
@@ -133,5 +134,5 @@ if (class_exists(McpController::class)) {
         } finally {
             $requestStack->pop();
         }
-    })->name('api_mcp');
+    })->name('api_mcp')->middleware(config()->get('api-platform.mcp.middleware', []));
 }

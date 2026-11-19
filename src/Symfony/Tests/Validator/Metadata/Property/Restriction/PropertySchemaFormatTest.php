@@ -86,6 +86,7 @@ final class PropertySchemaFormatTest extends TestCase
         }
         yield 'ipv4' => [new Ip(version: '4'), new ApiProperty(), ['format' => 'ipv4']];
         yield 'ipv6' => [new Ip(version: '6'), new ApiProperty(), ['format' => 'ipv6']];
+        yield 'ipv4 or ipv6' => [new Ip(version: 'all'), new ApiProperty(), ['oneOf' => [['format' => 'ipv4'], ['format' => 'ipv6']]]];
         yield 'not supported' => [new Positive(), new ApiProperty(), []];
     }
 }

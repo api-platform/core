@@ -32,12 +32,12 @@ class SouinPurgerTest extends TestCase
     public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo']])->shouldBeCalled();
-        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar']])->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo'], 'user_data' => ['Surrogate-Key', '/foo']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar'], 'user_data' => ['Surrogate-Key', '/foo, /bar']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo']])->shouldBeCalled();
-        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar']])->shouldBeCalled();
+        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo'], 'user_data' => ['Surrogate-Key', '/foo']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy2->request('PURGE', '', ['headers' => ['Surrogate-Key' => '/foo, /bar'], 'user_data' => ['Surrogate-Key', '/foo, /bar']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $purger = new SouinPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);
@@ -134,12 +134,12 @@ class SouinPurgerTest extends TestCase
         self::assertSame([
             Request::METHOD_PURGE,
             'http://dummy_host/dummy_api_path/souin_api',
-            ['headers' => ['Surrogate-Key' => '/foo']],
+            ['headers' => ['Surrogate-Key' => '/foo'], 'user_data' => ['Surrogate-Key', '/foo']],
         ], $client1->requests[0]);
         self::assertSame([
             Request::METHOD_PURGE,
             'http://dummy_host/dummy_api_path/souin_api',
-            ['headers' => ['Surrogate-Key' => '/foo']],
+            ['headers' => ['Surrogate-Key' => '/foo'], 'user_data' => ['Surrogate-Key', '/foo']],
         ], $client2->requests[0]);
     }
 
@@ -149,5 +149,14 @@ class SouinPurgerTest extends TestCase
         self::assertSame(['Surrogate-Key' => ''], $purger->getResponseHeaders([]));
         self::assertSame(['Surrogate-Key' => 'first-value/, second'], $purger->getResponseHeaders(['first-value/', 'second']));
         self::assertSame(['Surrogate-Key' => 'C0mplex_Value/, The value with spaces'], $purger->getResponseHeaders(['C0mplex_Value/', 'The value with spaces']));
+    }
+
+    public function testPurgeWithCustomHttpMethod(): void
+    {
+        $clientProphecy = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy->request('DELETE', '', ['headers' => ['Surrogate-Key' => '/foo'], 'user_data' => ['Surrogate-Key', '/foo']])->willReturn(new MockResponse())->shouldBeCalled();
+
+        $purger = new SouinPurger([$clientProphecy->reveal()], method: Request::METHOD_DELETE);
+        $purger->purge(['/foo']);
     }
 }

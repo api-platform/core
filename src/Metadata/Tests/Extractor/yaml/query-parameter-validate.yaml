@@ -1,0 +1,5 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   operations:
+                ApiPlatform\Metadata\GetCollection:
+                    queryParameterValidate: false

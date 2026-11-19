@@ -15,6 +15,13 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterTrait;
+use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -23,13 +30,17 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * The date filter allows to filter a collection by date intervals.
  *
  * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
  *
- * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
+ * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php), or, when the `format` argument is set, the format given to `DateTimeImmutable::createFromFormat()`.
  *
  * The `after` and `before` filters will filter including the value whereas `strictly_after` and `strictly_before` will filter excluding the value.
  *
@@ -121,17 +132,58 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class DateFilter extends AbstractFilter implements DateFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class DateFilter implements DateFilterInterface, FilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface, OpenApiParameterFilterInterface, PropertyAwareFilterInterface
 {
     use DateFilterTrait;
+    use ManagerRegistryAwareTrait;
+    use MongoDbOdmPropertyHelperTrait;
+    use NameConverterAwareTrait;
+    use PropertyAwareFilterTrait;
 
     public const DOCTRINE_DATE_TYPES = [
         'date' => true,
         'date_immutable' => true,
     ];
 
+    private LoggerInterface $logger;
+
     /**
-     * {@inheritdoc}
+     * @param array<string, mixed>|null $properties
+     */
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, private readonly ?string $format = null)
+    {
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger ?? new NullLogger();
+        $this->properties = $properties;
+        $this->nameConverter = $nameConverter;
+    }
+
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    {
+        foreach ($context['filters'] ?? [] as $property => $value) {
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
+        }
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function isPropertyEnabled(string $property, string $resourceClass): bool
+    {
+        if (null === $this->properties) {
+            // to ensure sanity, nested properties must still be explicitly enabled
+            return !$this->isPropertyNested($property, $resourceClass);
+        }
+
+        return \array_key_exists($property, $this->properties);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
      */
     protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
@@ -209,12 +261,11 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
             return;
         }
 
-        try {
-            $value = new \DateTime($value);
-        } catch (\Exception) {
-            // Silently ignore this filter if it can not be transformed to a \DateTime
+        $value = $this->createDateFromValue($value, false, $this->format);
+
+        if (null === $value) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(\sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
+                'exception' => new InvalidArgumentException($this->getInvalidDateMessage($field, $this->format)),
             ]);
 
             return;
@@ -247,7 +298,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
      */
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'string', 'format' => 'date'];
+        return null === $this->format ? ['type' => 'string', 'format' => 'date'] : ['type' => 'string'];
     }
 
     public function getOpenApiParameters(Parameter $parameter): array

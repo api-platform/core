@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterCompany as DocumentFilterCompany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterDepartment as DocumentFilterDepartment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterEmployee as DocumentFilterEmployee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest\FilterCompany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest\FilterDepartment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest\FilterEmployee;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SortFilterWithoutProperty;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -35,7 +36,7 @@ final class SortFilterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [FilterCompany::class, FilterDepartment::class, FilterEmployee::class];
+        return [FilterCompany::class, FilterDepartment::class, FilterEmployee::class, SortFilterWithoutProperty::class];
     }
 
     protected function setUp(): void
@@ -178,6 +179,20 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
+    public function testOpenApiDocumentsSortParameterAsSingleValueOnly(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $parameters = $response->toArray()['paths']['/filter_employees']['get']['parameters'];
+        $names = array_column($parameters, 'name');
+
+        $this->assertContains('orderName', $names);
+        $this->assertNotContains('orderName[]', $names);
+    }
+
     public function testIriFilterOnDepartment(): void
     {
         $response = self::createClient()->request('GET', '/filter_departments');
@@ -193,6 +208,17 @@ final class SortFilterTest extends ApiTestCase
         sort($names);
 
         $this->assertSame(['Alice', 'Bob'], $names);
+    }
+
+    public function testSortFilterThrowsExceptionWhenPropertyIsMissing(): void
+    {
+        $response = self::createClient()->request('GET', '/sort_filter_without_properties?sortNoProperty=asc');
+        $this->assertResponseStatusCodeSame(400);
+
+        $this->assertStringContainsString(
+            'The filter parameter with key "sortNoProperty" must specify a property',
+            $response->toArray(false)['detail']
+        );
     }
 
     private function loadFixtures(): void

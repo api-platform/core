@@ -41,7 +41,8 @@ window.onload = function() {
     }).observe(document, {childList: true, subtree: true});
 
     const data = JSON.parse(document.getElementById('swagger-data').innerText);
-    const ui = SwaggerUIBundle(Object.assign({
+
+    const config = {
         spec: data.spec,
         dom_id: '#swagger-ui',
         validatorUrl: null,
@@ -55,7 +56,18 @@ window.onload = function() {
             SwaggerUIBundle.plugins.DownloadUrl,
         ],
         layout: 'StandaloneLayout',
-    }, data.extraConfiguration));
+    };
+
+    if (data.withCredentials) {
+        // Cloudflare Access fix: ensure cookies are sent on token / CORS calls
+        config.requestInterceptor = (req) => {
+            req.credentials = 'include';
+            return req;
+        };
+    }
+
+    const withExtraConfig = Object.assign(config, data.extraConfiguration);
+    const ui = SwaggerUIBundle(withExtraConfig);
 
     if (data.oauth.enabled) {
         ui.initOAuth({

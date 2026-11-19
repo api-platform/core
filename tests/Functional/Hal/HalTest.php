@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Hal;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\HalRelatedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\HalThirdLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\RelationEmbedder;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationGroupImpactOnCollection;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class HalTest extends ApiTestCase
@@ -27,7 +28,7 @@ final class HalTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [RelationEmbedder::class, HalRelatedResource::class, HalThirdLevel::class];
+        return [RelationEmbedder::class, HalRelatedResource::class, HalThirdLevel::class, RelationGroupImpactOnCollection::class];
     }
 
     public function testEntrypointListsResourcesAsHalLinks(): void
@@ -36,11 +37,25 @@ final class HalTest extends ApiTestCase
             'headers' => ['Accept' => 'application/hal+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('/', $body['_links']['self']['href']);
         $hrefs = array_column($body['_links'], 'href');
         $this->assertContains('/hal_relation_embedders', $hrefs);
+    }
+
+    public function testEntrypointExposesTemplatedItemLinks(): void
+    {
+        $response = self::createClient()->request('GET', '/', [
+            'headers' => ['Accept' => 'application/hal+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('/hal_relation_embedders', $body['_links']['halRelationEmbedder']['href'] ?? null);
+        $this->assertSame(['href' => '/hal_relation_embedders/{id}', 'templated' => true], $body['_links']['halRelationEmbedderItem'] ?? null);
+        if ('mongodb' !== static::getContainer()->getParameter('kernel.environment')) {
+            $this->assertSame(['href' => '/relation_group_impact_on_collections/{id}{._format}', 'templated' => true], $body['_links']['relationGroupImpactOnCollectionItem'] ?? null);
+        }
     }
 
     public function testGetEmbedsRelatedResourceAndItsRelation(): void
@@ -49,7 +64,7 @@ final class HalTest extends ApiTestCase
             'headers' => ['Accept' => 'application/hal+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
 
         $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
@@ -92,7 +107,7 @@ final class HalTest extends ApiTestCase
             'json' => ['krondstadt' => 'Updated'],
         ]);
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
         $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);
@@ -110,7 +125,7 @@ final class HalTest extends ApiTestCase
             'json' => ['krondstadt' => 'Patched'],
         ]);
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
         $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);

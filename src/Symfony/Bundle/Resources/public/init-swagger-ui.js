@@ -41,7 +41,7 @@ window.onload = function() {
     }).observe(document, {childList: true, subtree: true});
 
     const data = JSON.parse(document.getElementById('swagger-data').innerText);
-    const ui = SwaggerUIBundle(Object.assign({
+    const config = {
         spec: data.spec,
         dom_id: '#swagger-ui',
         validatorUrl: null,
@@ -56,7 +56,16 @@ window.onload = function() {
             SwaggerUIBundle.plugins.DownloadUrl,
         ],
         layout: 'StandaloneLayout',
-    }, data.extraConfiguration));
+    };
+
+    if (data.withCredentials) {
+        config.requestInterceptor = (req) => {
+            req.credentials = 'include';
+            return req;
+        };
+    }
+
+    const ui = SwaggerUIBundle(Object.assign(config, data.extraConfiguration));
 
     if (data.oauth.enabled) {
         ui.initOAuth({

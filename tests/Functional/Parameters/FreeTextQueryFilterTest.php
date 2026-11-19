@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Owner as DocumentOwner;
@@ -23,6 +23,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Owner;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
+use PHPUnit\Framework\Attributes\TestWith;
 
 final class FreeTextQueryFilterTest extends ApiTestCase
 {
@@ -44,6 +45,16 @@ final class FreeTextQueryFilterTest extends ApiTestCase
         $client = $this->createClient();
         $client->request('GET', '/chickens?q=9780')->toArray();
         $this->assertJsonContains(['totalItems' => 1]);
+    }
+
+    #[TestWith(['/chickens?q[foo]=bar'])]
+    #[TestWith(['/chickens?q[][foo]=bar'])]
+    public function testFreeTextQueryFilterWithoutCondition(string $uri): void
+    {
+        $this->createClient()->request('GET', $uri);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains(['totalItems' => 4]);
     }
 
     public function testFreeTextQueryFilterWithOneToManyRelation(): void
@@ -98,6 +109,23 @@ final class FreeTextQueryFilterTest extends ApiTestCase
 
         $this->assertJsonContains(['totalItems' => 2]);
         $this->assertCount(2, $response['member']);
+    }
+
+    public function testFreeTextQueryFilterWithPerPropertyFilterMap(): void
+    {
+        $client = $this->createClient();
+
+        $response = $client->request('GET', '/chickens?qmixed=Henri')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertSame('Henriette', $response['member'][0]['name']);
+
+        $response = $client->request('GET', '/chickens?qmixed=978020137963')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertSame('978020137963', $response['member'][0]['ean']);
+
+        $response = $client->request('GET', '/chickens?qmixed=97802')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertSame('978020137962', $response['member'][0]['name']);
     }
 
     public function testFreeTextQueryFilterWithTwoLevelTraversalPartialWithPropertyPlaceholder(): void

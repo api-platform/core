@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Doctrine\Common\Metadata\Property\DoctrineDiscriminatorSerializerPropertyMetadataFactory;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\FilterExtension;
@@ -193,6 +194,15 @@ return function (ContainerConfigurator $container) {
         ->args([
             service('doctrine_mongodb'),
             service('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner'),
+        ]);
+
+    $services->set('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.discriminator_serializer', DoctrineDiscriminatorSerializerPropertyMetadataFactory::class)
+        ->decorate('api_platform.metadata.property.metadata_factory', null, 31)
+        ->args([
+            service('doctrine_mongodb'),
+            service('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.discriminator_serializer.inner'),
+            service('serializer.mapping.class_metadata_factory')->nullOnInvalid(),
+            service('api_platform.resource_class_resolver'),
         ]);
 
     $services->set('api_platform.doctrine_mongodb.odm.state.collection_provider', CollectionProvider::class)

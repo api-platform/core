@@ -30,8 +30,8 @@ class Question
     private ?int $id = null;
     #[ORM\Column(nullable: true)]
     private ?string $content = null;
-    #[ORM\OneToOne(targetEntity: Answer::class, inversedBy: 'question')]
-    #[ORM\JoinColumn(name: 'answer_id', referencedColumnName: 'id', unique: true)]
+    #[ORM\ManyToOne(targetEntity: Answer::class, inversedBy: 'relatedQuestions')]
+    #[ORM\JoinColumn(name: 'answer_id', referencedColumnName: 'id')]
     private ?Answer $answer = null;
 
     /**

@@ -16,8 +16,6 @@ namespace ApiPlatform\Elasticsearch\Filter;
 /**
  * Elasticsearch filter interface for a constant score query.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 interface ConstantScoreFilterInterface extends FilterInterface

@@ -30,7 +30,7 @@ final class ToolProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!isset($context['mcp_request'])) {
+        if (!isset($context['mcp_request'], $context['mcp_data'])) {
             return null;
         }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+           https://api-platform.com/schema/metadata/resources-3.0.xsd">
+    <resource uriTemplate="/users/{author}/programs.{_format}" class="ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program">
+        <uriVariables>
+            <uriVariable parameterName="author"/>
+        </uriVariables>
+        <operations>
+            <operation class="ApiPlatform\Metadata\Post">
+                <openapi>
+                    <parameters>
+                        <parameter name="author" in="path" description="Author username" required="true" example="john-doe"/>
+                        <parameter name="format" in="query" description="Response format" required="false"/>
+                    </parameters>
+                </openapi>
+            </operation>
+        </operations>
+    </resource>
+</resources>

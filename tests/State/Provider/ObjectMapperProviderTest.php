@@ -25,6 +25,13 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 class ObjectMapperProviderTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (!interface_exists(ObjectMapperInterface::class)) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+    }
+
     public function testProvideBypassesWhenNoObjectMapper(): void
     {
         $data = new SourceEntity();
@@ -173,7 +180,7 @@ class ObjectMapperProviderTest extends TestCase
     {
         $sourceEntity = new SourceEntity();
         $outputResource = new OutputResource();
-        $operation = new Patch(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
+        $operation = new Get(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->once())
             ->method('map')

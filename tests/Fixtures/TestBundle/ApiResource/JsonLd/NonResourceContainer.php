@@ -13,26 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd;
 
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(
-    shortName: 'JsonLdNonResourceContainer',
-    normalizationContext: ['groups' => ['jsonld_non_resource']],
-    operations: [
-        new Get(
-            uriTemplate: '/jsonld_non_resource_containers/{id}',
-            uriVariables: ['id'],
-            provider: [self::class, 'provide'],
-        ),
-    ],
-)]
-#[ApiFilter(PropertyFilter::class)]
+#[ApiResource(shortName: 'JsonLdNonResourceContainer', normalizationContext: ['groups' => ['jsonld_non_resource']], operations: [
+    new Get(
+        uriTemplate: '/jsonld_non_resource_containers/{id}',
+        uriVariables: ['id'],
+        provider: [self::class, 'provide'],
+    ),
+], parameters: ['properties' => new QueryParameter(filter: new PropertyFilter())])]
 class NonResourceContainer
 {
     #[ApiProperty(identifier: true)]

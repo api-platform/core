@@ -13,12 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ChildAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\CrudOpenApiApiPlatformTag;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWebhook;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6151\OverrideOpenApiResponses;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUser;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUserAction;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8143\ReferenceResponse;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\OpenApiPartialUpdateResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParameterOnPropertyWithDefaultKey;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
@@ -35,10 +40,13 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaResourceRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NoCollectionDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OverriddenOperationDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ParameterOnProperties;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ParameterOnPropertiesWithHeaderParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -99,12 +107,119 @@ class OpenApiTest extends ApiTestCase
             OverrideOpenApiResponses::class,
             DummyAddress::class,
             RamseyUuidDummy::class,
+            NumericValidated::class,
             JsonSchemaResource::class,
             JsonSchemaResourceRelated::class,
             WrappedResponseEntity::class,
             ParentAttribute::class,
             ChildAttribute::class,
+            DeprecatedPutUser::class,
+            DeprecatedPutUserAction::class,
+            ReferenceResponse::class,
+            OpenApiPartialUpdateResource::class,
+            ParameterOnProperties::class,
+            ParameterOnPropertiesWithHeaderParameter::class,
+            ParameterOnPropertyWithDefaultKey::class,
         ];
+    }
+
+    public function testOpenApiReferenceInResponsesUsesDollarRef(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $responses = $json['paths']['/issue8143_reference_response']['post']['responses'];
+        $this->assertArrayHasKey('$ref', $responses['401']);
+        $this->assertSame('#/components/responses/401', $responses['401']['$ref']);
+        $this->assertArrayNotHasKey('ref', $responses['401']);
+    }
+
+    public function testNonJsonLdRequestBodiesKeepTheirFormatDefinition(): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+
+        $content = $json['paths']['/dummies']['post']['requestBody']['content'];
+
+        $this->assertSame('#/components/schemas/Dummy', $content['application/xml']['schema']['$ref']);
+        $this->assertSame('#/components/schemas/Dummy', $content['application/ld+json']['schema']['$ref']);
+    }
+
+    public function testJsonApiRequestBodyUsesItsOwnInputDefinition(): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+        $schemas = $json['components']['schemas'];
+
+        $inputName = $this->definitionName($json['paths']['/dummies']['post']['requestBody']['content']['application/vnd.api+json']['schema']['$ref']);
+        $outputName = $this->definitionName($json['paths']['/dummies/{id}']['get']['responses']['200']['content']['application/vnd.api+json']['schema']['$ref']);
+
+        $this->assertSame('Dummy.jsonapi', $outputName);
+        $this->assertNotSame($outputName, $inputName);
+
+        $input = $schemas[$inputName];
+        $this->assertSame(['$ref' => '#/components/schemas/'.$inputName.'.resource'], $input['properties']['data']);
+        $this->assertSame(['type'], $schemas[$inputName.'.resource']['required']);
+        $this->assertArrayHasKey('attributes', $schemas[$inputName.'.resource']['properties']);
+        $this->assertArrayNotHasKey('included', $input['properties']);
+
+        $this->assertSame(['$ref' => '#/components/schemas/'.$outputName.'.resource'], $schemas[$outputName]['properties']['data']);
+        $this->assertSame(['type', 'id'], $schemas[$outputName.'.resource']['required']);
+    }
+
+    private function definitionName(string $ref): string
+    {
+        return substr($ref, \strlen('#/components/schemas/'));
+    }
+
+    public function testDeprecatedPutDoesNotLeakIntoNestedResourceSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $json = $response->toArray();
+        $schemas = $json['components']['schemas'];
+
+        // The POST input schema of DeprecatedPutUserAction embeds DeprecatedPutUser.
+        $postRef = $json['paths']['/deprecated_put_user_actions']['post']['requestBody']['content']['application/ld+json']['schema']['$ref'] ?? null;
+        $this->assertNotNull($postRef, 'POST input schema ref is missing');
+
+        $postName = substr($postRef, \strlen('#/components/schemas/'));
+        $userRef = $schemas[$postName]['properties']['user']['$ref'] ?? null;
+        $this->assertNotNull($userRef, 'Nested user property schema ref is missing');
+
+        $userName = substr($userRef, \strlen('#/components/schemas/'));
+        $this->assertArrayHasKey($userName, $schemas, 'Nested DeprecatedPutUser schema is missing from components');
+        $this->assertArrayNotHasKey('deprecated', $schemas[$userName], 'Nested DeprecatedPutUser schema must not be marked deprecated because of the deprecated PUT operation');
+    }
+
+    public function testPartialUpdateSchemasDoNotRequireProperties(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $json = $response->toArray();
+        $schemas = $json['components']['schemas'];
+        $postSchema = $json['paths']['/openapi_partial_update_resources']['post']['requestBody']['content']['application/json']['schema'];
+        $putSchema = $json['paths']['/openapi_partial_update_resources/{id}']['put']['requestBody']['content']['application/json']['schema'];
+        $patchSchema = $json['paths']['/openapi_partial_update_resources/{id}']['patch']['requestBody']['content']['application/json']['schema'];
+        $postName = substr($postSchema['$ref'], \strlen('#/components/schemas/'));
+        $putName = substr($putSchema['$ref'], \strlen('#/components/schemas/'));
+        $patchName = substr($patchSchema['$ref'], \strlen('#/components/schemas/'));
+
+        self::assertNotSame($postName, $putName);
+        self::assertNotSame($postName, $patchName);
+        self::assertSame(['name'], $schemas[$postName]['required']);
+        self::assertArrayNotHasKey('required', $schemas[$putName]);
+        self::assertArrayNotHasKey('required', $schemas[$patchName]);
     }
 
     public function testErrorsAreDocumented(): void
@@ -261,15 +376,33 @@ class OpenApiTest extends ApiTestCase
         ], 'description' => 'A resource used for OpenAPI tests.'], $res['components']['schemas']['Crud.jsonld']);
     }
 
+    public function testJsonApiCollectionSchemaDocumentsIncludedResources(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+        $schema = $json['paths']['/dummies']['get']['responses']['200']['content']['application/vnd.api+json']['schema'];
+        $properties = $schema['allOf'][1]['properties'];
+
+        $this->assertArrayHasKey('included', $properties);
+        $this->assertSame('array', $properties['included']['type']);
+        $this->assertTrue($properties['included']['readOnly']);
+        $this->assertArrayHasKey('anyOf', $properties['included']['items']);
+        $this->assertNotEmpty($properties['included']['items']['anyOf']);
+    }
+
     public function testRetrieveTheOpenApiDocumentation(): void
     {
         $response = self::createClient()->request('GET', '/docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $json = $response->toArray();
 
         // Context
-        $this->assertSame('3.1.0', $json['openapi']);
+        $this->assertSame('3.2.0', $json['openapi']);
         // Root properties
         $this->assertSame('My Dummy API', $json['info']['title']);
         $this->assertStringContainsString('This is a test API.', $json['info']['description']);
@@ -361,8 +494,10 @@ class OpenApiTest extends ApiTestCase
         $this->assertFalse($json['paths']['/dummies']['get']['parameters'][4]['required']);
         $this->assertSame('boolean', $json['paths']['/dummies']['get']['parameters'][4]['schema']['type']);
 
-        $this->assertSame('foobar[]', $json['paths']['/dummy_cars']['get']['parameters'][9]['name']);
-        $this->assertSame('Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}', $json['paths']['/dummy_cars']['get']['parameters'][9]['description']);
+        $dummyCarParameters = $json['paths']['/dummy_cars']['get']['parameters'];
+        $foobarParameter = array_values(array_filter($dummyCarParameters, static fn (array $parameter): bool => 'foobar[]' === $parameter['name']));
+        $this->assertCount(1, $foobarParameter);
+        $this->assertSame('Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}', $foobarParameter[0]['description']);
 
         // Webhook
         $this->assertSame('Something else here for example', $json['webhooks']['a/{id}']['get']['description']);
@@ -401,7 +536,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertCount(7, $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters']);
 
         // Subcollection - check schema
-        $this->assertSame('#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['responses']['200']['content']['application/ld+json']['schema']['allOf'][1]['properties']['hydra:member']['items']['$ref']);
+        $this->assertSame('#/components/schemas/RelatedToDummyFriend4.jsonld-fakemanytomany', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['responses']['200']['content']['application/ld+json']['schema']['allOf'][1]['properties']['hydra:member']['items']['$ref']);
 
         // Deprecations
         $this->assertTrue($json['paths']['/deprecated_resources']['get']['deprecated']);
@@ -457,7 +592,7 @@ class OpenApiTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/docs?api_gateway=true', ['headers' => ['accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $json = $response->toArray();
 
         $this->assertSame('/', $json['basePath']);
@@ -498,11 +633,11 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $json = $response->toArray();
 
         // Context
-        $this->assertSame('3.1.0', $json['openapi']);
+        $this->assertSame('3.2.0', $json['openapi']);
         // Root properties
         $this->assertSame('My Dummy API', $json['info']['title']);
         $this->assertStringContainsString('This is a test API.', $json['info']['description']);
@@ -534,7 +669,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.openapi+yaml'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+yaml; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+yaml');
     }
 
     public function testRetrieveTheOpenApiDocumentationHtml(): void
@@ -572,15 +707,36 @@ class OpenApiTest extends ApiTestCase
         $json = $response->toArray();
 
         $this->assertSame('3.0.0', $json['openapi']);
-        $this->assertEquals([
-            ['type' => 'integer'],
-            ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['id']['anyOf']);
-        $this->assertEquals([
-            ['type' => 'boolean'],
-            ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['anyOf']);
+        $this->assertSame('integer', $json['components']['schemas']['DummyBoolean']['properties']['id']['type']);
+        $this->assertTrue($json['components']['schemas']['DummyBoolean']['properties']['id']['nullable']);
+        $this->assertSame('boolean', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['type']);
+        $this->assertTrue($json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['nullable']);
         $this->assertArrayNotHasKey('owl:maxCardinality', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']);
+    }
+
+    public function testOpenApi30EmitsBooleanExclusiveBoundsForNumericConstraints(): void
+    {
+        $kernel = self::bootKernel();
+        if ('mongodb' === $kernel->getEnvironment()) {
+            $this->markTestSkipped('Resource not loaded with MongoDB.');
+        }
+
+        $response = self::createClient()->request('GET', '/docs.jsonopenapi?spec_version=3.0.0', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertSame('3.0.0', $json['openapi']);
+        $this->assertArrayHasKey('NumericValidated', $json['components']['schemas']);
+        $properties = $json['components']['schemas']['NumericValidated']['properties'];
+
+        $this->assertSame(10, $properties['greaterThanMe']['minimum']);
+        $this->assertTrue($properties['greaterThanMe']['exclusiveMinimum']);
+
+        $this->assertSame(99, $properties['lessThanMe']['maximum']);
+        $this->assertTrue($properties['lessThanMe']['exclusiveMaximum']);
+
+        $this->assertSame(0, $properties['positive']['minimum']);
+        $this->assertTrue($properties['positive']['exclusiveMinimum']);
     }
 
     public function testRetrieveTheOpenApiDocumentationInJson(): void
@@ -589,7 +745,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'text/html,*/*;q=0.8'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
     }
 
     public function testOpenApiUiIsEnabledForDocsEndpointWithDummyObject(): void
@@ -602,24 +758,30 @@ class OpenApiTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function testRetrieveTheEntrypoint(): void
+    /**
+     * @see https://github.com/api-platform/core/issues/8361
+     */
+    public function testEntrypointRejectsOpenApiFormat(): void
     {
         $response = self::createClient()->request('GET', '/', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
-        $this->assertJson($response->getContent());
+        $this->assertResponseStatusCodeSame(406);
     }
 
-    public function testRetrieveTheEntrypointWithUrlFormat(): void
+    /**
+     * The ".jsonopenapi" URL suffix is resolved by routing before content negotiation
+     * runs, so an unsupported route format yields a 404 (consistent with any other
+     * resource requested with an unsupported format suffix), not a 406.
+     *
+     * @see https://github.com/api-platform/core/issues/8361
+     */
+    public function testEntrypointRejectsOpenApiFormatWithUrlFormat(): void
     {
         $response = self::createClient()->request('GET', '/index.jsonopenapi', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
-        $this->assertJson($response->getContent());
+        $this->assertResponseStatusCodeSame(404);
     }
 
     public function testOpenApiSchemaWithNormalizationAttributes(): void
@@ -652,5 +814,96 @@ class OpenApiTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hiddenData', $childProperties);
         $this->assertArrayNotHasKey('id', $childProperties);
+    }
+
+    public function testOpenApiParameterOnProperties(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('paths', $json);
+        $this->assertArrayHasKey('/parameter_on_properties', $json['paths']);
+        $this->assertArrayHasKey('get', $json['paths']['/parameter_on_properties']);
+        $this->assertArrayHasKey('parameters', $json['paths']['/parameter_on_properties']['get']);
+
+        $parameters = $json['paths']['/parameter_on_properties']['get']['parameters'];
+
+        $this->assertCount(2, $parameters);
+
+        $qnameParameterGet = $parameters[0];
+
+        $this->assertNotNull($qnameParameterGet);
+        $this->assertSame('qname', $qnameParameterGet['name']);
+        $this->assertSame('query', $qnameParameterGet['in']);
+        $this->assertSame('ParameterOnProperties qname', $qnameParameterGet['description']);
+        $this->assertFalse($qnameParameterGet['required']);
+        $this->assertFalse($qnameParameterGet['deprecated']);
+        $this->assertSame('string', $qnameParameterGet['schema']['type']);
+        $this->assertNull($qnameParameterGet['schema']['items']['type']);
+        $this->assertSame('form', $qnameParameterGet['style']);
+        $this->assertTrue($qnameParameterGet['explode']);
+
+        $qnameParameterGetCollection = $parameters[1];
+
+        $this->assertNotNull($qnameParameterGetCollection);
+        $this->assertSame('qname[]', $qnameParameterGetCollection['name']);
+        $this->assertSame('query', $qnameParameterGetCollection['in']);
+        $this->assertSame('ParameterOnProperties qname', $qnameParameterGetCollection['description']);
+        $this->assertFalse($qnameParameterGetCollection['required']);
+        $this->assertFalse($qnameParameterGetCollection['deprecated']);
+        $this->assertSame('array', $qnameParameterGetCollection['schema']['type']);
+        $this->assertSame('string', $qnameParameterGetCollection['schema']['items']['type']);
+        $this->assertSame('deepObject', $qnameParameterGetCollection['style']);
+        $this->assertTrue($qnameParameterGetCollection['explode']);
+    }
+
+    public function testOpenApiParameterOnPropertiesWithHeaderParameter(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('paths', $json);
+        $this->assertArrayHasKey('/parameter_on_properties_with_header_parameter', $json['paths']);
+        $this->assertArrayHasKey('get', $json['paths']['/parameter_on_properties_with_header_parameter']);
+        $this->assertArrayHasKey('parameters', $json['paths']['/parameter_on_properties_with_header_parameter']['get']);
+
+        $parameters = $json['paths']['/parameter_on_properties_with_header_parameter']['get']['parameters'];
+
+        $this->assertCount(1, $parameters);
+        $authParameter = $parameters[0];
+
+        $this->assertNotNull($authParameter);
+        $this->assertSame('X-Authorization', $authParameter['name']);
+        $this->assertSame('header', $authParameter['in']);
+        $this->assertSame('Authorization header', $authParameter['description']);
+        $this->assertFalse($authParameter['required']);
+        $this->assertFalse($authParameter['deprecated']);
+        $this->assertSame('string', $authParameter['schema']['type']);
+    }
+
+    public function testOpenApiParameterOnPropertyWithDefaultKey(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('/parameter_on_property_with_default_key', $json['paths']);
+
+        $parameters = $json['paths']['/parameter_on_property_with_default_key']['get']['parameters'];
+
+        $this->assertCount(5, $parameters);
+
+        $this->assertSame('title', $parameters[4]['name']);
     }
 }

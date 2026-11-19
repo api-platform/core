@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -87,24 +88,47 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $iri));
         }
 
-        $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
+        $routeOperation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
-        if ($operation instanceof CollectionOperationInterface) {
+        if ($routeOperation instanceof CollectionOperationInterface) {
             throw new InvalidArgumentException(\sprintf('The iri "%s" references a collection not an item.', $iri));
         }
 
-        if (!$operation instanceof HttpOperation) {
+        if (!$routeOperation instanceof HttpOperation) {
             throw new RuntimeException(\sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
         }
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
+        $dispatchOperation = $routeOperation;
+        $expectedClass = $context['resource_class'] ?? null;
+        if (\is_string($expectedClass) && $expectedClass !== $parameters['_api_resource_class'] && class_exists($expectedClass)) {
+            foreach ($this->resourceMetadataCollectionFactory->create($expectedClass) as $resourceMetadata) {
+                foreach ($resourceMetadata->getOperations() ?? [] as $candidate) {
+                    if ($candidate instanceof HttpOperation && !$candidate instanceof CollectionOperationInterface && $candidate->getRouteName() === ($parameters['_route'] ?? null)) {
+                        $dispatchOperation = $candidate;
+                        break 2;
+                    }
+                }
+            }
+        }
+
         try {
-            $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
+            $uriVariables = $this->getOperationUriVariables($dispatchOperation, $parameters, $dispatchOperation->getClass() ?? $attributes['resource_class']);
         } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
+        // If a caller-provided GraphQl operation carries its own provider, dispatch through it
+        // so the user-defined Query(provider: X) wins over the route-matched HTTP operation.
+        if ($operation instanceof GraphQlOperation && null !== $operation->getProvider()) {
+            $dispatchOperation = $operation;
+        }
+
+        if (false === ($context['map_resource'] ?? null)) {
+            $dispatchOperation = $dispatchOperation->withMap(false);
+        }
+
+        if ($item = $this->provider->provide($dispatchOperation, $uriVariables, $context)) {
             return $item;
         }
 
@@ -122,7 +146,9 @@ final class IriConverter implements IriConverterInterface
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
-        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.((\is_string($resource) || $operation instanceof CollectionOperationInterface) ? '_c' : '_i');
+        // item_uri_template steers both the skolem check and the resource class promotion below,
+        // so it has to be part of the key even when it did not resolve to an operation.
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_s' : '_o').($operation instanceof CollectionOperationInterface ? '_c' : '_i').($context['item_uri_template'] ?? '');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }
@@ -154,11 +180,16 @@ final class IriConverter implements IriConverterInterface
             !$operation->getName()
             || ($operation instanceof HttpOperation && 'POST' === $operation->getMethod())
         ) {
-            $forceCollection = $operation instanceof CollectionOperationInterface;
-            try {
-                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
-                $identifiersExtractorOperation = $operation;
-            } catch (OperationNotFoundException) {
+            if (isset($this->localOperationCache[$localOperationCacheKey])) {
+                $operation = $this->localOperationCache[$localOperationCacheKey];
+                $identifiersExtractorOperation = $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? $operation;
+            } else {
+                $forceCollection = $operation instanceof CollectionOperationInterface;
+                try {
+                    $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
+                    $identifiersExtractorOperation = $operation;
+                } catch (OperationNotFoundException) {
+                }
             }
         }
 

@@ -16,6 +16,7 @@ namespace ApiPlatform\Mcp\Tests\Capability\Registry;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Mcp\Capability\Registry\Loader;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
@@ -71,10 +72,9 @@ class LoaderTest extends TestCase
                     return true;
                 }),
                 Loader::HANDLER,
-                true,
             );
 
-        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory, new ToolInputSchemaFactory($schemaFactory));
         $loader->load($registry);
     }
 
@@ -114,10 +114,9 @@ class LoaderTest extends TestCase
                     return true;
                 }),
                 Loader::HANDLER,
-                true,
             );
 
-        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory, new ToolInputSchemaFactory($schemaFactory));
         $loader->load($registry);
     }
 
@@ -154,10 +153,9 @@ class LoaderTest extends TestCase
                     return true;
                 }),
                 Loader::HANDLER,
-                true,
             );
 
-        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory, new ToolInputSchemaFactory($schemaFactory));
         $loader->load($registry);
     }
 
@@ -177,7 +175,7 @@ class LoaderTest extends TestCase
         $registry->expects($this->never())->method('registerTool');
         $registry->expects($this->never())->method('registerResource');
 
-        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory, new ToolInputSchemaFactory($schemaFactory));
         $loader->load($registry);
     }
 }

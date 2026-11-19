@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\MappingException;
 
 /**
@@ -60,7 +61,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         }
 
         $property = $parameter->getProperty();
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
         $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
@@ -68,34 +69,44 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $leafProperty = $nestedInfo['leaf_property'] ?? $property;
         $classMetadata = $documentManager->getClassMetadata($leafClass);
 
+        // Backed enum exposed as a resource: match the scalar field against the resolved enum.
         if (!$classMetadata->hasReference($leafProperty)) {
+            if (!$this->isEnumField($classMetadata, $leafProperty)) {
+                return;
+            }
+
+            $normalize = static fn (mixed $v): mixed => $v instanceof \BackedEnum ? $v->value : $v;
+
+            if (is_iterable($value)) {
+                $values = \is_array($value) ? $value : iterator_to_array($value);
+                $match->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->in(array_map($normalize, $values)));
+
+                return;
+            }
+
+            $match->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->equals($normalize($value)));
+
             return;
         }
 
         $method = $classMetadata->isSingleValuedAssociation($leafProperty) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
+            $value = \is_array($value) ? $value : iterator_to_array($value);
+
+            if ([] === $value) {
+                $match->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->in([]));
+
+                return;
+            }
+
             $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
-                if (!\is_object($v)) {
-                    continue;
-                }
-
                 $or->addOr($aggregationBuilder->matchExpr()->field($matchField)->{$method}($v));
             }
 
             $match->{$operator}($or);
-
-            return;
-        }
-
-        // The IRI did not resolve to a resource: emit an always-false clause so the query
-        // returns no result rather than attempting to match against a raw IRI string.
-        if (!\is_object($value)) {
-            $match->{$operator}(
-                $aggregationBuilder->matchExpr()->field($matchField)->in([])
-            );
 
             return;
         }
@@ -112,5 +123,10 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     public static function getParameterProvider(): string
     {
         return IriConverterParameterProvider::class;
+    }
+
+    private function isEnumField(ClassMetadata $classMetadata, string $field): bool
+    {
+        return $classMetadata->hasField($field) && null !== ($classMetadata->getFieldMapping($field)['enumType'] ?? null);
     }
 }

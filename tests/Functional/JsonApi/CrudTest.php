@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -75,7 +75,7 @@ final class CrudTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.api+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertCount(1, $body['data']);
     }

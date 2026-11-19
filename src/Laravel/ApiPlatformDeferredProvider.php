@@ -40,6 +40,7 @@ use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource\EloquentResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
 use ApiPlatform\Laravel\Eloquent\State\LinksHandler;
@@ -84,6 +85,8 @@ use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
@@ -150,6 +153,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         $this->app->singleton(ParameterProvider::class, static function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
+            $tagged[ReadLinkParameterProvider::class] = new ReadLinkParameterProvider($app->make(CallableProvider::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
 
             return new ParameterProvider(
                 new ParameterValidatorProvider(
@@ -158,7 +162,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                         $app->make(ResourceAccessCheckerInterface::class)
                     ),
                 ),
-                new ServiceLocator($tagged)
+                new ServiceLocator($tagged),
+                $app->make(PaginationOptions::class)
             );
         });
 
@@ -291,7 +296,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                     ),
                     (bool) $config->get('api-platform.partial_patch_validation', false)
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file'),
+                $app->make(ModelMetadata::class)
             );
         });
 
@@ -339,6 +345,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         $this->app->singleton('api_platform.graphql.state_provider.parameter', static function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
+            $tagged[ReadLinkParameterProvider::class] = new ReadLinkParameterProvider($app->make(CallableProvider::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
 
             return new ParameterProvider(
                 new ParameterValidatorProvider(

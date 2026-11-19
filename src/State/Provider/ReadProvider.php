@@ -88,14 +88,18 @@ final class ReadProvider implements ProviderInterface, StopwatchAwareInterface
             $data = null;
         }
 
-        if (
-            null === $data
-            && 'POST' !== $operation->getMethod()
-            && ('PUT' !== $operation->getMethod()
-                || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
-            )
-        ) {
-            throw new NotFoundHttpException('Not Found', $e ?? null);
+        if (null === $data) {
+            $throwOnNotFound = $operation->getThrowOnNotFound();
+            if (null === $throwOnNotFound) {
+                $throwOnNotFound = 'POST' !== $operation->getMethod()
+                    && ('PUT' !== $operation->getMethod()
+                        || ($operation instanceof Put && !($operation->getAllowCreate() ?? false))
+                    );
+            }
+
+            if ($throwOnNotFound) {
+                throw new NotFoundHttpException('Not Found', $e ?? null);
+            }
         }
 
         $request?->attributes->set('data', $data);

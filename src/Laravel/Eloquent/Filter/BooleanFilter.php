@@ -39,7 +39,7 @@ final class BooleanFilter implements FilterInterface, JsonSchemaFilterInterface
             return $builder;
         }
 
-        return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), $values);
+        return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), self::BOOLEAN_VALUES[$values]);
     }
 
     public function getSchema(Parameter $parameter): array

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredNumericParameter as FilteredNumericParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredNumericParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -66,26 +66,24 @@ final class NumericFilterTest extends ApiTestCase
         yield 'amount_alias_int_equal' => ['/filtered_numeric_parameters?amount=20', 2];
     }
 
-    #[DataProvider('nullAndEmptyScenariosProvider')]
-    public function testRangeFilterWithNullAndEmptyValues(string $url, int $expectedCount): void
+    #[DataProvider('emptyScenariosProvider')]
+    public function testRangeFilterWithEmptyValues(string $url, int $expectedCount): void
     {
         $response = self::createClient()->request('GET', $url);
         $this->assertResponseIsSuccessful();
 
-        $responseData = $response->toArray();
-        $filteredItems = $responseData['hydra:member'];
+        $filteredItems = $response->toArray()['hydra:member'];
 
         $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
     }
 
-    public static function nullAndEmptyScenariosProvider(): \Generator
+    public static function emptyScenariosProvider(): \Generator
     {
-        yield 'quantity_int_null_value' => ['/filtered_numeric_parameters?quantity=null', 4];
         yield 'quantity_int_empty_value' => ['/filtered_numeric_parameters?quantity=', 4];
-        yield 'ratio_float_null_value' => ['/filtered_numeric_parameters?ratio=null', 4];
         yield 'ratio_float_empty_value' => ['/filtered_numeric_parameters?ratio=', 4];
-        yield 'amount_alias_int_null_value' => ['/filtered_numeric_parameters?amount=null', 4];
         yield 'amount_alias_int_empty_value' => ['/filtered_numeric_parameters?amount=', 4];
+        yield 'quantities_list_only_empty_value' => ['/filtered_numeric_parameters?quantities[]=', 4];
+        yield 'quantities_list_value_and_empty_value' => ['/filtered_numeric_parameters?quantities[]=20&quantities[]=', 2];
     }
 
     /**

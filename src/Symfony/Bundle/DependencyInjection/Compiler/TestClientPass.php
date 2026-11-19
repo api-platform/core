@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Symfony\Bundle\Test\Client;
+use ApiPlatform\Test\Client;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -28,6 +28,8 @@ final class TestClientPass implements CompilerPassInterface
         if (
             !class_exists(AbstractBrowser::class)
             || !trait_exists(HttpClientTrait::class)
+            // after the HttpClientTrait check: Client uses that trait
+            || !class_exists(Client::class)
             || !$container->hasParameter('test.client.parameters')
         ) {
             return;

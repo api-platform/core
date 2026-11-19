@@ -27,6 +27,23 @@ final class EndSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), 'like', '%'.$values);
+        if (\is_array($values) && !array_is_list($values)) {
+            return $builder;
+        }
+
+        $property = $this->getQueryProperty($parameter);
+        $whereClause = $context['whereClause'] ?? 'where';
+
+        if (!\is_array($values)) {
+            return $builder->{$whereClause}($property, 'like', '%'.$values);
+        }
+
+        return $builder->{$whereClause}(static function (Builder $group) use ($property, $values): void {
+            foreach ($values as $value) {
+                if (!\is_array($value)) {
+                    $group->orWhere($property, 'like', '%'.$value);
+                }
+            }
+        });
     }
 }

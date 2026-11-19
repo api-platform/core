@@ -17,12 +17,13 @@ use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\ExtensionTrait;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 final class OpenApi
 {
     use ExtensionTrait;
 
-    public const VERSION = '3.1.0';
+    public const VERSION = '3.2.0';
 
     private string $openapi = self::VERSION;
     private Components $components;
@@ -30,7 +31,7 @@ final class OpenApi
     /**
      * @param array|null $externalDocs
      */
-    public function __construct(private Info $info, private array $servers, private Paths $paths, ?Components $components = null, private array $security = [], private array $tags = [], private $externalDocs = null, private ?string $jsonSchemaDialect = null, private readonly ?\ArrayObject $webhooks = null)
+    public function __construct(private Info $info, private array $servers, private Paths $paths, ?Components $components = null, private array $security = [], private array $tags = [], private $externalDocs = null, private ?string $jsonSchemaDialect = null, private readonly ?\ArrayObject $webhooks = null, private ?string $self = null)
     {
         $this->components = $components ?? new Components();
     }
@@ -83,6 +84,12 @@ final class OpenApi
     public function getWebhooks(): ?\ArrayObject
     {
         return $this->webhooks;
+    }
+
+    #[SerializedName('$self')]
+    public function getSelf(): ?string
+    {
+        return $this->self;
     }
 
     public function withOpenapi(string $openapi): self
@@ -153,6 +160,14 @@ final class OpenApi
     {
         $clone = clone $this;
         $clone->jsonSchemaDialect = $jsonSchemaDialect;
+
+        return $clone;
+    }
+
+    public function withSelf(?string $self): self
+    {
+        $clone = clone $this;
+        $clone->self = $self;
 
         return $clone;
     }

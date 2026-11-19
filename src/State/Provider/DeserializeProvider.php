@@ -15,22 +15,16 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\StopwatchAwareInterface;
 use ApiPlatform\State\StopwatchAwareTrait;
-use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Constraints\Type;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Contracts\Translation\LocaleAwareInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Contracts\Translation\TranslatorTrait;
 
 final class DeserializeProvider implements ProviderInterface, StopwatchAwareInterface
 {
@@ -40,14 +34,8 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
-        private ?TranslatorInterface $translator = null,
+        private readonly ?DenormalizationViolationFactoryInterface $violationFactory = null,
     ) {
-        if (null === $this->translator) {
-            $this->translator = new class implements TranslatorInterface, LocaleAwareInterface {
-                use TranslatorTrait;
-            };
-            $this->translator->setLocale('en');
-        }
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -81,18 +69,6 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
             throw new UnsupportedMediaTypeHttpException('Format not supported.');
         }
 
-        if (null === ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? null)) {
-            $method = $operation->getMethod();
-            $assignObjectToPopulate = 'POST' === $method
-                || 'PATCH' === $method
-                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
-
-            if ($assignObjectToPopulate) {
-                $serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] = true;
-                trigger_deprecation('api-platform/core', '5.0', 'To assign an object to populate you should set "%s" in your denormalizationContext, not defining it is deprecated.', SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE);
-            }
-        }
-
         if (null !== $data && ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? false)) {
             $serializerContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
@@ -101,32 +77,10 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
 
         try {
             $data = $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);
-        } catch (PartialDenormalizationException $e) {
-            if (!class_exists(ConstraintViolationList::class)) {
-                throw $e;
-            }
+        } catch (PartialDenormalizationException|NotNormalizableValueException $e) {
+            $this->violationFactory?->handle($e, $operation);
 
-            $violations = new ConstraintViolationList();
-            foreach ($e->getErrors() as $exception) {
-                if (!$exception instanceof NotNormalizableValueException) {
-                    continue;
-                }
-                $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
-                $parameters = [];
-                if ($exception->canUseMessageForUser()) {
-                    $parameters['hint'] = $exception->getMessage();
-                }
-                if (!$expectedTypes && $exception->canUseMessageForUser()) {
-                    $violationMessage = $exception->getMessage();
-                    $violations->add(new ConstraintViolation($violationMessage, $violationMessage, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
-                } else {
-                    $message = (new Type($expectedTypes))->message;
-                    $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
-                }
-            }
-            if (0 !== \count($violations)) {
-                throw new ValidationException($violations);
-            }
+            throw $e;
         }
 
         $this->stopwatch?->stop('api_platform.provider.deserialize');
@@ -134,23 +88,5 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         $request->attributes->set('data', $data);
 
         return $data;
-    }
-
-    private function normalizeExpectedTypes(?array $expectedTypes = null): array
-    {
-        $normalizedTypes = [];
-
-        foreach ($expectedTypes ?? [] as $expectedType) {
-            $normalizedType = $expectedType;
-
-            if (class_exists($expectedType) || interface_exists($expectedType)) {
-                $classReflection = new \ReflectionClass($expectedType);
-                $normalizedType = $classReflection->getShortName();
-            }
-
-            $normalizedTypes[] = $normalizedType;
-        }
-
-        return $normalizedTypes;
     }
 }

@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
@@ -30,19 +29,16 @@ class HydraLinkProcessorTest extends TestCase
     {
         $data = new \stdClass();
         $operation = new Get(links: [new Link('a', 'b')]);
-        $request = $this->createMock(Request::class);
-        $request->attributes = $this->createMock(ParameterBag::class);
+        $request = new Request();
 
-        $request->attributes->expects($this->once())->method('set')->with('_api_platform_links', $this->callback(function ($linkProvider) {
-            $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
-            $this->assertEquals($linkProvider->getLinks(), [new Link('a', 'b'), new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', '/docs')]);
-
-            return true;
-        }));
         $context = ['request' => $request];
         $decorated = $this->createMock(ProcessorInterface::class);
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->once())->method('generate')->with('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('/docs');
         (new HydraLinkProcessor($decorated, $urlGenerator))->process($data, $operation, [], $context);
+
+        $linkProvider = $request->attributes->get('_api_platform_links');
+        $this->assertInstanceOf(GenericLinkProvider::class, $linkProvider);
+        $this->assertEquals([new Link('a', 'b'), new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', '/docs')], $linkProvider->getLinks());
     }
 }

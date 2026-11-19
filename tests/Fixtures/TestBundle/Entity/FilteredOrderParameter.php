@@ -14,41 +14,29 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
 #[GetCollection(
     paginationItemsPerPage: 5,
     parameters: [
         'createdAt' => new QueryParameter(
-            filter: new OrderFilter(),
-            nativeType: new BuiltinType(TypeIdentifier::STRING)
+            filter: new SortFilter(),
         ),
         'date' => new QueryParameter(
-            filter: new OrderFilter(),
+            filter: new SortFilter(),
             property: 'createdAt',
-            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date_null_always_first' => new QueryParameter(
-            filter: new OrderFilter(),
+            filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_FIRST),
             property: 'createdAt',
-            filterContext: ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST],
-            nativeType: new BuiltinType(TypeIdentifier::STRING)
-        ),
-        'date_null_always_first_old_way' => new QueryParameter(
-            filter: new OrderFilter(properties: ['createdAt' => ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST]]),
-            property: 'createdAt',
-            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'order[:property]' => new QueryParameter(
-            filter: new OrderFilter(),
-            filterContext: ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST],
+            filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_FIRST),
         ),
     ],
 )]

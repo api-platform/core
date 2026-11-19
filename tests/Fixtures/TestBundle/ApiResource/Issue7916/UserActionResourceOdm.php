@@ -29,7 +29,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7916\UserAction;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/user-actions',
+            uriTemplate: '/user-actions-odm',
             parameters: [
                 'name' => new QueryParameter(
                     filter: new PartialSearchFilter(),

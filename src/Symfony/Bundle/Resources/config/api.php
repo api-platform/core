@@ -47,6 +47,14 @@ use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Symfony\Routing\Router;
 use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 use Negotiation\Negotiator;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\Types\ContextFactory;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -69,7 +77,38 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.property_accessor', 'property_accessor');
 
-    $services->alias('api_platform.property_info', 'property_info');
+    $services->set('api_platform.property_info.reflection_extractor', ReflectionExtractor::class)
+        ->tag('api_platform.property_info.list_extractor', ['priority' => -1000])
+        ->tag('api_platform.property_info.type_extractor', ['priority' => -1002])
+        ->tag('api_platform.property_info.access_extractor', ['priority' => -1000])
+        ->tag('api_platform.property_info.initializable_extractor', ['priority' => -1000]);
+
+    if (class_exists(DocBlockFactory::class)) {
+        $services->set('api_platform.property_info.php_doc_extractor', PhpDocExtractor::class)
+            ->tag('api_platform.property_info.description_extractor', ['priority' => -1000])
+            ->tag('api_platform.property_info.type_extractor', ['priority' => -1001]);
+    }
+
+    if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
+        $services->set('api_platform.property_info.phpstan_extractor', PhpStanExtractor::class)
+            ->tag('api_platform.property_info.type_extractor', ['priority' => -1000]);
+    }
+
+    $services->set('api_platform.property_info', PropertyInfoExtractor::class)
+        ->args([
+            tagged_iterator('api_platform.property_info.list_extractor'),
+            tagged_iterator('api_platform.property_info.type_extractor'),
+            tagged_iterator('api_platform.property_info.description_extractor'),
+            tagged_iterator('api_platform.property_info.access_extractor'),
+            tagged_iterator('api_platform.property_info.initializable_extractor'),
+        ]);
+
+    $services->set('api_platform.property_info.cache', PropertyInfoCacheExtractor::class)
+        ->decorate('api_platform.property_info')
+        ->args([
+            service('.inner'),
+            service('cache.property_info'),
+        ]);
 
     $services->set('api_platform.negotiator', Negotiator::class);
 
@@ -137,7 +176,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -895]);
+        ->tag('serializer.normalizer', ['priority' => -895])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.serializer.denormalizer.item', ItemDenormalizer::class)
         ->args([
@@ -155,7 +195,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -894]);
+        ->tag('serializer.normalizer', ['priority' => -894])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.normalizer.object', ObjectNormalizer::class)
         ->args([
@@ -213,7 +254,8 @@ return function (ContainerConfigurator $container) {
         ->tag('routing.loader');
 
     $services->set('api_platform.symfony.iri_converter.skolem', SkolemIriConverter::class)
-        ->args([service('api_platform.router')]);
+        ->args([service('api_platform.router')])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.api.identifiers_extractor', IdentifiersExtractor::class)
         ->args([

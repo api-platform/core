@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
@@ -28,8 +29,10 @@ use Doctrine\ORM\QueryBuilder;
 final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = false)
     {
@@ -44,18 +47,27 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         }
 
         $property = $parameter->getProperty();
-        $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
-        $field = $alias.'.'.$property;
         $values = $parameter->getValue();
+
+        // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+        if (\is_array($values) && !array_is_list($values)) {
+            return;
+        }
+
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
+        }
+
+        $alias = $queryBuilder->getRootAliases()[0];
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
+        $field = $alias.'.'.$property;
 
         if (!is_iterable($values)) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
 
-            $likeExpression = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpression = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
             $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
 
             return;
@@ -64,9 +76,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $likeExpressions = [];
         foreach ($values as $val) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $likeExpressions[] = $this->caseSensitive
-                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-                : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
+            $likeExpressions[] = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
 
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($val));
         }
@@ -78,6 +88,6 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
     private function formatLikeValue(string $value): string
     {
-        return '%'.addcslashes($value, '\\%_').'%';
+        return '%'.$this->escapeLikeValue($value).'%';
     }
 }

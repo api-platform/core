@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredDateParameter as FilteredDateParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredDateParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -34,6 +36,15 @@ final class DateFilterTest extends ApiTestCase
     public static function getResources(): array
     {
         return [FilteredDateParameter::class];
+    }
+
+    public function testDateFilterIsStandalone(): void
+    {
+        self::assertNotContains(
+            AbstractFilter::class,
+            class_parents(DateFilter::class) ?: [],
+            'DateFilter must not extend the deprecated AbstractFilter (5.0 standalone rewrite).'
+        );
     }
 
     /**
@@ -106,6 +117,25 @@ final class DateFilterTest extends ApiTestCase
         yield 'date__alias_include_null_always_with_empty_alias' => ['/filtered_date_parameters?date_include_null_always=', 4];
         yield 'date_alias_old_way_with_null_alias' => ['/filtered_date_parameters?date_old_way=null', 4];
         yield 'date__alias_old_way_with_empty_alias' => ['/filtered_date_parameters?date_old_way=', 4];
+    }
+
+    public function testDateFilterWithInputFormat(): void
+    {
+        $client = self::createClient();
+
+        $items = $client->request('GET', '/filtered_date_parameters?createdAtFormatted[before]=15/06/2024')->toArray()['hydra:member'];
+        $this->assertCount(2, $items);
+        $this->assertSame(['2024-01-01', '2024-06-15'], array_map(static fn (array $item): string => substr($item['createdAt'], 0, 10), $items));
+
+        $items = $client->request('GET', '/filtered_date_parameters?createdAtFormatted[strictly_before]=15/06/2024')->toArray()['hydra:member'];
+        $this->assertCount(1, $items);
+        $this->assertSame('2024-01-01', substr($items[0]['createdAt'], 0, 10));
+
+        $items = $client->request('GET', '/filtered_date_parameters?createdAtFormatted[after]=15/06/2024')->toArray()['hydra:member'];
+        $this->assertCount(2, $items);
+
+        $this->assertCount(4, $client->request('GET', '/filtered_date_parameters?createdAtFormatted[before]=2024-06-15')->toArray()['hydra:member']);
+        $this->assertCount(4, $client->request('GET', '/filtered_date_parameters?createdAtFormatted[before]=32/03/2024')->toArray()['hydra:member']);
     }
 
     /**

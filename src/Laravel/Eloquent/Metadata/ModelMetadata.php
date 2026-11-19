@@ -28,16 +28,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ModelMetadata
 {
     /**
-     * @var array<class-string, array<string, mixed>>
-     */
-    private $attributesLocalCache = [];
-
-    /**
-     * @var array<class-string, array<string, mixed>>
-     */
-    private $relationsLocalCache = [];
-
-    /**
      * The methods that can be called in a model to indicate a relation.
      *
      * @var string[]
@@ -56,8 +46,17 @@ final class ModelMetadata
         'morphedByMany',
     ];
 
-    public function __construct(private NameConverterInterface $relationNameConverter = new CamelCaseToSnakeCaseNameConverter())
-    {
+    private int $missingTableReads = 0;
+
+    /**
+     * @param array<class-string, array<string, mixed>> $attributes seeds the attribute cache, e.g. from a dump produced by api-platform:metadata:dump, so the app can boot without a database
+     * @param array<class-string, array<string, mixed>> $relations  seeds the relation cache for the same reason
+     */
+    public function __construct(
+        private NameConverterInterface $relationNameConverter = new CamelCaseToSnakeCaseNameConverter(),
+        private array $attributes = [],
+        private array $relations = [],
+    ) {
     }
 
     /**
@@ -67,8 +66,8 @@ final class ModelMetadata
      */
     public function getAttributes(Model $model): array
     {
-        if (isset($this->attributesLocalCache[$model::class])) {
-            return $this->attributesLocalCache[$model::class];
+        if (isset($this->attributes[$model::class])) {
+            return $this->attributes[$model::class];
         }
 
         $connection = $model->getConnection();
@@ -109,10 +108,21 @@ final class ModelMetadata
         // Don't cache an empty result for a missing table: the table may be created later
         // (e.g. by RefreshDatabase between MCP boot-time discovery and the actual request).
         if ([] === $result && !$schema->hasTable($table)) {
+            ++$this->missingTableReads;
+
             return $result;
         }
 
-        return $this->attributesLocalCache[$model::class] = $result;
+        return $this->attributes[$model::class] = $result;
+    }
+
+    /**
+     * Counts the attribute reads that found no table. Metadata computed while this number
+     * changes was built from a missing table, and must not be cached beyond the current call.
+     */
+    public function getMissingTableReads(): int
+    {
+        return $this->missingTableReads;
     }
 
     /**
@@ -194,11 +204,12 @@ final class ModelMetadata
      */
     public function getRelations(Model $model): array
     {
-        if (isset($this->relationsLocalCache[$model::class])) {
-            return $this->relationsLocalCache[$model::class];
+        if (isset($this->relations[$model::class])) {
+            return $this->relations[$model::class];
         }
 
         $relations = [];
+        $nullableColumns = null;
         $class = new \ReflectionClass($model);
 
         foreach ($class->getMethods() as $method) {
@@ -252,9 +263,19 @@ final class ModelMetadata
                 'related' => \get_class($relation->getRelated()),
                 'foreign_key' => method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : null,
             ];
+
+            if ($relation instanceof BelongsTo) {
+                $nullableColumns ??= array_column($model->getConnection()->getSchemaBuilder()->getColumns($model->getTable()), 'nullable', 'name');
+                $relations[$relationName]['nullable'] = (bool) ($nullableColumns[$relation->getForeignKeyName()] ?? false);
+            }
         }
 
-        return $this->relationsLocalCache[$model::class] = $relations;
+        // Don't cache nullability read from a missing table, see getAttributes().
+        if ([] === $nullableColumns) {
+            return $relations;
+        }
+
+        return $this->relations[$model::class] = $relations;
     }
 
     /**

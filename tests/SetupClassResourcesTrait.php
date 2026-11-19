@@ -26,6 +26,7 @@ trait SetupClassResourcesTrait
 
     public static function tearDownAfterClass(): void
     {
+        static::ensureKernelShutdown();
         static::removeResources();
         $reflectionClass = new \ReflectionClass(Router::class);
         $reflectionClass->setStaticPropertyValue('cache', []);

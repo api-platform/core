@@ -29,6 +29,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_processor.serialize.inner'),
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
+            '%api_platform.enable_head_request_optimization%',
         ]);
 
     $services->set('api_platform.state_processor.write', WriteProcessor::class)
@@ -44,6 +45,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.operation.metadata_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
+            tagged_locator('api_platform.parameter_provider', 'key'),
         ]);
 
     $services->set('api_platform.state_processor.add_link_header', AddLinkHeaderProcessor::class)

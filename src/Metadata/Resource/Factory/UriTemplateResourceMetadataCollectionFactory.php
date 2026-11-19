@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Util\UriTemplateHelper;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -153,9 +154,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
         $operation = $operation->withUriVariables($uriVariables);
 
-        if (str_ends_with($uriTemplate, '{._format}') || str_ends_with($uriTemplate, '.{_format}')) {
-            $uriTemplate = substr($uriTemplate, 0, -10);
-        }
+        $uriTemplate = UriTemplateHelper::withoutFormatSuffix($uriTemplate);
 
         // TODO: move this to the Symfony bridge
         if (class_exists(Route::class)) {
@@ -174,10 +173,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                         continue;
                     }
 
-                    $newUriVariables[$variable] = (new Link())
-                        ->withFromClass($operation->getClass())
-                        ->withIdentifiers([property_exists($operation->getClass(), $variable) ? $variable : 'id'])
-                        ->withParameterName($variable);
+                    $link = $this->linkFactory->completeLink((new Link())->withFromClass($operation->getClass())->withParameterName($variable));
+
+                    $newUriVariables[$variable] = $link->getIdentifiers() ? $link : $link->withIdentifiers([property_exists($operation->getClass(), $variable) ? $variable : 'id']);
                 }
 
                 return $operation->withUriVariables($newUriVariables);

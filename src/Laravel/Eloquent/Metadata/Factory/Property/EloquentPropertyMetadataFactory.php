@@ -88,7 +88,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 'collection', 'encrypted:collection' => Type::collection(Type::object(Collection::class)),
                 'encrypted:array' => Type::builtin(TypeIdentifier::ARRAY),
                 'encrypted:object' => Type::object(),
-                default => \in_array($builtinType, TypeIdentifier::values(), true) ? Type::builtin($builtinType) : Type::string(),
+                default => $this->resolveDefaultType($builtinType),
             };
 
             if ($p['nullable']) {
@@ -118,6 +118,8 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             $type = Type::object($relation['related']);
             if ($collection) {
                 $type = Type::iterable($type);
+            } elseif (true === ($relation['nullable'] ?? false)) {
+                $type = Type::nullable($type);
             }
 
             return $propertyMetadata
@@ -126,5 +128,20 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
         }
 
         return $propertyMetadata;
+    }
+
+    private function resolveDefaultType(string $builtinType): Type
+    {
+        if (\in_array($builtinType, TypeIdentifier::values(), true)) {
+            return Type::builtin($builtinType);
+        }
+
+        // Laravel allows passing parameters to class casts via "Class:param" syntax (e.g. AsEnumCollection).
+        $castClass = explode(':', $builtinType, 2)[0];
+        if (enum_exists($castClass)) {
+            return Type::enum($castClass);
+        }
+
+        return Type::string();
     }
 }

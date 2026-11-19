@@ -107,6 +107,9 @@ final class QueryChecker
                 if (str_contains((string) $part, '.')) {
                     [$alias] = explode('.', (string) $part);
 
+                    // strip leading SQL function call, e.g. "find_in_set(t.type, ...)" → "t"
+                    $alias = str_contains($alias, '(') ? substr($alias, strpos($alias, '(') + 1) : $alias;
+
                     $orderByAliases[] = $alias;
                 }
             }

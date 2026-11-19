@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Routing;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
@@ -76,7 +77,7 @@ class ApiLoaderTest extends TestCase
                 $path,
                 'api_platform.action.get_item',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_get_item',
                 ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
@@ -91,7 +92,7 @@ class ApiLoaderTest extends TestCase
                 $path,
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_delete_item',
                 [],
@@ -106,7 +107,7 @@ class ApiLoaderTest extends TestCase
                 $path,
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_put_item',
                 [],
@@ -121,7 +122,7 @@ class ApiLoaderTest extends TestCase
                 '/dummies.{_format}',
                 'some.service.name',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_my_op_collection',
                 ['my_default' => 'default_value', '_format' => 'a valid format'],
@@ -140,7 +141,7 @@ class ApiLoaderTest extends TestCase
                 '/dummies.{_format}',
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_my_second_op_collection',
                 [],
@@ -158,7 +159,7 @@ class ApiLoaderTest extends TestCase
                 'some/custom/path',
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_my_path_op_collection',
                 [],
@@ -173,7 +174,7 @@ class ApiLoaderTest extends TestCase
                 '/dummies.{_format}',
                 'api_platform.action.placeholder',
                 true,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_my_stateless_op_collection',
                 [],
@@ -188,7 +189,7 @@ class ApiLoaderTest extends TestCase
                 '/foo',
                 'Foo\\Bar\\MyController::method',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_my_controller_method_item',
                 [],
@@ -219,7 +220,7 @@ class ApiLoaderTest extends TestCase
                 $prefixedPath,
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_get_item',
                 ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
@@ -234,7 +235,7 @@ class ApiLoaderTest extends TestCase
                 $prefixedPath,
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_delete_item',
                 [],
@@ -248,7 +249,7 @@ class ApiLoaderTest extends TestCase
                 $prefixedPath,
                 'api_platform.action.placeholder',
                 null,
-                RelatedDummyEntity::class,
+                DummyEntity::class,
                 [],
                 'api_dummies_put_item',
                 [],
@@ -277,9 +278,42 @@ class ApiLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_item'));
         $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_by_uuid_item'));
         $this->assertNull($routeCollection->get('api_dummies_get_collection'));
-        $this->assertNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNotNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNotNull($routeCollection->get('api_doc'));
         $this->assertNull($routeCollection->get('api_entrypoint'));
+        $this->assertNull($routeCollection->get('api_validation_errors'));
         $this->assertNotNull($routeCollection->get('api_genid'));
+    }
+
+    public function testApiLoaderIrisTypeWithoutJsonLdRegistersNeitherDocsNorContextRoutes(): void
+    {
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}{._format}')->withController('api_platform.action.get_item'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection, formats: ['json' => ['application/json']])->load(null, ApiLoader::TYPE_IRIS);
+
+        $this->assertNotNull($routeCollection->get('api_dummies_get_item'));
+        $this->assertNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNull($routeCollection->get('api_doc'));
+        $this->assertNotNull($routeCollection->get('api_genid'));
+    }
+
+    public function testApiLoaderUsesOperationRoutePriority(): void
+    {
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}')->withRoutePriority(10),
+                'api_dummies_get_collection' => (new GetCollection())->withUriTemplate('/dummies')->withPriority(10),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
+
+        $this->assertSame(10, $routeCollection->getPriority('api_dummies_get_item'));
+        $this->assertNull($routeCollection->getPriority('api_dummies_get_collection'));
     }
 
     public function testApiLoaderWithUndefinedControllerService(): void
@@ -296,7 +330,65 @@ class ApiLoaderTest extends TestCase
         $routeCollection->get('api_dummies_my_undefined_controller_method_item');
     }
 
-    private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
+    public function testApiLoaderThrowsWhenTwoResourceClassesDeclareTheSameOperationName(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Operation "_api_/dummies/{id}_get" is declared by both "%s" and "%s".', DummyEntity::class, RelatedDummyEntity::class));
+
+        $operations = new Operations([
+            '_api_/dummies/{id}_get' => (new Get())->withUriTemplate('/dummies/{id}'),
+        ]);
+
+        $this->getApiLoaderWithResourceMetadataCollection(
+            new ResourceMetadataCollection(DummyEntity::class, [(new ApiResource())->withShortName('dummy')->withOperations($operations)]),
+            new ResourceMetadataCollection(RelatedDummyEntity::class, [(new ApiResource())->withShortName('relatedDummy')->withOperations($operations)]),
+        )->load(null);
+    }
+
+    public function testApiLoaderLetsAResourceReuseTheRouteOfAnotherOneWithRouteName(): void
+    {
+        $operationName = '_api_/dummies/{id}_get';
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection(
+            new ResourceMetadataCollection(DummyEntity::class, [(new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                $operationName => (new Get())->withUriTemplate('/dummies/{id}'),
+            ]))]),
+            new ResourceMetadataCollection(RelatedDummyEntity::class, [(new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations([
+                $operationName => (new Get())->withUriTemplate('/dummies/{id}')->withRouteName($operationName),
+            ]))]),
+        )->load(null);
+
+        $route = $routeCollection->get($operationName);
+        $this->assertNotNull($route);
+        $this->assertSame(DummyEntity::class, $route->getDefault('_api_resource_class'));
+    }
+
+    /**
+     * A NotExposed placeholder of one class may share its name with the exposed operation of another class:
+     * the exposed operation owns the route, whatever the discovery order.
+     */
+    public function testApiLoaderLetsAnExposedOperationWinOverANotExposedPlaceholder(): void
+    {
+        $operationName = '_api_/dummies/{id}_get';
+        $exposed = new ResourceMetadataCollection(DummyEntity::class, [(new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+            $operationName => (new Get())->withUriTemplate('/dummies/{id}'),
+        ]))]);
+        $placeholder = new ResourceMetadataCollection(RelatedDummyEntity::class, [(new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+            $operationName => (new NotExposed())->withUriTemplate('/dummies/{id}'),
+        ]))]);
+
+        // exposed first: DummyEntity is loaded first and owns the exposed operation
+        $route = $this->getApiLoaderWithResourceMetadataCollection($exposed, $placeholder)->load(null)->get($operationName);
+        $this->assertNotNull($route);
+        $this->assertSame(DummyEntity::class, $route->getDefault('_api_resource_class'));
+
+        // placeholder first: the exposed operation now belongs to RelatedDummyEntity, loaded second, and still wins
+        $route = $this->getApiLoaderWithResourceMetadataCollection($placeholder, $exposed)->load(null)->get($operationName);
+        $this->assertNotNull($route);
+        $this->assertSame(RelatedDummyEntity::class, $route->getDefault('_api_resource_class'));
+    }
+
+    private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection, ?ResourceMetadataCollection $relatedResourceCollection = null, array $formats = ['jsonld' => ['application/ld+json']]): ApiLoader
     {
         $routingConfig = __DIR__.'/../../../src/Symfony/Bundle/Resources/config/routing';
 
@@ -323,7 +415,7 @@ class ApiLoaderTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceCollection);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->willReturn($resourceCollection);
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->willReturn($relatedResourceCollection ?? new ResourceMetadataCollection(RelatedDummyEntity::class, []));
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class, RelatedDummyEntity::class]));
@@ -338,7 +430,7 @@ class ApiLoaderTest extends TestCase
 
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false);
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), $formats, [], false, true, true, false);
     }
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route

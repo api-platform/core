@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Hal;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\MaxDepthResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -85,7 +85,7 @@ final class MaxDepthTest extends ApiTestCase
             ],
         ]);
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertArrayHasKey('_embedded', $body);
         $this->assertArrayHasKey('child', $body['_embedded']);

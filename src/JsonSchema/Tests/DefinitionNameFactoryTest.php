@@ -15,8 +15,11 @@ namespace ApiPlatform\JsonSchema\Tests;
 
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\Tests\Fixtures\DefinitionNameFactory\InputOutputCollision\Input\ThingCreate as InputThingCreate;
+use ApiPlatform\JsonSchema\Tests\Fixtures\DefinitionNameFactory\InputOutputCollision\Output\ThingCreate as OutputThingCreate;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DtoOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,6 +34,8 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Dummy.jsonapi', Dummy::class, 'jsonapi'];
         yield ['Dummy.jsonhal', Dummy::class, 'jsonhal'];
         yield ['Dummy.jsonld', Dummy::class, 'jsonld'];
+        yield ['Dummy.partial', Dummy::class, 'json', null, null, [SchemaFactory::PARTIAL_UPDATE => true]];
+        yield ['Dummy.jsonld.partial', Dummy::class, 'jsonld', null, null, [SchemaFactory::PARTIAL_UPDATE => true]];
 
         yield ['Dummy.DtoOutput', Dummy::class, 'json', DtoOutput::class];
         yield ['Dummy.DtoOutput.jsonapi', Dummy::class, 'jsonapi', DtoOutput::class];
@@ -111,6 +116,38 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Bar.DtoOutput.jsonapi-title_author.name_name', Dummy::class, 'jsonapi', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
         yield ['Bar.DtoOutput.jsonhal-title_author.name_name', Dummy::class, 'jsonhal', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
         yield ['Bar.DtoOutput.jsonld-title_author.name_name', Dummy::class, 'jsonld', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+
+        yield ['Dummy-validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a']])];
+        yield ['Dummy.jsonapi-validation.a', Dummy::class, 'jsonapi', null, new Post(validationContext: ['groups' => ['a']])];
+
+        yield ['Dummy-validation.a_b', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a', 'b']])];
+
+        yield ['Dummy-validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a', 'a']])];
+
+        yield ['Dummy-read_validation.a', Dummy::class, 'json', null, new Post(validationContext: ['groups' => ['a']]), [AbstractNormalizer::GROUPS => ['read']]];
+        yield ['Dummy-read_a', Dummy::class, 'json', null, new Post(), [AbstractNormalizer::GROUPS => ['read', 'a']]];
+
+        yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => 'app.group_generator'])];
+
+        yield ['Dummy-validation.seq1_seq2', Dummy::class, 'json', null, new Post(validationContext: ['groups' => self::groupSequence(['seq1', 'seq2'])])];
+
+        yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => [self::class, 'callableGroups']])];
+
+        yield ['Dummy', Dummy::class, 'json', null, new Post(validationContext: ['groups' => static fn (): array => ['x']])];
+    }
+
+    public static function callableGroups(): array
+    {
+        return ['x'];
+    }
+
+    private static function groupSequence(array $groups): object
+    {
+        return new class($groups) {
+            public function __construct(public array $groups)
+            {
+            }
+        };
     }
 
     #[DataProvider('providerDefinitions')]
@@ -143,6 +180,35 @@ final class DefinitionNameFactoryTest extends TestCase
         self::assertEquals(
             'DummyClass.jsonhal',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonhal')
+        );
+    }
+
+    public function testCreateDistinctDefinitionNamesWhenInputAndOutputShareShortName(): void
+    {
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $operation = new Post(class: Dummy::class, shortName: 'Thing');
+
+        $inputName = $definitionNameFactory->create(
+            Dummy::class,
+            'jsonld',
+            InputThingCreate::class,
+            $operation,
+            ['schema_type' => \ApiPlatform\JsonSchema\Schema::TYPE_INPUT]
+        );
+
+        $outputName = $definitionNameFactory->create(
+            Dummy::class,
+            'jsonld',
+            OutputThingCreate::class,
+            $operation,
+            ['schema_type' => \ApiPlatform\JsonSchema\Schema::TYPE_OUTPUT]
+        );
+
+        self::assertNotSame(
+            $inputName,
+            $outputName,
+            'Input and Output DTO classes sharing the same short name must produce distinct definition names.'
         );
     }
 

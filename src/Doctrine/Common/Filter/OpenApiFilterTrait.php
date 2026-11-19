@@ -24,26 +24,25 @@ trait OpenApiFilterTrait
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
         $schema = $parameter->getSchema();
-        if (false === $parameter->getCastToArray() || (isset($schema['type']) && 'array' !== $schema['type'])) {
-            return new OpenApiParameter(name: $parameter->getKey(), in: 'query');
+        $castToArray = $parameter->getCastToArray();
+
+        if (false === $castToArray) {
+            return new OpenApiParameter(name: $parameter->getKey(), in: 'query', schema: $schema ?? []);
         }
 
-        if ('array' === ($schema['type'] ?? null)) {
-            $arraySchema = $schema;
-        } else {
-            $arraySchema = ['type' => 'array', 'items' => $schema ?? ['type' => 'string']];
-        }
-
+        $arraySchema = 'array' === ($schema['type'] ?? null)
+            ? $schema
+            : ['type' => 'array', 'items' => $schema ?? ['type' => 'string']];
         $arrayParameter = new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true, schema: $arraySchema);
 
-        // When castToArray is null (default), both singular and array forms are accepted
-        if (null === $parameter->getCastToArray()) {
-            return [
-                new OpenApiParameter(name: $parameter->getKey(), in: 'query'),
-                $arrayParameter,
-            ];
+        if (true === $castToArray) {
+            return $arrayParameter;
         }
 
-        return $arrayParameter;
+        // When castToArray is null (default), both singular and array forms are accepted.
+        return [
+            new OpenApiParameter(name: $parameter->getKey(), in: 'query', schema: $schema ?? []),
+            $arrayParameter,
+        ];
     }
 }

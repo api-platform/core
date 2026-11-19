@@ -17,7 +17,7 @@ final class SecurityScheme
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $type = null, private string $description = '', private ?string $name = null, private ?string $in = null, private ?string $scheme = null, private ?string $bearerFormat = null, private ?OAuthFlows $flows = null, private ?string $openIdConnectUrl = null)
+    public function __construct(private ?string $type = null, private string $description = '', private ?string $name = null, private ?string $in = null, private ?string $scheme = null, private ?string $bearerFormat = null, private ?OAuthFlows $flows = null, private ?string $openIdConnectUrl = null, private ?string $oauth2MetadataUrl = null, private ?bool $deprecated = null)
     {
     }
 
@@ -59,6 +59,16 @@ final class SecurityScheme
     public function getOpenIdConnectUrl(): ?string
     {
         return $this->openIdConnectUrl;
+    }
+
+    public function getOauth2MetadataUrl(): ?string
+    {
+        return $this->oauth2MetadataUrl;
+    }
+
+    public function getDeprecated(): ?bool
+    {
+        return $this->deprecated;
     }
 
     public function withType(string $type): self
@@ -121,6 +131,22 @@ final class SecurityScheme
     {
         $clone = clone $this;
         $clone->openIdConnectUrl = $openIdConnectUrl;
+
+        return $clone;
+    }
+
+    public function withOauth2MetadataUrl(string $oauth2MetadataUrl): self
+    {
+        $clone = clone $this;
+        $clone->oauth2MetadataUrl = $oauth2MetadataUrl;
+
+        return $clone;
+    }
+
+    public function withDeprecated(bool $deprecated): self
+    {
+        $clone = clone $this;
+        $clone->deprecated = $deprecated;
 
         return $clone;
     }

@@ -16,6 +16,9 @@ namespace ApiPlatform\Mcp\Tests\JsonSchema;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
+use ApiPlatform\Metadata\McpToolCollection;
 use PHPUnit\Framework\TestCase;
 
 class SchemaFactoryTest extends TestCase
@@ -141,6 +144,36 @@ class SchemaFactoryTest extends TestCase
         $arr = $result->getArrayCopy();
         $this->assertSame('object', $arr['type']);
         $this->assertSame(['foo' => ['type' => 'string']], $arr['properties']);
+    }
+
+    public function testEmptySchemasStayEmptyObjects(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['WithMixed'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'anything' => new \ArrayObject(),
+                'described' => new \ArrayObject(['description' => 'x']),
+                'values' => new \ArrayObject([
+                    'type' => 'array',
+                    'items' => new \ArrayObject(),
+                ]),
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/WithMixed';
+
+        $inner = $this->createStub(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'json');
+
+        $properties = $result->getArrayCopy()['properties'];
+        $this->assertSame('{}', json_encode($properties['anything']));
+        $this->assertSame('{}', json_encode($properties['values']['items']));
+        $this->assertArrayNotHasKey('type', $properties['described']);
     }
 
     public function testNestedRefInsideAllOf(): void
@@ -370,5 +403,157 @@ class SchemaFactoryTest extends TestCase
         $value = $arr['properties']['value'];
         $this->assertArrayNotHasKey('type', $value);
         $this->assertSame([['type' => 'string'], ['type' => 'integer']], $value['anyOf']);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8266
+     *
+     * A nullable embedded relation is emitted upstream as
+     * anyOf: [ {$ref: #/definitions/...}, {type: null} ]. The flattener drops the
+     * definitions block, so the $ref nested inside the anyOf must be resolved during
+     * recursion — otherwise it survives as a dangling reference.
+     */
+    public function testRefInsideAnyOfIsResolved(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['Root'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'related' => new \ArrayObject([
+                    'anyOf' => [
+                        ['$ref' => '#/definitions/Related.jsonld'],
+                        ['type' => 'null'],
+                    ],
+                ]),
+            ],
+        ]);
+        $definitions['Related.jsonld'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'name' => ['type' => 'string'],
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/Root';
+
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'jsonld');
+
+        $arr = $result->getArrayCopy();
+        $related = $arr['properties']['related'];
+
+        // The $ref member must be resolved to its target object, leaving no dangling reference.
+        $this->assertArrayNotHasKey('$ref', $related['anyOf'][0]);
+        $this->assertSame('object', $related['anyOf'][0]['type']);
+        $this->assertSame(['name' => ['type' => 'string']], $related['anyOf'][0]['properties']);
+
+        // The nullable member is left untouched and the anyOf keeps no spurious type fallback.
+        $this->assertSame(['type' => 'null'], $related['anyOf'][1]);
+        $this->assertArrayNotHasKey('type', $related);
+    }
+
+    /**
+     * A single-item MCP operation has no routed item URI (Mcp\Routing\IriConverter returns null),
+     * so the output schema must advertise `gen_id` as false to drop the required `@id`.
+     */
+    public function testSingleItemMcpOperationForcesGenIdFalse(): void
+    {
+        foreach ([new McpTool(class: \stdClass::class), new McpResource(uri: 'app://dummy', class: \stdClass::class)] as $operation) {
+            $captured = null;
+            $inner = $this->createMock(SchemaFactoryInterface::class);
+            $inner->method('buildSchema')->willReturnCallback(function (...$args) use (&$captured) {
+                $captured = $args[5] ?? null;
+
+                return $this->emptyObjectSchema();
+            });
+
+            $factory = new SchemaFactory($inner);
+            $factory->buildSchema('App\\Dummy', 'jsonld', Schema::TYPE_OUTPUT, $operation);
+
+            $this->assertFalse($captured['gen_id'] ?? null, $operation::class.' must force gen_id to false');
+        }
+    }
+
+    public function testMcpToolCollectionDoesNotForceGenIdFalse(): void
+    {
+        $captured = 'untouched';
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturnCallback(function (...$args) use (&$captured) {
+            $captured = $args[5] ?? null;
+
+            return $this->emptyObjectSchema();
+        });
+
+        $factory = new SchemaFactory($inner);
+        $factory->buildSchema('App\\Dummy', 'jsonld', Schema::TYPE_OUTPUT, new McpToolCollection(class: \stdClass::class));
+
+        $this->assertNull($captured);
+    }
+
+    public function testInputSchemaDoesNotForceGenIdFalse(): void
+    {
+        $captured = 'untouched';
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturnCallback(function (...$args) use (&$captured) {
+            $captured = $args[5] ?? null;
+
+            return $this->emptyObjectSchema();
+        });
+
+        $factory = new SchemaFactory($inner);
+        $factory->buildSchema('App\\Dummy', 'json', Schema::TYPE_INPUT, new McpTool(class: \stdClass::class));
+
+        $this->assertNull($captured);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8504
+     *
+     * A nullable property is emitted upstream as `type: ["string", "null"]`. Several MCP clients
+     * read `type` as a single string, so the flattener must rewrite the array form into `anyOf`
+     * branches, each with a single `type`, while keeping sibling keywords in place.
+     */
+    public function testArrayTypeIsSplitIntoAnyOf(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['Root'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'name' => new \ArrayObject([
+                    'type' => ['string', 'null'],
+                    'description' => 'A nullable name',
+                ]),
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/Root';
+
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'json');
+
+        $arr = $result->getArrayCopy();
+        $name = $arr['properties']['name'];
+
+        $this->assertArrayNotHasKey('type', $name, 'the array `type` must be removed');
+        $this->assertSame([['type' => 'string'], ['type' => 'null']], $name['anyOf']);
+        $this->assertSame('A nullable name', $name['description'], 'sibling keywords are preserved');
+    }
+
+    private function emptyObjectSchema(): Schema
+    {
+        $schema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($schema['$schema']);
+        $schema->getDefinitions()['Dummy'] = new \ArrayObject(['type' => 'object']);
+        $schema['$ref'] = '#/definitions/Dummy';
+
+        return $schema;
     }
 }

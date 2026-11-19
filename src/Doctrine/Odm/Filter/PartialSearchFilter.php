@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -30,6 +31,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = true)
     {
@@ -45,12 +47,23 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
         $property = $parameter->getProperty();
         $values = $parameter->getValue();
+
+        if (\is_array($values) && !array_is_list($values)) {
+            // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
+
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
+        }
+
         $match = $context['match'] = $context['match'] ??
             $aggregationBuilder
             ->matchExpr();
         $operator = $context['operator'] ?? 'addAnd';
 
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         if (!is_iterable($values)) {
             $escapedValue = preg_quote($values, '/');

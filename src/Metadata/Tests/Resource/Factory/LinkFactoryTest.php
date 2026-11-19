@@ -25,6 +25,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ScopedLinkResource;
+use ApiPlatform\Metadata\Tests\Fixtures\Metadata\ScopedLink;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -139,6 +141,45 @@ final class LinkFactoryTest extends TestCase
             (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['composite1', 'composite2'])->withCompositeIdentifier(true),
             $linkFactory->completeLink((new Link())->withFromClass(AttributeResource::class))
         );
+    }
+
+    public function testCreateLinksFromAttributesWithExtendedLink(): void
+    {
+        $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnMap([[ScopedLinkResource::class, 'dummy', (new ApiProperty())->withNativeType(Type::object(Dummy::class))]]);
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);
+
+        $links = $linkFactory->createLinksFromAttributes((new Get())->withClass(ScopedLinkResource::class));
+
+        self::assertCount(1, $links);
+        self::assertInstanceOf(ScopedLink::class, $links[0]);
+        self::assertSame('dummy', $links[0]->getSecurityObjectName());
+        self::assertSame('is_granted("RULE_VIEW", dummy)', $links[0]->getSecurity());
+        self::assertSame('dummy', $links[0]->getFromProperty());
+        self::assertSame(ScopedLinkResource::class, $links[0]->getFromClass());
+    }
+
+    public function testCompleteLinkDoesNotCacheEmptyIdentifiers(): void
+    {
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->expects($this->any())->method('create')->with(AttributeResource::class)->willReturnOnConsecutiveCalls(
+            new PropertyNameCollection([]),
+            new PropertyNameCollection(['uuid']),
+        );
+
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->expects($this->any())->method('create')->with(AttributeResource::class, 'uuid')->willReturn((new ApiProperty())->withIdentifier(true));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver);
+
+        $firstLink = $linkFactory->completeLink((new Link())->withFromClass(AttributeResource::class));
+        self::assertSame([], $firstLink->getIdentifiers());
+
+        $secondLink = $linkFactory->completeLink((new Link())->withFromClass(AttributeResource::class));
+        self::assertSame(['uuid'], $secondLink->getIdentifiers());
     }
 
     public function testCreateLinkFromProperty(): void

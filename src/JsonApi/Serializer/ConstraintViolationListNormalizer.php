@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -39,9 +39,13 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
      */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
+        $operation = $context['operation'] ?? null;
+        $status = (string) ($operation instanceof HttpOperation ? $operation->getStatus() : null) ?: '422';
         $violations = [];
         foreach ($data as $violation) {
             $violations[] = [
+                'status' => $status,
+                'title' => 'Validation Failed',
                 'detail' => $violation->getMessage(),
                 'source' => [
                     'pointer' => $this->getSourcePointerFromViolation($violation),
@@ -73,13 +77,13 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         $fieldName = $violation->getPropertyPath();
 
         if (!$fieldName) {
-            return 'data';
+            return '/data';
         }
 
         $root = $violation->getRoot();
 
         if (!\is_object($root)) {
-            return "data/attributes/$fieldName";
+            return "/data/attributes/$fieldName";
         }
 
         $class = $root::class;
@@ -94,17 +98,10 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-            if ($type && null !== $type->getClassName()) {
-                return "data/relationships/$fieldName";
-            }
-        } else {
-            if ($propertyMetadata->getNativeType()?->isSatisfiedBy(static fn ($t) => $t instanceof ObjectType)) {
-                return "data/relationships/$fieldName";
-            }
+        if ($propertyMetadata->getNativeType()?->isSatisfiedBy(static fn ($t) => $t instanceof ObjectType)) {
+            return "/data/relationships/$fieldName";
         }
 
-        return "data/attributes/$fieldName";
+        return "/data/attributes/$fieldName";
     }
 }

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -25,13 +25,15 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 #[GetCollection(
     parameters: [
         'active' => new QueryParameter(
-            filter: new BooleanFilter(),
+            filter: new ExactFilter(),
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
+            castToNativeType: true,
         ),
         'enabled' => new QueryParameter(
-            filter: new BooleanFilter(),
+            filter: new ExactFilter(),
             property: 'active',
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
+            castToNativeType: true,
         ),
     ],
 )]

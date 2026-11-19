@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Orm;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Parameter;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -43,7 +44,7 @@ trait NestedPropertyHelperTrait
         $nestedInfo = ($extraProperties['nested_properties_info'] ?? []) ? reset($extraProperties['nested_properties_info']) : null;
 
         if (!$nestedInfo) {
-            return [$alias, $property];
+            return [$alias, $extraProperties['query_property'] ?? $property];
         }
 
         $relationClasses = $nestedInfo['relation_classes'] ?? [];
@@ -72,5 +73,10 @@ trait NestedPropertyHelperTrait
         $leafProperty = $nestedInfo['leaf_property'];
 
         return [$alias, $embedded && $association ? $association.'.'.$leafProperty : $leafProperty];
+    }
+
+    private function joinTypeFor(array $context): ?string
+    {
+        return 'orWhere' === ($context['whereClause'] ?? null) ? Join::LEFT_JOIN : null;
     }
 }

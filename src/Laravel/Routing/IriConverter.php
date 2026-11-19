@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -67,22 +68,31 @@ class IriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
-        $parameters = $this->router->match($iri);
+        try {
+            $parameters = $this->router->match($iri);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(\sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
+        }
+
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'], $parameters['uri_variables'])) {
             throw new InvalidArgumentException(\sprintf('No resource associated to "%s".', $iri));
         }
 
-        $operation = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
+        $routeOperation = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
-        if ($operation instanceof CollectionOperationInterface) {
+        if ($routeOperation instanceof CollectionOperationInterface) {
             throw new InvalidArgumentException(\sprintf('The iri "%s" references a collection not an item.', $iri));
         }
 
-        if (!$operation instanceof HttpOperation) {
+        if (!$routeOperation instanceof HttpOperation) {
             throw new RuntimeException(\sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
         }
 
-        if ($item = $this->provider->provide($operation, $parameters['uri_variables'], $context)) {
+        $dispatchOperation = ($operation instanceof GraphQlOperation && null !== $operation->getProvider())
+            ? $operation
+            : $routeOperation;
+
+        if ($item = $this->provider->provide($dispatchOperation, $parameters['uri_variables'], $context)) {
             return $item; // @phpstan-ignore-line
         }
 
@@ -103,7 +113,8 @@ class IriConverter implements IriConverterInterface
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
-        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
+        // A Relation skips the resource class promotion below, it can not share a cache entry with its related model.
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_s' : '_o').($operation instanceof CollectionOperationInterface ? '_c' : '_i').($resource instanceof Relation ? '_r' : '');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }
@@ -135,11 +146,16 @@ class IriConverter implements IriConverterInterface
             !$operation->getName()
             || ($operation instanceof HttpOperation && 'POST' === $operation->getMethod())
         ) {
-            $forceCollection = $operation instanceof CollectionOperationInterface;
-            try {
-                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
-                $identifiersExtractorOperation = $operation;
-            } catch (OperationNotFoundException) {
+            if (isset($this->localOperationCache[$localOperationCacheKey])) {
+                $operation = $this->localOperationCache[$localOperationCacheKey];
+                $identifiersExtractorOperation = $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? $operation;
+            } else {
+                $forceCollection = $operation instanceof CollectionOperationInterface;
+                try {
+                    $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
+                    $identifiersExtractorOperation = $operation;
+                } catch (OperationNotFoundException) {
+                }
             }
         }
 

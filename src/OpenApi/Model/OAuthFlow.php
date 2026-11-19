@@ -17,7 +17,7 @@ final class OAuthFlow
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $authorizationUrl = null, private ?string $tokenUrl = null, private ?string $refreshUrl = null, private ?\ArrayObject $scopes = null)
+    public function __construct(private ?string $authorizationUrl = null, private ?string $tokenUrl = null, private ?string $refreshUrl = null, private ?\ArrayObject $scopes = null, private ?string $deviceAuthorizationUrl = null)
     {
     }
 
@@ -39,6 +39,11 @@ final class OAuthFlow
     public function getScopes(): \ArrayObject
     {
         return $this->scopes;
+    }
+
+    public function getDeviceAuthorizationUrl(): ?string
+    {
+        return $this->deviceAuthorizationUrl;
     }
 
     public function withAuthorizationUrl(string $authorizationUrl): self
@@ -69,6 +74,14 @@ final class OAuthFlow
     {
         $clone = clone $this;
         $clone->scopes = $scopes;
+
+        return $clone;
+    }
+
+    public function withDeviceAuthorizationUrl(string $deviceAuthorizationUrl): self
+    {
+        $clone = clone $this;
+        $clone->deviceAuthorizationUrl = $deviceAuthorizationUrl;
 
         return $clone;
     }

@@ -22,6 +22,9 @@ use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\FieldMapping;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -45,21 +48,33 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
 
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
 
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
         // Use precomputed ORM leaf metadata when available (nested properties),
         // otherwise resolve at runtime by walking the association chain.
+        // A leaf that is not an association (e.g. a nested backed enum column) has no target class: it is also resolved at runtime.
         $ormLeafMetadata = $this->getOrmLeafMetadata($parameter);
 
-        if (null === $ormLeafMetadata) {
+        if (!isset($ormLeafMetadata['association_target_class'])) {
             $ormLeafMetadata = $this->resolveLeafMetadataAtRuntime($queryBuilder, $resourceClass, $parameter->getProperty(), $property);
+        }
+
+        // Backed enum exposed as a resource: compare the scalar column to the resolved enum.
+        if (null === $ormLeafMetadata) {
+            $this->applyEnumComparison($queryBuilder, $alias, $property, $parameterName, $value, $context);
+
+            return;
         }
 
         // Collection associations (OneToMany/ManyToMany) require a JOIN to compare individual elements.
         if ($ormLeafMetadata['is_collection_valued']) {
-            $queryBuilder->join(\sprintf('%s.%s', $alias, $property), $parameterName);
+            if (Join::LEFT_JOIN === $this->joinTypeFor($context)) {
+                $queryBuilder->leftJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
+            } else {
+                $queryBuilder->innerJoin(\sprintf('%s.%s', $alias, $property), $parameterName);
+            }
 
             if (is_iterable($value)) {
                 $queryBuilder
@@ -102,8 +117,27 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         return IriConverterParameterProvider::class;
     }
 
+    private function applyEnumComparison(QueryBuilder $queryBuilder, string $alias, string $property, string $parameterName, mixed $value, array $context): void
+    {
+        $propertyExpr = \sprintf('%s.%s', $alias, $property);
+        $normalize = static fn (mixed $v): mixed => $v instanceof \BackedEnum ? $v->value : $v;
+
+        if (is_iterable($value)) {
+            $values = \is_array($value) ? $value : iterator_to_array($value);
+            $queryBuilder
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s IN (:%s)', $propertyExpr, $parameterName))
+                ->setParameter($parameterName, array_map($normalize, $values));
+
+            return;
+        }
+
+        $queryBuilder
+            ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s = :%s', $propertyExpr, $parameterName))
+            ->setParameter($parameterName, $normalize($value));
+    }
+
     /**
-     * @return array{is_collection_valued: bool, association_target_class: string, identifier_type: ?string}|null
+     * @return array{is_collection_valued: bool, association_target_class: ?string, identifier_type: ?string}|null
      */
     private function getOrmLeafMetadata(mixed $parameter): ?array
     {
@@ -122,9 +156,12 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
      * Resolves leaf metadata at runtime by walking the association chain.
      * Used as fallback when precomputed orm_leaf_metadata is not available.
      *
-     * @return array{is_collection_valued: bool, association_target_class: string, identifier_type: ?string}
+     * Returns null when the leaf is a backed enum column so the caller compares it directly;
+     * a non-association, non-enum leaf is left to raise a mapping error.
+     *
+     * @return array{is_collection_valued: bool, association_target_class: string, identifier_type: ?string}|null
      */
-    private function resolveLeafMetadataAtRuntime(QueryBuilder $queryBuilder, string $resourceClass, string $originalProperty, string $leafProperty): array
+    private function resolveLeafMetadataAtRuntime(QueryBuilder $queryBuilder, string $resourceClass, string $originalProperty, string $leafProperty): ?array
     {
         $em = $queryBuilder->getEntityManager();
         $metadata = $em->getClassMetadata($resourceClass);
@@ -133,6 +170,10 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         for ($i = 0, $count = \count($segments) - 1; $i < $count; ++$i) {
             $associationMapping = $metadata->getAssociationMapping($segments[$i]);
             $metadata = $em->getClassMetadata($associationMapping['targetEntity']);
+        }
+
+        if (!$metadata->hasAssociation($leafProperty) && $this->isEnumField($metadata, $leafProperty)) {
+            return null;
         }
 
         $isCollectionValued = $metadata->isCollectionValuedAssociation($leafProperty);
@@ -151,5 +192,20 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             'association_target_class' => $targetClass,
             'identifier_type' => $identifierType,
         ];
+    }
+
+    private function isEnumField(ClassMetadata $metadata, string $field): bool
+    {
+        if (!isset($metadata->fieldMappings[$field])) {
+            return false;
+        }
+
+        $fieldMapping = $metadata->fieldMappings[$field];
+        // Doctrine ORM 2.x returns an array and Doctrine ORM 3.x returns a FieldMapping object.
+        if ($fieldMapping instanceof FieldMapping) {
+            $fieldMapping = (array) $fieldMapping;
+        }
+
+        return null !== ($fieldMapping['enumType'] ?? null);
     }
 }

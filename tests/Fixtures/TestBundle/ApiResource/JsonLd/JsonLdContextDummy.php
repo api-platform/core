@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\ApiResource;
     shortName: 'JsonLdContextDummy',
     provider: [self::class, 'provide'],
     processor: [self::class, 'process'],
+    jsonldContext: ['dct' => 'http://purl.org/dc/terms/'],
 )]
 class JsonLdContextDummy
 {
@@ -28,6 +29,9 @@ class JsonLdContextDummy
 
     #[ApiProperty(iris: ['https://schema.org/name'])]
     public ?string $name = null;
+
+    #[ApiProperty(iris: ['dct:title'])]
+    public ?string $title = null;
 
     #[ApiProperty(iris: ['https://schema.org/alternateName'])]
     public ?string $alias = null;

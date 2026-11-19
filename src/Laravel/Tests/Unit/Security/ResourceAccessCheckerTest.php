@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests\Unit\Security;
 
 use ApiPlatform\Laravel\Eloquent\Paginator;
+use ApiPlatform\Laravel\Eloquent\PartialPaginator;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator as SimplePaginator;
 use Illuminate\Support\Facades\Gate;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
@@ -44,6 +47,32 @@ class ResourceAccessCheckerTest extends TestCase
             ->andReturn(true);
 
         $paginator = new Paginator(new LengthAwarePaginator([], 0, 1));
+        $checker = new ResourceAccessChecker();
+        $this->assertTrue($checker->isGranted(Book::class, 'viewAny', ['object' => $paginator]));
+    }
+
+    public function testEloquentCollectionFallsBackToResourceClass(): void
+    {
+        Gate::shouldReceive('allows')
+            ->once()
+            ->with('viewAny', Book::class)
+            ->andReturn(true);
+
+        // CollectionProvider returns a plain Eloquent Collection when pagination is disabled (?pagination=false).
+        $collection = new Collection([]);
+        $checker = new ResourceAccessChecker();
+        $this->assertTrue($checker->isGranted(Book::class, 'viewAny', ['object' => $collection]));
+    }
+
+    public function testPartialPaginatorFallsBackToResourceClass(): void
+    {
+        Gate::shouldReceive('allows')
+            ->once()
+            ->with('viewAny', Book::class)
+            ->andReturn(true);
+
+        // CollectionProvider returns a PartialPaginator when partial pagination is enabled.
+        $paginator = new PartialPaginator(new SimplePaginator([], 1));
         $checker = new ResourceAccessChecker();
         $this->assertTrue($checker->isGranted(Book::class, 'viewAny', ['object' => $paginator]));
     }

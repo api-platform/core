@@ -105,6 +105,8 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated since API Platform 4.4: use {@see ExactFilter} declared with a boolean `nativeType` instead. Removed in 6.0.
  */
 final class BooleanFilter extends AbstractFilter implements JsonSchemaFilterInterface
 {

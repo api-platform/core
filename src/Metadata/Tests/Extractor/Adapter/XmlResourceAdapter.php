@@ -66,6 +66,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'stateOptions',
         'collectDenormalizationErrors',
         'jsonStream',
+        'throwOnNotFound',
         'links',
         'parameters',
     ];
@@ -230,6 +231,11 @@ XML_WRAP
         $this->buildValues($resource->addChild('hydraContext'), $values);
     }
 
+    private function buildJsonldContext(\SimpleXMLElement $resource, array $values): void
+    {
+        $this->buildValues($resource->addChild('jsonldContext'), $values);
+    }
+
     private function buildOpenapi(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->openapi ?? $resource->addChild('openapi');
@@ -378,10 +384,10 @@ XML_WRAP
     private function buildPaginationViaCursor(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('paginationViaCursor');
-        foreach ($values as $key => $value) {
+        foreach ($values as $value) {
             $child = $node->addChild('paginationField');
-            $child->addAttribute('field', $key);
-            $child->addAttribute('direction', $value);
+            $child->addAttribute('field', $value['field']);
+            $child->addAttribute('direction', $value['direction']);
         }
     }
 

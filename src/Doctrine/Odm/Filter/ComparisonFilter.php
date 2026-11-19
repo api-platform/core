@@ -29,8 +29,6 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Decorates an equality filter (ExactFilter) to add comparison operators (gt, gte, lt, lte).
- *
- * @experimental
  */
 final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
 {
@@ -46,6 +44,12 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         'lte' => 'lte',
         'ne' => 'notEqual',
     ];
+
+    /**
+     * Friendly range syntax: `?price[between]=10..100`. MongoDB has no BETWEEN keyword, so a range
+     * is expressed as the native `gte`/`lte` pair on the field.
+     */
+    public const OPERATOR_BETWEEN = 'between';
 
     public function __construct(private readonly FilterInterface $filter)
     {
@@ -76,6 +80,12 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
                 continue;
             }
 
+            if (self::OPERATOR_BETWEEN === $operator) {
+                $this->applyBetween($aggregationBuilder, $resourceClass, $operation, $context, $parameter, $value);
+
+                continue;
+            }
+
             if (isset(self::OPERATORS[$operator])) {
                 $this->applyOperator($aggregationBuilder, $resourceClass, $operation, $context, $parameter, self::OPERATORS[$operator], $value);
             }
@@ -86,13 +96,17 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();
+        $leafSchema = $this->filter instanceof JsonSchemaFilterInterface
+            ? $this->filter->getSchema($parameter->withCastToArray(false))
+            : ['type' => 'string'];
 
         return [
-            new OpenApiParameter(name: "{$key}[gt]", in: $in),
-            new OpenApiParameter(name: "{$key}[gte]", in: $in),
-            new OpenApiParameter(name: "{$key}[lt]", in: $in),
-            new OpenApiParameter(name: "{$key}[lte]", in: $in),
-            new OpenApiParameter(name: "{$key}[ne]", in: $in),
+            new OpenApiParameter(name: "{$key}[gt]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[gte]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[lt]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[lte]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[ne]", in: $in, explode: false, schema: $leafSchema),
+            new OpenApiParameter(name: "{$key}[between]", in: $in, explode: false, schema: ['type' => 'string']),
         ];
     }
 
@@ -111,6 +125,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
                 'lt' => $innerSchema,
                 'lte' => $innerSchema,
                 'ne' => $innerSchema,
+                'between' => ['type' => 'string'],
             ],
         ];
     }
@@ -132,5 +147,26 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         if (isset($newContext['match'])) {
             $context['match'] = $newContext['match'];
         }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
+     */
+    private function applyBetween(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation, array &$context, Parameter $parameter, mixed $value): void
+    {
+        if (!\is_string($value)) {
+            return;
+        }
+
+        $bounds = explode('..', $value, 2);
+        if (2 !== \count($bounds) || !is_numeric($bounds[0]) || !is_numeric($bounds[1])) {
+            return;
+        }
+
+        // MongoDB range = native gte/lte pair (coerce bounds to numbers)
+        $this->applyOperator($aggregationBuilder, $resourceClass, $operation, $context, $parameter, 'gte', $bounds[0] + 0);
+        $this->applyOperator($aggregationBuilder, $resourceClass, $operation, $context, $parameter, 'lte', $bounds[1] + 0);
     }
 }

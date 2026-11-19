@@ -15,6 +15,9 @@ namespace ApiPlatform\OpenApi;
 
 use ApiPlatform\OpenApi\Model\Tag;
 
+/**
+ * Holds the options of the OpenAPI document, such as its title, version and authentication schemes.
+ */
 final readonly class Options
 {
     /**
@@ -47,6 +50,7 @@ final readonly class Options
         private ?string $errorResourceClass = null,
         private ?string $validationErrorResourceClass = null,
         private ?string $licenseIdentifier = null,
+        private bool $withCredentials = false,
     ) {
     }
 
@@ -177,5 +181,10 @@ final readonly class Options
     public function getLicenseIdentifier(): ?string
     {
         return $this->licenseIdentifier;
+    }
+
+    public function getWithCredentials(): bool
+    {
+        return $this->withCredentials;
     }
 }

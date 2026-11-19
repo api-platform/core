@@ -14,14 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -106,6 +110,9 @@ class XmlExtractorTest extends TestCase
                     'parameters' => null,
                     'jsonStream' => null,
                     'map' => null,
+                    'jsonldContext' => null,
+
+                    'throwOnNotFound' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -178,7 +185,7 @@ class XmlExtractorTest extends TestCase
                     'messenger' => 'input',
                     'order' => ['foo', 'bar'],
                     'paginationViaCursor' => [
-                        'id' => 'DESC',
+                        ['field' => 'id', 'direction' => 'DESC'],
                     ],
                     'exceptionToStatus' => [
                         ExceptionInterface::class => 400,
@@ -256,7 +263,7 @@ class XmlExtractorTest extends TestCase
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                'id' => 'DESC',
+                                ['field' => 'id', 'direction' => 'DESC'],
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -267,12 +274,11 @@ class XmlExtractorTest extends TestCase
                             'validate' => null,
                             'write' => null,
                             'serialize' => null,
-                            'queryParameterValidate' => null,
                             'strictQueryParameterValidation' => null,
                             'hideHydraOperation' => null,
-                            'collection' => null,
                             'method' => null,
                             'priority' => null,
+                            'routePriority' => null,
                             'processor' => null,
                             'provider' => null,
                             'itemUriTemplate' => null,
@@ -283,6 +289,9 @@ class XmlExtractorTest extends TestCase
                             'routeName' => 'custom_route_name',
                             'jsonStream' => null,
                             'map' => null,
+                            'jsonldContext' => null,
+
+                            'throwOnNotFound' => null,
                         ],
                         [
                             'name' => null,
@@ -359,7 +368,7 @@ class XmlExtractorTest extends TestCase
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                'id' => 'DESC',
+                                ['field' => 'id', 'direction' => 'DESC'],
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -373,12 +382,11 @@ class XmlExtractorTest extends TestCase
                             'validate' => null,
                             'write' => null,
                             'serialize' => null,
-                            'queryParameterValidate' => null,
                             'strictQueryParameterValidation' => null,
                             'hideHydraOperation' => null,
-                            'collection' => null,
                             'method' => null,
                             'priority' => null,
+                            'routePriority' => null,
                             'processor' => null,
                             'provider' => null,
                             'stateOptions' => null,
@@ -397,6 +405,9 @@ class XmlExtractorTest extends TestCase
                             'routeName' => null,
                             'jsonStream' => null,
                             'map' => null,
+                            'jsonldContext' => null,
+
+                            'throwOnNotFound' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -410,9 +421,59 @@ class XmlExtractorTest extends TestCase
                     'parameters' => null,
                     'jsonStream' => null,
                     'map' => null,
+                    'jsonldContext' => null,
+
+                    'throwOnNotFound' => null,
                 ],
             ],
         ], $extractor->getResources());
+    }
+
+    public function testPaginationViaCursor(): void
+    {
+        $resources = (new XmlResourceExtractor([__DIR__.'/xml/pagination_via_cursor.xml']))->getResources();
+
+        $this->assertSame([
+            ['field' => 'id', 'direction' => 'DESC'],
+            ['field' => 'createdAt', 'direction' => 'ASC'],
+        ], $resources[Comment::class][0]['paginationViaCursor']);
+    }
+
+    public function testContainerParametersAreResolved(): void
+    {
+        $parameters = [
+            'user.class' => User::class,
+            'user.route_prefix' => '/admin',
+            'user.security' => 'is_granted("ROLE_ADMIN")',
+        ];
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->willReturnCallback(static fn (string $id): string => $parameters[$id]);
+
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/parameters.xml'], $container);
+        $resources = $extractor->getResources();
+
+        $this->assertArrayHasKey(User::class, $resources);
+
+        // scalar string field: %param% resolved anywhere in the string
+        $this->assertSame('/admin', $resources[User::class][0]['routePrefix']);
+
+        // expression field, whole-string %param%: resolved to the stored expression so it reaches
+        // ExpressionLanguage (the literal #8104 case, which throws if left as "%user.security%")
+        $this->assertSame('is_granted("ROLE_ADMIN")', $resources[User::class][0]['security']);
+
+        // expression field with a real expression (no whole-string param): left untouched
+        $this->assertSame('is_granted("ROLE_USER")', $resources[User::class][0]['operations'][0]['security']);
+    }
+
+    public function testParameterOpenApiAndPriority(): void
+    {
+        $parameter = (new XmlResourceExtractor([__DIR__.'/xml/parameter_openapi.xml']))->getResources()[Comment::class][0]['parameters']['q'];
+
+        $this->assertSame(10, $parameter->getPriority());
+        $this->assertSame('q', $parameter->getOpenApi()->getName());
+        $this->assertSame('query', $parameter->getOpenApi()->getIn());
+        $this->assertSame('Search', $parameter->getOpenApi()->getDescription());
+        $this->assertTrue($parameter->getOpenApi()->getAllowReserved());
     }
 
     #[DataProvider('getInvalidPaths')]
@@ -432,5 +493,70 @@ class XmlExtractorTest extends TestCase
                 "/^Error while parsing .+\/xml\/invalid\/required_class.xml: \[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./",
             ],
         ];
+    }
+
+    public function testLessStrictSchema(): void
+    {
+        $resource = (new XmlResourceExtractor([__DIR__.'/xml/less_strict_schema.xml']))->getResources()[Comment::class][0];
+
+        $this->assertFalse($resource['openapi']);
+        $this->assertSame(0, $resource['paginationItemsPerPage']);
+        $this->assertSame(['https://example.com/a', 'https://example.com/b'], array_map(static fn ($link) => $link->getHref(), $resource['links']));
+        $this->assertSame(['X-A' => 'a', 'X-B' => 'b'], $resource['headers']);
+        $this->assertSame(-1, $resource['operations'][0]['priority']);
+        $this->assertSame([], $resource['graphQlOperations'][0]['args']);
+    }
+
+    /**
+     * Tests issue #8175: two XML operations sharing an explicit name silently
+     * dropped one another. The factory must reject the duplicate up front.
+     */
+    public function testDuplicateOperationNameFromXmlThrows(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_operation_name.xml']);
+        $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
+
+        $factory->create(Comment::class);
+    }
+
+    public function testDuplicateGraphQlOperationNameFromXmlThrows(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_graphql_operation_name.xml']);
+        $factory = new ExtractorResourceMetadataCollectionFactory($extractor, graphQlEnabled: true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', Comment::class));
+
+        $factory->create(Comment::class);
+    }
+
+    public function testOpenApiParametersAreAList(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_parameters.xml']);
+        $resources = $extractor->getResources();
+
+        $operation = $resources[Program::class][0]['operations'][0]['openapi'];
+        $parameters = $operation->getParameters();
+
+        $this->assertTrue(array_is_list($parameters));
+        $this->assertEquals('author', $parameters[0]->getName());
+        $this->assertEquals('path', $parameters[0]->getIn());
+        $this->assertEquals('john-doe', $parameters[0]->getExample());
+        $this->assertEquals('format', $parameters[1]->getName());
+    }
+
+    public function testOpenApiExternalDocsAndOptionalAttributes(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/openapi_optional_attributes.xml']);
+        $openapi = $extractor->getResources()[Program::class][0]['operations'][0]['openapi'];
+
+        $this->assertSame('More about programs', $openapi->getExternalDocs()->getDescription());
+        $this->assertSame('https://example.com/programs', $openapi->getExternalDocs()->getUrl());
+        $this->assertSame('', $openapi->getParameters()[0]->getDescription());
+        $this->assertFalse($openapi->getParameters()[0]->getRequired());
+        $this->assertFalse($openapi->getRequestBody()->getRequired());
     }
 }

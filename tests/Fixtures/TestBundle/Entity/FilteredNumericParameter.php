@@ -13,25 +13,41 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
 #[GetCollection(
     paginationItemsPerPage: 5,
     parameters: [
         'quantity' => new QueryParameter(
-            filter: new NumericFilter(),
+            filter: new ExactFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::INT),
+            castToNativeType: true,
         ),
         'amount' => new QueryParameter(
-            filter: new NumericFilter(),
+            filter: new ExactFilter(),
             property: 'quantity',
+            nativeType: new BuiltinType(TypeIdentifier::INT),
+            castToNativeType: true,
+        ),
+        'quantities' => new QueryParameter(
+            filter: new ExactFilter(),
+            property: 'quantity',
+            nativeType: new CollectionType(new GenericType(new BuiltinType(TypeIdentifier::ARRAY), new BuiltinType(TypeIdentifier::INT)), true),
+            castToNativeType: true,
         ),
         'ratio' => new QueryParameter(
-            filter: new NumericFilter(),
+            filter: new ExactFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::FLOAT),
+            castToNativeType: true,
         ),
     ],
 )]

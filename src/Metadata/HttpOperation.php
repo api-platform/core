@@ -28,6 +28,7 @@ class HttpOperation extends Operation
     public const METHOD_DELETE = 'DELETE';
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_OPTIONS = 'OPTIONS';
+    public const METHOD_QUERY = 'QUERY';
 
     /** @var array<int|string, string|string[]>|null */
     protected $formats;
@@ -70,7 +71,8 @@ class HttpOperation extends Operation
      *     no_transform?: bool,
      *     immutable?: bool,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
-     * @param array<string, string>|null $headers
+     * @param array<string, string>|null                  $headers
+     * @param array<string, ResponseHeaderParameter>|null $responseHeaders
      * @param list<array{
      *     field: string,
      *     direction: string,
@@ -161,9 +163,11 @@ class HttpOperation extends Operation
         protected ?string $condition = null,
         protected ?string $controller = null,
         protected ?array $headers = null,
+        protected ?array $responseHeaders = null,
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
+        protected ?array $jsonldContext = null,
         protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
@@ -211,6 +215,7 @@ class HttpOperation extends Operation
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?int $priority = null,
+        ?int $routePriority = null,
         ?string $name = null,
         $provider = null,
         $processor = null,
@@ -221,6 +226,7 @@ class HttpOperation extends Operation
         array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
         ?bool $jsonStream = null,
+        ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
     ) {
@@ -270,6 +276,7 @@ class HttpOperation extends Operation
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
+            routePriority: $routePriority,
             name: $name,
             provider: $provider,
             processor: $processor,
@@ -282,6 +289,7 @@ class HttpOperation extends Operation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map
         );
@@ -582,6 +590,25 @@ class HttpOperation extends Operation
         return $this->headers;
     }
 
+    /**
+     * @return array<string, ResponseHeaderParameter>|null
+     */
+    public function getResponseHeaders(): ?array
+    {
+        return $this->responseHeaders;
+    }
+
+    /**
+     * @param array<string, ResponseHeaderParameter> $responseHeaders
+     */
+    public function withResponseHeaders(array $responseHeaders): static
+    {
+        $self = clone $this;
+        $self->responseHeaders = $responseHeaders;
+
+        return $self;
+    }
+
     public function withHeaders(array $headers): static
     {
         $self = clone $this;
@@ -625,6 +652,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
+
+        return $self;
+    }
+
+    public function getJsonldContext(): ?array
+    {
+        return $this->jsonldContext;
+    }
+
+    public function withJsonldContext(array $jsonldContext): static
+    {
+        $self = clone $this;
+        $self->jsonldContext = $jsonldContext;
 
         return $self;
     }

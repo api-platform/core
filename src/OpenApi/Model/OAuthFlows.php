@@ -17,7 +17,7 @@ final class OAuthFlows
 {
     use ExtensionTrait;
 
-    public function __construct(private ?OAuthFlow $implicit = null, private ?OAuthFlow $password = null, private ?OAuthFlow $clientCredentials = null, private ?OAuthFlow $authorizationCode = null)
+    public function __construct(private ?OAuthFlow $implicit = null, private ?OAuthFlow $password = null, private ?OAuthFlow $clientCredentials = null, private ?OAuthFlow $authorizationCode = null, private ?OAuthFlow $deviceAuthorization = null)
     {
     }
 
@@ -39,6 +39,11 @@ final class OAuthFlows
     public function getAuthorizationCode(): ?OAuthFlow
     {
         return $this->authorizationCode;
+    }
+
+    public function getDeviceAuthorization(): ?OAuthFlow
+    {
+        return $this->deviceAuthorization;
     }
 
     public function withImplicit(OAuthFlow $implicit): self
@@ -69,6 +74,14 @@ final class OAuthFlows
     {
         $clone = clone $this;
         $clone->authorizationCode = $authorizationCode;
+
+        return $clone;
+    }
+
+    public function withDeviceAuthorization(OAuthFlow $deviceAuthorization): self
+    {
+        $clone = clone $this;
+        $clone->deviceAuthorization = $deviceAuthorization;
 
         return $clone;
     }

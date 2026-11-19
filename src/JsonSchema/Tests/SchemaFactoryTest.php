@@ -24,11 +24,14 @@ use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\GenericChild;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResource;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResourceWithUnionIntersectTypes;
+use ApiPlatform\JsonSchema\Tests\Fixtures\NullableObjectCollection;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Serializable;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -36,11 +39,9 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
 
@@ -48,92 +49,57 @@ class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[IgnoreDeprecations]
-    public function testBuildSchemaForNonResourceClassLegacy(): void
+    public function testBuildSchemaKeepsNullOnNullableObjectCollections(): void
     {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $child = Type::object(GenericChild::class);
+        $types = [
+            'optionalChildren' => Type::nullable(Type::list($child)),
+            'requiredChildren' => Type::list($child),
+            'optionalMixedChildren' => Type::nullable(Type::list(Type::union($child, Type::object(NotAResource::class)))),
+        ];
 
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar', 'genderType']));
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
-                ->withReadable(true)
-                ->withSchema(['type' => 'string'])
-        );
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])
-                ->withReadable(true)
-                ->withDefault('default_bar')
-                ->withExample('example_bar')
-                ->withSchema(['type' => 'integer', 'default' => 'default_bar', 'example' => 'example_bar'])
-        );
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'genderType', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)])
-                ->withReadable(true)
-                ->withDefault('male')
-                ->withSchema(['type' => 'object', 'default' => 'male', 'example' => 'male'])
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(
+            static fn (string $resourceClass): PropertyNameCollection => new PropertyNameCollection(match ($resourceClass) {
+                NullableObjectCollection::class => array_keys($types),
+                GenericChild::class => ['property'],
+                default => [],
+            })
         );
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(
+            static fn (string $resourceClass, string $property): ApiProperty => GenericChild::class === $resourceClass
+                ? (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withSchema(['type' => 'string'])
+                : (new ApiProperty())->withNativeType($types[$property])->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
 
-        $definitionNameFactory = new DefinitionNameFactory();
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
 
         $schemaFactory = new SchemaFactory(
-            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
-            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
-            definitionNameFactory: $definitionNameFactory,
+            resourceMetadataFactory: $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            resourceClassResolver: $resourceClassResolver,
+            definitionNameFactory: new DefinitionNameFactory(),
         );
-        $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
+        $resultSchema = $schemaFactory->buildSchema(NullableObjectCollection::class);
 
-        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $definitions = $resultSchema->getDefinitions();
+        $properties = $resultSchema->getDefinitions()[$resultSchema->getRootDefinitionKey()]['properties'];
 
-        $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
-        $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]);
-        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
-        $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertArrayNotHasKey('default', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertArrayNotHasKey('example', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
-        $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertArrayHasKey('default', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertArrayHasKey('example', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertSame('integer', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
-        $this->assertSame('default_bar', $definitions[$rootDefinitionKey]['properties']['bar']['default']);
-        $this->assertSame('example_bar', $definitions[$rootDefinitionKey]['properties']['bar']['example']);
+        $this->assertSame(['array', 'null'], $properties['optionalChildren']['type']);
+        $this->assertSame(['$ref' => '#/definitions/GenericChild'], (array) $properties['optionalChildren']['items']);
 
-        $this->assertArrayHasKey('genderType', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['genderType']);
-        $this->assertArrayHasKey('default', $definitions[$rootDefinitionKey]['properties']['genderType']);
-        $this->assertArrayHasKey('example', $definitions[$rootDefinitionKey]['properties']['genderType']);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['genderType']['type']);
-        $this->assertSame('male', $definitions[$rootDefinitionKey]['properties']['genderType']['default']);
-        $this->assertSame('male', $definitions[$rootDefinitionKey]['properties']['genderType']['example']);
+        $this->assertSame('array', $properties['requiredChildren']['type']);
+        $this->assertSame(['$ref' => '#/definitions/GenericChild'], (array) $properties['requiredChildren']['items']);
+
+        $this->assertSame(['array', 'null'], $properties['optionalMixedChildren']['type']);
+        $this->assertArrayHasKey('anyOf', (array) $properties['optionalMixedChildren']['items']);
     }
 
     public function testBuildSchemaForNonResourceClass(): void
     {
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
-            $this->markTestSkipped('This test only supports type-info component');
-        }
-
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -230,80 +196,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame('#/definitions/GenericChild', $definitions[$rootDefinitionKey]['properties']['items']['$ref']);
     }
 
-    #[IgnoreDeprecations]
-    public function testBuildSchemaForNonResourceClassWithUnionIntersectTypesLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, Argument::cetera())->willReturn(new PropertyNameCollection(['ignoredProperty', 'unionType', 'intersectType']));
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'ignoredProperty', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING, nullable: true)])
-                ->withReadable(true)
-                ->withSchema(['type' => ['string', 'null']])
-        );
-        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'unionType', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING, nullable: true), new LegacyType(LegacyType::BUILTIN_TYPE_INT, nullable: true), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, nullable: true)])
-                ->withReadable(true)
-                ->withSchema(['oneOf' => [
-                    ['type' => ['string', 'null']],
-                    ['type' => ['integer', 'null']],
-                ]])
-        );
-        $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'intersectType', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, class: Serializable::class), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, class: DummyResourceInterface::class)])
-                ->withReadable(true)
-                ->withSchema(['type' => 'object'])
-        );
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(NotAResourceWithUnionIntersectTypes::class)->willReturn(false);
-
-        $definitionNameFactory = new DefinitionNameFactory();
-
-        $schemaFactory = new SchemaFactory(
-            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
-            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
-            definitionNameFactory: $definitionNameFactory,
-        );
-        $resultSchema = $schemaFactory->buildSchema(NotAResourceWithUnionIntersectTypes::class);
-
-        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $definitions = $resultSchema->getDefinitions();
-
-        $this->assertSame((new \ReflectionClass(NotAResourceWithUnionIntersectTypes::class))->getShortName(), $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
-        $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]);
-        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
-
-        $this->assertArrayHasKey('ignoredProperty', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
-        $this->assertSame(['string', 'null'], $definitions[$rootDefinitionKey]['properties']['ignoredProperty']['type']);
-        $this->assertArrayHasKey('unionType', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('oneOf', $definitions[$rootDefinitionKey]['properties']['unionType']);
-        $this->assertCount(2, $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]);
-        $this->assertSame(['string', 'null'], $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][0]['type']);
-        $this->assertSame(['integer', 'null'], $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf'][1]['type']);
-
-        $this->assertArrayHasKey('intersectType', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['intersectType']);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['intersectType']['type']);
-    }
-
     public function testBuildSchemaForNonResourceClassWithUnionIntersectTypes(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -372,89 +264,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('intersectType', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['intersectType']);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['intersectType']['type']);
-    }
-
-    #[IgnoreDeprecations]
-    public function testBuildSchemaWithSerializerGroupsLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
-        $shortName = (new \ReflectionClass(OverriddenOperationDummy::class))->getShortName();
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $operation = (new Put())->withName('put')->withNormalizationContext([
-            'groups' => 'overridden_operation_dummy_put',
-            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
-        ])->withShortName($shortName)->withValidationContext(['groups' => ['validation_groups_dummy_put']]);
-        $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)
-            ->willReturn(
-                new ResourceMetadataCollection(OverriddenOperationDummy::class, [
-                    (new ApiResource())->withOperations(new Operations(['put' => $operation])),
-                ])
-            );
-
-        $serializerGroup = 'custom_operation_dummy';
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['alias', 'description', 'genderType']));
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::type('array'))->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
-                ->withReadable(true)
-                ->withSchema(['type' => 'string'])
-        );
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::type('array'))->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])
-                ->withReadable(true)
-                ->withSchema(['type' => 'string'])
-        );
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'genderType', Argument::type('array'))->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class)])
-                ->withReadable(true)
-                ->withDefault(GenderTypeEnum::MALE)
-                ->withSchema(['type' => 'object'])
-        );
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
-        $resourceClassResolverProphecy->isResourceClass(GenderTypeEnum::class)->willReturn(true);
-
-        $definitionNameFactory = new DefinitionNameFactory();
-
-        $schemaFactory = new SchemaFactory(
-            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
-            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
-            definitionNameFactory: $definitionNameFactory,
-        );
-        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, null, null, ['groups' => $serializerGroup, AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
-
-        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $definitions = $resultSchema->getDefinitions();
-
-        $this->assertSame((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName().'-'.$serializerGroup, $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
-        $this->assertFalse($definitions[$rootDefinitionKey]['additionalProperties']);
-        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
-        $this->assertArrayHasKey('alias', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['alias']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['alias']['type']);
-        $this->assertArrayHasKey('description', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['description']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['description']['type']);
-        $this->assertArrayHasKey('genderType', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['genderType']);
-        $this->assertArrayNotHasKey('default', $definitions[$rootDefinitionKey]['properties']['genderType']);
-        $this->assertArrayNotHasKey('example', $definitions[$rootDefinitionKey]['properties']['genderType']);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['genderType']['type']);
     }
 
     public function testBuildSchemaWithSerializerGroups(): void
@@ -623,63 +432,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame('string', $definitions[$childDefinitionKey]['properties']['name']['type']);
     }
 
-    #[IgnoreDeprecations]
-    public function testBuildSchemaForAssociativeArrayLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar']));
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))])
-                ->withReadable(true)
-                ->withSchema(['type' => 'array', 'items' => ['string', 'int']])
-        );
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(
-            (new ApiProperty())
-                ->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))])
-                ->withReadable(true)
-                ->withSchema(['type' => 'object', 'additionalProperties' => 'string'])
-        );
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
-
-        $definitionNameFactory = new DefinitionNameFactory();
-
-        $schemaFactory = new SchemaFactory(
-            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
-            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
-            definitionNameFactory: $definitionNameFactory,
-        );
-        $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
-
-        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $definitions = $resultSchema->getDefinitions();
-
-        $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
-        $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['foo']);
-        $this->assertSame('array', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
-        $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
-        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertArrayHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['bar']);
-        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
-        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
-    }
-
     public function testBuildSchemaForAssociativeArray(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -730,5 +482,216 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
         $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
+    }
+
+    public function testPartialUpdateRequiredPropertiesUseDistinctDefinitions(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::string())
+                ->withReadable(true)
+                ->withWritable(true)
+                ->withRequired(true)
+                ->withSchema(['type' => 'string'])
+        );
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(true);
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
+            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
+        );
+
+        $postSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'jsonld',
+            Schema::TYPE_INPUT,
+            new Post(class: NotAResource::class, shortName: 'RequiredResource'),
+        );
+        $postDefinitionKey = $postSchema->getRootDefinitionKey();
+
+        $partialPutSchema = new Schema(Schema::VERSION_OPENAPI);
+        $partialPutSchema->setDefinitions($postSchema->getDefinitions());
+        $partialPutSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'jsonld',
+            Schema::TYPE_INPUT,
+            new Put(class: NotAResource::class, shortName: 'RequiredResource', extraProperties: ['standard_put' => false]),
+            $partialPutSchema,
+        );
+        $partialPutDefinitionKey = $partialPutSchema->getRootDefinitionKey();
+
+        $standardPutSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'jsonld',
+            Schema::TYPE_INPUT,
+            new Put(class: NotAResource::class, shortName: 'RequiredResource'),
+        );
+        $standardPutDefinitionKey = $standardPutSchema->getRootDefinitionKey();
+
+        self::assertSame('RequiredResource.jsonld', $postDefinitionKey);
+        self::assertSame('RequiredResource.jsonld.partial', $partialPutDefinitionKey);
+        self::assertSame('RequiredResource.jsonld', $standardPutDefinitionKey);
+        self::assertNotSame($postDefinitionKey, $partialPutDefinitionKey);
+        self::assertSame(['foo'], $postSchema->getDefinitions()[$postDefinitionKey]['required']);
+        self::assertArrayNotHasKey('required', $partialPutSchema->getDefinitions()[$partialPutDefinitionKey]);
+        self::assertSame(['foo'], $standardPutSchema->getDefinitions()[$standardPutDefinitionKey]['required']);
+
+        $patchSchema = $schemaFactory->buildSchema(
+            NotAResource::class,
+            'json',
+            Schema::TYPE_INPUT,
+            new Patch(class: NotAResource::class, shortName: 'RequiredResource'),
+        );
+
+        self::assertSame('RequiredResource.jsonMergePatch', $patchSchema->getRootDefinitionKey());
+        self::assertArrayNotHasKey('required', $patchSchema->getDefinitions()[$patchSchema->getRootDefinitionKey()]);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideASingleReference(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::object(GenericChild::class))
+            ->withDescription('The child.')
+            ->withSchema(['description' => 'The child.', 'type' => Schema::UNKNOWN_TYPE]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            '$ref' => '#/definitions/GenericChild',
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideANullableReference(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::object(GenericChild::class)))
+            ->withDescription('The child.')
+            ->withDefault('default_child')
+            ->withExample('example_child')
+            ->withSchema(['description' => 'The child.', 'default' => 'default_child', 'example' => 'example_child', 'type' => Schema::UNKNOWN_TYPE]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            'default' => 'default_child',
+            'example' => 'example_child',
+            'anyOf' => [
+                ['$ref' => '#/definitions/GenericChild'],
+                ['type' => 'null'],
+            ],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideACollectionOfReferences(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::list(Type::object(GenericChild::class)))
+            ->withDescription('The children.')
+            ->withWritable(false)
+            ->withSchema(['description' => 'The children.', 'readOnly' => true, 'maxItems' => 1, 'type' => 'array', 'items' => ['type' => Schema::UNKNOWN_TYPE]]));
+
+        $this->assertSame([
+            'description' => 'The children.',
+            'readOnly' => true,
+            'maxItems' => 1,
+            'type' => 'array',
+            'items' => ['$ref' => '#/definitions/GenericChild'],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * An intersection carries its unresolved type in an allOf, which must not survive next to the references.
+     *
+     * @see https://github.com/api-platform/core/issues/8453
+     */
+    public function testBuildSchemaKeepsPropertyMetadataAlongsideAnIntersectionOfReferences(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::intersection(Type::object(GenericChild::class), Type::object(Serializable::class)))
+            ->withDescription('The child.')
+            ->withSchema(['description' => 'The child.', 'allOf' => [['type' => Schema::UNKNOWN_TYPE], ['type' => Schema::UNKNOWN_TYPE]]]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            'allOf' => [
+                ['$ref' => '#/definitions/GenericChild'],
+                ['$ref' => '#/definitions/Serializable'],
+            ],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    public function testBuildSchemaUsesAnyOfForAUnionOfReferences(): void
+    {
+        $properties = $this->buildPropertiesWithReference('child', (new ApiProperty())
+            ->withNativeType(Type::union(Type::object(GenericChild::class), Type::object(Serializable::class)))
+            ->withDescription('The child.')
+            ->withSchema(['description' => 'The child.', 'anyOf' => [['type' => Schema::UNKNOWN_TYPE], ['type' => Schema::UNKNOWN_TYPE]]]));
+
+        $this->assertSame([
+            'description' => 'The child.',
+            'anyOf' => [
+                ['$ref' => '#/definitions/GenericChild'],
+                ['$ref' => '#/definitions/Serializable'],
+            ],
+        ], $properties['child']->getArrayCopy());
+    }
+
+    /**
+     * Builds the schema of a non-resource class holding a single property typed after another class.
+     *
+     * @return array<string, \ArrayObject<string, mixed>>
+     */
+    private function buildPropertiesWithReference(string $propertyName, ApiProperty $propertyMetadata): array
+    {
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(
+            static fn (string $class): PropertyNameCollection => new PropertyNameCollection(
+                NotAResource::class === $class ? [$propertyName] : ['property'],
+            ),
+        );
+
+        $childPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::string())
+            ->withReadable(true)
+            ->withSchema(['type' => 'string']);
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(
+            static fn (string $class): ApiProperty => NotAResource::class === $class
+                ? $propertyMetadata->withReadable(true)
+                : $childPropertyMetadata,
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            resourceClassResolver: $resourceClassResolver,
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $schema = $schemaFactory->buildSchema(NotAResource::class);
+
+        return $schema->getDefinitions()[$schema->getRootDefinitionKey()]['properties'];
     }
 }

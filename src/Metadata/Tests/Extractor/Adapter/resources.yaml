@@ -66,6 +66,8 @@ resources:
                     hydraContext:
                         foo:
                             bar: baz
+                    jsonldContext:
+                        dct: 'http://purl.org/dc/terms/'
                     openapi:
                         extensionProperties:
                             bar: baz
@@ -86,7 +88,9 @@ resources:
                     paginationClientItemsPerPage: false
                     paginationClientPartial: false
                     paginationViaCursor:
-                        userId: DESC
+                        -
+                            field: userId
+                            direction: DESC
                     paginationEnabled: false
                     paginationFetchJoinCollection: false
                     paginationUseOutputWalkers: false
@@ -191,6 +195,8 @@ resources:
             hydraContext:
                 foo:
                     bar: baz
+            jsonldContext:
+                dct: 'http://purl.org/dc/terms/'
             openapi:
                 extensionProperties:
                     bar: baz
@@ -211,7 +217,9 @@ resources:
             paginationClientItemsPerPage: true
             paginationClientPartial: true
             paginationViaCursor:
-                id: DESC
+                -
+                    field: id
+                    direction: DESC
             paginationEnabled: true
             paginationFetchJoinCollection: true
             paginationUseOutputWalkers: true
@@ -339,6 +347,7 @@ resources:
             strictQueryParameterValidation: false
             hideHydraOperation: false
             jsonStream: true
+            throwOnNotFound: true
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

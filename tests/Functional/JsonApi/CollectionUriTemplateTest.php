@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnly;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnlyRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PropertyCollectionIriOnlyRelationSecondLevel;
@@ -73,7 +73,7 @@ final class CollectionUriTemplateTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'links' => [
                 'propertyCollectionIriOnlyRelation' => '/property-collection-relations',

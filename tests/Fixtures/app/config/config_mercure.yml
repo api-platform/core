@@ -1,2 +1,5 @@
 imports:
     - { resource: config_test.yml }
+
+parameters:
+    app.mercure.publish_to_hub: true

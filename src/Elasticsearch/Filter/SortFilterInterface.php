@@ -16,8 +16,6 @@ namespace ApiPlatform\Elasticsearch\Filter;
 /**
  * Elasticsearch filter interface for sorting.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 interface SortFilterInterface extends FilterInterface

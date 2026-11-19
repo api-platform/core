@@ -71,6 +71,24 @@ class NestedPropertyFilterTest extends TestCase
         $response->assertJsonPath('member.0.quantity', 2);
     }
 
+    public function testEqualsFilterWithMultipleValues(): void
+    {
+        $product = Product::create(['name' => 'Laptop', 'price' => 999.99]);
+
+        foreach ([2, 5, 7] as $quantity) {
+            ProductOrder::create([
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'customer_name' => 'John Doe',
+            ]);
+        }
+
+        $response = $this->getJson('/api/product_orders?quantity[]=2&quantity[]=5', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertJsonCount(2, 'member');
+        $response->assertJsonPath('totalItems', 2);
+    }
+
     public function testFilterByDeeplyNestedPropertyWithSnakeCase(): void
     {
         // Create test data

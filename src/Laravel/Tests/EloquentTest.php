@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\Tests;
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
@@ -109,6 +110,19 @@ class EloquentTest extends TestCase
 
         $response = $this->get('/api/books?name='.$name, ['Accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['member'][0], $book);
+    }
+
+    public function testPartialSearchFilterWithArrayValue(): void
+    {
+        foreach (['Alpha', 'Bravo', 'Charlie'] as $name) {
+            BookFactory::new()->has(AuthorFactory::new())->create(['name' => $name]);
+        }
+
+        $response = $this->get('/api/books?name[]=lph&name[]=rav', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertEqualsCanonicalizing(['Alpha', 'Bravo'], array_column($response->json()['member'], 'name'));
+
+        $response = $this->get('/api/books?name[x]=lph', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertCount(3, $response->json()['member']);
     }
 
     public function testDateFilterEqual(): void
@@ -299,6 +313,16 @@ class EloquentTest extends TestCase
         $this->assertSame($res['totalItems'], 2);
     }
 
+    public function testOrFilterWithSingleValue(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $book = $this->get('/api/books', ['Accept' => ['application/ld+json']])->json()['member'][0];
+
+        $response = $this->get(\sprintf('/api/books?name2[]=%s', $book['name']), ['Accept' => ['application/ld+json']]);
+        $response->assertOk();
+        $this->assertSame(1, $response->json()['totalItems']);
+    }
+
     public function testRangeLowerThanFilter(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
@@ -417,6 +441,21 @@ class EloquentTest extends TestCase
         $this->assertSame($json['totalItems'], 2);
     }
 
+    public function testRangeFilterWithInvalidValue(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $log = Log::spy();
+
+        $res = $this->get('/api/books?isbn_range=5', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(10, $res->json()['totalItems']);
+
+        $res = $this->get('/api/books?isbn_range[unknown]=5', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(10, $res->json()['totalItems']);
+        $log->shouldHaveReceived('notice')->twice();
+    }
+
     public function testWrongOrderFilter(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
@@ -433,9 +472,17 @@ class EloquentTest extends TestCase
 
     public function testBooleanFilter(): void
     {
-        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $books = BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $res = $this->get('/api/books?published=notabool', ['Accept' => ['application/ld+json']]);
         $this->assertEquals($res->getStatusCode(), 422);
+
+        $res = $this->get('/api/books?published=true', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame($books->count(), $res->json()['totalItems']);
+
+        $res = $this->get('/api/books?published=false', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(0, $res->json()['totalItems']);
 
         $res = $this->get('/api/books?published=0', ['Accept' => ['application/ld+json']]);
         $this->assertEquals($res->getStatusCode(), 200);

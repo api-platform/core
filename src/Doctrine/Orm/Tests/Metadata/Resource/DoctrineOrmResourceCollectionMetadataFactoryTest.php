@@ -99,14 +99,13 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
         $readOnlyMetadata = new ClassMetadata(DummyReadOnly::class);
         $readOnlyMetadata->markReadOnly();
         $objectManager->method('getClassMetadata')->willReturn($readOnlyMetadata);
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->method('getManagerForClass')->with(DummyReadOnly::class)->willReturn($objectManager);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturnMap([[DummyReadOnly::class, $objectManager]]);
 
-        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactory
             ->method('create')
-            ->with(DummyReadOnly::class)
-            ->willReturn(new ResourceMetadataCollection(DummyReadOnly::class, [
+            ->willReturnMap([[DummyReadOnly::class, new ResourceMetadataCollection(DummyReadOnly::class, [
                 (new ApiResource())
                     ->withOperations(
                         new Operations([
@@ -118,7 +117,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
                             'delete' => (new Delete())->withClass(DummyReadOnly::class),
                         ])
                     ),
-            ]));
+            ])]]);
 
         $resourceMetadataCollectionFactory = new DoctrineOrmResourceCollectionMetadataFactory($managerRegistry, $resourceMetadataCollectionFactory);
 

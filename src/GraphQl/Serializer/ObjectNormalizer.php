@@ -64,6 +64,17 @@ final class ObjectNormalizer implements NormalizerInterface
         }
 
         $normalizedData = $this->decorated->normalize($data, $format, $context);
+
+        // The default circular_reference_handler returns the visited object's IRI
+        // as a string; return an identifier-only node so the GraphQL field shape
+        // is preserved instead of crashing.
+        if (\is_string($normalizedData) && isset($originalResource)) {
+            return [
+                self::ITEM_RESOURCE_CLASS_KEY => $this->getObjectClass($originalResource),
+                self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($originalResource),
+            ];
+        }
+
         if (!\is_array($normalizedData)) {
             throw new UnexpectedValueException('Expected data to be an array.');
         }

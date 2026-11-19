@@ -16,6 +16,8 @@ namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 use ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter;
 use ApiPlatform\Doctrine\Orm\Tests\DoctrineOrmFilterTestCase;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\IntegerBackedEnumDummy;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @author Rémi Marseille <marseille.remi@gmail.com>
@@ -25,6 +27,23 @@ final class BackedEnumFilterTest extends DoctrineOrmFilterTestCase
     use BackedEnumFilterTestTrait;
 
     protected string $filterClass = BackedEnumFilter::class;
+
+    #[DataProvider('provideNonPositiveIntegerValues')]
+    public function testApplyNonPositiveIntegerValue(string $value): void
+    {
+        $this->doTestApply(
+            ['value' => null],
+            ['value' => $value],
+            \sprintf('SELECT o FROM %s o WHERE o.value = :value_p1', IntegerBackedEnumDummy::class),
+            resourceClass: IntegerBackedEnumDummy::class,
+        );
+    }
+
+    public static function provideNonPositiveIntegerValues(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'negative' => ['-1'];
+    }
 
     public static function provideApplyTestData(): array
     {

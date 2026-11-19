@@ -17,11 +17,18 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyWithUninitializedProperties;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\UnitOfWork as ODMUnitOfWork;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\UnitOfWork as ORMUnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata as PersistenceClassMetadata;
+use Doctrine\Persistence\Mapping\RuntimeReflectionService;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -141,4 +148,195 @@ class PersistProcessorTest extends TestCase
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Post(map: true));
         $this->assertSame($dummy, $result);
     }
+
+    public function testHandleLazyObjectRelationsKeepsNewOrmRelationWithAssignedIdentifier(): void
+    {
+        $relation = new PersistProcessorTestRelationStub();
+        $data = new PersistProcessorTestObjectWithRelationStub($relation);
+
+        $unitOfWork = $this->createMock(ORMUnitOfWork::class);
+        $unitOfWork->expects($this->once())->method('getEntityState')->with($relation)->willReturn(ORMUnitOfWork::STATE_NEW);
+
+        $relationManager = $this->createMock(EntityManagerInterface::class);
+        $relationManager->expects($this->any())->method('contains')->with($relation)->willReturn(false);
+        $relationManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createOrmRelationMetadata());
+        $relationManager->method('getUnitOfWork')->willReturn($unitOfWork);
+        $relationManager->expects($this->never())->method('getReference');
+
+        $this->processObjectWithRelation($data, $relationManager);
+
+        $this->assertSame($relation, $data->relation);
+    }
+
+    public function testHandleLazyObjectRelationsKeepsNewOdmRelationWithAssignedIdentifier(): void
+    {
+        $relation = new PersistProcessorTestRelationStub();
+        $data = new PersistProcessorTestObjectWithRelationStub($relation);
+
+        $unitOfWork = $this->createMock(PersistProcessorTestDocumentUnitOfWorkStub::class);
+        $unitOfWork->expects($this->once())->method('getDocumentState')->with($relation)->willReturn(ODMUnitOfWork::STATE_NEW);
+
+        $relationManager = $this->createMockForIntersectionOfInterfaces([ObjectManager::class, PersistProcessorTestDocumentManagerStub::class]);
+        $relationManager->expects($this->any())->method('contains')->with($relation)->willReturn(false);
+        $relationManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createRelationMetadata());
+        $relationManager->method('getUnitOfWork')->willReturn($unitOfWork);
+        $relationManager->expects($this->never())->method('getReference');
+
+        $this->processObjectWithRelation($data, $relationManager);
+
+        $this->assertSame($relation, $data->relation);
+    }
+
+    public function testHandleLazyObjectRelationsReplacesRelationWhenManagerHasNoUnitOfWork(): void
+    {
+        $relation = new PersistProcessorTestRelationStub();
+        $reference = new PersistProcessorTestRelationStub();
+        $data = new PersistProcessorTestObjectWithRelationStub($relation);
+
+        $relationManager = $this->createMockForIntersectionOfInterfaces([ObjectManager::class, PersistProcessorTestReferenceManagerStub::class]);
+        $relationManager->expects($this->any())->method('contains')->with($relation)->willReturn(false);
+        $relationManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestRelationStub::class)->willReturn($this->createRelationMetadata());
+        $relationManager->expects($this->once())->method('getReference')->with(PersistProcessorTestRelationStub::class, ['id' => 'relation-id'])->willReturn($reference);
+
+        $this->processObjectWithRelation($data, $relationManager);
+
+        $this->assertSame($reference, $data->relation);
+    }
+
+    public function testPersistPutCreateResolvesParentLinkViaToProperty(): void
+    {
+        $device = new PersistProcessorTestDeviceStub();
+
+        $userReference = new PersistProcessorTestUserStub();
+        $userReference->id = 'user-uuid';
+
+        $deviceClassMetadata = new ORMClassMetadata(PersistProcessorTestDeviceStub::class);
+        $deviceClassMetadata->identifier = ['id'];
+
+        $deviceManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $deviceManagerProphecy->getClassMetadata(PersistProcessorTestDeviceStub::class)->willReturn($deviceClassMetadata);
+        $deviceManagerProphecy->contains($device)->willReturn(false);
+        $deviceManagerProphecy->persist($device)->shouldBeCalled();
+        $deviceManagerProphecy->flush()->shouldBeCalled();
+        $deviceManagerProphecy->refresh($device)->shouldBeCalled();
+
+        $userClassMetadata = new ORMClassMetadata(PersistProcessorTestUserStub::class);
+        $userClassMetadata->identifier = ['id'];
+
+        $userManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $userManagerProphecy->getClassMetadata(PersistProcessorTestUserStub::class)->willReturn($userClassMetadata);
+        $userManagerProphecy->getReference(PersistProcessorTestUserStub::class, 'user-uuid')
+            ->willReturn($userReference)
+            ->shouldBeCalledTimes(1);
+        $userManagerProphecy->contains($userReference)->willReturn(true);
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestDeviceStub::class)->willReturn($deviceManagerProphecy->reveal());
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestUserStub::class)->willReturn($userManagerProphecy->reveal());
+
+        $operation = new Put(
+            extraProperties: ['standard_put' => true],
+            uriVariables: [
+                'userId' => new Link(toProperty: 'user', fromClass: PersistProcessorTestUserStub::class, identifiers: ['id']),
+                'id' => new Link(fromClass: PersistProcessorTestDeviceStub::class, identifiers: ['id']),
+            ],
+        );
+
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process(
+            $device,
+            $operation,
+            ['userId' => 'user-uuid', 'id' => 'device-uuid'],
+            ['previous_data' => null],
+        );
+
+        $this->assertSame($device, $result);
+        $this->assertSame($userReference, $device->user);
+        $this->assertSame('device-uuid', $device->id);
+    }
+
+    private function createRelationMetadata(): PersistenceClassMetadata
+    {
+        $metadata = $this->createStub(PersistenceClassMetadata::class);
+        $metadata->method('getIdentifierValues')->willReturn(['id' => 'relation-id']);
+
+        return $metadata;
+    }
+
+    private function createOrmRelationMetadata(): ORMClassMetadata
+    {
+        $metadata = new ORMClassMetadata(PersistProcessorTestRelationStub::class);
+        $metadata->mapField(['fieldName' => 'id', 'type' => 'string', 'id' => true]);
+        $metadata->wakeupReflection(new RuntimeReflectionService());
+
+        return $metadata;
+    }
+
+    private function processObjectWithRelation(PersistProcessorTestObjectWithRelationStub $data, ObjectManager $relationManager): void
+    {
+        $dataManager = $this->createMock(ObjectManager::class);
+        $dataManager->expects($this->any())->method('getClassMetadata')->with(PersistProcessorTestObjectWithRelationStub::class)->willReturn($this->createStub(PersistenceClassMetadata::class));
+        $dataManager->expects($this->any())->method('contains')->with($data)->willReturn(false);
+        $dataManager->expects($this->once())->method('persist')->with($data);
+        $dataManager->expects($this->once())->method('flush');
+        $dataManager->expects($this->once())->method('refresh')->with($data);
+
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturnMap([
+            [PersistProcessorTestObjectWithRelationStub::class, $dataManager],
+            [PersistProcessorTestRelationStub::class, $relationManager],
+        ]);
+
+        (new PersistProcessor($managerRegistry))->process($data, new Post(map: true));
+    }
+}
+
+/** @internal */
+class PersistProcessorTestUserStub
+{
+    public ?string $id = null;
+}
+
+/** @internal */
+class PersistProcessorTestDeviceStub
+{
+    public ?string $id = null;
+    public ?PersistProcessorTestUserStub $user = null;
+}
+
+/** @internal */
+class PersistProcessorTestObjectWithRelationStub
+{
+    public ?string $id = null;
+
+    public function __construct(public PersistProcessorTestRelationStub $relation)
+    {
+    }
+}
+
+/** @internal */
+class PersistProcessorTestRelationStub
+{
+    public string $id = 'relation-id';
+}
+
+/** @internal */
+interface PersistProcessorTestReferenceManagerStub
+{
+    /**
+     * @param class-string         $className
+     * @param array<string, mixed> $identifier
+     */
+    public function getReference(string $className, array $identifier): object;
+}
+
+/** @internal */
+interface PersistProcessorTestDocumentManagerStub extends PersistProcessorTestReferenceManagerStub
+{
+    public function getUnitOfWork(): PersistProcessorTestDocumentUnitOfWorkStub;
+}
+
+/** @internal */
+interface PersistProcessorTestDocumentUnitOfWorkStub
+{
+    public function getDocumentState(object $object): int;
 }

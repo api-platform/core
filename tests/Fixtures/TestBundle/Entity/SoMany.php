@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiFilter(RangeFilter::class, properties: ['id'])]
-#[ApiFilter(OrderFilter::class, properties: ['id' => 'DESC'])]
-#[ApiResource(paginationPartial: true, paginationViaCursor: [['field' => 'id', 'direction' => 'DESC']])]
+#[ApiResource(paginationPartial: true, paginationViaCursor: [['field' => 'id', 'direction' => 'DESC']], parameters: ['id' => new QueryParameter(filter: new RangeFilter()), 'order[:property]' => new QueryParameter(filter: new SortFilter())])]
 #[ORM\Entity]
 class SoMany
 {

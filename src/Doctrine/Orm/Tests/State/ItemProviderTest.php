@@ -20,6 +20,7 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Company;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Employee;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\OperationResource;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Model\EmployeeApi;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
@@ -35,6 +36,8 @@ use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ManyToOneAssociationMapping;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\TokenType;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
@@ -56,17 +59,17 @@ class ItemProviderTest extends TestCase
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
         $queryBuilderMock->method('getQuery')->willReturn($queryMock);
-        $queryBuilderMock->method('andWhere')->with('o.identifier = :identifier_p1');
+        $queryBuilderMock->expects($this->once())->method('andWhere')->with('o.identifier = :identifier_p1');
         $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
-        $queryBuilderMock->method('setParameter')->with('identifier_p1', 1, Types::INTEGER);
+        $queryBuilderMock->expects($this->once())->method('setParameter')->with('identifier_p1', 1, Types::INTEGER);
 
         $managerMock = $this->getManagerRegistry(OperationResource::class, [
             'identifier' => [
                 'type' => Types::INTEGER,
             ],
         ], $queryBuilderMock);
-        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
-        $managerRegistryMock->method('getManagerForClass')->with(OperationResource::class)->willReturn($managerMock);
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[OperationResource::class, $managerMock]]);
 
         $operation = (new Get())->withUriVariables([
             'identifier' => (new Link())->withFromClass(OperationResource::class)
@@ -74,12 +77,12 @@ class ItemProviderTest extends TestCase
         ])->withClass(OperationResource::class)->withName('get');
 
         $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
-        $extensionMock->method('applyToItem')
+        $extensionMock->expects($this->once())->method('applyToItem')
             ->with($queryBuilderMock, $this->isInstanceOf(QueryNameGeneratorInterface::class), OperationResource::class, ['identifier' => 1], $operation, $context);
 
         $dataProvider = new ItemProvider(
             $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
-            $managerRegistryMock,
+            $managerRegistryStub,
             [$extensionMock]
         );
 
@@ -120,8 +123,8 @@ class ItemProviderTest extends TestCase
                 'type' => Types::INTEGER,
             ],
         ], $queryBuilderMock);
-        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
-        $managerRegistryMock->method('getManagerForClass')->with(OperationResource::class)->willReturn($managerMock);
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[OperationResource::class, $managerMock]]);
 
         $context = [];
         $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
@@ -131,11 +134,229 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider(
             $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
-            $managerRegistryMock,
+            $managerRegistryStub,
             [$extensionMock]
         );
 
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
+    }
+
+    public function testGetItemWithFetchDataFalseOnSubresourceFiltersParentLink(): void
+    {
+        $reference = new Employee();
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturnMap([[Employee::class, $classMetadataMock]]);
+        $managerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Employee::class, ['id' => 2])
+            ->willReturn($reference);
+
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[Employee::class, $managerMock]]);
+
+        $operation = (new Get())->withUriVariables([
+            'companyId' => (new Link())->withFromClass(Company::class)->withToProperty('company'),
+            'id' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['id']),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryStub,
+        );
+
+        $this->assertSame($reference, $dataProvider->provide($operation, ['companyId' => 1, 'id' => 2], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseMapsRenamedIdentifierUriVariable(): void
+    {
+        $reference = new Employee();
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturnMap([[Employee::class, $classMetadataMock]]);
+        $managerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Employee::class, ['id' => 2])
+            ->willReturn($reference);
+
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[Employee::class, $managerMock]]);
+
+        // The identifier uriVariable is named "employeeId" while the entity's own identifier field is "id".
+        $operation = (new Get())->withUriVariables([
+            'companyId' => (new Link())->withFromClass(Company::class)->withToProperty('company'),
+            'employeeId' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['id'])->withParameterName('employeeId'),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryStub,
+        );
+
+        $this->assertSame($reference, $dataProvider->provide($operation, ['companyId' => 1, 'employeeId' => 2], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseFallsBackToQueryWhenOwnIdentifierMissing(): void
+    {
+        $returnObject = new \stdClass();
+
+        $queryMock = $this->createMock($this->getQueryClass());
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
+
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $repositoryStub = $this->createStub(EntityRepository::class);
+        $repositoryStub->method('createQueryBuilder')->willReturnMap([['o', $queryBuilderMock]]);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturn($classMetadataMock);
+        $managerMock->method('getRepository')->willReturn($repositoryStub);
+        // Only the parent link is provided: the own identifier cannot be resolved to a reference,
+        // so we must fall back to the query that resolves the link instead of calling getReference().
+        $managerMock->expects($this->never())->method('getReference');
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
+
+        $operation = (new Get())->withUriVariables([
+            'companyId' => (new Link())->withFromClass(Company::class)->withToProperty('company')->withIdentifiers(['id']),
+            'id' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['id']),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['companyId' => 1], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseFallsBackToQueryWhenIdentifierIsNotADoctrineIdentifier(): void
+    {
+        $returnObject = new \stdClass();
+
+        $queryMock = $this->createMock($this->getQueryClass());
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
+
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+
+        // The Doctrine identifier is "id" while the resource exposes "uuid" as its API identifier:
+        // getReference() cannot be built from "uuid", so we must fall back to the query.
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $repositoryStub = $this->createStub(EntityRepository::class);
+        $repositoryStub->method('createQueryBuilder')->willReturnMap([['o', $queryBuilderMock]]);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturn($classMetadataMock);
+        $managerMock->method('getRepository')->willReturn($repositoryStub);
+        $managerMock->expects($this->never())->method('getReference');
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
+
+        $operation = (new Get())->withUriVariables([
+            'uuid' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['uuid'])->withParameterName('uuid'),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['uuid' => '61817181-0ecc-42fb-a6e7-d97f2ddcb344'], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseReturnsReferenceForStateOptionsResource(): void
+    {
+        $reference = new Employee();
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturnMap([[Employee::class, $classMetadataMock]]);
+        $managerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Employee::class, ['id' => 2])
+            ->willReturn($reference);
+
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[Employee::class, $managerMock]]);
+
+        // DTO resource: the operation class (EmployeeApi) differs from the stateOptions entity class (Employee),
+        // so the identifier-self link's fromClass is the resource class, not the entity class.
+        $operation = (new Get())->withUriVariables([
+            'id' => (new Link())->withFromClass(EmployeeApi::class)->withIdentifiers(['id']),
+        ])->withStateOptions(new Options(entityClass: Employee::class))->withName('get')->withClass(EmployeeApi::class);
+
+        // The reference fast-path must return before the item query is built, so item extensions never run.
+        $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
+        $extensionMock->expects($this->never())->method('applyToItem');
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryStub,
+            [$extensionMock]
+        );
+
+        $this->assertSame($reference, $dataProvider->provide($operation, ['id' => 2], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseFallsBackToQueryForStateOptionsResourceWhenIdentifierIsNotADoctrineIdentifier(): void
+    {
+        $returnObject = new \stdClass();
+
+        $queryMock = $this->createMock($this->getQueryClass());
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
+
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+
+        // Even for a DTO resource, the entity-identifier guard holds: the resource exposes "uuid" as its
+        // API identifier while the Doctrine identifier is "id", so getReference() cannot be built and we
+        // must fall back to the link-resolving query.
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $repositoryStub = $this->createStub(EntityRepository::class);
+        $repositoryStub->method('createQueryBuilder')->willReturnMap([['o', $queryBuilderMock]]);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturn($classMetadataMock);
+        $managerMock->method('getRepository')->willReturn($repositoryStub);
+        $managerMock->expects($this->never())->method('getReference');
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
+
+        // A no-op handleLinks mirrors what DoctrineOrmResourceCollectionMetadataFactory injects for a
+        // stateOptions resource in production; the unit test bypasses that factory (see CollectionProviderTest).
+        $operation = (new Get())->withUriVariables([
+            'uuid' => (new Link())->withFromClass(EmployeeApi::class)->withIdentifiers(['uuid'])->withParameterName('uuid'),
+        ])->withStateOptions(new Options(entityClass: Employee::class, handleLinks: static fn () => null))->withName('get')->withClass(EmployeeApi::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['uuid' => '61817181-0ecc-42fb-a6e7-d97f2ddcb344'], ['fetch_data' => false]));
     }
 
     public function testQueryResultExtension(): void
@@ -153,8 +374,8 @@ class ItemProviderTest extends TestCase
             ],
         ], $queryBuilderMock);
 
-        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
-        $managerRegistryMock->method('getManagerForClass')->with(OperationResource::class)->willReturn($managerMock);
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[OperationResource::class, $managerMock]]);
 
         $operation = (new Get())->withUriVariables([
             'identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers([
@@ -178,7 +399,7 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider(
             $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
-            $managerRegistryMock,
+            $managerRegistryStub,
             [$extensionMock]
         );
 
@@ -226,16 +447,15 @@ class ItemProviderTest extends TestCase
      */
     private function getManagerRegistry(string $resourceClass, array $identifierFields, QueryBuilder $queryBuilder, array $classMetadatas = [])
     {
-        $classMetadataMock = $this->createMock(ClassMetadata::class);
-        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(array_keys($identifierFields));
+        $classMetadataStub = $this->createStub(ClassMetadata::class);
+        $classMetadataStub->method('getIdentifierFieldNames')->willReturn(array_keys($identifierFields));
 
         $getTypeOfFieldExpectations = [];
         foreach ($identifierFields as $name => $field) {
             $getTypeOfFieldExpectations[$name] = $field['type'];
         }
 
-        $classMetadataMock->method('getTypeOfField')
-            ->with($this->logicalOr(...array_keys($identifierFields)))
+        $classMetadataStub->method('getTypeOfField')
             ->willReturnCallback(static function ($name) use ($getTypeOfFieldExpectations) {
                 return $getTypeOfFieldExpectations[$name];
             });
@@ -245,26 +465,25 @@ class ItemProviderTest extends TestCase
         $connectionMock = $this->createMock(Connection::class);
         $connectionMock->method('getDatabasePlatform')->willReturn($platformMock);
 
-        $repositoryMock = $this->createMock(EntityRepository::class);
-        $repositoryMock->method('createQueryBuilder')->with('o')->willReturn($queryBuilder);
+        $repositoryStub = $this->createStub(EntityRepository::class);
+        $repositoryStub->method('createQueryBuilder')->willReturnMap([['o', $queryBuilder]]);
 
-        $managerMock = $this->createMock(EntityManagerInterface::class);
-        $managerMock->method('getConnection')->willReturn($connectionMock);
-        $managerMock->method('getRepository')->with($resourceClass)->willReturn($repositoryMock);
+        $managerStub = $this->createStub(EntityManagerInterface::class);
+        $managerStub->method('getConnection')->willReturn($connectionMock);
+        $managerStub->method('getRepository')->willReturnMap([[$resourceClass, $repositoryStub]]);
 
-        $classMetadataExpectations = [$resourceClass => $classMetadataMock];
+        $classMetadataExpectations = [$resourceClass => $classMetadataStub];
 
         foreach ($classMetadatas as $class => $classMetadata) {
             $classMetadataExpectations[$class] = $classMetadata;
         }
 
-        $managerMock->method('getClassMetadata')
-            ->with($this->logicalOr(...array_keys($classMetadataExpectations)))
+        $managerStub->method('getClassMetadata')
             ->willReturnCallback(static function ($name) use ($classMetadataExpectations) {
                 return $classMetadataExpectations[$name];
             });
 
-        return $managerMock;
+        return $managerStub;
     }
 
     public function testGetSubresourceFromProperty(): void
@@ -275,35 +494,36 @@ class ItemProviderTest extends TestCase
         $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->expects($this->once())->method('join')->with(Employee::class, 'm_a1', 'WITH', 'o.id = m_a1.company');
+        $queryBuilderMock->expects($this->once())->method('join')->with(Employee::class, 'm_a1', \defined(TokenType::class.'::T_ON') ? Join::ON : Join::WITH, 'o.id = m_a1.company');
         $queryBuilderMock->expects($this->once())->method('getQuery')->willReturn($queryMock);
         $queryBuilderMock->expects($this->once())->method('getRootAliases')->willReturn(['o']);
         $queryBuilderMock->expects($this->once())->method('andWhere')->with('m_a1.id = :id_p1');
         $queryBuilderMock->expects($this->once())->method('setParameter')->with('id_p1', 1, Types::INTEGER);
 
-        $employeeClassMetadataMock = $this->createMock(ClassMetadata::class);
-        $employeeClassMetadataMock->method('getAssociationMapping')->with('company')->willReturn(
+        $employeeClassMetadataStub = $this->createStub(ClassMetadata::class);
+        $employeeClassMetadataStub->method('hasAssociation')->willReturnMap([['company', true]]);
+        $employeeClassMetadataStub->method('getAssociationMapping')->willReturnMap([[
+            'company',
             class_exists(ManyToOneAssociationMapping::class) ?
                 new ManyToOneAssociationMapping('company', Employee::class, Company::class) :
                 [
                     'type' => ClassMetadata::TO_ONE,
                     'fieldName' => 'company',
-                ]
-        );
+                ],
+        ]]);
 
-        $employeeClassMetadataMock->method('getTypeOfField')->with('id')->willReturn(Types::INTEGER);
+        $employeeClassMetadataStub->method('getTypeOfField')->willReturnMap([['id', Types::INTEGER]]);
 
         $managerMock = $this->getManagerRegistry(Company::class, [
             'id' => [
                 'type' => Types::INTEGER,
             ],
         ], $queryBuilderMock, [
-            Employee::class => $employeeClassMetadataMock,
+            Employee::class => $employeeClassMetadataStub,
         ]);
 
-        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
-        $managerRegistryMock->method('getManagerForClass')->with($this->logicalOr(Company::class, Employee::class))
-            ->willReturn($managerMock);
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub->method('getManagerForClass')->willReturnMap([[Company::class, $managerMock], [Employee::class, $managerMock]]);
 
         $operation = (new Get())->withUriVariables([
             'employeeId' => (new Link())->withFromClass(Employee::class)
@@ -319,7 +539,7 @@ class ItemProviderTest extends TestCase
 
         $dataProvider = new ItemProvider(
             $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
-            $managerRegistryMock,
+            $managerRegistryStub,
             [$extensionMock]
         );
 

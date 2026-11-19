@@ -36,7 +36,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.state_provider.main'),
             service('api_platform.state_processor.main'),
-            '%api_platform.docs_formats%',
+            '%api_platform.entrypoint_formats%',
         ]);
 
     $services->set('api_platform.action.documentation', DocumentationAction::class)

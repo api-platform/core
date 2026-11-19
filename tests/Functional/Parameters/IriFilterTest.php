@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Chicken;
@@ -66,6 +66,13 @@ final class IriFilterTest extends ApiTestCase
         $this->assertEquals($iris['coopIris'][1], $res['member'][0]['chickenCoop']);
 
         $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/595')->toArray();
+        $this->assertCount(0, $res['member']);
+    }
+
+    public function testIriFilterWithUnresolvableIri(): void
+    {
+        $res = self::createClient()->request('GET', '/chickens?chickenCoop=/invalid/iri')->toArray(false);
+        $this->assertResponseIsSuccessful();
         $this->assertCount(0, $res['member']);
     }
 

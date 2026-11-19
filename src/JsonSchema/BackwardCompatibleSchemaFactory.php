@@ -52,11 +52,11 @@ final class BackwardCompatibleSchemaFactory implements SchemaFactoryInterface, S
                         continue;
                     }
 
-                    if (isset($property['exclusiveMinimum'])) {
+                    if (isset($property['exclusiveMinimum']) && !\is_bool($property['exclusiveMinimum'])) {
                         $property['minimum'] = $property['exclusiveMinimum'];
                         $property['exclusiveMinimum'] = true;
                     }
-                    if (isset($property['exclusiveMaximum'])) {
+                    if (isset($property['exclusiveMaximum']) && !\is_bool($property['exclusiveMaximum'])) {
                         $property['maximum'] = $property['exclusiveMaximum'];
                         $property['exclusiveMaximum'] = true;
                     }

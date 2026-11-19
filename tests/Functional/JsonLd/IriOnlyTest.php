@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonLd;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\IriOnlyResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -34,7 +34,7 @@ final class IriOnlyTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', $uri);
         $this->assertResponseIsSuccessful();
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $this->assertSame([
             '@context' => [
                 '@vocab' => 'http://localhost/docs.jsonld#',

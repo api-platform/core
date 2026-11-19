@@ -44,6 +44,18 @@ final class PersistProcessor implements ProcessorInterface
         $toMany = [];
 
         foreach ($this->modelMetadata->getRelations($data) as $relation) {
+            // isset() is false for null, so an explicit null would be skipped and saved as a column named after the relation.
+            if (
+                (BelongsTo::class === $relation['type'] || MorphTo::class === $relation['type'])
+                && \array_key_exists($relation['name'], $data->getAttributes())
+                && null === $data->getAttributes()[$relation['name']]
+            ) {
+                $data->{$relation['method_name']}()->dissociate();
+                unset($data->{$relation['name']});
+
+                continue;
+            }
+
             if (!isset($data->{$relation['name']})) {
                 continue;
             }
@@ -51,7 +63,7 @@ final class PersistProcessor implements ProcessorInterface
             if (BelongsTo::class === $relation['type'] || MorphTo::class === $relation['type']) {
                 $rel = $data->{$relation['name']};
 
-                if (!$rel->exists) {
+                if (!$rel->exists || $rel->isDirty()) {
                     $rel->save();
                 }
 

@@ -30,8 +30,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Loops over parameters to check parameter security.
  * Throws an exception if security is not granted.
  *
- * @experimental
- *
  * @implements ProviderInterface<object>
  */
 final class SecurityParameterProvider implements ProviderInterface
@@ -52,15 +50,17 @@ final class SecurityParameterProvider implements ProviderInterface
 
         $operation = $request?->attributes->get('_api_operation') ?? $operation;
 
-        $parameters = $operation->getParameters() ?? new Parameters();
+        $existingParameters = $operation->getParameters();
+        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
-                if ($uriVariable->getValue() instanceof ParameterNotFound) {
-                    $uriVariable->setValue($uriVariables[$key] ?? new ParameterNotFound());
+                $link = $uriVariable->withKey($key);
+                if ($link->getValue() instanceof ParameterNotFound) {
+                    $link = $link->withValue($uriVariables[$key] ?? new ParameterNotFound());
                 }
 
-                $parameters->add($key, $uriVariable->withKey($key));
+                $parameters->add($key, $link);
             }
         }
 
@@ -69,6 +69,8 @@ final class SecurityParameterProvider implements ProviderInterface
             if (null === $security = $parameter->getSecurity()) {
                 continue;
             }
+
+            $targetResource = null;
 
             $value = $parameter->getValue();
             if ($parameter instanceof Link) {
@@ -110,7 +112,12 @@ final class SecurityParameterProvider implements ProviderInterface
                     default => AccessDeniedHttpException::class,
                 };
 
-                throw new ($exception)($parameter->getSecurityMessage() ?? 'Access Denied.');
+                $securityMessage = $parameter->getSecurityMessage();
+                if (MetadataAccessDeniedException::class === $exception) {
+                    throw new $exception($securityMessage ?? 'Access Denied.', detail: $securityMessage);
+                }
+
+                throw new $exception($securityMessage ?? 'Access Denied.');
             }
         }
 

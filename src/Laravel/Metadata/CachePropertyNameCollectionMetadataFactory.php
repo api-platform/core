@@ -13,24 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
-use Illuminate\Support\Facades\Cache;
 
-final readonly class CachePropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
+final class CachePropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
 {
+    use MetadataCacheTrait;
+
+    /**
+     * @var array<string, PropertyNameCollection>
+     */
+    private array $localCache = [];
+
     public function __construct(
-        private PropertyNameCollectionFactoryInterface $decorated,
-        private string $cacheStore,
+        private readonly PropertyNameCollectionFactoryInterface $decorated,
+        private readonly string $cacheStore,
+        private readonly ?ModelMetadata $modelMetadata = null,
     ) {
     }
 
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $key = hash('xxh3', serialize(['resource_class' => $resourceClass] + $options));
-
-        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $options) {
-            return $this->decorated->create($resourceClass, $options);
-        });
+        return $this->cached(
+            hash('xxh3', serialize(['resource_class' => $resourceClass] + $options)),
+            fn (): PropertyNameCollection => $this->decorated->create($resourceClass, $options),
+        );
     }
 }

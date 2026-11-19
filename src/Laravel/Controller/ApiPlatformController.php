@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Event;
@@ -75,6 +76,16 @@ class ApiPlatformController extends Controller
 
         if (null === $operation->canDeserialize()) {
             $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+        }
+
+        $denormalizationContext = $operation->getDenormalizationContext() ?? [];
+        if ($operation->canDeserialize() && !isset($denormalizationContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE])) {
+            $method = $operation->getMethod();
+            $assignObjectToPopulate = 'POST' === $method
+                || 'PATCH' === $method
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
+
+            $operation = $operation->withDenormalizationContext($denormalizationContext + [SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => $assignObjectToPopulate]);
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);

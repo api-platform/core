@@ -13,24 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use Illuminate\Support\Facades\Cache;
 
-final readonly class CachePropertyMetadataFactory implements PropertyMetadataFactoryInterface
+final class CachePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
+    use MetadataCacheTrait;
+
+    /**
+     * @var array<string, ApiProperty>
+     */
+    private array $localCache = [];
+
     public function __construct(
-        private PropertyMetadataFactoryInterface $decorated,
-        private string $cacheStore,
+        private readonly PropertyMetadataFactoryInterface $decorated,
+        private readonly string $cacheStore,
+        private readonly ?ModelMetadata $modelMetadata = null,
     ) {
     }
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
-        $key = hash('xxh3', serialize(['resource_class' => $resourceClass, 'property' => $property] + $options));
-
-        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $property, $options) {
-            return $this->decorated->create($resourceClass, $property, $options);
-        });
+        return $this->cached(
+            hash('xxh3', serialize(['resource_class' => $resourceClass, 'property' => $property] + $options)),
+            fn (): ApiProperty => $this->decorated->create($resourceClass, $property, $options),
+        );
     }
 }

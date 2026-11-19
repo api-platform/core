@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Parameter;
 
 /**
- * Caster returns the default value when a value can not be casted
- * This is used by parameters before they get validated by constraints
- * Therefore we do not need to throw exceptions, validation will just fail.
+ * Caster returns the value unchanged when it can not be casted, so constraint validation can
+ * reject it. Therefore we do not need to throw exceptions, validation will just fail.
  *
  * @internal
  */

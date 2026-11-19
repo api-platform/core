@@ -17,7 +17,10 @@ final class Encoding
 {
     use ExtensionTrait;
 
-    public function __construct(private string $contentType = '', private ?\ArrayObject $headers = null, private string $style = '', private bool $explode = false, private bool $allowReserved = false)
+    /**
+     * @param array<int, Encoding>|null $prefixEncoding
+     */
+    public function __construct(private string $contentType = '', private ?\ArrayObject $headers = null, private string $style = '', private bool $explode = false, private bool $allowReserved = false, private ?\ArrayObject $encoding = null, private ?array $prefixEncoding = null, private ?self $itemEncoding = null)
     {
     }
 
@@ -56,6 +59,24 @@ final class Encoding
         return $this->allowReserved;
     }
 
+    public function getEncoding(): ?\ArrayObject
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * @return array<int, Encoding>|null
+     */
+    public function getPrefixEncoding(): ?array
+    {
+        return $this->prefixEncoding;
+    }
+
+    public function getItemEncoding(): ?self
+    {
+        return $this->itemEncoding;
+    }
+
     public function withContentType(string $contentType): self
     {
         $clone = clone $this;
@@ -92,6 +113,33 @@ final class Encoding
     {
         $clone = clone $this;
         $clone->allowReserved = $allowReserved;
+
+        return $clone;
+    }
+
+    public function withEncoding(?\ArrayObject $encoding): self
+    {
+        $clone = clone $this;
+        $clone->encoding = $encoding;
+
+        return $clone;
+    }
+
+    /**
+     * @param array<int, Encoding>|null $prefixEncoding
+     */
+    public function withPrefixEncoding(?array $prefixEncoding): self
+    {
+        $clone = clone $this;
+        $clone->prefixEncoding = $prefixEncoding;
+
+        return $clone;
+    }
+
+    public function withItemEncoding(self $itemEncoding): self
+    {
+        $clone = clone $this;
+        $clone->itemEncoding = $itemEncoding;
 
         return $clone;
     }

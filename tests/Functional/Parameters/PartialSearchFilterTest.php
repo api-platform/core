@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Owner as DocumentOwner;
@@ -141,6 +141,39 @@ final class PartialSearchFilterTest extends ApiTestCase
             1,
             ['xx_%_\\_%_xx'],
         ];
+    }
+
+    public function testPartialSearchFilterMatchesEscapeCharLiterally(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('LIKE escaping only applies to the ORM filters.');
+        }
+
+        $manager = $this->getManager();
+        $chicken = new Chicken();
+        $chicken->setName('Bang!!_');
+        $chicken->setOwner($manager->getRepository(Owner::class)->findOneBy(['name' => 'Alice']));
+        $chicken->setChickenCoop($manager->getRepository(ChickenCoop::class)->findOneBy([]));
+        $manager->persist($chicken);
+        $manager->flush();
+
+        $response = self::createClient()->request('GET', '/chickens?namePartial[]=!!&namePartial[]=Zebra');
+        $this->assertResponseIsSuccessful();
+        $this->assertSame(['Bang!!_'], array_column($response->toArray()['member'], 'name'));
+
+        $response = self::createClient()->request('GET', '/chickens?namePartial=g!');
+        $this->assertResponseIsSuccessful();
+        $this->assertSame(['Bang!!_'], array_column($response->toArray()['member'], 'name'));
+
+        $response = self::createClient()->request('GET', '/chickens?namePartial=_!');
+        $this->assertResponseIsSuccessful();
+        $this->assertSame([], $response->toArray()['member']);
+
+        $response = self::createClient()->request('GET', '/chickens?namePartial[]=%5F&namePartial[]=!!');
+        $this->assertResponseIsSuccessful();
+        $names = array_column($response->toArray()['member'], 'name');
+        sort($names);
+        $this->assertSame(['Bang!!_', 'xx_%_\\_%_xx'], $names);
     }
 
     #[DataProvider('partialSearchFilterWithOneToManyRelationProvider')]

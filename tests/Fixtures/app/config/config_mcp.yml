@@ -1,0 +1,10 @@
+mcp:
+    servers:
+        default:
+            http:
+                path: '/mcp'
+            session:
+                store: 'file'
+                directory: '%kernel.cache_dir%/mcp'
+                ttl: 3600
+            registry: '*'

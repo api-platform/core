@@ -34,6 +34,7 @@ trait ContentNegotiationTrait
      */
     private function getMimeTypeFormat(string $mimeType, array $formats): ?string
     {
+        $mimeType = strtolower(trim($mimeType));
         $canonicalMimeType = null;
         $pos = strpos($mimeType, ';');
         if (false !== $pos) {
@@ -41,6 +42,7 @@ trait ContentNegotiationTrait
         }
 
         foreach ($formats as $format => $mimeTypes) {
+            $mimeTypes = array_map(strtolower(...), (array) $mimeTypes);
             if (\in_array($mimeType, $mimeTypes, true)) {
                 return $format;
             }
@@ -97,7 +99,15 @@ trait ContentNegotiationTrait
         /** @var string|null $accept */
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
-            if ($mediaType = $this->negotiator->getBest($accept, $mimeTypes)) {
+            $mediaType = $this->negotiator->getBest($accept, $mimeTypes);
+            // willdurand/negotiation treats media-range parameters as match
+            // constraints, so a wildcard carrying informational params
+            // (e.g. `*\/*; charset=utf-8` from PhpStorm) fails negotiation.
+            // Retry on a bare wildcard. See #1532.
+            if (!$mediaType && str_contains($accept, '*/*')) {
+                $mediaType = $this->negotiator->getBest('*/*', $mimeTypes);
+            }
+            if ($mediaType) {
                 return $this->getMimeTypeFormat($mediaType->getType(), $formats);
             }
 
@@ -111,12 +121,12 @@ trait ContentNegotiationTrait
         if (null !== $requestFormat) {
             $mimeType = $request->getMimeType($requestFormat);
 
-            if (isset($flattenedMimeTypes[$mimeType])) {
+            if (null !== $mimeType && isset($flattenedMimeTypes[$mimeType])) {
                 return $requestFormat;
             }
 
             if ($throw) {
-                throw $this->getNotAcceptableHttpException($mimeType, $flattenedMimeTypes);
+                throw $this->getNotAcceptableHttpException($mimeType ?? $requestFormat, $flattenedMimeTypes);
             }
         }
 

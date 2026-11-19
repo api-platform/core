@@ -33,7 +33,6 @@ class AppKernel extends Kernel
     {
         parent::__construct($environment, $debug);
 
-        // patch for behat/symfony2-extension not supporting %env(APP_ENV)%
         $this->environment = $_SERVER['APP_ENV'] ?? $environment;
     }
 

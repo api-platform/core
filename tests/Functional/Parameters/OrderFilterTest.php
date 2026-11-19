@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredOrderParameter as FilteredOrderParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredOrderParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -122,14 +122,6 @@ final class OrderFilterTest extends ApiTestCase
         ];
         yield 'date_null_always_first_alias_desc' => [
             '/filtered_order_parameters?date_null_always_first=desc',
-            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
-        ];
-        yield 'date_null_always_first_old_way_alias_asc' => [
-            '/filtered_order_parameters?date_null_always_first_old_way=asc',
-            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
-        ];
-        yield 'date_null_always_first_old_way_alias_desc' => [
-            '/filtered_order_parameters?date_null_always_first_old_way=desc',
             [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
         yield 'order_property_created_at_null_first_asc' => [

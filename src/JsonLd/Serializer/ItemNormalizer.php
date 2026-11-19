@@ -158,18 +158,27 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
         if (null === $types) {
-            // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
-            // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
-            // object's class Type and not rely on operation ?
-            if (isset($context['item_uri_template'])) {
-                // When the operation comes from item_uri_template, use its shortName directly
-                // as $resourceClass refers to the collection resource, not the item resource
+            $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+            if (isset($context['item_uri_template']) || $operation->getClass() === $typeClass) {
+                // The operation serves the class being normalized: use its shortName so @type matches the
+                // (possibly deduplicated) @context. For item_uri_template, $resourceClass is the collection
+                // resource, so the operation remains authoritative for the item type.
                 $types = [$operation->getShortName()];
             } else {
-                // Use resource-level shortName to avoid operation-specific overrides
-                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                // Embedded/related resource: the operation belongs to another class, so fall back to its
+                // resource-level shortName instead of an operation-specific override.
                 try {
-                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                    $resourceCollection = $this->resourceMetadataCollectionFactory->create($typeClass);
+                    $typeResource = $resourceCollection[0];
+                    if (null !== $operation->getName()) {
+                        foreach ($resourceCollection as $candidate) {
+                            if ($candidate->getOperations()?->has($operation->getName())) {
+                                $typeResource = $candidate;
+                                break;
+                            }
+                        }
+                    }
+                    $types = [$typeResource->getShortName()];
                 } catch (\Exception) {
                     $types = [$operation->getShortName()];
                 }

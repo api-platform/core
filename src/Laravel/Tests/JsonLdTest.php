@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Author;
@@ -50,7 +53,7 @@ class JsonLdTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@id' => '/api/books',
@@ -66,7 +69,7 @@ class JsonLdTest extends TestCase
         $book = Book::first();
         $response = $this->get($this->getIriFromResource($book), ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@id' => $this->getIriFromResource($book),
@@ -94,13 +97,82 @@ class JsonLdTest extends TestCase
         );
 
         $response->assertStatus(201);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@type' => 'Book',
             'name' => 'Don Quichotte',
         ]);
         $this->assertMatchesRegularExpression('~^/api/books/~', $response->json('@id'));
+    }
+
+    public function testCreateBookWithAnIriWithoutRoute(): void
+    {
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 'Don Quichotte',
+                'author' => '/api/nope/1',
+                'isbn' => fake()->isbn13(),
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(400);
+        $this->assertStringContainsString('Invalid IRI "/api/nope/1"', $response->json('detail'));
+    }
+
+    public function testCreateBookWithAnInvalidType(): void
+    {
+        AuthorFactory::new()->create();
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 123,
+                'author' => $this->getIriFromResource(Author::find(1)),
+                'isbn' => fake()->isbn13(),
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(400);
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function usePreviouslyPublishedExceptionToStatus($app): void
+    {
+        $app['config']->set('api-platform.exception_to_status', [
+            AuthenticationException::class => 401,
+            AuthorizationException::class => 403,
+        ]);
+    }
+
+    #[DefineEnvironment('usePreviouslyPublishedExceptionToStatus')]
+    public function testCreateBookWithAnInvalidTypeAndAPreviouslyPublishedConfig(): void
+    {
+        AuthorFactory::new()->create();
+        $response = $this->postJson(
+            '/api/books',
+            [
+                'name' => 123,
+                'author' => $this->getIriFromResource(Author::find(1)),
+                'isbn' => fake()->isbn13(),
+            ],
+            [
+                'accept' => 'application/ld+json',
+                'content_type' => 'application/ld+json',
+            ]
+        );
+
+        $response->assertStatus(400);
     }
 
     public function testUpdateBook(): void
@@ -184,7 +256,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/outputs', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@type' => 'NotAResource',
             'name' => 'test',
@@ -198,7 +270,7 @@ class JsonLdTest extends TestCase
         PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         $response = $this->get('/api/posts', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
 
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Post',
@@ -244,7 +316,7 @@ class JsonLdTest extends TestCase
         );
 
         $response->assertStatus(422);
-        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/problem+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/ValidationError',
             '@type' => 'ValidationError',
@@ -269,7 +341,7 @@ class JsonLdTest extends TestCase
         );
 
         $response->assertStatus(422);
-        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/problem+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/ValidationError',
             '@type' => 'ValidationError',
@@ -286,7 +358,7 @@ class JsonLdTest extends TestCase
         SluggableFactory::new()->count(10)->create();
         $response = $this->get('/api/sluggables', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Sluggable',
             '@id' => '/api/sluggables',
@@ -304,12 +376,36 @@ class JsonLdTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function testJsonLdContextHasCorrectContentType(): void
+    {
+        $response = $this->get('/api/contexts/Entrypoint', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json');
+        $this->assertArrayHasKey('@context', $response->json());
+    }
+
+    public function testJsonLdResourceContextHasCorrectContentType(): void
+    {
+        $response = $this->get('/api/contexts/Book', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json');
+        $this->assertArrayHasKey('@context', $response->json());
+    }
+
+    public function testJsonLdContextDefaultsToEntrypoint(): void
+    {
+        $response = $this->get('/api/contexts/', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json');
+        $this->assertArrayHasKey('@context', $response->json());
+    }
+
     public function testHidden(): void
     {
         PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         $response = $this->get('/api/posts/1/comments/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonMissingPath('internalNote');
     }
 
@@ -318,7 +414,7 @@ class JsonLdTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $this->assertStringNotContainsString('internalNote', (string) $response->getContent());
     }
 
@@ -362,7 +458,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/resource_with_models?page=1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/ResourceWithModel',
             '@id' => '/api/resource_with_models',

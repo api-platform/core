@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonLd;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\CustomInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\CustomOutputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyCollectionDto;
@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyIdCollectionDt
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InputOutputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\NoInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\PostNoOutputResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\RequiredConstructorInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UserResource;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -41,6 +42,7 @@ final class InputOutputDtoTest extends ApiTestCase
             InputOutputResource::class,
             NoInputResource::class,
             PostNoOutputResource::class,
+            RequiredConstructorInputResource::class,
             DummyCollectionDto::class,
             DummyFooCollectionDto::class,
             DummyIdCollectionDto::class,
@@ -58,7 +60,7 @@ final class InputOutputDtoTest extends ApiTestCase
             'json' => ['foo' => 'test', 'bar' => 1],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $this->assertJsonContains([
             '@context' => '/contexts/JsonLdCustomInput',
             '@id' => '/jsonld_custom_inputs/1',
@@ -78,6 +80,21 @@ final class InputOutputDtoTest extends ApiTestCase
             ],
             'json' => ['foo' => 'test', 'bar' => 'not-an-int'],
         ]);
+        $this->assertResponseStatusCodeSame(400);
+        $body = $response->toArray(false);
+        $this->assertSame('The input data is misformatted.', $body['detail']);
+    }
+
+    public function testCustomInputRejectsBadTypeMissingConstructorParam(): void
+    {
+        $response = self::createClient()->request('POST', '/jsonld_required_constructor_inputs', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'json' => ['title' => 'Hello'],
+        ]);
+
         $this->assertResponseStatusCodeSame(400);
         $body = $response->toArray(false);
         $this->assertSame('The input data is misformatted.', $body['detail']);
@@ -158,15 +175,11 @@ final class InputOutputDtoTest extends ApiTestCase
 
     public function testCreateNoInputResource(): void
     {
-        if ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false) {
-            $this->markTestSkipped('PlaceholderAction cannot resolve $data when input:false in event-listener mode.');
-        }
-
         $response = self::createClient()->request('POST', '/jsonld_no_inputs', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('JsonLdNoInput', $body['@type']);
         $this->assertSame(1, $body['id']);
@@ -254,7 +267,7 @@ final class InputOutputDtoTest extends ApiTestCase
             'json' => ['email' => 'user@example.com'],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('user@example.com', $body['email']);
     }

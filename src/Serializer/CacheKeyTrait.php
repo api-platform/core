@@ -21,7 +21,7 @@ namespace ApiPlatform\Serializer;
  */
 trait CacheKeyTrait
 {
-    private function getCacheKey(?string $format, array $context): string|bool
+    protected function getCacheKey(?string $format, array $context): string|bool
     {
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);
@@ -29,6 +29,7 @@ trait CacheKeyTrait
         unset($context[self::EXCLUDE_FROM_CACHE_KEY]);
         unset($context[self::OBJECT_TO_POPULATE]);
         unset($context['cache_key']); // avoid artificially different keys
+        unset($context['request_uri'], $context['uri'], $context['filters']);
 
         try {
             return hash('xxh128', $format.serialize([

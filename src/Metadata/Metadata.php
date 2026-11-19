@@ -82,6 +82,7 @@ abstract class Metadata
         protected ?bool $hideHydraOperation = null,
         protected ?bool $jsonStream = null,
         protected ?bool $map = null,
+        protected ?bool $throwOnNotFound = null,
         protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
@@ -651,6 +652,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->middleware = $middleware;
+
+        return $self;
+    }
+
+    public function getThrowOnNotFound(): ?bool
+    {
+        return $this->throwOnNotFound;
+    }
+
+    public function withThrowOnNotFound(bool $throwOnNotFound): static
+    {
+        $self = clone $this;
+        $self->throwOnNotFound = $throwOnNotFound;
 
         return $self;
     }

@@ -76,6 +76,10 @@ final class DeserializeListener
         }
 
         if (!$operation->canDeserialize()) {
+            if (!$request->attributes->has('data')) {
+                $request->attributes->set('data', null);
+            }
+
             return;
         }
 

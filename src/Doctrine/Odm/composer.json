@@ -25,26 +25,28 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/doctrine-common": "^4.2.23",
-        "api-platform/metadata": "^4.2",
-        "api-platform/serializer": "^4.2.16",
-        "api-platform/state": "^4.2.4",
+        "api-platform/doctrine-common": "^5.1",
+        "api-platform/metadata": "^5.0",
+        "api-platform/serializer": "^5.0",
+        "api-platform/state": "^5.0",
         "doctrine/mongodb-odm": "^2.10",
-        "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
-        "symfony/type-info": "^7.3 || ^8.0"
+        "symfony/property-info": "^7.4 || ^8.0",
+        "symfony/type-info": "^7.4 || ^8.0"
     },
     "require-dev": {
+        "api-platform/json-schema": "^5.0",
+        "api-platform/openapi": "^5.0",
         "doctrine/doctrine-bundle": "^2.11 || ^3.1",
         "doctrine/mongodb-odm-bundle": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.5 || ^12.2",
-        "symfony/cache": "^6.4 || ^7.0 || ^8.0",
-        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
-        "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
-        "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
-        "symfony/uid": "^6.4 || ^7.0 || ^8.0",
-        "symfony/validator": "^6.4.11 || ^7.0 || ^8.0",
-        "symfony/yaml": "^6.4 || ^7.0 || ^8.0"
+        "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
+        "symfony/cache": "^7.4 || ^8.0",
+        "symfony/framework-bundle": "^7.4 || ^8.0",
+        "symfony/property-access": "^7.4 || ^8.0",
+        "symfony/serializer": "^7.4 || ^8.0",
+        "symfony/uid": "^7.4 || ^8.0",
+        "symfony/validator": "^7.4 || ^8.0",
+        "symfony/yaml": "^7.4 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -62,13 +64,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.4.x-dev",
+            "dev-5.0": "5.0.x-dev",
+            "dev-main": "5.1.x-dev",
             "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0 || ^8.0"
+            "require": "^7.4 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

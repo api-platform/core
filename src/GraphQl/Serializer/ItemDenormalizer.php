@@ -13,7 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Serializer\ItemNormalizerTrait;
+use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
+use ApiPlatform\Serializer\TagCollectorInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts GraphQL inputs to objects (denormalization only).
@@ -22,7 +36,18 @@ use ApiPlatform\Serializer\AbstractItemNormalizer;
  */
 final class ItemDenormalizer extends AbstractItemNormalizer
 {
+    use ItemNormalizerTrait;
+
     public const FORMAT = 'graphql';
+
+    private readonly LoggerInterface $logger;
+
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, ?TagCollectorInterface $tagCollector = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null, ?LoggerInterface $logger = null)
+    {
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
+
+        $this->logger = $logger ?? new NullLogger();
+    }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {

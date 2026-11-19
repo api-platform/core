@@ -20,6 +20,9 @@ use ApiPlatform\State\OptionsInterface;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class GetCollection extends HttpOperation implements CollectionOperationInterface
 {
+    /**
+     * @param array<string|\SortDirection>|null $order
+     */
     public function __construct(
         ?string $uriTemplate = null,
         ?array $types = null,
@@ -41,9 +44,11 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?string $condition = null,
         ?string $controller = null,
         ?array $headers = null,
+        ?array $responseHeaders = null,
         ?array $cacheHeaders = null,
         ?array $paginationViaCursor = null,
         ?array $hydraContext = null,
+        ?array $jsonldContext = null,
         bool|OpenApiOperation|Webhook|null $openapi = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -90,6 +95,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?int $priority = null,
+        ?int $routePriority = null,
         ?string $name = null,
         $provider = null,
         $processor = null,
@@ -102,6 +108,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         protected ?bool $hideHydraOperation = null,
         ?bool $jsonStream = null,
         array $extraProperties = [],
+        ?bool $throwOnNotFound = null,
         private ?string $itemUriTemplate = null,
         ?bool $map = null,
     ) {
@@ -126,9 +133,11 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             condition: $condition,
             controller: $controller,
             headers: $headers,
+            responseHeaders: $responseHeaders,
             cacheHeaders: $cacheHeaders,
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,
+            jsonldContext: $jsonldContext,
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
@@ -174,11 +183,13 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
+            routePriority: $routePriority,
             name: $name,
             provider: $provider,
             processor: $processor,
             parameters: $parameters,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             rules: $rules,
             policy: $policy,

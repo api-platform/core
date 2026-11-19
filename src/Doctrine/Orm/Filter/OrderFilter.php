@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\PropertyPlaceholderOpenApiParameterTrait;
+use ApiPlatform\Doctrine\Orm\Util\BCHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -198,6 +199,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ *
+ * @deprecated since API Platform 4.4: use {@see SortFilter} instead. Removed in 6.0.
  */
 final class OrderFilter extends AbstractFilter implements OrderFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
@@ -276,10 +279,10 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface, 
             $nullRankHiddenField = \sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
 
             $queryBuilder->addSelect(\sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
-            $queryBuilder->addOrderBy($nullRankHiddenField, $nullsDirection);
+            $queryBuilder->addOrderBy($nullRankHiddenField, BCHelper::sortDirection($nullsDirection));
         }
 
-        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), $direction);
+        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), BCHelper::sortDirection($direction));
     }
 
     /**

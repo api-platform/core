@@ -99,7 +99,13 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 continue;
             }
 
-            $denormalizedFields[$this->denormalizePropertyName((string) $key, $resourceClass, $context)] = \is_array($value) ? $this->replaceIdKeys($value, $resourceClass, $context) : $value;
+            if (\is_array($value)) {
+                // Unwrap nested pagination structures so the attribute tree mirrors the resource shape.
+                $value = $value['edges']['node'] ?? $value['collection'] ?? $value;
+                $value = \is_array($value) ? $this->replaceIdKeys($value, $resourceClass, $context) : $value;
+            }
+
+            $denormalizedFields[$this->denormalizePropertyName((string) $key, $resourceClass, $context)] = $value;
         }
 
         return $denormalizedFields;

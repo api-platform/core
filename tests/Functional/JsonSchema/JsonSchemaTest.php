@@ -16,13 +16,15 @@ namespace ApiPlatform\Tests\Functional\JsonSchema;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
+use ApiPlatform\Test\ApiTestCase;
+use ApiPlatform\Test\Constraint\MatchesJsonSchema;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AggregateRating;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ChildAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8115\Module;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8115\ReadModuleResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
@@ -72,6 +74,7 @@ class JsonSchemaTest extends ApiTestCase
             ResourceWithIterableUnionProperty::class,
             ParentAttribute::class,
             ChildAttribute::class,
+            ReadModuleResource::class,
         ];
     }
 
@@ -135,6 +138,39 @@ class JsonSchemaTest extends ApiTestCase
         $schema = $this->schemaFactory->buildSchema(BrokenDocs::class, 'jsonld');
 
         $this->assertArrayHasKey('Related.jsonld-location.read_collection', $schema['definitions']);
+    }
+
+    public function testJsonApiIncludedReferencesNotExposedResource(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonapi', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products/{code}_get'));
+
+        $included = $schema['definitions'][$schema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertSame([['$ref' => '#/definitions/AggregateRating.jsonapi.resource']], $included['items']['anyOf']);
+        $this->assertArrayHasKey('AggregateRating.jsonapi', $schema['definitions']);
+    }
+
+    public function testJsonApiIncludedItemsAreResourceObjects(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonapi', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products/{code}_get'));
+        $definitions = $schema->getDefinitions();
+
+        $anyOf = $definitions[$schema->getRootDefinitionKey()]['properties']['included']['items']['anyOf'];
+        $this->assertNotEmpty($anyOf);
+
+        foreach ($anyOf as $entry) {
+            $resolved = $schema->getArrayCopy();
+            foreach (explode('/', substr($entry['$ref'], 2)) as $segment) {
+                $resolved = $resolved[$segment];
+            }
+
+            $this->assertArrayHasKey('id', $resolved['properties'], $entry['$ref']);
+            $this->assertArrayHasKey('type', $resolved['properties'], $entry['$ref']);
+            $this->assertArrayNotHasKey('data', $resolved['properties'], $entry['$ref']);
+
+            $documentName = substr($entry['$ref'], \strlen('#/definitions/'), -\strlen('.resource'));
+            $this->assertSame($entry['$ref'], $definitions[$documentName]['properties']['data']['$ref']);
+        }
     }
 
     public function testArraySchemaWithReference(): void
@@ -211,8 +247,8 @@ class JsonSchemaTest extends ApiTestCase
     public function testSchemaWithUnknownType(): void
     {
         $schema = $this->schemaFactory->buildSchema(Book::class, 'json', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/issue-5452/books{._format}_get_collection'));
-        $this->assertContains(['$ref' => '#/definitions/ActivableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
-        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/ActivableInterface'], $schema['definitions']['Book']['properties']['library']['allOf']);
+        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface'], $schema['definitions']['Book']['properties']['library']['allOf']);
     }
 
     public function testReadOnlySchema(): void
@@ -294,5 +330,17 @@ class JsonSchemaTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hiddenData', $childProperties);
         $this->assertArrayNotHasKey('id', $childProperties);
+    }
+
+    public function testSchemaGroupsForNonResourceOperationClass(): void
+    {
+        $operation = $this->operationMetadataFactory->create('issue8115_modules_get_collection');
+        $schema = $this->schemaFactory->buildSchema(Module::class, 'json', Schema::TYPE_OUTPUT, $operation);
+
+        $definitionName = array_key_first($schema['definitions']->getArrayCopy());
+        $properties = $schema['definitions'][$definitionName]['properties'];
+
+        $this->assertArrayHasKey('name', $properties);
+        $this->assertArrayNotHasKey('secret', $properties);
     }
 }

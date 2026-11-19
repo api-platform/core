@@ -23,6 +23,8 @@ use ApiPlatform\Symfony\Controller\MainController;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use GraphQL\GraphQL;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
@@ -94,19 +96,26 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
-                        ->booleanNode('query_parameter_validation')
-                            ->defaultValue(true)
-                            ->setDeprecated('api-platform/symfony', '4.2', 'Will be removed in API Platform 5.0.')
-                        ->end()
                     ->end()
                 ->end()
-                // TODO 4.4: deprecate use_iri_as_id defaulting to true
                 ->arrayNode('jsonapi')
                     ->addDefaultsIfNotSet()
                         ->children()
                         ->booleanNode('use_iri_as_id')
-                            ->defaultTrue()
-                            ->info('Set to false to use entity identifiers instead of IRIs as the "id" field in JSON:API responses.')
+                            ->defaultFalse()
+                            ->info('Set to true to use IRIs instead of entity identifiers as the "id" field in JSON:API responses. Defaults to false, which uses the entity identifier and exposes the IRI as "links.self".')
+                        ->end()
+                        ->booleanNode('allow_client_generated_id')
+                            ->defaultFalse()
+                            ->info('Allow client-generated IDs on JSON:API POST per https://jsonapi.org/format/#crud-creating-client-ids. Off by default to prevent id spoofing on public endpoints.')
+                        ->end()
+                        ->booleanNode('strict_resource_type')
+                            ->defaultFalse()
+                            ->info('Require the "type" member of JSON:API request resource objects (400 when missing) and reject a "type" that does not match the endpoint resource on POST, PUT and PATCH (409 Conflict), per https://jsonapi.org/format/#crud-creating-responses-409.')
+                        ->end()
+                        ->booleanNode('strict_member_names')
+                            ->defaultFalse()
+                            ->info('Expose the "id" and "type" properties as "resourceId" and "resourceType" attributes instead of "_id" and "_type", which are not valid member names per https://jsonapi.org/format/#document-member-names. The "links", "relationships" and "included" properties are no longer renamed.')
                         ->end()
                     ->end()
                 ->end()
@@ -127,13 +136,9 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_scalar')->defaultValue(class_exists(TwigBundle::class))->info('Enable Scalar API Reference')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
+                ->booleanNode('enable_head_request_optimization')->defaultTrue()->info('Skip response body construction on HEAD requests so collections are not iterated. Disable to process HEAD identically to GET.')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
                 ->booleanNode('enable_phpdoc_parser')->defaultTrue()->info('Enable resource metadata collector using PHPStan PhpDocParser.')->end()
-                ->booleanNode('enable_link_security')
-                    ->defaultTrue()
-                    ->info('Enable security for Links (sub resources).')
-                    ->setDeprecated('api-platform/symfony', '4.2', 'This option is always enabled and will be removed in API Platform 5.0.')
-                ->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -163,10 +168,6 @@ final class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
-                ->end()
-                ->arrayNode('resource_class_directories')
-                    ->prototype('scalar')->end()
-                    ->setDeprecated('api-platform/symfony', '4.1', 'The "resource_class_directories" configuration is deprecated, classes using #[ApiResource] attribute are autoconfigured by the dependency injection container.')
                 ->end()
                 ->arrayNode('serializer')
                     ->addDefaultsIfNotSet()
@@ -294,10 +295,6 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->integerNode('max_query_depth')->defaultValue(20)
                         ->end()
-                        ->arrayNode('graphql_playground')
-                            ->setDeprecated('api-platform/core', '4.0', 'The "graphql_playground" configuration is deprecated and will be ignored.')
-                            ->canBeEnabled()
-                        ->end()
                         ->integerNode('max_query_complexity')->defaultValue(500)
                         ->end()
                         ->scalarNode('nesting_separator')->defaultValue('_')->info('The separator to use to filter nested fields.')->end()
@@ -324,6 +321,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('persist_authorization')->defaultValue(false)->info('Persist the SwaggerUI Authorization in the localStorage.')->end()
+                        ->booleanNode('with_credentials')->defaultValue(false)->info('Send credentials (cookies, authorization headers) on Swagger UI cross-origin requests (e.g. when running behind Cloudflare Access).')->end()
                         ->arrayNode('versions')
                             ->info('The active versions of OpenAPI to be exported or used in Swagger UI. The first value is the default.')
                             ->defaultValue($supportedVersions)
@@ -407,12 +405,6 @@ final class Configuration implements ConfigurationInterface
                             ->info('Enable the tags-based cache invalidation system.')
                             ->canBeEnabled()
                             ->children()
-                                ->arrayNode('varnish_urls')
-                                    ->setDeprecated('api-platform/core', '3.0', 'The "varnish_urls" configuration is deprecated, use "urls" or "scoped_clients".')
-                                    ->defaultValue([])
-                                    ->prototype('scalar')->end()
-                                    ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
-                                ->end()
                                 ->arrayNode('urls')
                                     ->defaultValue([])
                                     ->prototype('scalar')->end()
@@ -438,16 +430,6 @@ final class Configuration implements ConfigurationInterface
                                 ->scalarNode('purger')
                                     ->defaultValue('api_platform.http_cache.purger.varnish')
                                     ->info('Specify a purger to use (available values: "api_platform.http_cache.purger.varnish.ban", "api_platform.http_cache.purger.varnish.xkey", "api_platform.http_cache.purger.souin").')
-                                ->end()
-                                ->arrayNode('xkey')
-                                    ->setDeprecated('api-platform/core', '3.0', 'The "xkey" configuration is deprecated, use your own purger to customize surrogate keys or the appropriate parameters.')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('glue')
-                                        ->defaultValue(' ')
-                                        ->info('xkey glue between keys')
-                                        ->end()
-                                    ->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -620,6 +602,8 @@ final class Configuration implements ConfigurationInterface
                         SerializerExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                         OptimisticLockException::class => Response::HTTP_CONFLICT,
+                        UniqueConstraintViolationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
+                        ForeignKeyConstraintViolationException::class => Response::HTTP_CONFLICT,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)
@@ -689,6 +673,17 @@ final class Configuration implements ConfigurationInterface
                 }
 
                 return $normalizedDefaults;
+            })
+            ->end()
+            ->validate()
+            ->always(static function (array $defaults): array {
+                foreach (['mcp', 'graph_ql_operations', 'state_options', 'links', 'openapi'] as $option) {
+                    if (null !== ($defaults[$option] ?? null) && ('openapi' !== $option || !\is_bool($defaults[$option]))) {
+                        throw new InvalidConfigurationException(\sprintf('The "defaults.%s" option is not supported, it needs objects. Set it on the resources instead.', $option));
+                    }
+                }
+
+                return $defaults;
             });
 
         $this->defineDefault($defaultsNode, new \ReflectionClass(ApiResource::class), $nameConverter);
@@ -700,8 +695,26 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('parameters')
                     ->info('Global parameters applied to all resources and operations.')
                     ->useAttributeAsKey('parameter_class')
+                    ->validate()
+                        ->always(static function (array $parameters): array {
+                            foreach ($parameters as $name => $parameter) {
+                                $class = $parameter['class'] ?? $name;
+                                if ((isset($parameter['class']) || str_contains((string) $name, '\\')) && !is_subclass_of($class, Parameter::class)) {
+                                    throw new InvalidConfigurationException(\sprintf('The default parameter "%s" must reference a class extending "%s", "%s" given.', $name, Parameter::class, $class));
+                                }
+                            }
+
+                            return $parameters;
+                        })
+                    ->end()
                     ->prototype('array')
-                        ->ignoreExtraKeys(false);
+                        ->ignoreExtraKeys(false)
+                        ->children()
+                            ->scalarNode('class')
+                                ->cannotBeEmpty()
+                                ->info('The parameter class for a named global parameter entry.')
+                            ->end()
+                        ->end();
 
         $this->defineDefault($parametersNode, new \ReflectionClass(Parameter::class), $nameConverter);
 

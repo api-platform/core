@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
 use ApiPlatform\GraphQl\State\Provider\NoopProvider;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -26,7 +27,6 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 
 class ResolverFactory implements ResolverFactoryInterface
@@ -49,32 +49,27 @@ class ResolverFactory implements ResolverFactoryInterface
 
                 // special treatment for nested resources without a resolver/provider
                 if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && (!$operation->getProvider() || NoopProvider::class === $operation->getProvider())) {
-                    return \is_array($body) ? $this->resolve(
-                        $source,
-                        $args,
-                        $info,
-                        $rootClass,
-                        $operation,
-                        new ArrayPaginator($body, 0, \count($body))
-                    ) : $body;
+                    if ($operation instanceof CollectionOperationInterface && \is_array($body)) {
+                        return $this->resolve(
+                            $source,
+                            $args,
+                            $info,
+                            $rootClass,
+                            $operation,
+                            new ArrayPaginator($body, 0, \count($body))
+                        );
+                    }
+
+                    return $body;
                 }
 
                 $propertyMetadata = $rootClass ? $propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
 
-                if (method_exists(PropertyInfoExtractor::class, 'getType')) {
-                    $type = $propertyMetadata?->getNativeType();
+                $type = $propertyMetadata?->getNativeType();
 
-                    // Data already fetched and normalized (field or nested resource)
-                    if ($body || null === $resourceClass || ($type && !$type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType))) {
-                        return $body;
-                    }
-                } else {
-                    $type = $propertyMetadata?->getBuiltinTypes()[0] ?? null;
-
-                    // Data already fetched and normalized (field or nested resource)
-                    if ($body || null === $resourceClass || ($type && !$type->isCollection())) {
-                        return $body;
-                    }
+                // Data already fetched and normalized (field or nested resource)
+                if ($body || null === $resourceClass || ($type && !$type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType))) {
+                    return $body;
                 }
             }
 

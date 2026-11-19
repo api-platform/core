@@ -24,9 +24,6 @@ trait DispatchTrait
 {
     private ?MessageBusInterface $messageBus;
 
-    /**
-     * @param object|Envelope $message
-     */
     private function dispatch(object $message): Envelope
     {
         if (!$this->messageBus instanceof MessageBusInterface) {

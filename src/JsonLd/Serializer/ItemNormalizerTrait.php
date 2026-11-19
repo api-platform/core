@@ -55,6 +55,10 @@ trait ItemNormalizerTrait
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        if (isset($data['@id']) && !\is_string($data['@id']) && (!isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]) || ($context['deep_object_to_populate'] ?? false))) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "@id" attribute must be "string", "%s" given.', \gettype($data['@id'])), $data['@id'], ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.@id' : '@id', true);
+        }
+
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE])) {
             if (true !== ($context['api_allow_update'] ?? true)) {
@@ -70,6 +74,9 @@ trait ItemNormalizerTrait
                     throw $e;
                 }
             }
+        } elseif (isset($data['@id']) && ($context['deep_object_to_populate'] ?? false)) {
+            // the object to populate is the relation currently linked to the parent, an explicit @id must replace it instead of mutating it in place
+            $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true], $context['operation'] ?? null);
         }
 
         return parent::denormalize($data, $type, $format, $context);

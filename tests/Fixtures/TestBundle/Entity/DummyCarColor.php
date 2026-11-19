@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource]
+#[ApiResource(parameters: ['prop' => new QueryParameter(filter: new ExactFilter())])]
 #[ORM\Entity]
 class DummyCarColor
 {
@@ -35,7 +35,6 @@ class DummyCarColor
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE', referencedColumnName: 'id_id')]
     #[Assert\NotBlank]
     private DummyCar $car;
-    #[ApiFilter(SearchFilter::class)]
     #[ORM\Column(nullable: false)]
     #[Assert\NotBlank]
     #[Groups(['colors'])]

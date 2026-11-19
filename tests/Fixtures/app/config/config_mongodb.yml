@@ -127,6 +127,12 @@ services:
         tags:
             - name: 'messenger.message_handler'
 
+    app.messenger_handler.rpc:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Document\RPCHandler'
+        public: false
+        tags:
+            - name: 'messenger.message_handler'
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
         arguments:
             $decorated: '@ApiPlatform\Doctrine\Odm\State\ItemProvider'

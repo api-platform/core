@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
         new Get(provider: Availability::class.'::getCase'),
     ],
     graphQlOperations: [
-        new Query(provider: Availability::class.'getCase'),
+        new Query(provider: Availability::class.'::getCase'),
     ]
 )]
 enum Availability: int

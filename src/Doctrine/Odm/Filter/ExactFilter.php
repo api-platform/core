@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\EmptyValueParameterTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
@@ -32,6 +33,7 @@ use Doctrine\ODM\MongoDB\Mapping\MappingException;
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use EmptyValueParameterTrait;
     use ManagerRegistryAwareTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
@@ -43,13 +45,22 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'];
+        $value = $parameter->getValue();
+
+        if (\is_array($value) && !array_is_list($value)) {
+            // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
+
+        if ($this->ignoreEmptyValue($parameter, $value)) {
+            return;
+        }
 
         if (null === $parameter->getProperty()) {
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
         $property = $parameter->getProperty();
-        $value = $parameter->getValue();
         $operator = $context['operator'] ?? 'addAnd';
         $match = $context['match'] = $context['match'] ??
             $aggregationBuilder
@@ -60,7 +71,7 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
         $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;

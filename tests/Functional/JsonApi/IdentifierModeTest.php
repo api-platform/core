@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiNotExposedRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiRelatedDummy;
@@ -45,7 +45,7 @@ class IdentifierModeTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 'id' => '10',
@@ -68,7 +68,7 @@ class IdentifierModeTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 [

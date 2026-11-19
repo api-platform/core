@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\State\Exception\ParameterNotSupportedException;
+use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
@@ -66,6 +69,86 @@ final class ParameterProviderTest extends TestCase
         $this->assertEquals(['a' => 'bar'], $operation->getParameters()->get('search[:property]', QueryParameter::class)->getValue());
         $this->assertEquals('t42', $operation->getParameters()->get('baz', QueryParameter::class)->getValue());
         $this->assertEquals(new ParameterNotFound(), $operation->getParameters()->get('fas', QueryParameter::class)->getValue());
+    }
+
+    public function testStrictQueryParameterValidationAllowsPaginationParameters(): void
+    {
+        $paginationOptions = new PaginationOptions(
+            paginationEnabled: true,
+            clientItemsPerPage: true,
+            paginationClientEnabled: true,
+            clientPartialPaginationEnabled: true,
+        );
+
+        $operation = new GetCollection(parameters: new Parameters(), strictQueryParameterValidation: true);
+        $parameterProvider = new ParameterProvider(null, null, $paginationOptions);
+        $request = new Request(server: ['QUERY_STRING' => 'page=2&itemsPerPage=10&pagination=false&partial=true']);
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $parameterProvider->provide($operation, [], $context);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testStrictQueryParameterValidationUsesRenamedPaginationParameters(): void
+    {
+        // Simulates a global rename, e.g. api_platform.collection.pagination.items_per_page_parameter_name: _limit
+        $paginationOptions = new PaginationOptions(
+            paginationEnabled: true,
+            paginationPageParameterName: '_page',
+            clientItemsPerPage: true,
+            itemsPerPageParameterName: '_limit',
+        );
+
+        $operation = new GetCollection(parameters: new Parameters(), strictQueryParameterValidation: true);
+        $parameterProvider = new ParameterProvider(null, null, $paginationOptions);
+        $request = new Request(server: ['QUERY_STRING' => '_page=2&_limit=10']);
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $parameterProvider->provide($operation, [], $context);
+        $this->addToAssertionCount(1);
+
+        // The default names must no longer be implicitly whitelisted once renamed.
+        $rejected = new ParameterProvider(null, null, $paginationOptions);
+        $request = new Request(server: ['QUERY_STRING' => 'itemsPerPage=10']);
+        $context = ['request' => $request, 'operation' => $operation];
+        $this->expectException(ParameterNotSupportedException::class);
+        $rejected->provide($operation, [], $context);
+    }
+
+    public function testStrictQueryParameterValidationStillRejectsUnknownParameters(): void
+    {
+        $paginationOptions = new PaginationOptions(paginationEnabled: true);
+        $operation = new GetCollection(parameters: new Parameters(), strictQueryParameterValidation: true);
+        $parameterProvider = new ParameterProvider(null, null, $paginationOptions);
+        $request = new Request(server: ['QUERY_STRING' => 'unknown=1']);
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $this->expectException(ParameterNotSupportedException::class);
+        $parameterProvider->provide($operation, [], $context);
+    }
+
+    public function testStrictQueryParameterValidationDoesNotWhitelistPaginationOnItemOperations(): void
+    {
+        $paginationOptions = new PaginationOptions(paginationEnabled: true);
+        $operation = new Get(parameters: new Parameters(), strictQueryParameterValidation: true);
+        $parameterProvider = new ParameterProvider(null, null, $paginationOptions);
+        $request = new Request(server: ['QUERY_STRING' => 'page=2']);
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $this->expectException(ParameterNotSupportedException::class);
+        $parameterProvider->provide($operation, [], $context);
+    }
+
+    public function testStrictQueryParameterValidationWithoutPaginationOptionsStillRejectsPagination(): void
+    {
+        $operation = new GetCollection(parameters: new Parameters(), strictQueryParameterValidation: true);
+        $parameterProvider = new ParameterProvider();
+        $request = new Request(server: ['QUERY_STRING' => 'page=2']);
+        $context = ['request' => $request, 'operation' => $operation];
+
+        $this->expectException(ParameterNotSupportedException::class);
+        $parameterProvider->provide($operation, [], $context);
     }
 
     public static function provide(): void

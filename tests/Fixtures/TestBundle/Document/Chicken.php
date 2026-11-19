@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Doctrine\Odm\Filter\ComparisonFilter;
+use ApiPlatform\Doctrine\Odm\Filter\EndSearchFilter;
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Odm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\WordStartSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -45,8 +48,35 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
                     filter: new PartialSearchFilter(true),
                     property: 'name',
                 ),
+                'nameEnd' => new QueryParameter(
+                    filter: new EndSearchFilter(false),
+                    property: 'name',
+                ),
+                'nameEndNoProperty' => new QueryParameter(filter: new EndSearchFilter()),
+                'nameEndSensitive' => new QueryParameter(
+                    filter: new EndSearchFilter(true),
+                    property: 'name',
+                ),
+                'nameStart' => new QueryParameter(
+                    filter: new StartSearchFilter(false),
+                    property: 'name',
+                ),
+                'nameStartNoProperty' => new QueryParameter(filter: new StartSearchFilter()),
+                'nameStartSensitive' => new QueryParameter(
+                    filter: new StartSearchFilter(true),
+                    property: 'name',
+                ),
+                'nameWordStart' => new QueryParameter(
+                    filter: new WordStartSearchFilter(false),
+                    property: 'name',
+                ),
+                'nameWordStartNoProperty' => new QueryParameter(filter: new WordStartSearchFilter()),
                 'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
                 'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
+                'qmixed' => new QueryParameter(filter: new FreeTextQueryFilter([
+                    'name' => new OrFilter(new PartialSearchFilter()),
+                    'ean' => new OrFilter(new ExactFilter()),
+                ]), description: 'Partial name match or exact ean match'),
                 'ownerNamePartial' => new QueryParameter(
                     filter: new PartialSearchFilter(),
                     property: 'owner.name',

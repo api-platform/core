@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -31,9 +31,9 @@ class IriModeTest extends ApiTestCase
         return [JsonApiDummy::class];
     }
 
-    public function testGetSingleResourceDefaultIriMode(): void
+    public function testGetSingleResourceIriMode(): void
     {
-        // Default mode (use_iri_as_id: true) — id is the IRI, no links.self
+        // use_iri_as_id: true, set by the shared test environment — id is the IRI, no links.self
         self::createClient()->request('GET', '/jsonapi_dummies/10', [
             'headers' => ['accept' => 'application/vnd.api+json'],
         ]);

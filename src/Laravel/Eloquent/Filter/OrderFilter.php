@@ -16,13 +16,14 @@ namespace ApiPlatform\Laravel\Eloquent\Filter;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\SortFilterInterface;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 
-final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface, SortFilterInterface
 {
     use QueryPropertyTrait;
 

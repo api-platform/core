@@ -17,7 +17,7 @@ final class Tag
 {
     use ExtensionTrait;
 
-    public function __construct(private string $name, private ?string $description = null, private ?string $externalDocs = null)
+    public function __construct(private string $name, private ?string $description = null, private ?string $externalDocs = null, private ?string $summary = null, private ?string $parent = null, private ?string $kind = null)
     {
     }
 
@@ -56,6 +56,45 @@ final class Tag
     {
         $clone = clone $this;
         $clone->externalDocs = $externalDocs;
+
+        return $clone;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function withSummary(string $summary): self
+    {
+        $clone = clone $this;
+        $clone->summary = $summary;
+
+        return $clone;
+    }
+
+    public function getParent(): ?string
+    {
+        return $this->parent;
+    }
+
+    public function withParent(string $parent): self
+    {
+        $clone = clone $this;
+        $clone->parent = $parent;
+
+        return $clone;
+    }
+
+    public function getKind(): ?string
+    {
+        return $this->kind;
+    }
+
+    public function withKind(string $kind): self
+    {
+        $clone = clone $this;
+        $clone->kind = $kind;
 
         return $clone;
     }

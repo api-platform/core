@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Authorization;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\LegacySecuredDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -48,7 +48,7 @@ final class LegacyDenyTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testStandardUserCannotCreate(): void

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\IsGrantedTestResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -48,6 +48,7 @@ final class IsGrantedTest extends ApiTestCase
 
         $client->request('GET', '/is_granted_tests/1');
         $this->assertResponseStatusCodeSame(403);
+        $this->assertJsonContains(['detail' => "Access Denied. The user doesn't have ROLE_ADMIN."]);
     }
 
     public function testGetIsGrantedAsAnonymous(): void

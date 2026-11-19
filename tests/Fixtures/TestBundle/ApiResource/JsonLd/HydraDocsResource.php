@@ -46,6 +46,9 @@ class HydraDocsResource
     #[Assert\NotBlank]
     public string $name = '';
 
+    #[ApiProperty(jsonldContext: ['hydra:title' => 'The label'])]
+    public string $label = '';
+
     public ?HydraDocsRelated $related = null;
 
     /** @var array<HydraDocsRelated> */

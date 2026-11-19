@@ -18,14 +18,13 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Item normalizer decorator that prevents {@see \ApiPlatform\Serializer\ItemNormalizer}
  * from taking over for the {@see DocumentNormalizer::FORMAT} format because of priorities.
- *
- * @experimental
  */
-final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, ResetInterface
 {
     public const FORMAT = 'elasticsearch';
 
@@ -97,5 +96,12 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         $this->decorated->setSerializer($serializer);
+    }
+
+    public function reset(): void
+    {
+        if ($this->decorated instanceof ResetInterface) {
+            $this->decorated->reset();
+        }
     }
 }

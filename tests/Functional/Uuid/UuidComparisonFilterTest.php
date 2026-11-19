@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Uuid;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid\SymfonyUuidDevice;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid\SymfonyUuidDeviceEndpoint;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -40,6 +40,24 @@ final class UuidComparisonFilterTest extends ApiTestCase
 
         if ($this->isMongoDB()) {
             $this->markTestSkipped('UuidFilter is ORM only.');
+        }
+    }
+
+    public function testOpenApiOperatorParametersUseScalarUuidSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $parameters = $response->toArray()['paths']['/symfony_uuid_devices']['get']['parameters'];
+        $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'idComparison['));
+        $this->assertCount(6, $comparisonParams);
+
+        foreach ($comparisonParams as $param) {
+            $expected = 'idComparison[between]' === $param['name'] ? ['type' => 'string'] : ['type' => 'string', 'format' => 'uuid'];
+            $this->assertSame($expected, $param['schema'], $param['name']);
+            $this->assertFalse($param['explode'], $param['name']);
         }
     }
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
@@ -31,6 +32,7 @@ use ApiPlatform\Symfony\EventListener\ReadListener;
 use ApiPlatform\Symfony\EventListener\RespondListener;
 use ApiPlatform\Symfony\EventListener\SerializeListener;
 use ApiPlatform\Symfony\EventListener\WriteListener;
+use ApiPlatform\Validator\DenormalizationViolationFactory;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -55,10 +57,14 @@ return static function (ContainerConfigurator $container) {
         ->arg(1, service('api_platform.serializer.context_builder'))
         ->arg('$logger', service('logger')->nullOnInvalid());
 
+    // Outermost decorator of the read chain (access checkers sit at 0) so parameters are
+    // resolved, and their values propagated to the uriVariables, before anything reads them.
     $services->set('api_platform.state_provider.parameter', ParameterProvider::class)
+        ->decorate('api_platform.state_provider.read', null, -10)
         ->args([
-            null,
+            service('api_platform.state_provider.parameter.inner'),
             tagged_locator('api_platform.parameter_provider', 'key'),
+            service('api_platform.pagination_options'),
         ]);
 
     $services->set('api_platform.listener.request.read', ReadListener::class)
@@ -66,16 +72,23 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_provider.read'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.uri_variables.converter'),
-            service('api_platform.state_provider.parameter')->nullOnInvalid(),
         ])
         ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 4]);
+
+    $services->set('api_platform.state.denormalization_violation_factory', DenormalizationViolationFactory::class)
+        ->args([
+            service('validator'),
+            service('translator')->nullOnInvalid(),
+        ]);
+
+    $services->alias(DenormalizationViolationFactoryInterface::class, 'api_platform.state.denormalization_violation_factory');
 
     $services->set('api_platform.state_provider.deserialize', DeserializeProvider::class)
         ->args([
             null,
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
-            service('translator')->nullOnInvalid(),
+            service('api_platform.state.denormalization_violation_factory')->nullOnInvalid(),
         ]);
 
     $services->set('api_platform.listener.request.deserialize', DeserializeListener::class)
@@ -90,6 +103,7 @@ return static function (ContainerConfigurator $container) {
             null,
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
+            '%api_platform.enable_head_request_optimization%',
         ]);
 
     $services->set('api_platform.state_processor.write', WriteProcessor::class)
@@ -104,6 +118,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.operation.metadata_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
+            tagged_locator('api_platform.parameter_provider', 'key'),
         ]);
 
     $services->set('api_platform.state_processor.add_link_header', AddLinkHeaderProcessor::class)
@@ -151,6 +166,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_processor.documentation.serialize.inner'),
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
+            '%api_platform.enable_head_request_optimization%',
         ]);
 
     $services->set('api_platform.state_processor.documentation.write', WriteProcessor::class)
@@ -184,7 +200,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.state_provider.documentation'),
             service('api_platform.state_processor.documentation'),
-            '%api_platform.docs_formats%',
+            '%api_platform.entrypoint_formats%',
         ]);
 
     $services->set('api_platform.action.documentation', DocumentationAction::class)

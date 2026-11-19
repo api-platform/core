@@ -15,6 +15,9 @@ namespace ApiPlatform\Mcp\JsonSchema;
 
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -32,6 +35,16 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
+        // A single-item MCP operation has no routed item URI (Mcp\Routing\IriConverter returns null),
+        // so the serializer omits `@id`: mirror that here so the advertised output schema doesn't require it.
+        if (Schema::TYPE_OUTPUT === $type
+            && ($operation instanceof McpTool || $operation instanceof McpResource)
+            && !$operation instanceof CollectionOperationInterface
+        ) {
+            $serializerContext ??= [];
+            $serializerContext['gen_id'] = false;
+        }
+
         $schema = $this->decorated->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
 
         $definitions = [];
@@ -116,7 +129,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             return self::resolveDeep($node, $definitions, $resolving);
         }
 
-        if (!isset($node['type'])) {
+        if (!isset($node['type']) && (isset($node['properties']) || isset($node['additionalProperties']) || isset($node['patternProperties']) || isset($node['required']))) {
             $node['type'] = 'object';
         }
 
@@ -129,22 +142,64 @@ final class SchemaFactory implements SchemaFactoryInterface
     private static function resolveDeep(array $node, array $definitions, array &$resolving): array
     {
         if (isset($node['items'])) {
-            $node['items'] = self::resolveNode(
+            $node['items'] = self::emptyAsObject(self::resolveNode(
                 $node['items'] instanceof \ArrayObject ? $node['items']->getArrayCopy() : $node['items'],
                 $definitions,
                 $resolving,
-            );
+            ));
         }
 
         if (isset($node['properties']) && \is_array($node['properties'])) {
             foreach ($node['properties'] as $propName => $propSchema) {
-                $node['properties'][$propName] = self::resolveNode(
+                $node['properties'][$propName] = self::emptyAsObject(self::resolveNode(
                     $propSchema instanceof \ArrayObject ? $propSchema->getArrayCopy() : $propSchema,
                     $definitions,
                     $resolving,
-                );
+                ));
             }
         }
+
+        foreach (['oneOf', 'anyOf'] as $combinator) {
+            if (isset($node[$combinator]) && \is_array($node[$combinator])) {
+                foreach ($node[$combinator] as $i => $member) {
+                    $node[$combinator][$i] = self::emptyAsObject(self::resolveNode(
+                        $member instanceof \ArrayObject ? $member->getArrayCopy() : $member,
+                        $definitions,
+                        $resolving,
+                    ));
+                }
+            }
+        }
+
+        return self::splitArrayType($node);
+    }
+
+    private static function emptyAsObject(array $node): array|\ArrayObject
+    {
+        return [] === $node ? new \ArrayObject() : $node;
+    }
+
+    /**
+     * Several MCP clients read `type` as a single string and either reject the tool or drop
+     * the constraint when it is expressed as an array (e.g. nullable types yield ["string","null"]).
+     * Rewrite an array `type` into `anyOf` branches, each carrying a single `type`, for wider
+     * client compatibility. Other keywords stay as siblings of the `anyOf`.
+     *
+     * @see https://github.com/api-platform/core/issues/8504
+     */
+    private static function splitArrayType(array $node): array
+    {
+        if (!isset($node['type']) || !\is_array($node['type'])) {
+            return $node;
+        }
+
+        $branches = [];
+        foreach ($node['type'] as $type) {
+            $branches[] = ['type' => $type];
+        }
+
+        unset($node['type']);
+        $node['anyOf'] = $branches;
 
         return $node;
     }

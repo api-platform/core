@@ -24,12 +24,6 @@ To run tests against MongoDB:
 
 ## Execution Guidelines
 
-### Behat (Functional)
-
-* **Progress Format:** ALWAYS use \--format=progress. Without this, output verbosity increases execution time from \~10m to \~30m.  
-* **Tags:** Filter efficiently: vendor/bin/behat \--tags=@pagination \--format=progress  
-* **Debugging:** Only drop \--format=progress if you need to debug a *single* scenario using \-vvv.
-
 ### PHPUnit
 
 * **Filtering:** Never run the full suite. Always filter by class or path.  

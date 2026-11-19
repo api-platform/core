@@ -17,7 +17,7 @@ final class Example
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $summary = null, private ?string $description = null, private mixed $value = null, private ?string $externalValue = null)
+    public function __construct(private ?string $summary = null, private ?string $description = null, private mixed $value = null, private ?string $externalValue = null, private mixed $dataValue = null, private ?string $serializedValue = null)
     {
     }
 
@@ -69,6 +69,32 @@ final class Example
     {
         $clone = clone $this;
         $clone->externalValue = $externalValue;
+
+        return $clone;
+    }
+
+    public function getDataValue(): mixed
+    {
+        return $this->dataValue;
+    }
+
+    public function withDataValue(mixed $dataValue): self
+    {
+        $clone = clone $this;
+        $clone->dataValue = $dataValue;
+
+        return $clone;
+    }
+
+    public function getSerializedValue(): ?string
+    {
+        return $this->serializedValue;
+    }
+
+    public function withSerializedValue(string $serializedValue): self
+    {
+        $clone = clone $this;
+        $clone->serializedValue = $serializedValue;
 
         return $clone;
     }

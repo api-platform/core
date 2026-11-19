@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\CustomOutputResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -35,7 +35,7 @@ final class InputOutputTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 'type' => 'CustomOutputDto',
@@ -54,7 +54,7 @@ final class InputOutputTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 ['type' => 'CustomOutputDto', 'attributes' => ['foo' => 'test', 'bar' => 1]],

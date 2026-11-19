@@ -22,6 +22,8 @@ use Psr\Container\ContainerInterface;
 
 final class ParameterValidationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    private const BOOLEAN_VALUES = ['true', 'false', '1', '0'];
+
     public function __construct(
         private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
         private readonly ?ContainerInterface $filterLocator = null,
@@ -145,7 +147,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         }
 
         if (isset($schema['type']) && 'boolean' === $schema['type']) {
-            $assertions[] = 'boolean';
+            $assertions[] = Rule::in(self::BOOLEAN_VALUES);
         }
 
         if (!$assertions) {

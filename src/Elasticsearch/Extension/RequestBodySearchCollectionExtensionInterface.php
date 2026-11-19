@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Operation;
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 interface RequestBodySearchCollectionExtensionInterface

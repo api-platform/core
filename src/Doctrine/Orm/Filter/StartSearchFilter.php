@@ -1,0 +1,88 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Doctrine\Orm\Filter;
+
+use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
+use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
+use ApiPlatform\Metadata\Operation;
+use Doctrine\ORM\QueryBuilder;
+
+/**
+ * Filters the collection by the beginning of a string property, using a `LIKE 'value%'` clause.
+ */
+final class StartSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
+{
+    use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
+    use NestedPropertyHelperTrait;
+    use OpenApiFilterTrait;
+    use ScalarValuesTrait;
+
+    public function __construct(private readonly bool $caseSensitive = false)
+    {
+    }
+
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    {
+        $parameter = $context['parameter'];
+
+        if (null === $parameter->getProperty()) {
+            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
+        }
+
+        $property = $parameter->getProperty();
+        $values = $parameter->getValue();
+
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
+        }
+
+        $alias = $queryBuilder->getRootAliases()[0];
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
+        $field = $alias.'.'.$property;
+
+        if (!is_iterable($values)) {
+            $parameterName = $queryNameGenerator->generateParameterName($property);
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
+
+            $likeExpression = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
+            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
+
+            return;
+        }
+
+        $likeExpressions = [];
+        foreach ($values as $val) {
+            $parameterName = $queryNameGenerator->generateParameterName($property);
+            $likeExpressions[] = $this->createLikeExpression($field, $parameterName, $this->caseSensitive);
+
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue($val));
+        }
+
+        $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(
+            $queryBuilder->expr()->orX(...$likeExpressions)
+        );
+    }
+
+    private function formatLikeValue(string $value): string
+    {
+        return $this->escapeLikeValue($value).'%';
+    }
+}

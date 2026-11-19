@@ -76,9 +76,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (!$this->isResourceClass($className)) {
+            $serializerContext ??= $operation ? $this->getSerializerContext($operation, $type) : [];
             $operation = null;
             $inputOrOutputClass = null;
-            $serializerContext ??= [];
         } else {
             $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
             $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
@@ -151,10 +151,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                                     'type' => 'object',
                                     'properties' => self::HREF_PROP,
                                 ],
+                                'item' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        'type' => 'object',
+                                        'properties' => self::HREF_PROP,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
-                    'required' => ['_links', '_embedded'],
+                    'required' => ['_links'],
                 ];
 
                 $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
@@ -181,7 +188,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                                             'type' => 'object',
                                             'properties' => self::HREF_PROP,
                                         ],
-                                        'previous' => [
+                                        'prev' => [
                                             'type' => 'object',
                                             'properties' => self::HREF_PROP,
                                         ],

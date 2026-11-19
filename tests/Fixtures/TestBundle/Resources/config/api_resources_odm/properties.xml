@@ -8,11 +8,7 @@
               readable="true" writable="false" identifier="true"/>
 
     <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment" name="comment"
-              description="Comment message" readable="true" writable="true">
-        <builtinTypes>
-            <builtinType>string</builtinType>
-        </builtinTypes>
-    </property>
+              description="Comment message" readable="true" writable="true"/>
 
     <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment" name="date"
               description="Comment creation date" readable="true" writable="true"/>

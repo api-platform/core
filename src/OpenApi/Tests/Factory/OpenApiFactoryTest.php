@@ -21,18 +21,22 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -54,6 +58,7 @@ use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use ApiPlatform\OpenApi\Model\SecurityScheme;
 use ApiPlatform\OpenApi\Model\Server;
+use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
@@ -529,7 +534,7 @@ class OpenApiFactoryTest extends TestCase
 
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceCollectionMetadataFactory,
@@ -954,6 +959,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -999,6 +1005,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1212,6 +1219,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1361,6 +1369,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
+                    'minimum' => 1,
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
@@ -1389,13 +1398,67 @@ class OpenApiFactoryTest extends TestCase
         $this->assertArrayNotHasKey('403', $diamondPutResponses);
     }
 
+    public function testOperationTagsAcceptTagObjects(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+
+        $candidateTag = new Tag(name: 'Candidate', description: 'Some description');
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            (new Get())->withUriTemplate('/dummies/{id}')->withOpenapi(new OpenApiOperation(tags: [$candidateTag]))->withShortName('Dummy')->withName('api_dummies_get')->withRouteName('api_dummies_get'),
+            (new GetCollection())->withUriTemplate('/dummies')->withOpenapi(new OpenApiOperation(tags: ['Plain', $candidateTag]))->withShortName('Dummy')->withName('api_dummies_get_collection')->withRouteName('api_dummies_get_collection'),
+        ]))->withClass(Dummy::class)->withDescription('Dummy description')]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => Dummy::class === $resourceClass ? $resourceCollectionMetadata : new ResourceMetadataCollection($resourceClass, []));
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+        $paths = $openApi->getPaths();
+
+        $this->assertSame(['Candidate'], $paths->getPath('/dummies/{id}')->getGet()->getTags());
+        $this->assertSame(['Plain', 'Candidate'], $paths->getPath('/dummies')->getGet()->getTags());
+
+        $tags = [];
+        foreach ($openApi->getTags() as $tag) {
+            $tags[$tag->getName()] = $tag->getDescription();
+        }
+        $this->assertSame(['Candidate' => 'Some description', 'Plain' => 'Dummy description'], $tags);
+    }
+
     public function testGetExtensionPropertiesWithFalseValue(): void
     {
         $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
             (new Get())->withOpenapi(true)->withShortName('Dummy')->withName('api_dummies_get_collection')->withRouteName('api_dummies_get_collection'),
@@ -1437,5 +1500,583 @@ class OpenApiFactoryTest extends TestCase
         );
 
         $openApi = $factory->__invoke();
+    }
+
+    public function testMetadataParameterInOpenApiOperationParametersThrows(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            (new GetCollection())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('api_dummies_get_collection')
+                ->withUriTemplate('/dummies')
+                ->withOpenapi(new Operation(parameters: [new QueryParameter(key: 'bar')])),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->expects($this->once())
+            ->method('create')
+            ->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(Parameter::class);
+
+        $factory->__invoke();
+    }
+
+    public function testForbiddenResponseForEverySecurityOption(): void
+    {
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+
+        $post = (new Post())->withClass(Dummy::class)->withShortName('Dummy')->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            'postDenormalize' => $post->withName('post_denormalize')->withUriTemplate('/post-denormalize')->withSecurityPostDenormalize('is_granted("ROLE_ADMIN")'),
+            'postValidation' => $post->withName('post_validation')->withUriTemplate('/post-validation')->withSecurityPostValidation('is_granted("ROLE_ADMIN")'),
+            'parameter' => $post->withName('parameter')->withUriTemplate('/parameter')->withParameters(['q' => new QueryParameter(key: 'q', security: 'is_granted("ROLE_ADMIN")')]),
+            'policy' => $post->withName('policy')->withUriTemplate('/policy')->withPolicy('create'),
+            'link' => $post->withName('link')->withUriTemplate('/link/{id}')->withUriVariables(['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], security: 'is_granted("ROLE_ADMIN")')]),
+            'noSecurity' => $post->withName('no_security')->withUriTemplate('/no-security'),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $paths = $factory->__invoke()->getPaths();
+
+        $this->assertArrayHasKey('403', $paths->getPath('/post-denormalize')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/post-validation')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/parameter')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/policy')->getPost()->getResponses());
+        $this->assertArrayHasKey('403', $paths->getPath('/link/{id}')->getPost()->getResponses());
+        $this->assertArrayNotHasKey('403', $paths->getPath('/no-security')->getPost()->getResponses());
+    }
+
+    public function testStringFilterWithUserDescriptionOverridesFilterDescription(): void
+    {
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f1', true]]);
+        $filterLocator->method('get')->willReturnMap([['f1', new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string', 'required' => true, 'strategy' => 'exact'],
+        ])]]);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f1', description: 'User description wins')],
+            $filterLocator,
+        );
+
+        $this->assertSame('User description wins', $this->getParameterByName($parameters, 'name')->getDescription());
+    }
+
+    public function testStringFilterWithUserOpenApiOverridesFilterOpenApi(): void
+    {
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f2', true]]);
+        $filterLocator->method('get')->willReturnMap([['f2', new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+        ])]]);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f2', openApi: new Parameter(name: 'name', in: 'query', description: 'User OpenApi description', deprecated: true, example: 'foo'))],
+            $filterLocator,
+        );
+
+        $parameter = $this->getParameterByName($parameters, 'name');
+        $this->assertSame('User OpenApi description', $parameter->getDescription());
+        $this->assertTrue($parameter->getDeprecated());
+        $this->assertSame('foo', $parameter->getExample());
+        $this->assertSame(['type' => 'string'], $parameter->getSchema());
+    }
+
+    public function testStringFilterNotImplementingFilterInterfaceIsSkipped(): void
+    {
+        $filter = new class implements OpenApiParameterFilterInterface {
+            public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+            {
+                return null;
+            }
+        };
+
+        $filterLocator = $this->createMock(ContainerInterface::class);
+        $filterLocator->expects($this->atLeastOnce())->method('has')->with('f3notfilterinterface')->willReturn(true);
+        $filterLocator->expects($this->atLeastOnce())->method('get')->with('f3notfilterinterface')->willReturn($filter);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f3notfilterinterface', openApi: new Parameter(name: 'name', in: 'query', description: 'From user openApi'))],
+            $filterLocator,
+        );
+
+        $this->assertSame('From user openApi', $this->getParameterByName($parameters, 'name')->getDescription());
+    }
+
+    public function testFilterInstanceWithUserMetadataStillHonoured(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'foo' => new QueryParameter(
+                filter: new DummyFilter(['foo' => ['property' => 'foo', 'type' => 'string']]),
+                description: 'Instance filter description',
+                openApi: new Parameter(name: 'foo', in: 'query', description: 'Instance filter openapi override'),
+            ),
+        ], null);
+
+        $this->assertSame('Instance filter openapi override', $this->getParameterByName($parameters, 'foo')->getDescription());
+    }
+
+    public function testStringFilterFanOutOnlyOverridesTheMatchingGeneratedParameter(): void
+    {
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f4fanout', true]]);
+        $filterLocator->method('get')->willReturnMap([['f4fanout', new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+            'description' => ['property' => 'description', 'type' => 'string'],
+        ])]]);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['order[name]' => new QueryParameter(filter: 'f4fanout', property: 'name', description: 'Fan-out matched description')],
+            $filterLocator,
+        );
+
+        $this->assertSame('Fan-out matched description', $this->getParameterByName($parameters, 'order[name]')->getDescription());
+        $this->assertSame('', $this->getParameterByName($parameters, 'description')->getDescription());
+    }
+
+    public function testStringFilterWithoutUserMetadataIsUnchanged(): void
+    {
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f5nometa', true]]);
+        $filterLocator->method('get')->willReturnMap([['f5nometa', new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+        ])]]);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['name' => new QueryParameter(filter: 'f5nometa')],
+            $filterLocator,
+        );
+
+        $parameter = $this->getParameterByName($parameters, 'name');
+        $this->assertSame('', $parameter->getDescription());
+        $this->assertSame(['type' => 'string'], $parameter->getSchema());
+    }
+
+    /**
+     * Fan-out with no name match: a generic, non property-templated QueryParameter cannot be matched to any of the
+     * filter's generated parameter names, so its user metadata is silently ignored. See OpenApiFactoryTest report.
+     */
+    public function testStringFilterFanOutWithNoMatchLeavesGeneratedParametersUntouched(): void
+    {
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturnMap([['f6nomatch', true]]);
+        $filterLocator->method('get')->willReturnMap([['f6nomatch', new DummyFilter([
+            'name' => ['property' => 'name', 'type' => 'string'],
+            'description' => ['property' => 'description', 'type' => 'string'],
+        ])]]);
+
+        $parameters = $this->getGeneratedQueryParameters(
+            ['search' => new QueryParameter(filter: 'f6nomatch', description: 'Should NOT apply, no matching name')],
+            $filterLocator,
+        );
+
+        $this->assertSame('', $this->getParameterByName($parameters, 'name')->getDescription());
+        $this->assertSame('', $this->getParameterByName($parameters, 'description')->getDescription());
+    }
+
+    public function testFilterlessArrayQueryParameterHonoursCastToArray(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $arraySchema = ['type' => 'array', 'items' => ['type' => 'string']];
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            'castTrue' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('cast_true')
+                ->withUriTemplate('/cast-true')
+                ->withParameters(['ids' => new QueryParameter(key: 'ids', schema: $arraySchema, castToArray: true)]),
+            'castFalse' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('cast_false')
+                ->withUriTemplate('/cast-false')
+                ->withParameters(['ids' => new QueryParameter(key: 'ids', schema: $arraySchema, castToArray: false)]),
+            'castNull' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('cast_null')
+                ->withUriTemplate('/cast-null')
+                ->withParameters(['ids' => new QueryParameter(key: 'ids', schema: $arraySchema)]),
+            'scalarQuery' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('scalar_query')
+                ->withUriTemplate('/scalar-query')
+                ->withParameters(['name' => new QueryParameter(key: 'name', schema: ['type' => 'string'])]),
+            'arrayHeader' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('array_header')
+                ->withUriTemplate('/array-header')
+                ->withParameters(['ids' => new HeaderParameter(key: 'ids', schema: $arraySchema)]),
+            'linkParameterGuard' => (new GetCollection(paginationEnabled: false))
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('link_parameter_guard')
+                ->withUriTemplate('/link-parameter-guard')
+                ->withParameters(['foobar' => new QueryParameter(key: 'foobar', schema: $arraySchema, openApi: [
+                    new Parameter(name: 'foobar', in: 'query', schema: $arraySchema),
+                    new Parameter(name: 'foobar[]', in: 'query', style: 'deepObject', explode: true, schema: $arraySchema),
+                ])]),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        $castTrueParameters = $openApi->getPaths()->getPath('/cast-true')->getGet()->getParameters();
+        $this->assertCount(1, $castTrueParameters);
+        $this->assertSame('ids[]', $castTrueParameters[0]->getName());
+        $this->assertTrue($castTrueParameters[0]->canExplode());
+        $this->assertSame('form', $castTrueParameters[0]->getStyle());
+        $this->assertSame($arraySchema, $castTrueParameters[0]->getSchema());
+
+        $castFalseParameters = $openApi->getPaths()->getPath('/cast-false')->getGet()->getParameters();
+        $this->assertCount(1, $castFalseParameters);
+        $this->assertSame('ids', $castFalseParameters[0]->getName());
+        $this->assertSame($arraySchema, $castFalseParameters[0]->getSchema());
+
+        $castNullParameters = $openApi->getPaths()->getPath('/cast-null')->getGet()->getParameters();
+        $this->assertCount(1, $castNullParameters);
+        $this->assertSame('ids[]', $castNullParameters[0]->getName());
+        $this->assertTrue($castNullParameters[0]->canExplode());
+        $this->assertSame('form', $castNullParameters[0]->getStyle());
+        $this->assertSame($arraySchema, $castNullParameters[0]->getSchema());
+
+        $scalarQueryParameters = $openApi->getPaths()->getPath('/scalar-query')->getGet()->getParameters();
+        $this->assertCount(1, $scalarQueryParameters);
+        $this->assertSame('name', $scalarQueryParameters[0]->getName());
+        $this->assertSame(['type' => 'string'], $scalarQueryParameters[0]->getSchema());
+
+        $arrayHeaderParameters = $openApi->getPaths()->getPath('/array-header')->getGet()->getParameters();
+        $this->assertCount(1, $arrayHeaderParameters);
+        $this->assertSame('ids', $arrayHeaderParameters[0]->getName());
+        $this->assertSame('header', $arrayHeaderParameters[0]->getIn());
+        $this->assertSame($arraySchema, $arrayHeaderParameters[0]->getSchema());
+
+        $linkParameterGuardParameters = $openApi->getPaths()->getPath('/link-parameter-guard')->getGet()->getParameters();
+        $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar' === $parameter->getName()));
+        $this->assertCount(1, array_filter($linkParameterGuardParameters, static fn (Parameter $parameter): bool => 'foobar[]' === $parameter->getName()));
+    }
+
+    public function testPageParameterHasAMinimum(): void
+    {
+        $page = $this->getParameterByName($this->getGeneratedQueryParameters([], null), 'page');
+
+        $this->assertSame(['type' => 'integer', 'default' => 1, 'minimum' => 1], $page->getSchema());
+    }
+
+    public function testFilterlessArrayQueryParameterWithBracketKeyIsNotSuffixedTwice(): void
+    {
+        $arraySchema = ['type' => 'array', 'items' => ['type' => 'string']];
+
+        foreach ([null, true, false] as $castToArray) {
+            $parameters = $this->getGeneratedQueryParameters(
+                ['status[]' => new QueryParameter(key: 'status[]', schema: $arraySchema, castToArray: $castToArray)],
+                null,
+            );
+
+            $statusParameters = array_values(array_filter($parameters, static fn (Parameter $parameter): bool => str_starts_with($parameter->getName(), 'status')));
+
+            $this->assertCount(1, $statusParameters, \sprintf('castToArray: %s', var_export($castToArray, true)));
+            $this->assertSame('status[]', $statusParameters[0]->getName());
+            $this->assertSame($arraySchema, $statusParameters[0]->getSchema());
+            $this->assertCount(0, array_filter($parameters, static fn (Parameter $parameter): bool => 'status[][]' === $parameter->getName()));
+        }
+    }
+
+    public function testQueryParameterDefaultIsDocumented(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'itemsCount' => new QueryParameter(key: 'itemsCount', schema: ['type' => 'integer'], default: 10),
+            'sort' => new QueryParameter(key: 'sort', default: 'asc'),
+        ], null);
+
+        $this->assertSame(['type' => 'integer', 'default' => 10], $this->getParameterByName($parameters, 'itemsCount')->getSchema());
+        $this->assertSame(['type' => 'string', 'default' => 'asc'], $this->getParameterByName($parameters, 'sort')->getSchema());
+    }
+
+    public function testHeaderParameterDefaultIsDocumented(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'X-Items-Count' => new HeaderParameter(key: 'X-Items-Count', schema: ['type' => 'integer'], default: 10),
+        ], null);
+
+        $parameter = $this->getParameterByName($parameters, 'X-Items-Count');
+        $this->assertSame('header', $parameter->getIn());
+        $this->assertSame(['type' => 'integer', 'default' => 10], $parameter->getSchema());
+    }
+
+    public function testParameterSchemaDefaultIsKept(): void
+    {
+        $parameters = $this->getGeneratedQueryParameters([
+            'itemsCount' => new QueryParameter(key: 'itemsCount', schema: ['type' => 'integer', 'default' => 5], default: 10),
+        ], null);
+
+        $this->assertSame(['type' => 'integer', 'default' => 5], $this->getParameterByName($parameters, 'itemsCount')->getSchema());
+    }
+
+    public function testDeleteOperationWithDeserializeDocumentsRequestBody(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            'deleteWithBody' => (new Delete())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('delete_with_body')
+                ->withUriTemplate('/dummies/{id}')
+                ->withInputFormats(self::OPERATION_FORMATS['input_formats'])
+                ->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
+                ->withInput(['class' => OutputDto::class])
+                ->withDeserialize(true),
+            'deletePlain' => (new Delete())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('delete_plain')
+                ->withUriTemplate('/dummies/{id}/plain')
+                ->withInputFormats(self::OPERATION_FORMATS['input_formats'])
+                ->withOutputFormats(self::OPERATION_FORMATS['output_formats']),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        $deleteWithBody = $openApi->getPaths()->getPath('/dummies/{id}')->getDelete();
+        $this->assertNotNull($deleteWithBody->getRequestBody());
+        $content = $deleteWithBody->getRequestBody()->getContent();
+        $schema = $content['application/ld+json']->getSchema();
+        $this->assertNotEmpty($schema);
+        $this->assertArrayHasKey('$ref', (array) $schema);
+        $this->assertStringContainsString('OutputDto', $schema['$ref']);
+
+        $deletePlain = $openApi->getPaths()->getPath('/dummies/{id}/plain')->getDelete();
+        $this->assertNull($deletePlain->getRequestBody());
+
+        $plainOperation = $resourceCollectionMetadata->getOperation('delete_plain');
+        $plainInputSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_INPUT, $plainOperation);
+        $this->assertArrayNotHasKey('$ref', $plainInputSchema->getArrayCopy(false));
+        $this->assertCount(0, $plainInputSchema->getDefinitions());
+    }
+
+    /**
+     * @param Parameter[] $parameters
+     */
+    private function getParameterByName(array $parameters, string $name): Parameter
+    {
+        foreach ($parameters as $parameter) {
+            if ($parameter->getName() === $name) {
+                return $parameter;
+            }
+        }
+
+        $this->fail(\sprintf('No OpenAPI parameter named "%s" was generated.', $name));
+    }
+
+    /**
+     * @param array<string, MetadataParameter> $parameters
+     *
+     * @return Parameter[]
+     */
+    private function getGeneratedQueryParameters(array $parameters, ?ContainerInterface $filterLocator): array
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            (new GetCollection())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('api_dummies_get_collection')
+                ->withUriTemplate('/dummies')
+                ->withParameters($parameters),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->expects($this->once())
+            ->method('create')
+            ->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $filterLocator,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+
+        return $openApi->getPaths()->getPath('/dummies')->getGet()->getParameters() ?? [];
     }
 }

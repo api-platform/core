@@ -30,7 +30,6 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -221,16 +220,6 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
         return $enumType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection(LegacyType $type): bool
-    {
-        trigger_deprecation('api-platform/graphql', '4.2', 'The "%s()" method is deprecated and will be removed.', __METHOD__, self::class);
-
-        return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
-    }
-
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
     {
         $namedType = GraphQLType::getNamedType($resourceType);
@@ -329,7 +318,8 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
+                    $queryOperation = $this->getQueryOperation($resourceMetadataCollection);
+                    $queryNormalizationContext = $queryOperation?->getNormalizationContext() ?? [];
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
@@ -339,6 +329,12 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
                     // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
                     // If not, use the query type in order to ensure the client cache could be used.
                     $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
+
+                    // The query type can only be reused when both operations produce the same output class.
+                    // A mutation declaring its own output class must expose that class on its payload.
+                    if (!$useWrappedType && ($operation->getOutput()['class'] ?? null) !== ($queryOperation?->getOutput()['class'] ?? null)) {
+                        $useWrappedType = true;
+                    }
 
                     $wrappedOperationName = $operationName;
 

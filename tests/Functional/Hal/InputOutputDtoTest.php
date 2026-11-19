@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Hal;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\CustomOutputResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -34,7 +34,7 @@ final class InputOutputDtoTest extends ApiTestCase
             'headers' => ['Accept' => 'application/hal+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('test', $body['foo']);
         $this->assertSame(1, $body['bar']);

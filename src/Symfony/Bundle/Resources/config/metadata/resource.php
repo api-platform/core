@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFac
 use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
+use ApiPlatform\Symfony\Metadata\Resource\Factory\ContainerParameterResourceMetadataCollectionFactory;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -66,14 +67,6 @@ return function (ContainerConfigurator $container) {
             '%api_platform.defaults%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', MutatorResourceMetadataCollectionFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
-        ->args([
-            service('api_platform.metadata.mutator_collection.resource'),
-            service('api_platform.metadata.mutator_collection.operation'),
-            service('api_platform.metadata.resource.metadata_collection_factory.mutator.inner'),
-        ]);
-
     $services->set('api_platform.metadata.resource.metadata_collection_factory.concerns', ConcernsResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
         ->args([
@@ -81,6 +74,13 @@ return function (ContainerConfigurator $container) {
             service('logger')->nullOnInvalid(),
             '%api_platform.defaults%',
             '%api_platform.graphql.enabled%',
+        ]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.container_parameter', ContainerParameterResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 900)
+        ->args([
+            service('service_container'),
+            service('api_platform.metadata.resource.metadata_collection_factory.container_parameter.inner'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation', NotExposedOperationResourceMetadataCollectionFactory::class)
@@ -115,6 +115,14 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.link_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory.link.inner'),
             '%api_platform.graphql.enabled%',
+        ]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', MutatorResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 400)
+        ->args([
+            service('api_platform.metadata.mutator_collection.resource'),
+            service('api_platform.metadata.mutator_collection.operation'),
+            service('api_platform.metadata.resource.metadata_collection_factory.mutator.inner'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.operation_name', OperationNameResourceMetadataCollectionFactory::class)

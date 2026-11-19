@@ -115,12 +115,6 @@ final class ValidateProvider implements ProviderInterface
             return $v;
         }
 
-        // hopefully this path never gets used, its there for BC-layer only
-        // TODO: remove in 5.0
-        if ($s = json_encode($body)) {
-            return json_decode($s, true);
-        }
-
         throw new RuntimeException('Could not transform the denormalized body in an array for validation');
     }
 }

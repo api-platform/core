@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\EmptyValueParameterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -28,6 +29,7 @@ use Doctrine\ORM\QueryBuilder;
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use EmptyValueParameterTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -35,6 +37,15 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
     {
         $parameter = $context['parameter'];
         $value = $parameter->getValue();
+
+        // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+        if (\is_array($value) && !array_is_list($value)) {
+            return;
+        }
+
+        if ($this->ignoreEmptyValue($parameter, $value)) {
+            return;
+        }
 
         if (null === $parameter->getProperty()) {
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
@@ -44,7 +55,25 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $alias = $queryBuilder->getRootAliases()[0];
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
+
+        if (ComparisonFilter::OPERATOR_BETWEEN === ($context['operator'] ?? null)) {
+            $whereClause = $context['whereClause'] ?? 'andWhere';
+
+            // equal bounds collapse to an equality so the optimizer skips the range scan
+            if ($value[0] === $value[1]) {
+                $queryBuilder->{$whereClause}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName))
+                    ->setParameter($parameterName, $value[0]);
+
+                return;
+            }
+
+            $queryBuilder->{$whereClause}(\sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $property, $parameterName))
+                ->setParameter($parameterName.'_1', $value[0])
+                ->setParameter($parameterName.'_2', $value[1]);
+
+            return;
+        }
 
         if (\is_array($value)) {
             $queryBuilder

@@ -29,12 +29,20 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\AI\McpBundle\McpBundle;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand as FrameworkTranslationExtractCommand;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -117,12 +125,20 @@ class ApiPlatformExtensionTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->container = $this->createContainer([
+            'DoctrineBundle' => DoctrineBundle::class,
+            'SecurityBundle' => SecurityBundle::class,
+            'TwigBundle' => TwigBundle::class,
+        ]);
+    }
+
+    /**
+     * @param array<string, class-string> $bundles
+     */
+    private function createContainer(array $bundles): ContainerBuilder
+    {
         $containerParameterBag = new ParameterBag([
-            'kernel.bundles' => [
-                'DoctrineBundle' => DoctrineBundle::class,
-                'SecurityBundle' => SecurityBundle::class,
-                'TwigBundle' => TwigBundle::class,
-            ],
+            'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => [
                 'TestBundle' => [
                     'parent' => null,
@@ -135,7 +151,7 @@ class ApiPlatformExtensionTest extends TestCase
             'kernel.environment' => 'test',
         ]);
 
-        $this->container = new ContainerBuilder($containerParameterBag);
+        return new ContainerBuilder($containerParameterBag);
     }
 
     private function assertContainerHas(array $services, array $aliases = []): void
@@ -173,6 +189,24 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testObjectMapperGateDoesNotAutoloadTranslationCommands(): void
+    {
+        spl_autoload_register(static function (string $class): void {
+            if ('Symfony\\Component\\Translation\\Command\\TranslationExtractCommand' === $class || FrameworkTranslationExtractCommand::class === $class) {
+                throw new \Error(\sprintf('Class "%s" must not be autoloaded.', $class));
+            }
+        }, true, true);
+
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        self::assertSame(
+            class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle']),
+            $this->container->hasDefinition('api_platform.object_mapper.metadata_factory')
+        );
+    }
+
     public function testCommonConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
@@ -190,6 +224,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.path_segment_name_generator.dash',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.metadata.inflector',
+            'api_platform.property_info',
             'api_platform.resource_class_resolver',
             'api_platform.route_loader',
             'api_platform.router',
@@ -231,7 +266,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.iri_converter',
             'api_platform.path_segment_name_generator',
             'api_platform.property_accessor',
-            'api_platform.property_info',
             'api_platform.serializer',
             'api_platform.inflector',
         ];
@@ -240,6 +274,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertServiceHasTags('api_platform.cache.route_name_resolver', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.symfony.iri_converter.skolem', ['kernel.reset']);
         $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
@@ -261,6 +296,21 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($services as $service) {
             $this->assertNotContainerHasService($service);
         }
+
+        $this->assertTrue($this->container->hasParameter('api_platform.enable_head_request_optimization'));
+        $this->assertTrue($this->container->getParameter('api_platform.enable_head_request_optimization'));
+    }
+
+    public function testUpgradeFilterCommandIsRegisteredWhenPhpParserAndDoctrineCommonAreAvailable(): void
+    {
+        (new ApiPlatformExtension())->load(self::DEFAULT_CONFIG, $this->container);
+
+        $this->assertContainerHas([
+            'api_platform.upgrade.filter_mapper',
+            'api_platform.upgrade.filter_resolver',
+            'api_platform.upgrade.filter_command',
+        ]);
+        $this->assertServiceHasTags('api_platform.upgrade.filter_command', ['console.command']);
     }
 
     public function testSwaggerUiDisabledConfiguration(): void
@@ -299,6 +349,19 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $this->assertContainerHas($services);
+    }
+
+    public function testOpenApiNameConverterDoesNotDependOnMissingSymfonyParent(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = true;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $definition = $this->container->getDefinition('api_platform.openapi.name_converter');
+
+        $this->assertNotInstanceOf(ChildDefinition::class, $definition, 'The OpenAPI name converter must not depend on Symfony\'s "serializer.name_converter.metadata_aware.abstract" parent, which does not exist when no name converter is configured.');
+        $this->assertSame(MetadataAwareNameConverter::class, $definition->getClass());
     }
 
     public function testReDocEnabledWithSwaggerUiDisabledConfiguration(): void
@@ -353,6 +416,73 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHas($services, $aliases);
         $this->container->hasParameter('api_platform.swagger.http_auth');
+    }
+
+    public function testMcpProviderChainIsSecuredAndValidatedWithSecurityBundle(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('symfony/mcp-bundle is not installed.');
+        }
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['use_symfony_listeners'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.mcp.handler');
+
+        foreach ([
+            'api_platform.mcp.state_provider.access_checker',
+            'api_platform.mcp.state_provider.access_checker.pre_read',
+            'api_platform.mcp.state_provider.access_checker.post_deserialize',
+            'api_platform.mcp.state_provider.access_checker.post_validate',
+            'api_platform.mcp.state_provider.security_parameter',
+            'api_platform.mcp.state_provider.validate',
+            'api_platform.mcp.state_provider.parameter_validator',
+        ] as $service) {
+            $this->assertContainerHasService($service);
+        }
+    }
+
+    public function testMcpProviderChainIsNotSecuredWithoutSecurityBundle(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('symfony/mcp-bundle is not installed.');
+        }
+
+        $this->container = $this->createContainer([
+            'DoctrineBundle' => DoctrineBundle::class,
+            'TwigBundle' => TwigBundle::class,
+        ]);
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['use_symfony_listeners'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.mcp.handler');
+        $this->assertNotContainerHasService('api_platform.state_provider.access_checker');
+
+        foreach ([
+            'api_platform.mcp.state_provider.access_checker',
+            'api_platform.mcp.state_provider.access_checker.pre_read',
+            'api_platform.mcp.state_provider.access_checker.post_deserialize',
+            'api_platform.mcp.state_provider.access_checker.post_validate',
+            'api_platform.mcp.state_provider.security_parameter',
+        ] as $service) {
+            $this->assertNotContainerHasService($service);
+        }
+
+        $this->assertContainerHasService('api_platform.mcp.state_provider.validate');
+        $this->assertContainerHasService('api_platform.mcp.state_provider.parameter_validator');
+    }
+
+    public function testMercurePublisherIsReset(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['mercure']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('kernel.reset'));
     }
 
     public function testItRegistersMetadataConfiguration(): void
@@ -411,5 +541,106 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
         $this->assertSame(30, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8201
+     */
+    public function testPropertyInfoExtractorsDoNotLeakIntoFrameworkPropertyInfo(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $services = ['api_platform.property_info.reflection_extractor'];
+        if (class_exists(\phpDocumentor\Reflection\DocBlockFactory::class)) {
+            $services[] = 'api_platform.property_info.php_doc_extractor';
+        }
+        if (class_exists(\PHPStan\PhpDocParser\Parser\PhpDocParser::class) && class_exists(\phpDocumentor\Reflection\Types\ContextFactory::class)) {
+            $services[] = 'api_platform.property_info.phpstan_extractor';
+        }
+
+        foreach ($services as $service) {
+            $this->assertContainerHasService($service);
+            $tags = $this->container->getDefinition($service)->getTags();
+            foreach ($tags as $name => $_) {
+                $this->assertStringStartsNotWith('property_info.', $name, \sprintf('Service "%s" must not use the global "property_info.*" tag namespace (leaks into Symfony\'s property_info and breaks the validator chain — issue #8201). Found tag "%s".', $service, $name));
+            }
+        }
+
+        $apiPlatformPropertyInfo = $this->container->getDefinition('api_platform.property_info');
+        foreach ($apiPlatformPropertyInfo->getArguments() as $arg) {
+            if ($arg instanceof \Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument) {
+                $this->assertStringStartsWith('api_platform.property_info.', $arg->getTag(), \sprintf('api_platform.property_info must consume only "api_platform.property_info.*" private tags; found "%s".', $arg->getTag()));
+            }
+        }
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8332
+     */
+    public function testCachePoolClearerClearsPropertyInfoAndOperationMetadataCaches(): void
+    {
+        $this->container->setParameter('kernel.debug', true);
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.cache_warmer.cache_pool_clearer');
+        $pools = $this->container->getDefinition('api_platform.cache_warmer.cache_pool_clearer')->getArgument(1);
+        $this->assertContains('cache.property_info', $pools);
+        $this->assertContains('api_platform.cache.metadata.operation', $pools);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8095
+     */
+    public function testHttpCachePurgersRegisteredWhenInvalidationDisabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = false;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.ban');
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.xkey');
+        $this->assertContainerHasService('api_platform.http_cache.purger.souin');
+        $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
+
+        $this->assertNotContainerHasService('api_platform.doctrine.listener.http_cache.purge');
+        $this->assertNotContainerHasService('api_platform.http_cache_purger.processor.add_tags');
+        $this->assertFalse($this->container->hasAlias('api_platform.http_cache.purger'));
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8095
+     */
+    public function testHttpCachePurgersAndListenerRegisteredWhenInvalidationEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.ban');
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.xkey');
+        $this->assertContainerHasService('api_platform.http_cache.purger.souin');
+        $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
+
+        $this->assertContainerHasService('api_platform.doctrine.listener.http_cache.purge');
+        $this->assertContainerHasService('api_platform.http_cache_purger.processor.add_tags');
+        $this->assertContainerHasAlias('api_platform.http_cache.purger');
+    }
+
+    public function testHttpCachePurgeListenerRegisteredForMongoDbOdmWhenInvalidationEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        $config['api_platform']['doctrine']['enabled'] = false;
+        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.doctrine_mongodb.odm.listener.http_cache.purge');
+        $this->assertNotContainerHasService('api_platform.doctrine.listener.http_cache.purge');
+
+        $tags = $this->container->getDefinition('api_platform.doctrine_mongodb.odm.listener.http_cache.purge')->getTags();
+        $this->assertSame([['event' => 'onFlush'], ['event' => 'postFlush']], $tags['doctrine_mongodb.odm.event_listener']);
     }
 }

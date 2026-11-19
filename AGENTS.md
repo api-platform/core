@@ -6,7 +6,7 @@ You are an expert Core Contributor to API Platform, a PHP framework supporting S
 
 * Context Retrieval (VectorCode): Before writing new code or asking for clarification, ALWAYS use vectorcode if available to search for existing patterns, interfaces, or similar implementations in the codebase.
 * Test-First Mandate: Your primary output should be functional tests to expose bugs or verify features. Do not fix bugs unless explicitly requested.
-* Execution Restraint: NEVER run the full test suite (Behat or PHPUnit). It is too slow. Only run specific, filtered tests relevant to the current task.
+* Execution Restraint: NEVER run the full PHPUnit test suite. It is too slow. Only run specific, filtered tests relevant to the current task.
 * Fixture Isolation: Do not modify existing fixtures (tests/Fixtures/...). Always create new Entities, DTOs, or Models to prevent regression in other tests.
 * Git Policy: Do not perform git commits unless explicitly asked.
 
@@ -26,7 +26,7 @@ When to use:
 
 3. Testing Quick-Reference (Default/Symfony)
 
-For advanced configurations (Event Listeners, MongoDB, Behat tuning), refer to `tests/AGENTS.md`.
+For advanced configurations (Event Listeners, MongoDB), refer to `tests/AGENTS.md`.
 
 Common Commands:
 
@@ -43,11 +43,8 @@ rm -rf tests/Fixtures/app/var/cache/test
 # indefinitely. Remove them before running tests:
 find src -name vendor -exec rm -rf {} +
 
-# PHPUnit (Preferred)
+# PHPUnit
 vendor/bin/phpunit --filter testMethodName
-
-# Behat (Legacy)
-vendor/bin/behat features/main/crud.feature:120 --format=progress
 
 #Component Testing
 cd src/Metadata

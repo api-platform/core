@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
+use Doctrine\ODM\MongoDB\UnitOfWork as OdmUnitOfWork;
+use Doctrine\ORM\UnitOfWork as OrmUnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
@@ -81,16 +83,45 @@ final class PersistProcessor implements ProcessorInterface
             // We create a new entity through PUT
             } else {
                 foreach (array_reverse($links) as $link) {
-                    if ($link->getExpandedValue() || !$link->getFromClass()) {
+                    if ($link->getExpandedValue() || !($fromClass = $link->getFromClass())) {
                         continue;
                     }
 
                     $identifierProperties = $link->getIdentifiers();
                     $hasCompositeIdentifiers = 1 < \count($identifierProperties);
+                    $toProperty = $link->getToProperty();
+                    $parentManager = $toProperty ? $this->managerRegistry->getManagerForClass($fromClass) : null;
+
+                    if ($toProperty && $parentManager && isset($reflectionProperties[$toProperty]) && method_exists($parentManager, 'getReference')) {
+                        if ($hasCompositeIdentifiers) {
+                            $referenceIdentifier = [];
+                            foreach ($identifierProperties as $identifierProperty) {
+                                $referenceIdentifier[$identifierProperty] = $this->getIdentifierValue($identifiers, $identifierProperty);
+                            }
+                        } else {
+                            $referenceIdentifier = $this->getIdentifierValue($identifiers);
+                        }
+
+                        $doctrineIdentifiers = $parentManager->getClassMetadata($fromClass)->getIdentifierFieldNames();
+                        if (!array_diff($identifierProperties, $doctrineIdentifiers) && !array_diff($doctrineIdentifiers, $identifierProperties)) {
+                            $parent = $parentManager->getReference($fromClass, $referenceIdentifier);
+                        } else {
+                            $criteria = $hasCompositeIdentifiers ? $referenceIdentifier : [$identifierProperties[0] => $referenceIdentifier];
+                            $parent = $parentManager->getRepository($fromClass)->findOneBy($criteria);
+                        }
+
+                        $reflectionProperties[$toProperty]->setValue($newData, $parent);
+
+                        continue;
+                    }
 
                     foreach ($identifierProperties as $identifierProperty) {
-                        $reflectionProperty = $reflectionProperties[$identifierProperty];
-                        $reflectionProperty->setValue($newData, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
+                        if (!isset($reflectionProperties[$identifierProperty])) {
+                            $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null);
+                            continue;
+                        }
+
+                        $reflectionProperties[$identifierProperty]->setValue($newData, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
                     }
                 }
 
@@ -200,9 +231,38 @@ final class PersistProcessor implements ProcessorInterface
                 continue;
             }
 
+            // Do not get reference for new objects with application-assigned identifiers (e.g. UUID generated in the constructor):
+            // the object does not exist in the database yet and must be handled by cascade persist
+            if ($this->isNewObject($relManager, $value)) {
+                continue;
+            }
+
             \assert(method_exists($relManager, 'getReference'));
 
             $reflectionProperty->setValue($data, $relManager->getReference($relClass, $identifiers));
         }
+    }
+
+    /**
+     * Checks if an object holding identifiers is new (not yet in the database) according to the unit of work.
+     * Objects with database-generated identifiers are never considered new here since Doctrine assumes they exist.
+     */
+    private function isNewObject(DoctrineObjectManager $manager, object $object): bool
+    {
+        if (!method_exists($manager, 'getUnitOfWork')) {
+            return false;
+        }
+
+        $unitOfWork = $manager->getUnitOfWork();
+
+        if (method_exists($unitOfWork, 'getEntityState')) {
+            return OrmUnitOfWork::STATE_NEW === $unitOfWork->getEntityState($object);
+        }
+
+        if (method_exists($unitOfWork, 'getDocumentState')) {
+            return OdmUnitOfWork::STATE_NEW === $unitOfWork->getDocumentState($object);
+        }
+
+        return false;
     }
 }

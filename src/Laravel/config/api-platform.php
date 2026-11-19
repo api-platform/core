@@ -11,9 +11,12 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 
 return [
@@ -48,6 +51,10 @@ return [
     // on PATCH operations, allowing partial updates without requiring all fields.
     'partial_patch_validation' => false,
 
+    // When true (default), HEAD requests skip response body construction so
+    // collections are not iterated. Set to false to process HEAD like GET.
+    'enable_head_request_optimization' => true,
+
     'docs_formats' => [
         'jsonld' => ['application/ld+json'],
         // 'jsonapi' => ['application/vnd.api+json'],
@@ -78,6 +85,28 @@ return [
         'partial_parameter_name' => 'partial',
     ],
 
+    'jsonapi' => [
+        // When false (default), the JSON:API `data.id` uses the resource scalar
+        // identifier and a `data.links.self` IRI is added. When true, `data.id`
+        // is the resource IRI.
+        'use_iri_as_id' => false,
+
+        // Allow client-generated IDs on JSON:API POST per
+        // https://jsonapi.org/format/#crud-creating-client-ids. Off by default
+        // to avoid id spoofing on public endpoints.
+        'allow_client_generated_id' => false,
+
+        // Require the "type" member of JSON:API request resource objects (400
+        // when missing) and reject a "type" that does not match the endpoint
+        // resource on POST, PUT and PATCH (409 Conflict). Off by default.
+        'strict_resource_type' => false,
+
+        // Expose the "id" and "type" properties as "resourceId" and "resourceType"
+        // attributes instead of "_id" and "_type", which are not valid JSON:API
+        // member names. Off by default.
+        'strict_member_names' => false,
+    ],
+
     'graphql' => [
         'enabled' => false,
         'nesting_separator' => '__',
@@ -99,6 +128,8 @@ return [
     'exception_to_status' => [
         AuthenticationException::class => 401,
         AuthorizationException::class => 403,
+        SerializerExceptionInterface::class => 400,
+        InvalidArgumentException::class => 400,
     ],
 
     'redoc' => [
@@ -143,13 +174,21 @@ return [
         //         'bearerFormat' => 'JWT',
         //     ],
         // ],
+        //
+        // 'with_credentials' => true,
     ],
 
     // 'openapi' => [
     //     'tags' => [],
-        // ],
+    // ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
+
+    // Class implementing PathSegmentNameGeneratorInterface used to derive route
+    // segments from resource short names (e.g. `ProductOrder` -> `product_orders`).
+    // Set to DashPathSegmentNameGenerator::class for dasherized segments
+    // (e.g. `product-orders`).
+    'path_segment_name_generator' => UnderscorePathSegmentNameGenerator::class,
 
     'serializer' => [
         'hydra_prefix' => false,
@@ -159,9 +198,18 @@ return [
     // we recommend using "file" or "acpu"
     'cache' => 'file',
 
+    // Path to an Eloquent model metadata file produced by `php artisan api-platform:metadata:dump`.
+    // When set (and APP_DEBUG is false), the model attributes and relations are read from this file
+    // at boot instead of being introspected from the database, allowing the app to boot without a
+    // live DB (e.g. during `docker build`, `composer install`, or static analysis in CI). Commit the
+    // file to VCS or bake it into your image, and re-run the command when your models change. Leave
+    // null to disable.
+    'metadata_dump' => null,
+
     // MCP (Model Context Protocol) configuration
     'mcp' => [
         'enabled' => true,
+        'middleware' => [],
     ],
 
     // install `api-platform/http-cache`

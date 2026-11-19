@@ -17,7 +17,6 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Util\Reflection;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -77,6 +76,20 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
+        // Private properties declared in a trait used by a parent class (e.g. a Doctrine STI parent) are
+        // not exposed on the child's reflection, so walk the hierarchy to read the ApiProperty attribute.
+        $parentReflectionClass = $reflectionClass->getParentClass();
+        while ($parentReflectionClass) {
+            if ($parentReflectionClass->hasProperty($property)) {
+                $reflectionProperty = $parentReflectionClass->getProperty($property);
+                if ($attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
+                    return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
+                }
+            }
+
+            $parentReflectionClass = $parentReflectionClass->getParentClass();
+        }
+
         foreach (array_merge(Reflection::ACCESSOR_PREFIXES, Reflection::MUTATOR_PREFIXES) as $prefix) {
             $methodName = $prefix.ucfirst($property);
             if (!$reflectionClass->hasMethod($methodName) && !$reflectionEnum?->hasMethod($methodName)) {
@@ -126,19 +139,6 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach (get_class_methods(ApiProperty::class) as $method) {
             if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches)) {
-                // BC layer, to remove in 5.0
-                if ('getBuiltinTypes' === $method) {
-                    if (method_exists(PropertyInfoExtractor::class, 'getType')) {
-                        continue;
-                    }
-
-                    if ($builtinTypes = $attribute->getBuiltinTypes()) {
-                        $propertyMetadata = $propertyMetadata->withBuiltinTypes($builtinTypes);
-                    }
-
-                    continue;
-                }
-
                 if (null !== $val = $attribute->{$method}()) {
                     $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
                 }

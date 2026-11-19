@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Authorization;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6446\SecurityPostValidation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedLinkedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
@@ -56,7 +56,7 @@ final class DenyTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testCustomDataProviderGeneratorReturns200(): void

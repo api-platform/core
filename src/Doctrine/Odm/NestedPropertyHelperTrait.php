@@ -39,7 +39,7 @@ trait NestedPropertyHelperTrait
         $nestedInfo = ($extraProperties['nested_properties_info'] ?? []) ? reset($extraProperties['nested_properties_info']) : null;
 
         if (!$nestedInfo) {
-            return $property;
+            return $extraProperties['query_property'] ?? $property;
         }
 
         $odmSegments = $nestedInfo['odm_segments'] ?? [];
@@ -86,5 +86,10 @@ trait NestedPropertyHelperTrait
         }
 
         return "$alias$leafProperty";
+    }
+
+    private function preserveNullsFor(array $context): bool
+    {
+        return 'addOr' === ($context['operator'] ?? null);
     }
 }

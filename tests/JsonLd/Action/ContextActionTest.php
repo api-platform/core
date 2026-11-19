@@ -52,17 +52,6 @@ class ContextActionTest extends TestCase
         $this->assertEquals(['@context' => ['/entrypoints']], $contextAction('Entrypoint'));
     }
 
-    public function testContextActionWithContexts(): void
-    {
-        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $contextBuilderProphecy->getBaseContext()->willReturn(['/contexts']);
-        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
-
-        $this->assertEquals(['@context' => ['/contexts']], $contextAction('ConstraintViolationList'));
-    }
-
     public function testContextActionWithResourceClass(): void
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);

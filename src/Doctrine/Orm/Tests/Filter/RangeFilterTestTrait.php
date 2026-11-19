@@ -134,6 +134,23 @@ trait RangeFilterTestTrait
                     ],
                 ],
             ],
+            'gt (array value)' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'gt' => ['9.99'],
+                    ],
+                ],
+            ],
+            'gt (array value) + lte' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'gt' => ['9.99'],
+                        'lte' => '19.99',
+                    ],
+                ],
+            ],
         ];
     }
 }

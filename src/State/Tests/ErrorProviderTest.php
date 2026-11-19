@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Tests;
 
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ErrorProvider;
@@ -43,5 +44,62 @@ class ErrorProviderTest extends TestCase
         /** @var Error */
         $error = $provider->provide(new Get(), [], ['request' => $request]);
         $this->assertEquals('Internal Server Error', $error->getDetail());
+    }
+
+    public function testAccessDeniedReasonIsExposedInDebugMode(): void
+    {
+        $error = self::provideError(new AccessDeniedException('Access Denied. Voter reason.'), true);
+
+        $this->assertSame('Access Denied. Voter reason.', $error->getDetail());
+    }
+
+    public function testAccessDeniedReasonIsHiddenInProduction(): void
+    {
+        $error = self::provideError(new AccessDeniedException('Access Denied. Voter reason.'), false);
+
+        $this->assertSame('Access Denied.', $error->getDetail());
+    }
+
+    public function testConfiguredAccessDeniedDetailIsPreservedInProduction(): void
+    {
+        $error = self::provideError(new AccessDeniedException('Internal message', detail: 'Public message'), false);
+
+        $this->assertSame('Public message', $error->getDetail());
+    }
+
+    public function testConfiguredEmptyAccessDeniedDetailIsPreservedInProduction(): void
+    {
+        $error = self::provideError(new AccessDeniedException('Internal message', detail: ''), false);
+
+        $this->assertSame('', $error->getDetail());
+    }
+
+    public function testUsesTheResolvedErrorOperationStatusForAccessDeniedProblem(): void
+    {
+        $error = self::provideError(new AccessDeniedException('Internal message', detail: 'Public message'), false, 404);
+
+        $this->assertSame(404, $error->getStatus());
+        $this->assertSame('/errors/404', $error->getType());
+        $this->assertSame('Public message', $error->getDetail());
+    }
+
+    public function testFindsTheAccessDeniedProblemInTheExceptionChain(): void
+    {
+        $problem = new AccessDeniedException('Access Denied. Voter reason.');
+        $exception = new \RuntimeException('Wrapper exception', previous: $problem);
+        $error = self::provideError($exception, false);
+
+        $this->assertSame('Access Denied.', $error->getDetail());
+    }
+
+    private static function provideError(\Throwable $exception, bool $debug, int $status = 403): Error
+    {
+        $request = Request::create('/');
+        $request->attributes->set('exception', $exception);
+
+        $error = (new ErrorProvider(debug: $debug))->provide(new Get(status: $status), [], ['request' => $request]);
+        self::assertInstanceOf(Error::class, $error);
+
+        return $error;
     }
 }

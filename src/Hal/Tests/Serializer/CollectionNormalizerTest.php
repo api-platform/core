@@ -125,30 +125,30 @@ class CollectionNormalizerTest extends TestCase
         $paginator->method('current')->willReturn('foo'); // @phpstan-ignore-line
 
         if (!$partial) {
-            $paginator->method('getLastPage')->willReturn(7.); // @phpstan-ignore-line
-            $paginator->method('getTotalItems')->willReturn(1312.); // @phpstan-ignore-line
+            $paginator->method('getLastPage')->willReturn(7.);
+            $paginator->method('getTotalItems')->willReturn(1312.);
         } else {
             $paginator->method('count')->willReturn(12);
         }
 
-        $resourceClassResolverMock = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolverMock->method('getResourceClass')->with($paginator, 'Foo')->willReturn('Foo');
+        $resourceClassResolverStub = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolverStub->method('getResourceClass')->willReturnMap([[$paginator, 'Foo', 'Foo']]);
 
-        $resourceMetadataFactoryMock = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactoryMock->method('create')->with('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+        $resourceMetadataFactoryStub = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryStub->method('create')->willReturnMap([['Foo', new ResourceMetadataCollection('Foo', [
             (new ApiResource())->withShortName('Foo')->withOperations(new Operations([
                 'bar' => (new GetCollection())->withShortName('Foo'),
             ])),
-        ]));
+        ])]]);
 
         $itemNormalizer = $this->createMock(NormalizerInterface::class);
-        $itemNormalizer->method('normalize')->with('foo', CollectionNormalizer::FORMAT, [
+        $itemNormalizer->expects($this->once())->method('normalize')->with('foo', CollectionNormalizer::FORMAT, [
             'resource_class' => 'Foo',
             'api_sub_level' => true,
             'root_operation_name' => 'bar',
         ])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverMock, 'page', $resourceMetadataFactoryMock);
+        $normalizer = new CollectionNormalizer($resourceClassResolverStub, 'page', $resourceMetadataFactoryStub);
         $normalizer->setNormalizer($itemNormalizer);
 
         return $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [

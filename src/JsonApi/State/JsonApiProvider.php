@@ -13,13 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\State;
 
+use ApiPlatform\JsonApi\Util\ResourceLinkageResolver;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\RequestParser;
 
 final class JsonApiProvider implements ProviderInterface
 {
-    public function __construct(private readonly ProviderInterface $decorated, private readonly string $orderParameterName = 'order')
-    {
+    public function __construct(
+        private readonly ProviderInterface $decorated,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ResourceLinkageResolver $resourceLinkageResolver,
+        private readonly string $orderParameterName = 'order',
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -70,7 +81,13 @@ final class JsonApiProvider implements ProviderInterface
             $filters = array_merge($pageParameter, $filters);
         }
 
-        [$included, $properties] = $this->transformFieldsetsParameters($queryParameters, $operation->getShortName() ?? '');
+        foreach (['page', 'itemsPerPage', 'pagination', 'partial'] as $paginationParameter) {
+            if (isset($queryParameters[$paginationParameter]) && !\is_array($queryParameters[$paginationParameter]) && !isset($filters[$paginationParameter])) {
+                $filters[$paginationParameter] = $queryParameters[$paginationParameter];
+            }
+        }
+
+        [$included, $properties] = $this->transformFieldsetsParameters($queryParameters, $operation);
 
         if ($properties) {
             $request->attributes->set('_api_filter_property', $properties);
@@ -81,13 +98,25 @@ final class JsonApiProvider implements ProviderInterface
         }
 
         if ($filters) {
+            // ReadProvider skips its raw-query fallback when _api_filters is set,
+            // so preserve flat custom params here too. JSON:API transforms win.
+            $rawParams = $request->attributes->get('_api_query_parameters');
+            if (null === $rawParams) {
+                $queryString = RequestParser::getQueryString($request);
+                $rawParams = $queryString ? RequestParser::parseRequestParams($queryString) : [];
+                $request->attributes->set('_api_query_parameters', $rawParams);
+            }
+            // Drop keys already consumed above so the raw bracket variants don't override the hoisted values.
+            $consumed = array_diff_key($rawParams, array_flip(['filter', 'page', 'itemsPerPage', 'pagination', 'partial', 'include', 'fields']));
+            $filters = array_replace($consumed, $filters);
+
             $request->attributes->set('_api_filters', $filters);
         }
 
         return $this->decorated->provide($operation, $uriVariables, $context);
     }
 
-    private function transformFieldsetsParameters(array $queryParameters, string $resourceShortName): array
+    private function transformFieldsetsParameters(array $queryParameters, Operation $operation): array
     {
         $includeParameter = $queryParameters['include'] ?? null;
         $fieldsParameter = $queryParameters['fields'] ?? null;
@@ -96,6 +125,10 @@ final class JsonApiProvider implements ProviderInterface
         if (!$fieldsParameter) {
             return [$includeParameter, []];
         }
+
+        $resourceShortName = $operation->getShortName() ?? '';
+        // Per the JSON:API spec, fields[TYPE] takes a resource TYPE while include takes a relation NAME.
+        $includedRelationTypes = $this->resolveIncludedRelationTypes($includeParameter, $operation->getClass());
 
         $properties = [];
         $included = [];
@@ -107,11 +140,56 @@ final class JsonApiProvider implements ProviderInterface
             } elseif (\in_array($resourceType, $includeParameter, true)) {
                 $properties[$resourceType] = $fields;
                 $included[] = $resourceType;
+            } elseif (null !== ($relationPath = $includedRelationTypes[$resourceType] ?? null)) {
+                // The serializer's ATTRIBUTES context is keyed by property NAME, not resource TYPE.
+                $properties[explode('.', $relationPath, 2)[0]] = $fields;
+                $included[] = $relationPath;
             } else {
                 $properties[$resourceType] = $fields;
             }
         }
 
-        return [$included, $properties];
+        return [array_values(array_unique($included)), $properties];
+    }
+
+    /**
+     * @param list<string> $includeParameter
+     *
+     * @return array<string, string>
+     */
+    private function resolveIncludedRelationTypes(array $includeParameter, ?string $resourceClass): array
+    {
+        if (!$includeParameter || null === $resourceClass) {
+            return [];
+        }
+
+        $relationPathsByProperty = [];
+        foreach ($includeParameter as $relationPath) {
+            $relationPathsByProperty[explode('.', $relationPath, 2)[0]] = $relationPath;
+        }
+
+        $types = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            if (null === ($relationPath = $relationPathsByProperty[$property] ?? null)) {
+                continue;
+            }
+
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            foreach ($this->resourceLinkageResolver->getRelationships($propertyMetadata) as [$relatedClass]) {
+                $types[$this->getShortName($relatedClass)] = $relationPath;
+                break;
+            }
+        }
+
+        return $types;
+    }
+
+    private function getShortName(string $resourceClass): string
+    {
+        try {
+            return $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation()->getShortName();
+        } catch (\Throwable) {
+            return (new \ReflectionClass($resourceClass))->getShortName();
+        }
     }
 }

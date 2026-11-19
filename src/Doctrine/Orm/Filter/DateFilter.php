@@ -15,6 +15,13 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterTrait;
+use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
@@ -25,15 +32,22 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata as LegacyClassMetadata;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * The date filter allows to filter a collection by date intervals.
  *
  * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
  *
- * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
+ * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php), or, when the `format` argument is set, the format given to `DateTimeImmutable::createFromFormat()`.
  *
  * The `after` and `before` filters will filter including the value whereas `strictly_after` and `strictly_before` will filter excluding the value.
  *
@@ -125,20 +139,105 @@ use Doctrine\ORM\QueryBuilder;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
-final class DateFilter extends AbstractFilter implements DateFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class DateFilter implements DateFilterInterface, FilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface, OpenApiParameterFilterInterface, PropertyAwareFilterInterface
 {
     use DateFilterTrait;
+    use ManagerRegistryAwareTrait;
+    use NameConverterAwareTrait;
+    use PropertyAwareFilterTrait;
 
+    // Use literal UTC type names for compatibility with Doctrine DBAL versions before 4.5.
     public const DOCTRINE_DATE_TYPES = [
         Types::DATE_MUTABLE => true,
         Types::DATETIME_MUTABLE => true,
+        'datetime_utc' => true,
         Types::DATETIMETZ_MUTABLE => true,
         Types::TIME_MUTABLE => true,
         Types::DATE_IMMUTABLE => true,
         Types::DATETIME_IMMUTABLE => true,
+        'datetime_utc_immutable' => true,
         Types::DATETIMETZ_IMMUTABLE => true,
         Types::TIME_IMMUTABLE => true,
     ];
+
+    private LoggerInterface $logger;
+
+    /**
+     * Resolved from the QueryBuilder in apply(); metadata is read from it so the active filter path
+     * never touches the injected ManagerRegistry (kept only for the deprecated getDescription() and
+     * for BC injection through ManagerRegistryAwareInterface).
+     */
+    private ?EntityManagerInterface $entityManager = null;
+
+    /**
+     * @param array<string, mixed>|null $properties
+     */
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, private readonly ?string $format = null)
+    {
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger ?? new NullLogger();
+        $this->properties = $properties;
+        $this->nameConverter = $nameConverter;
+    }
+
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    {
+        $this->entityManager = $queryBuilder->getEntityManager();
+
+        foreach ($context['filters'] ?? [] as $property => $value) {
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+        }
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function isPropertyEnabled(string $property, string $resourceClass): bool
+    {
+        if (null === $this->properties) {
+            // to ensure sanity, nested properties must still be explicitly enabled
+            return !$this->isPropertyNested($property, $resourceClass);
+        }
+
+        return \array_key_exists($property, $this->properties);
+    }
+
+    protected function getClassMetadata(string $resourceClass): LegacyClassMetadata
+    {
+        if ($this->entityManager instanceof EntityManagerInterface) {
+            return $this->entityManager->getClassMetadata($resourceClass);
+        }
+
+        // Legacy getDescription() runs without a QueryBuilder: fall back to the injected registry.
+        if ($this->hasManagerRegistry() && ($manager = $this->getManagerRegistry()->getManagerForClass($resourceClass))) {
+            return $manager->getClassMetadata($resourceClass);
+        }
+
+        return new ClassMetadata($resourceClass);
+    }
+
+    /**
+     * @return array{0: string, 1: string, 2: string[]}
+     */
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $joinType): array
+    {
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $parentAlias = $rootAlias;
+        $alias = null;
+
+        foreach ($propertyParts['associations'] as $association) {
+            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $joinType);
+            $parentAlias = $alias;
+        }
+
+        if (null === $alias) {
+            throw new InvalidArgumentException(\sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
+        }
+
+        return [$alias, $propertyParts['field'], $propertyParts['associations']];
+    }
 
     /**
      * {@inheritdoc}
@@ -234,12 +333,11 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
             return;
         }
 
-        try {
-            $value = !str_contains($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
-        } catch (\Exception) {
-            // Silently ignore this filter if it can not be transformed to a \DateTime
+        $value = $this->createDateFromValue($value, str_contains($type, '_immutable'), $this->format);
+
+        if (null === $value) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(\sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
+                'exception' => new InvalidArgumentException($this->getInvalidDateMessage($field, $this->format)),
             ]);
 
             return;
@@ -280,7 +378,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
      */
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'string', 'format' => 'date'];
+        return null === $this->format ? ['type' => 'string', 'format' => 'date'] : ['type' => 'string'];
     }
 
     public function getOpenApiParameters(Parameter $parameter): array

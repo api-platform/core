@@ -30,6 +30,7 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\HttpResponseHeadersTrait;
 use ApiPlatform\State\Util\HttpResponseStatusTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
@@ -59,11 +60,14 @@ final class JsonStreamerProcessor implements ProcessorInterface
         private readonly string $enabledParameterName = 'pagination',
         private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly bool $enableHeadRequestOptimization = true,
+        ?ContainerInterface $parameterProviderLocator = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
         $this->operationMetadataFactory = $operationMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->parameterProviderLocator = $parameterProviderLocator;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
@@ -79,6 +83,16 @@ final class JsonStreamerProcessor implements ProcessorInterface
             return $this->processor?->process($data, $operation, $uriVariables, $context);
         }
 
+        if ($this->enableHeadRequestOptimization && $request->isMethod('HEAD')) {
+            $response = new Response(
+                null,
+                $this->getStatus($request, $operation, $context),
+                $this->getHeaders($request, $operation, $context)
+            );
+
+            return $this->processor ? $this->processor->process($response, $operation, $uriVariables, $context) : $response;
+        }
+
         if ($operation instanceof CollectionOperationInterface) {
             $requestUri = $request->getRequestUri() ?? '';
             $collection = new Collection();
@@ -91,7 +105,7 @@ final class JsonStreamerProcessor implements ProcessorInterface
             }
 
             if ($data instanceof PaginatorInterface) {
-                $collection->totalItems = $data->getTotalItems();
+                $collection->totalItems = (int) $data->getTotalItems();
             }
 
             if (\is_array($data) || ($data instanceof \Countable && !$data instanceof PartialPaginatorInterface)) {

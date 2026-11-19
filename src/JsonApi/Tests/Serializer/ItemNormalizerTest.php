@@ -38,7 +38,6 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -128,6 +127,116 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
     }
 
+    public function testCacheKeyIsFalseWhenAPropertyHasSecurity(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(11);
+        $dummy->setName('hello');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withIdentifier(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')'));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/11');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(11);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('hello');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+        ]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize(Argument::any(), ItemNormalizer::FORMAT, Argument::type('array'))->will(static fn ($args) => $args[0]);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->normalize($dummy, ItemNormalizer::FORMAT);
+
+        $componentsCacheRef = new \ReflectionProperty(ItemNormalizer::class, 'componentsCache');
+        $this->assertSame([], $componentsCacheRef->getValue($normalizer), 'componentsCache must not be populated when a property has security set');
+    }
+
+    public function testUriTemplateLinkIsNotCachedAcrossObjects(): void
+    {
+        $first = new Dummy();
+        $first->setId(1);
+        $second = new Dummy();
+        $second->setId(2);
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummy']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::object(RelatedDummy::class))
+                ->withReadable(true)
+                ->withUriTemplate('/related_dummies/{id}')
+        );
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturnCallback(static fn (object $resource): string => \sprintf('/dummies/%d/related', $resource->getId()));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+        $resourceClassResolver->method('getResourceClass')->willReturn(RelatedDummy::class);
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturn(new RelatedDummy());
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+            (new ApiResource())->withOperations(new Operations([
+                new Get(name: '/related_dummies/{id}', uriTemplate: '/related_dummies/{id}', shortName: 'RelatedDummy'),
+            ])),
+        ]));
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $iriConverter,
+            $resourceClassResolver,
+            $propertyAccessor,
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory,
+        );
+
+        $getComponents = new \ReflectionMethod(ItemNormalizer::class, 'getComponents');
+        $context = ['resource_class' => Dummy::class, 'cache_key' => 'shared', 'api_normalize' => true];
+
+        $this->assertSame(['relatedDummy' => '/dummies/1/related'], $getComponents->invoke($normalizer, $first, ItemNormalizer::FORMAT, $context)['links']);
+        $this->assertSame(['relatedDummy' => '/dummies/2/related'], $getComponents->invoke($normalizer, $second, ItemNormalizer::FORMAT, $context)['links']);
+    }
+
     public function testNormalizeCircularReference(): void
     {
         $circularReferenceEntity = new CircularReference();
@@ -146,7 +255,7 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create(CircularReference::class)->willReturn(new ResourceMetadataCollection('CircularReference'));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(CircularReference::class, [])->willReturn(new PropertyNameCollection());
+        $propertyNameCollectionFactoryProphecy->create(CircularReference::class, Argument::type('array'))->willReturn(new PropertyNameCollection());
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -162,11 +271,9 @@ class ItemNormalizerTest extends TestCase
 
         $normalizer->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
 
-        // Symfony >= 7.3
-        $splObject = class_exists(EventStreamResponse::class) ? spl_object_id($circularReferenceEntity) : spl_object_hash($circularReferenceEntity);
         $context = [
             'circular_reference_limit' => 2,
-            'circular_reference_limit_counters' => [$splObject => 2],
+            'circular_reference_limit_counters' => [spl_object_id($circularReferenceEntity) => 2],
             'cache_error' => static function (): void {},
         ];
 

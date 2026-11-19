@@ -16,8 +16,15 @@ namespace ApiPlatform\Hal\Tests\Fixtures;
 class Dummy
 {
     public int $id;
-    private RelatedDummy $relatedDummy;
+    public ?RelatedDummy $relatedDummy = null;
     private string $name;
+    private ?string $alias = null;
+    private ?string $description = null;
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
 
     public function getName(): string
     {
@@ -29,12 +36,32 @@ class Dummy
         $this->name = $name;
     }
 
-    public function getRelatedDummy(): RelatedDummy
+    public function getAlias(): ?string
+    {
+        return $this->alias;
+    }
+
+    public function setAlias(?string $alias): void
+    {
+        $this->alias = $alias;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
+    }
+
+    public function getRelatedDummy(): ?RelatedDummy
     {
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy): void
+    public function setRelatedDummy(?RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

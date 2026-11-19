@@ -1,0 +1,9 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   uriTemplate: /programs.{_format}
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    openapi:
+                        parameters:
+                            -   in: query
+                                description: A parameter without a name

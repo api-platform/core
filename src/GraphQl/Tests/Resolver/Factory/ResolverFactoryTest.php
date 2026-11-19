@@ -68,8 +68,8 @@ class ResolverFactoryTest extends TestCase
         $resolveInfo = $this->createMock(ResolveInfo::class);
         $resolveInfo->fieldName = 'test';
 
-        $operationFactory = $this->createMock(OperationMetadataFactoryInterface::class);
-        $operationFactory->method('create')->with('/foo')->willReturn($op);
+        $operationFactory = $this->createStub(OperationMetadataFactoryInterface::class);
+        $operationFactory->method('create')->willReturnMap([['/foo', $op]]);
         $resolverFactory = new ResolverFactory($provider, $processor, $operationFactory);
         $this->assertSame($returnValue, $resolverFactory->__invoke()([], ['id' => '/foo'], [], $resolveInfo));
     }

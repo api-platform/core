@@ -132,6 +132,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </div>
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since API Platform 4.4: use the per-strategy QueryParameter-based filters instead — {@see ExactFilter} (`exact`), {@see PartialSearchFilter} (`partial`), {@see StartSearchFilter} (`start`), {@see EndSearchFilter} (`end`); for relation properties matched by IRI use {@see IriFilter}. Removed in 6.0.
  */
 final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
@@ -372,10 +374,11 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return 'array';
         }
 
+        // Use literal UTC type names for compatibility with Doctrine DBAL versions before 4.5.
         return match ($doctrineType) {
             Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
             Types::BOOLEAN => 'bool',
-            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE => \DateTimeInterface::class,
+            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE, 'datetime_utc', 'datetime_utc_immutable' => \DateTimeInterface::class,
             Types::FLOAT => 'float',
             default => 'string',
         };

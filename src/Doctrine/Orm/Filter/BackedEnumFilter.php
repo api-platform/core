@@ -107,6 +107,8 @@ use Doctrine\ORM\QueryBuilder;
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?status=published`.
  *
  * @author Rémi Marseille <marseille.remi@gmail.com>
+ *
+ * @deprecated since API Platform 4.4: use {@see ExactFilter} declared with a backed-enum `nativeType` instead. Removed in 6.0.
  */
 final class BackedEnumFilter extends AbstractFilter
 {
@@ -130,7 +132,7 @@ final class BackedEnumFilter extends AbstractFilter
         $normalizedValues = array_filter(array_map(
             fn ($v) => $this->normalizeValue($v, $property),
             $values
-        ));
+        ), static fn ($value) => null !== $value);
 
         if (empty($normalizedValues)) {
             return;

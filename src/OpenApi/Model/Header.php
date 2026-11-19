@@ -17,14 +17,14 @@ final class Header
 {
     use ExtensionTrait;
 
-    public function __construct(private readonly string $in = 'header', private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private mixed $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
+    public function __construct(private readonly ?string $in = null, private string $description = '', private bool $required = false, private bool $deprecated = false, private ?bool $allowEmptyValue = null, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private mixed $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
     {
         if (null === $style) {
             $this->style = 'simple';
         }
     }
 
-    public function getIn(): string
+    public function getIn(): ?string
     {
         return $this->in;
     }
@@ -44,12 +44,12 @@ final class Header
         return $this->deprecated;
     }
 
-    public function canAllowEmptyValue(): bool
+    public function canAllowEmptyValue(): ?bool
     {
         return $this->allowEmptyValue;
     }
 
-    public function getAllowEmptyValue(): bool
+    public function getAllowEmptyValue(): ?bool
     {
         return $this->allowEmptyValue;
     }

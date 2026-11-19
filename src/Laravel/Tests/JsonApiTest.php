@@ -45,6 +45,8 @@ class JsonApiTest extends TestCase
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
             $config->set('api-platform.pagination.items_per_page_parameter_name', 'limit');
+            // This suite asserts IRIs in "data.id", which is no longer the default since 5.0.
+            $config->set('api-platform.jsonapi.use_iri_as_id', true);
             $config->set('api-platform.defaults', [
                 'route_prefix' => '/api',
                 'parameters' => [
@@ -59,9 +61,9 @@ class JsonApiTest extends TestCase
 
     public function testGetEntrypoint(): void
     {
-        $response = $this->get('/api/', ['accept' => ['application/vnd.api+json']]);
+        $response = $this->get('http://localhost/api/', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $this->assertJsonContains(
             [
                 'links' => [
@@ -78,13 +80,13 @@ class JsonApiTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $response->assertJsonFragment([
             'links' => [
-                'self' => '/api/books?page=1',
-                'first' => '/api/books?page=1',
-                'last' => '/api/books?page=2',
-                'next' => '/api/books?page=2',
+                'self' => '/api/books?page%5Bpage%5D=1',
+                'first' => '/api/books?page%5Bpage%5D=1',
+                'last' => '/api/books?page%5Bpage%5D=2',
+                'next' => '/api/books?page%5Bpage%5D=2',
             ],
             'meta' => ['totalItems' => 10, 'itemsPerPage' => 5, 'currentPage' => 1],
         ]);
@@ -98,7 +100,7 @@ class JsonApiTest extends TestCase
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
 
         $this->assertJsonContains([
             'data' => [
@@ -141,7 +143,7 @@ class JsonApiTest extends TestCase
         );
 
         $response->assertStatus(201);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 'type' => 'Book',
@@ -243,20 +245,20 @@ class JsonApiTest extends TestCase
         );
 
         $response->assertStatus(422);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $json = $response->json();
         $this->assertJsonContains([
             'errors' => [
                 [
                     'detail' => 'The prop field is required.',
                     'title' => 'Validation Error',
-                    'status' => 422,
+                    'status' => '422',
                     'code' => '58350900e0fc6b8e/prop',
                 ],
                 [
                     'detail' => 'The max field must be less than 2.',
                     'title' => 'Validation Error',
-                    'status' => 422,
+                    'status' => '422',
                     'code' => '58350900e0fc6b8e/max',
                 ],
             ],
@@ -264,6 +266,7 @@ class JsonApiTest extends TestCase
 
         $this->assertArrayHasKey('id', $json['errors'][0]);
         $this->assertArrayHasKey('links', $json['errors'][0]);
+        $this->assertArrayNotHasKey('type', $json['errors'][0]);
         $this->assertArrayHasKey('type', $json['errors'][0]['links']);
 
         $response = $this->postJson(
@@ -289,12 +292,12 @@ class JsonApiTest extends TestCase
     {
         $response = $this->get('/api/books/notfound', headers: ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(404);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
 
         $this->assertJsonContains([
             'links' => ['type' => '/errors/404'],
             'title' => 'An error occurred',
-            'status' => 404,
+            'status' => '404',
             'detail' => 'Not Found',
         ], $response->json()['errors'][0]);
     }
@@ -330,5 +333,17 @@ class JsonApiTest extends TestCase
         $included = $res['included'][0]['attributes'];
         $this->assertArrayNotHasKey('createdAt', $included);
         $this->assertArrayHasKey('name', $included);
+    }
+
+    public function testSparseFieldsetOnIncludedResourceUsesItsOwnAllowedProperties(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->create();
+
+        $r = $this->get('/api/books?include=author&fields[book]=name&fields[author]=created_at', headers: ['accept' => 'application/vnd.api+json']);
+        $res = $r->json();
+
+        $this->assertArrayHasKey('included', $res);
+        $attributes = $res['included'][0]['attributes'] ?? [];
+        $this->assertSame(['createdAt'], array_keys($attributes));
     }
 }

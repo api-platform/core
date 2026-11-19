@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Hal;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\AbsoluteUrlChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\AbsoluteUrlParent;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -81,5 +81,17 @@ final class AbsoluteUrlTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertSame('http://example.com/hal_absolute_url_parents/1/children', $body['_links']['self']['href']);
         $this->assertSame('http://example.com/hal_absolute_url_children/1', $body['_links']['item'][0]['href']);
+    }
+
+    public function testEntrypointLinksUseAbsoluteUrls(): void
+    {
+        $client = self::createClient();
+        $response = $client->request('GET', '/', [
+            'headers' => ['Accept' => 'application/hal+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('http://localhost/hal_absolute_url_children', $body['_links']['halAbsoluteUrlChild']['href'] ?? null);
+        $this->assertSame(['href' => 'http://localhost/hal_absolute_url_children/{id}', 'templated' => true], $body['_links']['halAbsoluteUrlChildItem'] ?? null);
     }
 }

@@ -35,18 +35,18 @@ class VarnishXKeyPurgerTest extends TestCase
     public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo'], 'user_data' => ['xkey', '/foo']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar'], 'user_data' => ['xkey', '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(ClientInterface::class);
-        $clientProphecy2->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy2->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2->request('PURGE', '', ['headers' => ['xkey' => '/foo'], 'user_data' => ['xkey', '/foo']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar'], 'user_data' => ['xkey', '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy3 = $this->prophesize(ClientInterface::class);
-        $clientProphecy3->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy3->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar'], 'user_data' => ['xkey', '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy4 = $this->prophesize(ClientInterface::class);
-        $clientProphecy4->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy4->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar'], 'user_data' => ['xkey', '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
 
         /** @var HttpClientInterface $client1 */
         $client1 = $clientProphecy1->reveal();
@@ -80,7 +80,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $this->expectExceptionMessage('IRI "/foobar-long-foobar-toolong-foofoo-barbar" is too long to fit current max header length (currently set to "20"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.');
 
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foobar-long-foobar-toolong-foofoo-barbar']])->willReturn(new Response())->shouldNotBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foobar-long-foobar-toolong-foofoo-barbar'], 'user_data' => ['xkey', '/foobar-long-foobar-toolong-foofoo-barbar']])->willReturn(new Response())->shouldNotBeCalled();
 
         /** @var HttpClientInterface $client1 */
         $client1 = $clientProphecy1->reveal();
@@ -91,7 +91,7 @@ class VarnishXKeyPurgerTest extends TestCase
     public function testCustomGlue(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo,/bar,/baz']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo,/bar,/baz'], 'user_data' => ['xkey', '/foo,/bar,/baz']])->willReturn(new Response())->shouldBeCalled();
 
         /** @var HttpClientInterface $client1 */
         $client1 = $clientProphecy1->reveal();
@@ -198,7 +198,7 @@ class VarnishXKeyPurgerTest extends TestCase
     public function testConstructor(): void
     {
         $clientProphecy = $this->prophesize(ClientInterface::class);
-        $clientProphecy->request('PURGE', '', ['headers' => ['xkey' => '/foo']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy->request('PURGE', '', ['headers' => ['xkey' => '/foo'], 'user_data' => ['xkey', '/foo']])->willReturn(new Response())->shouldBeCalled();
         $purger = new VarnishXKeyPurger(new RewindableGenerator(static function () use ($clientProphecy) {
             yield $clientProphecy->reveal();
         }, 1));

@@ -109,7 +109,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
                 $reflectionProperty = $reflectionClass->getProperty($property);
 
-                foreach ($reflectionProperty->getAttributes(Link::class) as $attributeLink) {
+                foreach ($reflectionProperty->getAttributes(Link::class, \ReflectionAttribute::IS_INSTANCEOF) as $attributeLink) {
                     $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
                     $attributeLink = $attributeLink->newInstance()
@@ -175,6 +175,12 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
 
         if (!$hasIdProperty && !$identifiers && enum_exists($resourceClass)) {
             return $this->localIdentifiersPerResourceClassCache[$resourceClass] = ['value'];
+        }
+
+        // Don't cache an empty result: identifiers may not be resolvable yet (e.g. Eloquent
+        // model metadata race before migrations run), and this factory is a long-lived singleton.
+        if (!$identifiers) {
+            return $identifiers;
         }
 
         return $this->localIdentifiersPerResourceClassCache[$resourceClass] = $identifiers;
