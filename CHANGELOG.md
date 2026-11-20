@@ -1,5 +1,18 @@
 # Changelog
 
+## v5.0.9
+
+### Security
+
+* [206b1fc5c](https://github.com/api-platform/core/commit/206b1fc5cdbaa04d51f3c7c6649f076b91007692) fix(laravel): evaluate policies before deserialization ([GHSA-crpp-mf59-rhpq](https://github.com/api-platform/core/security/advisories/GHSA-crpp-mf59-rhpq))
+
+### Bug fixes
+
+* [80558a4b2](https://github.com/api-platform/core/commit/80558a4b29247053dc9329e8ceaa84981790fb57) fix(symfony): reset the HTTP cache purger between requests (#8857)
+* [fc8b23a0d](https://github.com/api-platform/core/commit/fc8b23a0d038e3696c296d690d826add1ed5142b) fix(symfony): keep the router context parameters when matching an IRI (#8859)
+* [824eaec7c](https://github.com/api-platform/core/commit/824eaec7cac01b6f7e6c1ee61df034929ad80b9f) fix(jsonapi): denormalize sparse fieldset names with the name converter (#8861)
+* [a032e794d](https://github.com/api-platform/core/commit/a032e794d7acf3edb6499f4f1d1981b648e67253) fix(jsonapi): sparse fieldset reads the resource properties (#8862)
+
 ## v5.0.8
 
 ### Security
