@@ -17,9 +17,6 @@ use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\SparseFieldsetNameConverted;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-/**
- * @see https://github.com/api-platform/core/issues/8860
- */
 final class SparseFieldsetNameConverterTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
@@ -33,7 +30,6 @@ final class SparseFieldsetNameConverterTest extends ApiTestCase
 
     public function testRequestedFieldsGoThroughTheNameConverter(): void
     {
-        // The test app's name converter serializes "nameConverted" as "name_converted", so that is what clients send.
         $response = self::createClient()->request(
             'GET',
             '/sparse_fieldset_name_converted/1?fields[SparseFieldsetNameConverted]=title,name_converted',

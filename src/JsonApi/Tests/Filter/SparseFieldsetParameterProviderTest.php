@@ -92,8 +92,6 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         );
     }
 
-    // #8860: with a name converter, clients send serialized names ("artist_credit"). They must be
-    // matched against, and whitelisted as, the PHP property names ("artistCredit"), like PropertyFilter does.
     public function testFieldsAreDenormalizedWithTheNameConverter(): void
     {
         $operation = new Get(class: SparseFieldsetIncludeArticleFixture::class, shortName: 'SparseFieldsetIncludeArticle');

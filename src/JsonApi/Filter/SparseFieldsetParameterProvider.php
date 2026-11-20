@@ -70,7 +70,6 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             }
 
             foreach (explode(',', $fields) as $f) {
-                // Clients send serialized names; match and whitelist the PHP property name, like PropertyFilter.
                 $f = $this->nameConverter?->denormalize($f) ?? $f;
                 if (\in_array($f, $resourceAllowedProperties, true)) {
                     $p[] = $f;
