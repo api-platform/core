@@ -49,9 +49,13 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $property = $parameter->getProperty();
         $values = $parameter->getValue();
 
-        // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
-        if (\is_array($values) && !array_is_list($values)) {
-            return;
+        // String keys denote operators owned by filters such as ComparisonFilter and DateFilter.
+        if (\is_array($values)) {
+            foreach ($values as $key => $value) {
+                if (!\is_int($key)) {
+                    return;
+                }
+            }
         }
 
         $values = $this->scalarValuesOnly($values);

@@ -143,6 +143,29 @@ final class PartialSearchFilterTest extends ApiTestCase
         ];
     }
 
+    public function testPartialSearchFilterAcceptsNonContiguousNumericKeys(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('This regression test targets the ORM filter.');
+        }
+
+        $manager = $this->getManager();
+        $owner = $manager->getRepository(Owner::class)->findOneBy(['name' => 'Alice']);
+        $coop = $manager->getRepository(ChickenCoop::class)->findOneBy([]);
+
+        foreach (['alpha', 'beta', 'gamma'] as $name) {
+            $chicken = new Chicken();
+            $chicken->setName($name);
+            $chicken->setOwner($owner);
+            $chicken->setChickenCoop($coop);
+            $manager->persist($chicken);
+        }
+        $manager->flush();
+
+        $this->testPartialSearchFilter('/chickens?namePartial[]=alpha&namePartial[]=beta', 2, ['alpha', 'beta']);
+        $this->testPartialSearchFilter('/chickens?namePartial%5B25%5D=alpha&namePartial%5B28%5D=beta', 2, ['alpha', 'beta']);
+    }
+
     public function testPartialSearchFilterMatchesEscapeCharLiterally(): void
     {
         if ($this->isMongoDB()) {
