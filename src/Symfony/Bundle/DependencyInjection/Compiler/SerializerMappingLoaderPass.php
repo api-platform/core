@@ -15,6 +15,8 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 
 final class SerializerMappingLoaderPass implements CompilerPassInterface
 {
@@ -22,7 +24,20 @@ final class SerializerMappingLoaderPass implements CompilerPassInterface
     {
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
         $loaders = $chainLoader->getArgument(0);
-        $loaders[] = $container->getDefinition('api_platform.serializer.property_metadata_loader');
-        $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $loaders);
+        $warmerLoaders = [...$loaders, $container->getDefinition('api_platform.serializer.property_metadata_loader')];
+
+        // Doctrine discriminator maps are loaded last so explicit serializer maps take precedence
+        foreach (['api_platform.doctrine.orm.serializer.discriminator_mapping_loader', 'api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader'] as $id) {
+            if ($container->hasDefinition($id)) {
+                $loader = $container->getDefinition($id);
+                // The explicit serializer loaders (attributes, XML, YAML) tell whether a class of the hierarchy declares its own map
+                $loader->setArgument('$serializerLoader', new Definition(LoaderChain::class, [$loaders]));
+                $chainLoader->replaceArgument(0, [...$chainLoader->getArgument(0), $loader]);
+                // The warmer builds the final metadata of the classes mapped by the other loaders: without the Doctrine map they would lose their subtypes
+                $warmerLoaders[] = $loader;
+            }
+        }
+
+        $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $warmerLoaders);
     }
 }
