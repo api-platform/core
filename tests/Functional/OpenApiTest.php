@@ -507,7 +507,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertSame('id', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][0]['name']);
         $this->assertSame('path', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][0]['in']);
         $this->assertTrue($json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][0]['required']);
-        $this->assertSame('string', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][0]['schema']['type']);
+        $this->assertSame('integer', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][0]['schema']['type']);
 
         $this->assertSame('page', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][1]['name']);
         $this->assertSame('query', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters'][1]['in']);
