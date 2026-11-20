@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.4.10
+
+### Security
+
+* [206b1fc5c](https://github.com/api-platform/core/commit/206b1fc5cdbaa04d51f3c7c6649f076b91007692) fix(laravel): evaluate policies before deserialization ([GHSA-crpp-mf59-rhpq](https://github.com/api-platform/core/security/advisories/GHSA-crpp-mf59-rhpq))
+
+### Bug fixes
+
+* [80558a4b2](https://github.com/api-platform/core/commit/80558a4b29247053dc9329e8ceaa84981790fb57) fix(symfony): reset the HTTP cache purger between requests (#8857)
+
 ## v4.4.9
 
 ### Security
