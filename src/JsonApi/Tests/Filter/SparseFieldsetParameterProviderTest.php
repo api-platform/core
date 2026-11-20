@@ -28,6 +28,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
 
@@ -90,7 +92,26 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         );
     }
 
-    private function createProvider(string $authorShortName): SparseFieldsetParameterProvider
+    public function testFieldsAreDenormalizedWithTheNameConverter(): void
+    {
+        $operation = new Get(class: SparseFieldsetIncludeArticleFixture::class, shortName: 'SparseFieldsetIncludeArticle');
+
+        $provider = $this->createProvider(authorShortName: 'SparseFieldsetIncludeAuthor', nameConverter: new CamelCaseToSnakeCaseNameConverter());
+
+        $parameter = (new QueryParameter(key: 'fields'))
+            ->withProperties(['title', 'artistCredit'])
+            ->setValue(['SparseFieldsetIncludeArticle' => 'title,artist_credit,unknown_field']);
+
+        $result = $provider->provide($parameter, [], ['operation' => $operation]);
+
+        $this->assertNotNull($result);
+        $this->assertSame(
+            ['title', 'artistCredit'],
+            $result->getNormalizationContext()[AbstractNormalizer::ATTRIBUTES] ?? null,
+        );
+    }
+
+    private function createProvider(string $authorShortName, ?NameConverterInterface $nameConverter = null): SparseFieldsetParameterProvider
     {
         $articleClass = SparseFieldsetIncludeArticleFixture::class;
         $authorClass = SparseFieldsetIncludeAuthorFixture::class;
@@ -144,6 +165,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
             new ResourceLinkageResolver($resourceClassResolver),
+            $nameConverter,
         );
     }
 }
