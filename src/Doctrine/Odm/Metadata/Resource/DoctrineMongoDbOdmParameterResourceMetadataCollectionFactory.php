@@ -80,7 +80,7 @@ final class DoctrineMongoDbOdmParameterResourceMetadataCollectionFactory impleme
         }
 
         $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
-        if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
+        if ((!class_exists($documentClass) && !interface_exists($documentClass)) || !$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
             return $operation;
         }
 

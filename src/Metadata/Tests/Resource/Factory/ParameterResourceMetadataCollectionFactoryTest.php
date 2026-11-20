@@ -33,6 +33,8 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithLimitedPropertyParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
@@ -90,6 +92,26 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals(new Parameter('test', 'query'), $hydraParameter->getOpenApi());
         $everywhere = $parameters->get('everywhere', QueryParameter::class);
         $this->assertNull($everywhere->getOpenApi());
+    }
+
+    public function testResourceNotBeingAClass(): void
+    {
+        /** @var class-string $resourceClass resource identified by a name which is not a class */
+        $resourceClass = 'DynamicFaq'; // @phpstan-ignore varTag.nativeType
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id']));
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(identifier: true));
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->method('create')->willReturn(new ResourceMetadataCollection($resourceClass, [
+            new ApiResource(class: $resourceClass, operations: ['dynamic_faq_collection' => new GetCollection(class: $resourceClass, name: 'dynamic_faq_collection', parameters: ['search' => new QueryParameter()])]),
+        ]));
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory($nameCollection, $propertyMetadata, $decorated);
+        $operation = $parameterFactory->create($resourceClass)->getOperation('dynamic_faq_collection');
+
+        $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
+        $this->assertTrue($parameters->has('search', QueryParameter::class));
     }
 
     public function testQueryParameterWithPropertyPlaceholder(): void
