@@ -42,7 +42,6 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             return null;
         }
 
-        $allowedProperties = $parameter->getProperties() ?? [];
         $value = $parameter->getValue();
         $normalizationContext = $operation->getNormalizationContext();
 
@@ -57,7 +56,7 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
         foreach ($value as $resource => $fields) {
             if (strtolower($resource) === $shortName) {
                 $p = &$properties;
-                $resourceAllowedProperties = $allowedProperties;
+                $resourceAllowedProperties = $this->getReadableProperties((string) $operation->getClass());
             } else {
                 $resourceAllowedProperties = $this->getAllowedProperties((string) $resource);
 
@@ -95,6 +94,14 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             return [];
         }
 
+        return $this->getReadableProperties($resourceClass);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getReadableProperties(string $resourceClass): array
+    {
         $allowedProperties = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             if ($this->propertyMetadataFactory->create($resourceClass, $property)->isReadable()) {
