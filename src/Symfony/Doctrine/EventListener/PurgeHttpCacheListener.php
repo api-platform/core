@@ -39,13 +39,14 @@ use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Purges responses containing modified entities from the proxy cache.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class PurgeHttpCacheListener
+final class PurgeHttpCacheListener implements ResetInterface
 {
     use ClassInfoTrait;
     private readonly PropertyAccessorInterface $propertyAccessor;
@@ -136,9 +137,17 @@ final class PurgeHttpCacheListener
             return;
         }
 
-        $this->purger->purge(array_values($this->tags));
+        try {
+            $this->purger->purge(array_values($this->tags));
+        } finally {
+            $this->reset();
+        }
+    }
 
+    public function reset(): void
+    {
         $this->tags = [];
+        $this->scheduledInsertions = [];
     }
 
     private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void

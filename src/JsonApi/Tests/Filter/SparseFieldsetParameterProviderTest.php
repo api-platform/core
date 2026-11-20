@@ -28,6 +28,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
 
@@ -56,7 +58,6 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $provider = $this->createProvider(authorShortName: 'SparseFieldsetIncludeAuthor');
 
         $parameter = (new QueryParameter(key: 'fields'))
-            ->withProperties(['title'])
             ->setValue(['SparseFieldsetIncludeAuthor' => 'name']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
@@ -78,7 +79,6 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $provider = $this->createProvider(authorShortName: 'Author');
 
         $parameter = (new QueryParameter(key: 'fields'))
-            ->withProperties(['title'])
             ->setValue(['author' => 'name']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
@@ -90,7 +90,25 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         );
     }
 
-    private function createProvider(string $authorShortName): SparseFieldsetParameterProvider
+    public function testFieldsAreDenormalizedWithTheNameConverter(): void
+    {
+        $operation = new Get(class: SparseFieldsetIncludeArticleFixture::class, shortName: 'SparseFieldsetIncludeArticle');
+
+        $provider = $this->createProvider(authorShortName: 'SparseFieldsetIncludeAuthor', nameConverter: new CamelCaseToSnakeCaseNameConverter());
+
+        $parameter = (new QueryParameter(key: 'fields'))
+            ->setValue(['SparseFieldsetIncludeArticle' => 'title,artist_credit,unknown_field']);
+
+        $result = $provider->provide($parameter, [], ['operation' => $operation]);
+
+        $this->assertNotNull($result);
+        $this->assertSame(
+            ['title', 'artistCredit'],
+            $result->getNormalizationContext()[AbstractNormalizer::ATTRIBUTES] ?? null,
+        );
+    }
+
+    private function createProvider(string $authorShortName, ?NameConverterInterface $nameConverter = null): SparseFieldsetParameterProvider
     {
         $articleClass = SparseFieldsetIncludeArticleFixture::class;
         $authorClass = SparseFieldsetIncludeAuthorFixture::class;
@@ -98,7 +116,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->method('create')->willReturnCallback(
             static fn (string $class): PropertyNameCollection => match ($class) {
-                $articleClass => new PropertyNameCollection(['author']),
+                $articleClass => new PropertyNameCollection(['author', 'title', 'artistCredit']),
                 $authorClass => new PropertyNameCollection(['name']),
                 default => new PropertyNameCollection([]),
             },
@@ -114,6 +132,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
             static fn (string $class, string $property): ApiProperty => match (true) {
                 $articleClass === $class && 'author' === $property => $authorRelationProperty,
                 $authorClass === $class && 'name' === $property => $authorNameProperty,
+                $articleClass === $class && \in_array($property, ['title', 'artistCredit'], true) => $authorNameProperty,
                 default => new ApiProperty(),
             },
         );
@@ -144,6 +163,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
             new ResourceLinkageResolver($resourceClassResolver),
+            $nameConverter,
         );
     }
 }

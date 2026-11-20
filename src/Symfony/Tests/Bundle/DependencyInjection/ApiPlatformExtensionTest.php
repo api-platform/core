@@ -485,6 +485,16 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->getTag('kernel.reset'));
     }
 
+    public function testHttpCachePurgerIsReset(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $this->container->getDefinition('api_platform.doctrine.listener.http_cache.purge')->getTag('kernel.reset'));
+    }
+
     public function testItRegistersMetadataConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;

@@ -77,6 +77,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         $context->setPathInfo($pathInfo);
         $context->setScheme($baseContext->getScheme());
         $context->setHost($baseContext->getHost());
+        $context->setParameters($baseContext->getParameters());
 
         try {
             $this->router->setContext($context);
