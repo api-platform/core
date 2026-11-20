@@ -58,7 +58,6 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $provider = $this->createProvider(authorShortName: 'SparseFieldsetIncludeAuthor');
 
         $parameter = (new QueryParameter(key: 'fields'))
-            ->withProperties(['title'])
             ->setValue(['SparseFieldsetIncludeAuthor' => 'name']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
@@ -80,7 +79,6 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $provider = $this->createProvider(authorShortName: 'Author');
 
         $parameter = (new QueryParameter(key: 'fields'))
-            ->withProperties(['title'])
             ->setValue(['author' => 'name']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
@@ -99,7 +97,6 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $provider = $this->createProvider(authorShortName: 'SparseFieldsetIncludeAuthor', nameConverter: new CamelCaseToSnakeCaseNameConverter());
 
         $parameter = (new QueryParameter(key: 'fields'))
-            ->withProperties(['title', 'artistCredit'])
             ->setValue(['SparseFieldsetIncludeArticle' => 'title,artist_credit,unknown_field']);
 
         $result = $provider->provide($parameter, [], ['operation' => $operation]);
@@ -119,7 +116,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
         $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->method('create')->willReturnCallback(
             static fn (string $class): PropertyNameCollection => match ($class) {
-                $articleClass => new PropertyNameCollection(['author']),
+                $articleClass => new PropertyNameCollection(['author', 'title', 'artistCredit']),
                 $authorClass => new PropertyNameCollection(['name']),
                 default => new PropertyNameCollection([]),
             },
@@ -135,6 +132,7 @@ final class SparseFieldsetParameterProviderTest extends TestCase
             static fn (string $class, string $property): ApiProperty => match (true) {
                 $articleClass === $class && 'author' === $property => $authorRelationProperty,
                 $authorClass === $class && 'name' === $property => $authorNameProperty,
+                $articleClass === $class && \in_array($property, ['title', 'artistCredit'], true) => $authorNameProperty,
                 default => new ApiProperty(),
             },
         );
