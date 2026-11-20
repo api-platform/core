@@ -140,7 +140,12 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
                 }
 
                 if ($isModel && !$graphQlOperation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
-                    if (($policyMethod = self::POLICY_METHODS[$graphQlOperation::class] ?? null) && method_exists($policy, $policyMethod)) {
+                    $policyMethod = self::POLICY_METHODS[$graphQlOperation::class] ?? null;
+                    if ($graphQlOperation instanceof Mutation && 'create' === $graphQlOperation->getName()) {
+                        $policyMethod = self::POLICY_METHODS[Post::class];
+                    }
+
+                    if ($policyMethod && method_exists($policy, $policyMethod)) {
                         $graphQlOperation = $graphQlOperation->withPolicy($policyMethod);
                     }
                 }
