@@ -1,0 +1,18 @@
+namespace App\ApiResource;
+
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use App\State\BookProcessor;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ApiResource(
+    operations: [
+        new Post(),
+    ],
+    processor: BookProcessor::class,
+)]
+class Book
+{
+    #[Assert\NotBlank]
+    public string $name;
+}
