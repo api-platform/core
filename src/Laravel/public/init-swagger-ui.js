@@ -54,6 +54,8 @@ window.onload = function() {
         ],
         plugins: [
             SwaggerUIBundle.plugins.DownloadUrl,
+            // Registered by swagger-ui-login-plugin.js (optional, templates may not load it)
+            ...(window.ApiPlatformSwaggerUiLoginPlugin ? [window.ApiPlatformSwaggerUiLoginPlugin] : []),
         ],
         layout: 'StandaloneLayout',
     };
