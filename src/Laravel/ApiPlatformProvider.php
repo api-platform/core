@@ -477,7 +477,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(DeserializeProvider::class, static function (Application $app) {
             return new DeserializeProvider(
-                $app->make(SwaggerUiProvider::class),
+                $app->make(AccessCheckerProvider::class),
                 $app->make(SerializerInterface::class),
                 $app->make(SerializerContextBuilderInterface::class),
                 $app->make(DenormalizationViolationFactoryInterface::class),
@@ -505,7 +505,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(AccessCheckerProvider::class, static function (Application $app) {
-            return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
+            return new AccessCheckerProvider($app->make(SwaggerUiProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
         $this->app->singleton(Negotiator::class, static function (Application $app) {
@@ -515,7 +515,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), $app->make(Negotiator::class), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
+            return new ContentNegotiationProvider($app->make(ParameterProvider::class), $app->make(Negotiator::class), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
@@ -1537,7 +1537,7 @@ class ApiPlatformProvider extends ServiceProvider
             $taggedCollectionResolvers = iterator_to_array($app->tagged(QueryCollectionResolverInterface::class));
 
             return new ResolverProvider(
-                $app->make(GraphQlReadProvider::class),
+                $app->make('api_platform.graphql.state_provider.access_checker'),
                 new ServiceLocator([...$resolvers, ...$taggedItemResolvers, ...$taggedCollectionResolvers]),
             );
         });
@@ -1555,7 +1555,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
 
         $this->app->singleton('api_platform.graphql.state_provider.access_checker', static function (Application $app) {
-            return new AccessCheckerProvider($app->make('api_platform.graphql.state_provider.parameter'), $app->make(ResourceAccessCheckerInterface::class));
+            return new AccessCheckerProvider($app->make(GraphQlReadProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
         $this->app->singleton(NormalizeProcessor::class, static function (Application $app) {
@@ -1576,7 +1576,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(ResolverFactoryInterface::class, static function (Application $app) {
             return new ResolverFactory(
-                $app->make('api_platform.graphql.state_provider.access_checker'),
+                $app->make('api_platform.graphql.state_provider.parameter'),
                 $app->make('api_platform.graphql.state_processor'),
                 $app->make('api_platform.graphql.runtime_operation_metadata_factory'),
             );
