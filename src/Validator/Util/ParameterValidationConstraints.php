@@ -102,6 +102,19 @@ trait ParameterValidationConstraints
             $assertions[] = new Choice(choices: $schema['enum']);
         }
 
+        // The scalar type applies to each value: it is declared before the collection wrapping below.
+        if (isset($schema['type']) && $parameter->getCastToNativeType()) {
+            $assertion = match ($schema['type']) {
+                'boolean', 'integer' => new Type(type: $schema['type']),
+                'number' => new Type(type: 'float'),
+                default => null,
+            };
+
+            if ($assertion) {
+                $assertions[] = $assertion;
+            }
+        }
+
         $isCollectionType = static fn ($t) => $t instanceof CollectionType;
         $isCollection = $parameter->getNativeType()?->isSatisfiedBy($isCollectionType) ?? false;
 
@@ -136,18 +149,6 @@ trait ParameterValidationConstraints
 
         if (isset($schema['type']) && 'array' === $schema['type']) {
             $assertions[] = new Type(type: 'array');
-        }
-
-        if (isset($schema['type']) && $parameter->getCastToNativeType()) {
-            $assertion = match ($schema['type']) {
-                'boolean', 'integer' => new Type(type: $schema['type']),
-                'number' => new Type(type: 'float'),
-                default => null,
-            };
-
-            if ($assertion) {
-                $assertions[] = $assertion;
-            }
         }
 
         if (isset($schema['type'], $schema['format']) && 'string' === $schema['type'] && 'uuid' === $schema['format']) {

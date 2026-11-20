@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Get;
@@ -23,6 +24,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\HeaderParameter;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Patch;
@@ -33,9 +36,17 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithEnumParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithLimitedPropertyParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
+use ApiPlatform\Metadata\Tests\Fixtures\Enum\IntBackedPriority;
+use ApiPlatform\Metadata\Tests\Fixtures\Enum\StringBackedStatus;
+use ApiPlatform\Metadata\Tests\Fixtures\Enum\UnitSuit;
 use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\State\Parameter\ValueCaster;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -1313,6 +1324,133 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertNotNull($param);
         $this->assertSame(ClassStringParameterProviderFilter::getParameterProvider(), $param->getProvider());
     }
+
+    public function testEnumClassIsResolvedToSchema(): void
+    {
+        $parameterFactory = $this->createEnumClassParameterFactory(new AttributesResourceMetadataCollectionFactory());
+        $parameters = $parameterFactory->create(WithEnumParameter::class)->getOperation('collection')->getParameters();
+
+        $status = $parameters->get('status', QueryParameter::class);
+        $this->assertSame(['type' => 'string', 'enum' => ['draft', 'published']], $status->getSchema());
+        $this->assertEquals(Type::string(), $status->getNativeType());
+
+        $priority = $parameters->get('priority', QueryParameter::class);
+        $this->assertSame(['type' => 'integer', 'enum' => [1, 2]], $priority->getSchema());
+        $this->assertTrue($priority->getCastToNativeType());
+        $this->assertSame([ValueCaster::class, 'toInt'], $priority->getCastFn());
+
+        $this->assertFalse($parameters->get('priorityNoCast', QueryParameter::class)->getCastToNativeType());
+
+        $this->assertEquals(['enum' => ['draft'], 'type' => 'string'], $parameters->get('narrowed', QueryParameter::class)->getSchema());
+
+        $typed = $parameters->get('typed', QueryParameter::class);
+        $this->assertSame(['type' => 'string', 'enum' => [1, 2]], $typed->getSchema());
+        $this->assertNull($typed->getCastToNativeType());
+
+        $this->assertSame(['draft', 'published'], $parameters->get('X-Status', HeaderParameter::class)->getSchema()['enum']);
+    }
+
+    #[DataProvider('provideInvalidEnumClasses')]
+    public function testEnumClassMustBeABackedEnum(string $enumClass): void
+    {
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->method('create')->willReturn(new ResourceMetadataCollection('Dummy', [
+            new ApiResource(operations: [
+                new GetCollection(name: 'collection', parameters: ['status' => new QueryParameter(enumClass: $enumClass)]),
+            ]),
+        ]));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The "enumClass" of the parameter "status" must be a backed enum, "%s" given.', $enumClass));
+
+        $this->createEnumClassParameterFactory($decorated)->create('Dummy');
+    }
+
+    public function testEnumClassWinsOverFilterSchema(): void
+    {
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class, [
+            new ApiResource(operations: [
+                // A class is needed for the filter description (legacy filter metadata).
+                new GetCollection(name: 'collection', class: \stdClass::class, parameters: [
+                    'priority' => new QueryParameter(filter: new NumberSchemaFilter(), enumClass: IntBackedPriority::class),
+                ]),
+            ]),
+        ]));
+
+        $priority = $this->createEnumClassParameterFactory($decorated)->create(\stdClass::class)->getOperation('collection')->getParameters()->get('priority', QueryParameter::class);
+
+        $this->assertSame(['type' => 'integer', 'enum' => [1, 2]], $priority->getSchema());
+        $this->assertTrue($priority->getCastToNativeType());
+        $this->assertSame([ValueCaster::class, 'toInt'], $priority->getCastFn());
+    }
+
+    #[DataProvider('provideEnumClassShapes')]
+    public function testEnumClassKeepsTheShapeAFilterTakes(QueryParameter $parameter, Type $expectedNativeType): void
+    {
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class, [
+            new ApiResource(operations: [
+                new GetCollection(name: 'collection', class: \stdClass::class, parameters: ['enum' => $parameter]),
+            ]),
+        ]));
+
+        $resolved = $this->createEnumClassParameterFactory($decorated)->create(\stdClass::class)->getOperation('collection')->getParameters()->get('enum', QueryParameter::class);
+
+        $this->assertEquals($expectedNativeType, $resolved->getNativeType());
+    }
+
+    public static function provideEnumClassShapes(): iterable
+    {
+        yield 'string backed enum with a filter takes a value or a list' => [
+            new QueryParameter(filter: new NumberSchemaFilter(), enumClass: StringBackedStatus::class),
+            Type::union(Type::string(), Type::list(Type::string())),
+        ];
+        yield 'int backed enum with a filter takes a value or a list' => [
+            new QueryParameter(filter: new NumberSchemaFilter(), enumClass: IntBackedPriority::class),
+            Type::union(Type::int(), Type::list(Type::int())),
+        ];
+        yield 'without a filter it is a single value' => [
+            new QueryParameter(enumClass: IntBackedPriority::class),
+            Type::int(),
+        ];
+        yield 'castToArray false narrows a filtered parameter to a single value' => [
+            new QueryParameter(filter: new NumberSchemaFilter(), enumClass: StringBackedStatus::class, castToArray: false),
+            Type::string(),
+        ];
+        yield 'a declared schema type decides the shape' => [
+            new QueryParameter(filter: new NumberSchemaFilter(), enumClass: StringBackedStatus::class, schema: ['type' => 'string']),
+            Type::string(),
+        ];
+        yield 'a declared native type is kept' => [
+            new QueryParameter(filter: new NumberSchemaFilter(), enumClass: StringBackedStatus::class, nativeType: Type::list(Type::string())),
+            Type::list(Type::string()),
+        ];
+    }
+
+    public static function provideInvalidEnumClasses(): iterable
+    {
+        yield 'non-backed enum' => [UnitSuit::class];
+        yield 'not an enum' => [\stdClass::class];
+        yield 'missing class' => ['App\\DoesNotExist'];
+    }
+
+    private function createEnumClassParameterFactory(ResourceMetadataCollectionFactoryInterface $decorated): ParameterResourceMetadataCollectionFactory
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id']));
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(identifier: true));
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        return new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            $decorated,
+            $filterLocator
+        );
+    }
 }
 
 class ClassStringParameterProviderFilter implements ParameterProviderFilterInterface
@@ -1320,6 +1458,19 @@ class ClassStringParameterProviderFilter implements ParameterProviderFilterInter
     public static function getParameterProvider(): string
     {
         return 'test_class_string_filter_provider';
+    }
+}
+
+class NumberSchemaFilter implements FilterInterface, JsonSchemaFilterInterface
+{
+    public function getDescription(string $resourceClass): array
+    {
+        return [];
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'number'];
     }
 }
 
