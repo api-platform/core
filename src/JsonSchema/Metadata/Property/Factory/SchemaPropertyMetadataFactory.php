@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
@@ -244,6 +245,12 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return $this->applyNullability(['allOf' => $schemas], $isNullable);
         }
 
+        // A list shape (array{int, string}) is serialized as a JSON array, so it is left to the CollectionType branch.
+        // symfony/type-info < 7.4.20 resolves its keyless items to a single '' key, which is left to that branch too.
+        if ($type instanceof ArrayShapeType && !array_is_list($shape = $type->getShape()) && !isset($shape[''])) {
+            return $this->applyNullability($this->getArrayShapeSchema($type, $readableLink), $isNullable);
+        }
+
         if ($type instanceof CollectionType) {
             $valueType = $type->getCollectionValueType();
             $valueSchema = $this->getJsonSchemaFromType($valueType, $readableLink);
@@ -298,6 +305,39 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         return ['type' => Schema::UNKNOWN_TYPE];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getArrayShapeSchema(ArrayShapeType $type, ?bool $readableLink): array
+    {
+        $properties = [];
+        $required = [];
+
+        foreach ($type->getShape() as $key => ['type' => $valueType, 'optional' => $optional]) {
+            $valueSchema = $this->getJsonSchemaFromType($valueType, $readableLink);
+            $properties[(string) $key] = [] === $valueSchema ? new \ArrayObject() : $valueSchema;
+
+            if (!$optional) {
+                $required[] = (string) $key;
+            }
+        }
+
+        $schema = ['type' => 'object', 'properties' => $properties];
+
+        // An empty "required" is invalid in OpenAPI 3.0
+        if ($required) {
+            $schema['required'] = $required;
+        }
+
+        if ($type->isSealed()) {
+            $schema['additionalProperties'] = false;
+        } elseif (null !== ($extraValueType = $type->getExtraValueType()) && [] !== ($extraSchema = $this->getJsonSchemaFromType($extraValueType, $readableLink))) {
+            $schema['additionalProperties'] = $extraSchema;
+        }
+
+        return $schema;
     }
 
     /**
