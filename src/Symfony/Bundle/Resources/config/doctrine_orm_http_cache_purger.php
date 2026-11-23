@@ -31,7 +31,8 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('doctrine.event_listener', ['event' => 'preUpdate'])
         ->tag('doctrine.event_listener', ['event' => 'onFlush'])
-        ->tag('doctrine.event_listener', ['event' => 'postFlush']);
+        ->tag('doctrine.event_listener', ['event' => 'postFlush'])
+        ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore']);
 
     $services->set('api_platform.http_cache.purge_tags.persist_processor', PurgeTagsProcessor::class)
         ->decorate('api_platform.doctrine.orm.state.persist_processor')
