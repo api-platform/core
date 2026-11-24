@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\HttpCache;
 
 use ApiPlatform\HttpCache\PurgeTagProviderInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedDeliveryDay;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DeliveryDay as DeliveryDayDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DeliveryDay;
 
@@ -28,11 +29,20 @@ final class DeliveryDayPurgeTagProvider implements PurgeTagProviderInterface
     {
         yield from $this->getSupplierCollectionTags($resource);
         yield from $this->getSupplierCollectionTags($previousResource);
+
+        if ($previousResource instanceof MappedDeliveryDay && $resource instanceof DeliveryDay) {
+            yield \sprintf('/mapped_delivery_days/day/%s', $previousResource->day);
+            yield \sprintf('/mapped_delivery_days/day/%s', $resource->day);
+        }
     }
 
     public function getTagsForDelete(object $resource): iterable
     {
-        return $this->getSupplierCollectionTags($resource);
+        yield from $this->getSupplierCollectionTags($resource);
+
+        if (($resource instanceof DeliveryDay || $resource instanceof DeliveryDayDocument) && null !== $resource->id) {
+            yield \sprintf('/delivery_days/%d/history', $resource->id);
+        }
     }
 
     /**

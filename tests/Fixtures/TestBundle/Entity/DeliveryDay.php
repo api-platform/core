@@ -20,7 +20,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedDeliveryDay;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ApiResource(
     operations: [
@@ -37,6 +39,7 @@ use Doctrine\ORM\Mapping as ORM;
     ],
 )]
 #[ORM\Entity]
+#[Map(target: MappedDeliveryDay::class)]
 class DeliveryDay
 {
     #[ORM\Column(type: 'integer')]

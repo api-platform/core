@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\HttpCache;
 
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\NullPurger;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedDeliveryDay;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Supplier as SupplierDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DeliveryDay;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Supplier;
@@ -36,7 +37,7 @@ final class PurgeTagProviderTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Supplier::class, DeliveryDay::class];
+        return [Supplier::class, DeliveryDay::class, MappedDeliveryDay::class];
     }
 
     public function testSubresourceCollectionIsPurged(): void
@@ -79,6 +80,32 @@ final class PurgeTagProviderTest extends ApiTestCase
         $client->request('DELETE', '/delivery_days/1');
         $this->assertResponseStatusCodeSame(204);
         $this->assertContains('/suppliers/2/delivery_days', $this->purger()->getIris());
+        $this->assertContains('/delivery_days/1/history', $this->purger()->getIris());
+    }
+
+    public function testMappedResourceUpdateReceivesEntityAndPreviousResource(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('The ObjectMapper stateOptions entity is ORM only.');
+        }
+
+        $this->recreateSchema([Supplier::class, DeliveryDay::class]);
+
+        $deliveryDay = new DeliveryDay();
+        $deliveryDay->day = 'monday';
+        $manager = $this->getManager();
+        $manager->persist($deliveryDay);
+        $manager->flush();
+
+        $this->purger()->clear();
+        self::createClient()->request('PUT', '/mapped_delivery_days/'.$deliveryDay->id, [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['day' => 'tuesday'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertContains('/mapped_delivery_days/day/monday', $this->purger()->getIris());
+        $this->assertContains('/mapped_delivery_days/day/tuesday', $this->purger()->getIris());
     }
 
     private function purger(): NullPurger
