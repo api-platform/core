@@ -74,6 +74,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\TypeInfo\Type;
@@ -2021,6 +2023,25 @@ class OpenApiFactoryTest extends TestCase
         $parameters = $openApi->getPaths()->getPath('/things/fixed/{id}')->getGet()->getParameters();
 
         $this->assertSame(['id'], array_map(static fn (Parameter $parameter): string => $parameter->getName(), array_values(array_filter($parameters, static fn (Parameter $parameter): bool => 'path' === $parameter->getIn()))));
+    }
+
+    public function testUserDefinedUriTemplateIsDocumentedInsteadOfSharedRoutePathWhenOptedIn(): void
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('shared_route', new Route('/shared/{kind}'));
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('getRouteCollection')->willReturn($routeCollection);
+
+        $operations = static fn (array $extraProperties): array => [
+            (new Get())->withUriTemplate('/shared/a')->withRouteName('shared_route')->withShortName('Dummy')->withName('shared_a')->withExtraProperties($extraProperties),
+            (new Get())->withUriTemplate('/shared/b')->withRouteName('shared_route')->withShortName('Dummy')->withName('shared_b')->withExtraProperties($extraProperties),
+        ];
+
+        $optedIn = $this->createOpenApiForOperations($operations(['user_defined_uri_template' => true, 'openapi_use_uri_template' => true]), $router);
+        $this->assertSame(['/shared/a', '/shared/b'], array_keys($optedIn->getPaths()->getPaths()));
+
+        $default = $this->createOpenApiForOperations($operations(['user_defined_uri_template' => true]), $router);
+        $this->assertSame(['/shared/{kind}'], array_keys($default->getPaths()->getPaths()));
     }
 
     /**
