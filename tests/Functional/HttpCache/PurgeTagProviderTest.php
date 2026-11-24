@@ -83,6 +83,36 @@ final class PurgeTagProviderTest extends ApiTestCase
         $this->assertContains('/delivery_days/1/history', $this->purger()->getIris());
     }
 
+    public function testSingleWriteTriggersSinglePurge(): void
+    {
+        $this->recreateSchema([Supplier::class, DeliveryDay::class]);
+
+        $manager = $this->getManager();
+        foreach (['First', 'Second'] as $name) {
+            $supplier = $this->isMongoDB() ? new SupplierDocument() : new Supplier();
+            $supplier->name = $name;
+            $manager->persist($supplier);
+        }
+        $manager->flush();
+
+        $client = self::createClient();
+        $client->request('POST', '/delivery_days', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['supplier' => '/suppliers/1', 'day' => 'monday'],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        $this->purger()->clear();
+        $client->request('PUT', '/delivery_days/1', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['supplier' => '/suppliers/2', 'day' => 'monday'],
+        ]);
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertSame(1, $this->purger()->getPurgeCount());
+        $this->assertContains('/suppliers/2', $this->purger()->getIris());
+        $this->assertContains('/suppliers/2/delivery_days', $this->purger()->getIris());
+    }
+
     public function testMappedResourceUpdateReceivesEntityAndPreviousResource(): void
     {
         if ($this->isMongoDB()) {
