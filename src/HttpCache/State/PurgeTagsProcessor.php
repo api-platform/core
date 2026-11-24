@@ -37,21 +37,27 @@ final class PurgeTagsProcessor implements ProcessorInterface
         $previousData = $context['previous_data'] ?? null;
         $resourceForDelete = $isDelete && \is_object($data) ? $data : null;
 
-        $result = $this->decorated->process($data, $operation, $uriVariables, $context);
-
         $tags = [];
-        foreach ($this->providers as $provider) {
-            if ($isDelete && null !== $resourceForDelete) {
+        if ($isDelete && null !== $resourceForDelete) {
+            foreach ($this->providers as $provider) {
                 foreach ($provider->getTagsForDelete($resourceForDelete) as $tag) {
                     $tags[$tag] = $tag;
                 }
-            } elseif (\is_object($previousData) && \is_object($result)) {
-                foreach ($provider->getTagsForUpdate($result, $previousData) as $tag) {
-                    $tags[$tag] = $tag;
-                }
-            } elseif (null === $previousData && \is_object($result)) {
-                foreach ($provider->getTagsForInsert($result) as $tag) {
-                    $tags[$tag] = $tag;
+            }
+        }
+
+        $result = $this->decorated->process($data, $operation, $uriVariables, $context);
+
+        if (!$isDelete) {
+            foreach ($this->providers as $provider) {
+                if (\is_object($previousData) && \is_object($result)) {
+                    foreach ($provider->getTagsForUpdate($result, $previousData) as $tag) {
+                        $tags[$tag] = $tag;
+                    }
+                } elseif (null === $previousData && \is_object($result)) {
+                    foreach ($provider->getTagsForInsert($result) as $tag) {
+                        $tags[$tag] = $tag;
+                    }
                 }
             }
         }
