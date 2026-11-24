@@ -211,6 +211,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
                 'hub_url' => null,
                 'include_type' => false,
+                'resolve_resource_objects' => false,
             ],
             'asset_package' => null,
             'openapi' => [

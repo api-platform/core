@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use ApiPlatform\State\ResourceObjectResolverInterface;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
@@ -61,6 +62,8 @@ final class PublishMercureUpdatesListener implements ResetInterface
     private readonly ?ExpressionLanguage $expressionLanguage;
     /** @var list<array{object: object, options: array, operation: ?Operation}> */
     private array $createdObjects;
+    /** @var list<object> */
+    private array $createdSources;
     /** @var list<array{object: object, options: array, operation: ?Operation}> */
     private array $updatedObjects;
     /** @var list<array{object: object, options: array, operation: ?Operation}> */
@@ -69,7 +72,7 @@ final class PublishMercureUpdatesListener implements ResetInterface
     /**
      * @param array<string, string[]|string> $formats
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, ?MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ?ExpressionLanguage $expressionLanguage = null, private bool $includeType = false)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, ?MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ?ExpressionLanguage $expressionLanguage = null, private bool $includeType = false, private readonly ?ResourceObjectResolverInterface $resourceObjectResolver = null)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
@@ -131,6 +134,13 @@ final class PublishMercureUpdatesListener implements ResetInterface
     public function postFlush(): void
     {
         try {
+            foreach ($this->createdSources as $source) {
+                foreach ($this->resourceObjectResolver?->resolve($source) ?? [] as $object) {
+                    $this->storeResourceToPublish($object, 'createdObjects');
+                }
+            }
+            $this->createdSources = [];
+
             foreach ($this->createdObjects as $entry) {
                 $this->publishUpdate($entry['object'], $entry['options'], 'create', $entry['operation']);
             }
@@ -153,11 +163,31 @@ final class PublishMercureUpdatesListener implements ResetInterface
     public function reset(): void
     {
         $this->createdObjects = [];
+        $this->createdSources = [];
         $this->updatedObjects = [];
         $this->deletedObjects = [];
     }
 
-    private function storeObjectToPublish(object $object, string $property): void
+    private function storeObjectToPublish(object $source, string $property): void
+    {
+        if (!$this->resourceObjectResolver) {
+            $this->storeResourceToPublish($source, $property);
+
+            return;
+        }
+
+        if ('createdObjects' === $property && null === $this->getResourceClass($source)) {
+            $this->createdSources[] = $source;
+
+            return;
+        }
+
+        foreach ($this->resourceObjectResolver->resolve($source) as $object) {
+            $this->storeResourceToPublish($object, $property);
+        }
+    }
+
+    private function storeResourceToPublish(object $object, string $property): void
     {
         if (null === $resourceClass = $this->getResourceClass($object)) {
             return;

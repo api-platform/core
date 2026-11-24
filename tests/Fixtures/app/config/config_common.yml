@@ -103,6 +103,7 @@ api_platform:
             - '%kernel.project_dir%/../TestBundle/Model'
     mercure:
         include_type: true
+        resolve_resource_objects: true
 
 services:
     test.client:
