@@ -41,9 +41,9 @@ class PolicyBeforeDeserializationTest extends TestCase
 
     public function testPatchPolicyIsEvaluatedOnTheStoredRecord(): void
     {
-        $owner = UserFactory::new()->create();
-        $attacker = UserFactory::new()->create();
-        $note = OwnedNoteFactory::new()->create(['user_id' => $owner->getKey(), 'title' => 'original']);
+        $owner = UserFactory::new()->createOne();
+        $attacker = UserFactory::new()->createOne();
+        $note = OwnedNoteFactory::new()->createOne(['user_id' => $owner->getKey(), 'title' => 'original']);
 
         $response = $this->actingAs($attacker)->patchJson(
             '/api/owned_notes/'.$note->getKey(),
@@ -55,14 +55,14 @@ class PolicyBeforeDeserializationTest extends TestCase
         );
 
         $response->assertStatus(403);
-        $stored = OwnedNote::findOrFail($note->getKey());
-        $this->assertSame($owner->getKey(), $stored->user_id);
-        $this->assertSame('original', $stored->title);
+        $note->refresh();
+        $this->assertSame($owner->getKey(), $note->getAttribute('user_id'));
+        $this->assertSame('original', $note->getAttribute('title'));
     }
 
     public function testGraphQlCreateMutationUsesTheCreatePolicy(): void
     {
-        $user = UserFactory::new()->create();
+        $user = UserFactory::new()->createOne();
 
         $response = $this->actingAs($user)->postJson('/api/graphql', ['query' => \sprintf('mutation {
     createOwnedNote(input: {title: "x", userId: %d}) {
