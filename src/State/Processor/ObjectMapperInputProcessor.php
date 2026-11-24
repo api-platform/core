@@ -58,9 +58,11 @@ final class ObjectMapperInputProcessor implements ProcessorInterface
         $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data') ?? $targetClass);
         $request?->attributes->set('mapped_data', $mapped);
 
-        $previousData = $context['previous_data'] ?? null;
+        $previousData = $context['previous_data'] ?? $request?->attributes->get('previous_data');
         if (\is_object($previousData) && null !== $targetClass && !$previousData instanceof $targetClass) {
-            $context['previous_data'] = $this->objectMapper->map($previousData, $targetClass);
+            $previousData = $this->objectMapper->map($previousData, $targetClass);
+            $context['previous_data'] = $previousData;
+            $request?->attributes->set('previous_data', $previousData);
         }
 
         return $this->decorated ? $this->decorated->process($mapped, $operation, $uriVariables, $context) : $mapped;
