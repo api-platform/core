@@ -55,6 +55,7 @@ interface SerializerContextBuilderInterface
      *   force_resource_class?: class-string,
      *   api_allow_update?: bool,
      *   deep_object_to_populate?: bool,
+     *   api_merge_patch_maps?: bool,
      *   collect_denormalization_errors?: bool,
      *   exclude_from_cache_key?: string[],
      *   api_included?: bool,
