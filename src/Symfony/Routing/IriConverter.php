@@ -104,7 +104,7 @@ final class IriConverter implements IriConverterInterface
         if (\is_string($expectedClass) && $expectedClass !== $parameters['_api_resource_class'] && class_exists($expectedClass)) {
             foreach ($this->resourceMetadataCollectionFactory->create($expectedClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() ?? [] as $candidate) {
-                    if ($candidate instanceof HttpOperation && !$candidate instanceof CollectionOperationInterface && $candidate->getRouteName() === ($parameters['_route'] ?? null)) {
+                    if ($candidate instanceof HttpOperation && !$candidate instanceof CollectionOperationInterface && $candidate->getRouteName() === ($parameters['_route'] ?? null) && $candidate->getUriTemplate() === $routeOperation->getUriTemplate()) {
                         $dispatchOperation = $candidate;
                         break 2;
                     }

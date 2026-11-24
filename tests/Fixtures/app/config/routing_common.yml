@@ -16,3 +16,11 @@ shared_static_route:
     methods: ['GET', 'HEAD']
     defaults:
         _controller: 'api_platform.action.placeholder'
+
+shared_route_variable_item:
+    path: '/shared_route_variable/{kind}/{id}'
+    methods: ['GET', 'HEAD']
+    defaults:
+        _controller: 'api_platform.action.placeholder'
+        _api_resource_class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SharedRouteIri\VariableRouteAlpha'
+        _api_operation_name: 'shared_route_variable_alpha_get'

@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Serializer;
 
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SharedRouteIri\CategoryProjection;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SharedRouteIri\CategoryResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SharedRouteIri\TopicResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SharedRouteIri\VariableRouteAlpha;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SharedRouteIri\VariableRouteBeta;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class SharedRouteIriTest extends ApiTestCase
@@ -27,7 +30,7 @@ final class SharedRouteIriTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [CategoryResource::class, CategoryProjection::class, TopicResource::class];
+        return [CategoryResource::class, CategoryProjection::class, TopicResource::class, VariableRouteAlpha::class, VariableRouteBeta::class];
     }
 
     public function testBorrowedRouteIriCanBeWrittenBackToTheSameRelation(): void
@@ -59,5 +62,13 @@ final class SharedRouteIriTest extends ApiTestCase
 
         self::assertResponseStatusCodeSame(400);
         self::assertJsonContains(['detail' => 'Invalid IRI "/shared_iri/topics/1".']);
+    }
+
+    public function testRouteSharedAcrossUriTemplatesIsNotBorrowedByTheExpectedClass(): void
+    {
+        $iriConverter = static::getContainer()->get('api_platform.iri_converter');
+        \assert($iriConverter instanceof IriConverterInterface);
+
+        $this->assertInstanceOf(VariableRouteAlpha::class, $iriConverter->getResourceFromIri('/shared_route_variable/alpha/1', ['resource_class' => VariableRouteBeta::class]));
     }
 }
