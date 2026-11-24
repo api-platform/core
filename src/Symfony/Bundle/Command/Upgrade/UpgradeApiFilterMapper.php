@@ -26,7 +26,7 @@ final class UpgradeApiFilterMapper
     private const ORM_NAMESPACE = 'ApiPlatform\Doctrine\Orm\Filter';
     private const ODM_NAMESPACE = 'ApiPlatform\Doctrine\Odm\Filter';
 
-    public function map(string $filterClass, ?string $strategy = null, ?string $propertyNativeType = null, bool $isRelation = false): UpgradeApiFilterMapping
+    public function map(string $filterClass, ?string $strategy = null, ?string $propertyNativeType = null, bool $isRelation = false, ?string $enumClass = null): UpgradeApiFilterMapping
     {
         $namespace = $this->driverNamespace($filterClass);
 
@@ -41,7 +41,7 @@ final class UpgradeApiFilterMapper
         return match ($shortName) {
             'BooleanFilter' => new UpgradeApiFilterMapping($canonical('ExactFilter'), castToNativeType: true, nativeType: 'bool'),
             'NumericFilter' => new UpgradeApiFilterMapping($canonical('ExactFilter'), castToNativeType: true, nativeType: $propertyNativeType ?? 'int'),
-            'BackedEnumFilter' => new UpgradeApiFilterMapping($canonical('ExactFilter'), castToNativeType: true, nativeType: $propertyNativeType),
+            'BackedEnumFilter' => new UpgradeApiFilterMapping($canonical('ExactFilter'), castToNativeType: true, nativeType: $propertyNativeType, enumClass: $enumClass),
             'OrderFilter' => new UpgradeApiFilterMapping($canonical('SortFilter')),
             'SearchFilter' => $this->searchReplacement($canonical, $strategy, $isRelation),
             default => new UpgradeApiFilterMapping($filterClass),

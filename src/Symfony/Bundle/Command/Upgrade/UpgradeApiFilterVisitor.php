@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\QueryParameter;
 use PhpParser\BuilderHelpers;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -164,8 +165,8 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
             $args[] = new Node\Arg(new Node\Scalar\String_($parameter->property), name: new Node\Identifier('property'));
         }
 
-        if (null !== $parameter->nativeType) {
-            $args[] = new Node\Arg($this->buildNativeType($parameter->nativeType), name: new Node\Identifier('nativeType'));
+        if (null !== $parameter->nativeType || null !== $parameter->enumClass) {
+            $args[] = new Node\Arg($this->buildNativeType($parameter), name: new Node\Identifier('nativeType'));
         }
 
         if ($parameter->castToNativeType) {
@@ -198,15 +199,27 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         return BuilderHelpers::normalizeValue($value);
     }
 
-    private function buildNativeType(string $nativeType): Node\Expr\New_
+    private function buildNativeType(UpgradeApiFilterParameter $parameter): Node\Expr\New_
     {
-        $case = match ($nativeType) {
+        if (null !== $parameter->enumClass) {
+            $backingType = (new \ReflectionEnum($parameter->enumClass))->getBackingType();
+
+            return new Node\Expr\New_(new Node\Name('BackedEnumType'), [
+                new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($this->shortName($parameter->enumClass)), new Node\Identifier('class'))),
+                new Node\Arg($this->buildBuiltinType('int' === (string) $backingType ? 'INT' : 'STRING')),
+            ]);
+        }
+
+        return $this->buildBuiltinType(match ($parameter->nativeType) {
             'bool' => 'BOOL',
             'int' => 'INT',
             'float' => 'FLOAT',
             default => 'STRING',
-        };
+        });
+    }
 
+    private function buildBuiltinType(string $case): Node\Expr\New_
+    {
         return new Node\Expr\New_(new Node\Name('BuiltinType'), [
             new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name('TypeIdentifier'), new Node\Identifier($case))),
         ]);
@@ -240,9 +253,15 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         foreach ($this->parameters as $parameter) {
             $imports[$parameter->filterClass] = true;
             $imports[QueryParameter::class] = true;
-            if (null !== $parameter->nativeType) {
+            if (null !== $parameter->nativeType || null !== $parameter->enumClass) {
                 $imports[BuiltinType::class] = true;
                 $imports[TypeIdentifier::class] = true;
+            }
+            if (null !== $parameter->enumClass) {
+                $imports[BackedEnumType::class] = true;
+                if ($this->namespaceOf($parameter->enumClass) !== $this->namespaceOf($this->className)) {
+                    $imports[$parameter->enumClass] = true;
+                }
             }
         }
 
@@ -264,5 +283,12 @@ final class UpgradeApiFilterVisitor extends NodeVisitorAbstract
         $parts = explode('\\', $fqcn);
 
         return end($parts);
+    }
+
+    private function namespaceOf(string $fqcn): string
+    {
+        $pos = strrpos($fqcn, '\\');
+
+        return false === $pos ? '' : substr($fqcn, 0, $pos);
     }
 }
