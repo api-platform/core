@@ -34,18 +34,18 @@ return static function (ContainerConfigurator $container) {
         ->tag('doctrine.event_listener', ['event' => 'postFlush'])
         ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore']);
 
-    $services->set('api_platform.http_cache.purge_tags.persist_processor', PurgeTagsProcessor::class)
+    $services->set('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor', PurgeTagsProcessor::class)
         ->decorate('api_platform.doctrine.orm.state.persist_processor')
         ->args([
-            service('api_platform.http_cache.purge_tags.persist_processor.inner'),
+            service('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor.inner'),
             service('api_platform.http_cache.purger'),
             tagged_iterator('api_platform.http_cache.purge_tag_provider'),
         ]);
 
-    $services->set('api_platform.http_cache.purge_tags.remove_processor', PurgeTagsProcessor::class)
+    $services->set('api_platform.doctrine.orm.http_cache.purge_tags.remove_processor', PurgeTagsProcessor::class)
         ->decorate('api_platform.doctrine.orm.state.remove_processor')
         ->args([
-            service('api_platform.http_cache.purge_tags.remove_processor.inner'),
+            service('api_platform.doctrine.orm.http_cache.purge_tags.remove_processor.inner'),
             service('api_platform.http_cache.purger'),
             tagged_iterator('api_platform.http_cache.purge_tag_provider'),
         ]);

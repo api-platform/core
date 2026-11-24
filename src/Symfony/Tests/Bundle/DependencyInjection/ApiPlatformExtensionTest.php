@@ -661,8 +661,8 @@ class ApiPlatformExtensionTest extends TestCase
         $config['api_platform']['doctrine']['enabled'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
 
-        $this->assertSame('api_platform.doctrine.orm.state.persist_processor', $this->container->getDefinition('api_platform.http_cache.purge_tags.persist_processor')->getDecoratedService()[0]);
-        $this->assertSame('api_platform.doctrine.orm.state.remove_processor', $this->container->getDefinition('api_platform.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
+        $this->assertSame('api_platform.doctrine.orm.state.persist_processor', $this->container->getDefinition('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor')->getDecoratedService()[0]);
+        $this->assertSame('api_platform.doctrine.orm.state.remove_processor', $this->container->getDefinition('api_platform.doctrine.orm.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
     }
 
     public function testPurgeTagsProcessorsDecorateMongoDbOdmProcessorsWhenInvalidationEnabled(): void
@@ -675,6 +675,6 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertSame('api_platform.doctrine_mongodb.odm.state.persist_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.persist_processor')->getDecoratedService()[0]);
         $this->assertSame('api_platform.doctrine_mongodb.odm.state.remove_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
-        $this->assertNotContainerHasService('api_platform.http_cache.purge_tags.persist_processor');
+        $this->assertNotContainerHasService('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor');
     }
 }
