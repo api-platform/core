@@ -1,0 +1,29 @@
+parameters:
+    runtime_resources.provider: 'ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentProvider'
+    runtime_resources.processor: 'ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentProcessor'
+    runtime_resources.filter: 'ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentFilter'
+
+services:
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\DefinitionProvider:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\OdmDefinitionProvider
+        public: true
+        arguments: ['@doctrine_mongodb']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentProvider:
+        arguments:
+            - '@api_platform.doctrine_mongodb.odm.state.item_provider'
+            - '@api_platform.doctrine_mongodb.odm.state.collection_provider'
+            - '@doctrine_mongodb'
+            - '@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeMapper'
+        tags: ['api_platform.state_provider']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentProcessor:
+        arguments:
+            - '@doctrine_mongodb'
+            - '@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeMapper'
+            - '@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentProvider'
+        tags: ['api_platform.state_processor']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Odm\DocumentFilter:
+        arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeResources', '@api_platform.iri_converter']
+        tags: ['api_platform.filter']
