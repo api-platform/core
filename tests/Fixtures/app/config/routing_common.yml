@@ -10,3 +10,9 @@ relation_embedded.custom_get:
     methods: ['GET', 'HEAD']
     defaults:
         _controller: 'ApiPlatform\Tests\Fixtures\TestBundle\Controller\CustomController::customAction'
+
+shared_static_route:
+    path: '/shared_static_route'
+    methods: ['GET', 'HEAD']
+    defaults:
+        _controller: 'api_platform.action.placeholder'
