@@ -48,6 +48,17 @@ final class ControllerApiOperationTest extends ApiTestCase
         ]);
     }
 
+    public function testSecurityWithLoggedInUser(): void
+    {
+        self::createClient()->request('POST', '/controller_api_operation/secured_checkout', [
+            'headers' => ['Accept' => 'application/ld+json', 'Content-Type' => 'application/ld+json', 'Authorization' => 'Basic ZHVuZ2xhczprZXZpbg=='],
+            'json' => ['reference' => 'abc'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains(['reference' => 'abc', 'status' => 'confirmed']);
+    }
+
     public function testValidationRuns(): void
     {
         self::createClient()->request('POST', '/controller_api_operation/checkout', [

@@ -38,7 +38,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.uri_variables.converter')->ignoreOnInvalid(),
         ])
-        ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 27])
+        ->tag('kernel.event_listener', ['event' => 'kernel.controller', 'method' => 'onKernelController'])
         ->tag('kernel.event_listener', ['event' => 'kernel.view', 'method' => 'onKernelView']);
 
     $services->set('api_platform.action.entrypoint', EntrypointAction::class)

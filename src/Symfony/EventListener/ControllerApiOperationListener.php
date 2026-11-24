@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -62,10 +64,19 @@ final class ControllerApiOperationListener
             return;
         }
 
-        $routeName = $request->attributes->get('_route');
+        $route = $request->attributes->get('_route');
+        $canonicalRoute = $request->attributes->get('_canonical_route');
+        $mismatch = null;
+
         foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
             foreach ($resource->getOperations() ?? [] as $operationName => $operation) {
-                if ($operation->getRouteName() !== $routeName || $operation->getController() !== $controller) {
+                if ($operation->getController() !== $controller) {
+                    continue;
+                }
+
+                if ($operation->getRouteName() !== $route && $operation->getRouteName() !== $canonicalRoute) {
+                    $mismatch ??= $operation;
+
                     continue;
                 }
 
@@ -77,5 +88,24 @@ final class ControllerApiOperationListener
                 return;
             }
         }
+
+        if (null !== $mismatch) {
+            throw new RuntimeException(\sprintf('Route "%1$s" points to "%2$s", whose "#[ApiOperation]" is bound to route "%3$s". Set "routeName: \'%1$s\'" on the operation.', $route, $controller, $mismatch->getRouteName()));
+        }
+    }
+
+    public function onKernelController(ControllerEvent $event): void
+    {
+        $controller = $event->getController();
+        if (!$this->resourceClasses || !\is_array($controller) && !\is_object($controller) || $event->getRequest()->attributes->get(self::REQUEST_ATTRIBUTE)) {
+            return;
+        }
+
+        $name = \is_array($controller) ? (\is_object($controller[0]) ? $controller[0]::class : $controller[0]).'::'.$controller[1] : $controller::class.'::__invoke';
+        if (!isset($this->resourceClasses[$name])) {
+            return;
+        }
+
+        throw new RuntimeException(\sprintf('The controller "%s" carries "#[ApiOperation]" but could not be bound to its operation.', $name));
     }
 }

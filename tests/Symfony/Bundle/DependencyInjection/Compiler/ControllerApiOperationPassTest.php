@@ -38,7 +38,10 @@ final class ControllerApiOperationPassTest extends TestCase
 
         $this->assertSame(
             [
-                CheckoutOutput::class => [ControllerApiOperationController::class.'::__invoke'],
+                CheckoutOutput::class => [
+                    ControllerApiOperationController::class.'::__invoke',
+                    ControllerApiOperationController::class.'::secured',
+                ],
                 Checkout::class => [
                     ControllerApiOperationController::class.'::get',
                     ControllerApiOperationController::class.'::getCollection',

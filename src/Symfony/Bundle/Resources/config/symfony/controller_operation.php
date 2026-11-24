@@ -23,5 +23,6 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory'),
             '%api_platform.controller_operations%',
         ])
-        ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 30]);
+        ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 30])
+        ->tag('kernel.event_listener', ['event' => 'kernel.controller', 'method' => 'onKernelController']);
 };

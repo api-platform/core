@@ -77,4 +77,18 @@ class ControllerApiOperationDefinitions
     {
         return new CheckoutOutput();
     }
+
+    #[Route('/route_attribute_name', name: 'route_attribute_name', methods: ['POST'])]
+    #[ApiOperation(new Post(routeName: 'explicit_route_name', output: CheckoutOutput::class))]
+    public function withExplicitRouteName(): CheckoutOutput
+    {
+        return new CheckoutOutput();
+    }
+
+    #[Route('/mismatched_method', name: 'mismatched_method', methods: ['GET'])]
+    #[ApiOperation(new Post(output: CheckoutOutput::class))]
+    public function withMismatchedMethod(): CheckoutOutput
+    {
+        return new CheckoutOutput();
+    }
 }

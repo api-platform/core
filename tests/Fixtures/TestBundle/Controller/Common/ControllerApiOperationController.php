@@ -38,6 +38,17 @@ class ControllerApiOperationController
         return $output;
     }
 
+    #[Route('/controller_api_operation/secured_checkout', name: 'controller_api_operation_secured_checkout', methods: ['POST'])]
+    #[ApiOperation(new Post(input: CheckoutInput::class, output: CheckoutOutput::class, security: 'is_granted("ROLE_USER")'))]
+    public function secured(CheckoutInput $data): CheckoutOutput
+    {
+        $output = new CheckoutOutput();
+        $output->reference = $data->reference;
+        $output->status = 'confirmed';
+
+        return $output;
+    }
+
     #[Route('/controller_api_operation/checkouts/{id}', name: 'controller_api_operation_checkout_get', methods: ['GET'], requirements: ['id' => '\d+'])]
     #[ApiOperation(new Get(class: Checkout::class, uriVariables: ['id'], formats: ['jsonld' => ['application/ld+json'], 'json' => ['application/json'], 'csv' => ['text/csv']]))]
     public function get(int $id): Checkout
