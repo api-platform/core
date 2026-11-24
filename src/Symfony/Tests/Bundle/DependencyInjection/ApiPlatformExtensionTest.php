@@ -653,4 +653,28 @@ class ApiPlatformExtensionTest extends TestCase
         $tags = $this->container->getDefinition('api_platform.doctrine_mongodb.odm.listener.http_cache.purge')->getTags();
         $this->assertSame([['event' => 'onFlush'], ['event' => 'postFlush']], $tags['doctrine_mongodb.odm.event_listener']);
     }
+
+    public function testPurgeTagsProcessorsDecorateDoctrineOrmProcessorsWhenInvalidationEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame('api_platform.doctrine.orm.state.persist_processor', $this->container->getDefinition('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor')->getDecoratedService()[0]);
+        $this->assertSame('api_platform.doctrine.orm.state.remove_processor', $this->container->getDefinition('api_platform.doctrine.orm.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
+    }
+
+    public function testPurgeTagsProcessorsDecorateMongoDbOdmProcessorsWhenInvalidationEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        $config['api_platform']['doctrine']['enabled'] = false;
+        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame('api_platform.doctrine_mongodb.odm.state.persist_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.persist_processor')->getDecoratedService()[0]);
+        $this->assertSame('api_platform.doctrine_mongodb.odm.state.remove_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
+        $this->assertNotContainerHasService('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor');
+    }
 }

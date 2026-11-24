@@ -507,6 +507,10 @@ services:
         class: ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault
         public: true
 
+    ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\DeliveryDayPurgeTagProvider:
+        tags:
+            - name: 'api_platform.http_cache.purge_tag_provider'
+
     ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider:
         tags:
             - name: 'api_platform.parameter_provider'
