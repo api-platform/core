@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent;
 
+use ApiPlatform\HttpCache\BufferedPurger;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\HttpCache\SouinPurger;
 use ApiPlatform\HttpCache\VarnishPurger;
@@ -24,6 +25,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpClient\HttpClient;
@@ -74,7 +76,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(PurgerInterface::class, static function (Application $app) {
+        $this->app->singleton(BufferedPurger::class, static function (Application $app) {
             $purgerClass = Config::get(
                 'api-platform.http_cache.invalidation.purger',
                 SouinPurger::class
@@ -84,7 +86,11 @@ class ApiPlatformEventProvider extends ServiceProvider
                 throw new \InvalidArgumentException("Purger class '{$purgerClass}' configured in api-platform.php was not found.");
             }
 
-            return $app->make($purgerClass);
+            return new BufferedPurger($app->make($purgerClass));
+        });
+
+        $this->app->singleton(PurgerInterface::class, static function (Application $app) {
+            return $app->make(BufferedPurger::class);
         });
 
         $this->app->singleton(PurgeHttpCacheListener::class, static function (Application $app) {
@@ -103,10 +109,15 @@ class ApiPlatformEventProvider extends ServiceProvider
             return;
         }
 
+        Event::listen(RouteMatched::class, function (): void {
+            $this->app->make(BufferedPurger::class)->startBuffering();
+        });
+
         Event::listen(RequestHandled::class, function (): void {
             Event::forget('eloquent.saved: *');
             Event::forget('eloquent.deleted: *');
             $this->app->make(PurgeHttpCacheListener::class)->postFlush();
+            $this->app->make(BufferedPurger::class)->flush();
         });
     }
 
