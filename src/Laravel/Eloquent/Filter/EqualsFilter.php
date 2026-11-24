@@ -29,8 +29,10 @@ final class EqualsFilter implements FilterInterface
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
         if (\is_array($values)) {
-            if (!array_is_list($values)) {
-                return $builder;
+            foreach ($values as $key => $value) {
+                if (!\is_int($key)) {
+                    return $builder;
+                }
             }
 
             $in = [];

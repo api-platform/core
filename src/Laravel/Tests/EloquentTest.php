@@ -125,6 +125,19 @@ class EloquentTest extends TestCase
         $this->assertCount(3, $response->json()['member']);
     }
 
+    public function testSearchFiltersAcceptNonContiguousNumericKeys(): void
+    {
+        foreach (['Alpha', 'Bravo', 'Charlie'] as $name) {
+            BookFactory::new()->has(AuthorFactory::new())->create(['name' => $name]);
+        }
+
+        $response = $this->get('/api/books?name%5B25%5D=lph&name%5B28%5D=rav', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertEqualsCanonicalizing(['Alpha', 'Bravo'], array_column($response->json()['member'], 'name'));
+
+        $response = $this->get('/api/books?name2%5B25%5D=Alpha&name2%5B28%5D=Bravo', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertEqualsCanonicalizing(['Alpha', 'Bravo'], array_column($response->json()['member'], 'name'));
+    }
+
     public function testDateFilterEqual(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
