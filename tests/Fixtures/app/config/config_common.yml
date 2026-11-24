@@ -277,7 +277,7 @@ services:
         class: ApiPlatform\Tests\Fixtures\NullPurger
         
     test.api_platform.http_cache.purger:
-        alias: api_platform.http_cache.purger
+        alias: api_platform.http_cache.purger.buffered.inner
         public: true
         
     test.property_accessor:
