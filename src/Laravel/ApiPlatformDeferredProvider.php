@@ -200,10 +200,9 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
             if (interface_exists(PurgerInterface::class) && $app->bound(PurgerInterface::class)) {
                 $purger = $app->make(PurgerInterface::class);
-                $providers = iterator_to_array($app->tagged(PurgeTagProviderInterface::class));
                 foreach ($tagged as $processor) {
                     if ($processor instanceof PersistProcessor || $processor instanceof RemoveProcessor) {
-                        $tagged[$processor::class] = new PurgeTagsProcessor($processor, $purger, $providers);
+                        $tagged[$processor::class] = new PurgeTagsProcessor($processor, $purger, $app->tagged(PurgeTagProviderInterface::class));
                     }
                 }
             }

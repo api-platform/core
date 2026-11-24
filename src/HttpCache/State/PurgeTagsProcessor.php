@@ -33,33 +33,17 @@ final class PurgeTagsProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        $isDelete = $operation instanceof DeleteOperationInterface;
-        $previousData = $context['previous_data'] ?? null;
-        $resourceForDelete = $isDelete && \is_object($data) ? $data : null;
-
         $tags = [];
-        if ($isDelete && null !== $resourceForDelete) {
-            foreach ($this->providers as $provider) {
-                foreach ($provider->getTagsForDelete($resourceForDelete) as $tag) {
-                    $tags[$tag] = $tag;
-                }
-            }
+        $collectBefore = $operation instanceof DeleteOperationInterface && \is_object($data);
+
+        if ($collectBefore) {
+            $tags = $this->collect($data, $operation, $context);
         }
 
         $result = $this->decorated->process($data, $operation, $uriVariables, $context);
 
-        if (!$isDelete) {
-            foreach ($this->providers as $provider) {
-                if (\is_object($previousData) && \is_object($result)) {
-                    foreach ($provider->getTagsForUpdate($result, $previousData) as $tag) {
-                        $tags[$tag] = $tag;
-                    }
-                } elseif (null === $previousData && \is_object($result)) {
-                    foreach ($provider->getTagsForInsert($result) as $tag) {
-                        $tags[$tag] = $tag;
-                    }
-                }
-            }
+        if (!$collectBefore && \is_object($result)) {
+            $tags = $this->collect($result, $operation, $context);
         }
 
         if ($tags) {
@@ -67,5 +51,22 @@ final class PurgeTagsProcessor implements ProcessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, string>
+     */
+    private function collect(object $resource, Operation $operation, array $context): array
+    {
+        $tags = [];
+        foreach ($this->providers as $provider) {
+            foreach ($provider->getTags($resource, $operation, $context) as $tag) {
+                $tags[$tag] = $tag;
+            }
+        }
+
+        return $tags;
     }
 }

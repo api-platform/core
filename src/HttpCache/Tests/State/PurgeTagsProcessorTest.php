@@ -17,93 +17,77 @@ use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\HttpCache\State\PurgeTagsProcessor;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
 
 class PurgeTagsProcessorTest extends TestCase
 {
-    public function testCallsGetTagsForInsertOnPost(): void
+    public function testDeleteCollectsTagsBeforeTheDecoratedProcessor(): void
     {
         $resource = new \stdClass();
+        $calls = [];
 
-        $decorated = $this->createStub(ProcessorInterface::class);
-        $decorated->method('process')->willReturn($resource);
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())->method('process')->willReturnCallback(static function () use (&$calls) {
+            $calls[] = 'process';
+
+            return null;
+        });
 
         $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->once())->method('getTagsForInsert')->with($resource)->willReturn(['/parents/1/children']);
-        $provider->expects($this->never())->method('getTagsForUpdate');
-        $provider->expects($this->never())->method('getTagsForDelete');
+        $provider->expects($this->once())->method('getTags')->with($resource, $this->isInstanceOf(Delete::class))->willReturnCallback(static function () use (&$calls) {
+            $calls[] = 'getTags';
+
+            return ['/parents/1/children'];
+        });
 
         $purger = $this->createMock(PurgerInterface::class);
         $purger->expects($this->once())->method('purge')->with(['/parents/1/children']);
 
-        $processor = new PurgeTagsProcessor($decorated, $purger, [$provider]);
-        $processor->process($resource, new Post(), [], []);
+        (new PurgeTagsProcessor($decorated, $purger, [$provider]))->process($resource, new Delete(), [], []);
+
+        $this->assertSame(['getTags', 'process'], $calls);
     }
 
-    public function testCallsGetTagsForUpdateOnPut(): void
+    public function testNonDeleteCollectsTagsFromTheDecoratedResult(): void
     {
-        $resource = new \stdClass();
-        $previousResource = new \stdClass();
+        $data = new \stdClass();
+        $result = new \stdClass();
+        $previousData = new \stdClass();
+        $context = ['previous_data' => $previousData];
 
         $decorated = $this->createStub(ProcessorInterface::class);
-        $decorated->method('process')->willReturn($resource);
+        $decorated->method('process')->willReturn($result);
 
         $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->never())->method('getTagsForInsert');
-        $provider->expects($this->once())->method('getTagsForUpdate')->with($resource, $previousResource)->willReturn(['/parents/1/children', '/parents/2/children']);
-        $provider->expects($this->never())->method('getTagsForDelete');
+        $provider->expects($this->once())->method('getTags')->with($result, $this->isInstanceOf(Put::class), $context)->willReturn(['/parents/1/children', '/parents/2/children']);
 
         $purger = $this->createMock(PurgerInterface::class);
         $purger->expects($this->once())->method('purge')->with(['/parents/1/children', '/parents/2/children']);
 
-        $processor = new PurgeTagsProcessor($decorated, $purger, [$provider]);
-        $processor->process($resource, new Put(), [], ['previous_data' => $previousResource]);
+        $this->assertSame($result, (new PurgeTagsProcessor($decorated, $purger, [$provider]))->process($data, new Put(), [], $context));
     }
 
-    public function testCallsGetTagsForUpdateOnPatch(): void
+    public function testTagsAreDeduplicatedAcrossProviders(): void
     {
         $resource = new \stdClass();
-        $previousResource = new \stdClass();
 
         $decorated = $this->createStub(ProcessorInterface::class);
         $decorated->method('process')->willReturn($resource);
 
-        $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->once())->method('getTagsForUpdate')->with($resource, $previousResource)->willReturn(['/parents/1/children']);
-        $provider->expects($this->never())->method('getTagsForInsert');
-        $provider->expects($this->never())->method('getTagsForDelete');
+        $first = $this->createStub(PurgeTagProviderInterface::class);
+        $first->method('getTags')->willReturn(['/a', '/b']);
+        $second = $this->createStub(PurgeTagProviderInterface::class);
+        $second->method('getTags')->willReturn(['/b', '/c']);
 
         $purger = $this->createMock(PurgerInterface::class);
-        $purger->expects($this->once())->method('purge')->with(['/parents/1/children']);
+        $purger->expects($this->once())->method('purge')->with(['/a', '/b', '/c']);
 
-        $processor = new PurgeTagsProcessor($decorated, $purger, [$provider]);
-        $processor->process($resource, new Patch(), [], ['previous_data' => $previousResource]);
+        (new PurgeTagsProcessor($decorated, $purger, [$first, $second]))->process($resource, new Put(), [], []);
     }
 
-    public function testCallsGetTagsForDeleteOnDelete(): void
-    {
-        $resource = new \stdClass();
-
-        $decorated = $this->createStub(ProcessorInterface::class);
-        $decorated->method('process')->willReturn(null);
-
-        $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->never())->method('getTagsForInsert');
-        $provider->expects($this->never())->method('getTagsForUpdate');
-        $provider->expects($this->once())->method('getTagsForDelete')->with($resource)->willReturn(['/parents/1/children']);
-
-        $purger = $this->createMock(PurgerInterface::class);
-        $purger->expects($this->once())->method('purge')->with(['/parents/1/children']);
-
-        $processor = new PurgeTagsProcessor($decorated, $purger, [$provider]);
-        $processor->process($resource, new Delete(), [], []);
-    }
-
-    public function testNoPurgeWhenNoTags(): void
+    public function testNoPurgeWithoutTags(): void
     {
         $resource = new \stdClass();
 
@@ -111,46 +95,25 @@ class PurgeTagsProcessorTest extends TestCase
         $decorated->method('process')->willReturn($resource);
 
         $provider = $this->createStub(PurgeTagProviderInterface::class);
-        $provider->method('getTagsForInsert')->willReturn([]);
+        $provider->method('getTags')->willReturn([]);
 
         $purger = $this->createMock(PurgerInterface::class);
         $purger->expects($this->never())->method('purge');
 
-        $processor = new PurgeTagsProcessor($decorated, $purger, [$provider]);
-        $processor->process($resource, new Post(), [], []);
+        (new PurgeTagsProcessor($decorated, $purger, [$provider]))->process($resource, new Put(), [], []);
     }
 
-    public function testDeduplicatesTags(): void
+    public function testNonObjectResultDoesNotCallProviders(): void
     {
-        $resource = new \stdClass();
-
         $decorated = $this->createStub(ProcessorInterface::class);
-        $decorated->method('process')->willReturn($resource);
+        $decorated->method('process')->willReturn(null);
 
-        $provider1 = $this->createStub(PurgeTagProviderInterface::class);
-        $provider1->method('getTagsForInsert')->willReturn(['/parents/1/children']);
-
-        $provider2 = $this->createStub(PurgeTagProviderInterface::class);
-        $provider2->method('getTagsForInsert')->willReturn(['/parents/1/children', '/parents/2/children']);
-
-        $purger = $this->createMock(PurgerInterface::class);
-        $purger->expects($this->once())->method('purge')->with(['/parents/1/children', '/parents/2/children']);
-
-        $processor = new PurgeTagsProcessor($decorated, $purger, [$provider1, $provider2]);
-        $processor->process($resource, new Post(), [], []);
-    }
-
-    public function testNoPurgeWhenNoProviders(): void
-    {
-        $resource = new \stdClass();
-
-        $decorated = $this->createStub(ProcessorInterface::class);
-        $decorated->method('process')->willReturn($resource);
+        $provider = $this->createMock(PurgeTagProviderInterface::class);
+        $provider->expects($this->never())->method('getTags');
 
         $purger = $this->createMock(PurgerInterface::class);
         $purger->expects($this->never())->method('purge');
 
-        $processor = new PurgeTagsProcessor($decorated, $purger, []);
-        $processor->process($resource, new Post(), [], []);
+        (new PurgeTagsProcessor($decorated, $purger, [$provider]))->process(new \stdClass(), new Put(), [], []);
     }
 }
