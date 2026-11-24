@@ -1,0 +1,26 @@
+parameters:
+    runtime_resources.provider: 'ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavProvider'
+    runtime_resources.processor: 'ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavProcessor'
+    runtime_resources.filter: 'ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavFilter'
+
+services:
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\DefinitionProvider:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\OrmDefinitionProvider
+        public: true
+        arguments: ['@doctrine']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavProvider:
+        arguments:
+            - '@api_platform.doctrine.orm.state.item_provider'
+            - '@api_platform.doctrine.orm.state.collection_provider'
+            - '@doctrine'
+            - '@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeMapper'
+        tags: ['api_platform.state_provider']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavProcessor:
+        arguments: ['@doctrine', '@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeMapper', '@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavProvider']
+        tags: ['api_platform.state_processor']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\Orm\EavFilter:
+        arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeResources', '@api_platform.iri_converter']
+        tags: ['api_platform.filter']
