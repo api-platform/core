@@ -312,6 +312,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
+                if (!str_contains($path, '{'.$parameterName.'}')) {
+                    continue;
+                }
+
                 $description = $uriVariable->getDescription();
                 if (null === $description) {
                     $fromClass = $uriVariable->getFromClass();

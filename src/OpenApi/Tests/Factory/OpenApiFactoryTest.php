@@ -74,6 +74,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\TypeInfo\Type;
 
@@ -287,7 +288,7 @@ class OpenApiFactoryTest extends TestCase
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withShortName('Parameter')->withDescription('This is a dummy');
         $parameterResource = (new ApiResource())->withOperations(new Operations([
-            'uriVariableSchema' => (new Get(uriTemplate: '/uri_variable_uuid', uriVariables: ['id' => new Link(schema: ['type' => 'string', 'format' => 'uuid'], description: 'hello', required: true, openApi: new Parameter('id', 'path'))]))->withOperation($baseOperation),
+            'uriVariableSchema' => (new Get(uriTemplate: '/uri_variable_uuid/{id}', uriVariables: ['id' => new Link(schema: ['type' => 'string', 'format' => 'uuid'], description: 'hello', required: true, openApi: new Parameter('id', 'path'))]))->withOperation($baseOperation),
             'parameters' => (new Put(uriTemplate: '/parameters', parameters: [
                 'foo' => new HeaderParameter(description: 'hi', schema: ['type' => 'string', 'format' => 'uuid']),
             ]))->withOperation($baseOperation),
@@ -1334,7 +1335,7 @@ class OpenApiFactoryTest extends TestCase
             )
         ), $emptyResponsePath->getPost());
 
-        $parameter = $paths->getPath('/uri_variable_uuid')->getGet()->getParameters()[0];
+        $parameter = $paths->getPath('/uri_variable_uuid/{id}')->getGet()->getParameters()[0];
         $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
 
         $parameter = $paths->getPath('/parameters')->getPut()->getParameters()[0];
@@ -2002,6 +2003,67 @@ class OpenApiFactoryTest extends TestCase
         $plainInputSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_INPUT, $plainOperation);
         $this->assertArrayNotHasKey('$ref', $plainInputSchema->getArrayCopy(false));
         $this->assertCount(0, $plainInputSchema->getDefinitions());
+    }
+
+    public function testUriVariableAbsentFromPathIsSkipped(): void
+    {
+        $openApi = $this->createOpenApiForOperations([
+            (new Get())
+                ->withUriTemplate('/things/fixed/{id}')
+                ->withUriVariables([
+                    'kind' => new Link(fromClass: Dummy::class, identifiers: ['kind']),
+                    'id' => new Link(fromClass: Dummy::class, identifiers: ['id']),
+                ])
+                ->withShortName('Dummy')
+                ->withName('things_fixed_get'),
+        ]);
+
+        $parameters = $openApi->getPaths()->getPath('/things/fixed/{id}')->getGet()->getParameters();
+
+        $this->assertSame(['id'], array_map(static fn (Parameter $parameter): string => $parameter->getName(), array_values(array_filter($parameters, static fn (Parameter $parameter): bool => 'path' === $parameter->getIn()))));
+    }
+
+    /**
+     * @param HttpOperation[] $operations
+     */
+    private function createOpenApiForOperations(array $operations, ?RouterInterface $router = null): OpenApi
+    {
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: $operations))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => Dummy::class === $resourceClass ? $resourceCollectionMetadata : new ResourceMetadataCollection($resourceClass, []));
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([Dummy::class]));
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: new DefinitionNameFactory(),
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            $router,
+            ['json' => ['application/problem+json']]
+        );
+
+        return $factory->__invoke();
     }
 
     /**
