@@ -31,6 +31,7 @@ final readonly class UpgradeApiFilterParameter
      * @param bool                 $caseSensitive    emit `caseSensitive: true` on the search filter (case-sensitive
      *                                               strategy); the new search filters are case-insensitive by default
      * @param array<string, mixed> $arguments        constructor arguments to pass to the (kept) filter, named
+     * @param class-string|null    $enumClass        backed enum FQCN to emit as a `BackedEnumType` native type, null to emit the scalar $nativeType
      */
     public function __construct(
         public string $key,
@@ -41,6 +42,7 @@ final readonly class UpgradeApiFilterParameter
         public ?string $filterContext = null,
         public bool $caseSensitive = false,
         public array $arguments = [],
+        public ?string $enumClass = null,
     ) {
     }
 }

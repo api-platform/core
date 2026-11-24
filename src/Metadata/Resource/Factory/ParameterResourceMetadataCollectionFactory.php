@@ -40,6 +40,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -354,6 +356,13 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 }
             }
 
+            if (null === $parameter->getCastFn() && ($nativeType = $parameter->getNativeType()) && ValueCaster::resolveEnumType($nativeType)) {
+                $parameter = $parameter->withCastFn([ValueCaster::class, 'toBackedEnum']);
+                if (null === $parameter->getCastToNativeType()) {
+                    $parameter = $parameter->withCastToNativeType(true);
+                }
+            }
+
             if ($parameter->getCastToNativeType() && null === $parameter->getCastFn()) {
                 $propertyKey = $parameter->getProperty() ?? $key;
                 $propNativeType = ($properties[$propertyKey] ?? null)?->getNativeType();
@@ -373,24 +382,48 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
     private function addFilterMetadata(Parameter $parameter): Parameter
     {
-        if (!$filter = $this->getFilterInstance($parameter->getFilter())) {
-            return $parameter;
+        $filter = $this->getFilterInstance($parameter->getFilter());
+
+        if ($filter) {
+            if (null === $parameter->getProvider() && $filter instanceof ParameterProviderFilterInterface) {
+                $parameter = $parameter->withProvider($filter::getParameterProvider());
+            }
+
+            if (null === $parameter->getSchema() && $filter instanceof JsonSchemaFilterInterface && $schema = $filter->getSchema($parameter)) {
+                $parameter = $parameter->withSchema($schema);
+            }
         }
 
-        if (null === $parameter->getProvider() && $filter instanceof ParameterProviderFilterInterface) {
-            $parameter = $parameter->withProvider($filter::getParameterProvider());
-        }
+        $parameter = $this->addNativeTypeSchema($parameter);
 
-        if (null === $parameter->getSchema() && $filter instanceof JsonSchemaFilterInterface && $schema = $filter->getSchema($parameter)) {
-            $parameter = $parameter->withSchema($schema);
-        }
-
-        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface
+        if ($filter && null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface
             && class_exists(OpenApiParameter::class) && ($openApiParameter = $filter->getOpenApiParameters($parameter))) {
             $parameter = $parameter->withOpenApi($openApiParameter);
         }
 
         return $parameter;
+    }
+
+    private function addNativeTypeSchema(Parameter $parameter): Parameter
+    {
+        if (!($nativeType = $parameter->getNativeType()) || !($enumType = ValueCaster::resolveEnumType($nativeType))) {
+            return $parameter;
+        }
+
+        if (!$enumType instanceof BackedEnumType) {
+            throw new RuntimeException(\sprintf('The parameter "%s" declares the enum "%s" as native type, only backed enums are supported.', $parameter->getKey(), $enumType->getClassName()));
+        }
+
+        $schema = [
+            'type' => $enumType->getBackingType()->isIdentifiedBy(TypeIdentifier::INT) ? 'integer' : 'string',
+            'enum' => array_column($enumType->getClassName()::cases(), 'value'),
+        ];
+
+        if ($nativeType->isSatisfiedBy(static fn (Type $t): bool => $t instanceof CollectionType)) {
+            $schema = ['type' => 'array', 'items' => $schema];
+        }
+
+        return $parameter->withSchema([...$schema, ...($parameter->getSchema() ?? [])]);
     }
 
     /**
