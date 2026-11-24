@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -122,7 +123,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         if ($toProperty) {
-            return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$toProperty.$property"), $parameterName);
+            try {
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$toProperty.$property"), $parameterName);
+            } catch (NoSuchPropertyException|UnexpectedTypeException $e) {
+                throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
+            }
         }
 
         $resourceClass = $this->getResourceClass($item, true);
@@ -144,7 +149,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 if ($type->isIdentifiedBy($class)) {
                     return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
                 }
-            } catch (NoSuchPropertyException $e) {
+            } catch (NoSuchPropertyException|UnexpectedTypeException $e) {
                 throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
             }
         }
