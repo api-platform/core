@@ -151,8 +151,9 @@ return function (ContainerConfigurator $container) {
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner')]);
 
+    // Parameter factories decorate below the YAML, XML and PHP file factories (800) so they also see parameters declared in resource files
     $services->set('api_platform.metadata.resource.metadata_collection_factory.parameter', ParameterResourceMetadataCollectionFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1000)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 790)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
