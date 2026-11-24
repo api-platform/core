@@ -8,6 +8,7 @@ API Platform 5.1 contains every change shipped in the v5.0.x releases, plus the 
 
 * JSON:API: a `PATCH` or `PUT` whose `data.id` does not match the endpoint now returns `409 Conflict`, as the specification requires; it used to be applied to the endpoint's resource ([#8752](https://github.com/api-platform/core/pull/8752)). With `jsonapi.strict_resource_type` enabled, a mismatched `data.type` also returns `409` on `PATCH` and `PUT`, not only on `POST`.
 * JSON:API: `jsonapi.strict_member_names` (off by default) exposes the `id` and `type` properties as `resourceId` and `resourceType` attributes instead of `_id` and `_type`, which are not valid member names, and stops renaming `links`, `relationships` and `included` ([#8752](https://github.com/api-platform/core/pull/8752)).
+* Resource polymorphism: resources whose class declares a serializer `#[DiscriminatorMap]` (or a Doctrine discriminator map with `doctrine.discriminator_map` / `doctrine_mongodb_odm.discriminator_map`) expose, validate and document their subtypes when `serializer.discriminator_map` is enabled (Laravel: `api-platform.serializer.discriminator_map`). It is off by default, as it changes the JSON-LD `@type`, the JSON Schemas and the denormalization of these resources ([#8620](https://github.com/api-platform/core/pull/8620)).
 
 ### Breaking changes
 

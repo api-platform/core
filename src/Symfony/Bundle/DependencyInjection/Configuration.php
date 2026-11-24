@@ -173,6 +173,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hydra_prefix')->defaultFalse()->info('Use the "hydra:" prefix.')->end()
+                        ->booleanNode('discriminator_map')->defaultFalse()->info('Expose the subtypes declared in the serializer discriminator map of a resource (polymorphic resources): subtype properties are readable, writable and documented. Always enabled when "doctrine.discriminator_map" or "doctrine_mongodb_odm.discriminator_map" is.')->end()
                     ->end()
                 ->end()
             ->end();
@@ -236,6 +237,12 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('doctrine')
                     ->{class_exists(DoctrineBundle::class) && interface_exists(EntityManagerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->booleanNode('discriminator_map')
+                            ->defaultFalse()
+                            ->info('Expose the subtypes declared in the Doctrine ORM discriminator map of a resource as a serializer discriminator map (polymorphic resources): mapped subclass properties are exposed and writable. An explicit serializer discriminator map always takes precedence.')
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
     }
@@ -246,6 +253,12 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('doctrine_mongodb_odm')
                     ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->booleanNode('discriminator_map')
+                            ->defaultFalse()
+                            ->info('Expose the subtypes declared in the Doctrine MongoDB ODM discriminator map of a resource as a serializer discriminator map (polymorphic resources): mapped subclass properties are exposed and writable. An explicit serializer discriminator map always takes precedence.')
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
     }

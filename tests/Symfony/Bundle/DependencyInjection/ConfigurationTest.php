@@ -200,9 +200,11 @@ class ConfigurationTest extends TestCase
             ],
             'doctrine' => [
                 'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),
+                'discriminator_map' => false,
             ],
             'doctrine_mongodb_odm' => [
                 'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true),
+                'discriminator_map' => false,
             ],
             'messenger' => [
                 'enabled' => true,
@@ -240,6 +242,7 @@ class ConfigurationTest extends TestCase
             'handle_symfony_errors' => false,
             'serializer' => [
                 'hydra_prefix' => null,
+                'discriminator_map' => false,
             ],
             'enable_phpdoc_parser' => true,
             'mcp' => [
