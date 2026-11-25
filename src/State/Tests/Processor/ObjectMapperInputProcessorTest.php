@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Tests\Processor;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\Processor\ObjectMapperInputProcessor;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
@@ -148,6 +149,37 @@ class ObjectMapperInputProcessorTest extends TestCase
 
         $processor = new ObjectMapperInputProcessor($objectMapper, $decorated);
         $this->assertSame($result, $processor->process($dto, $operation, [], ['request' => $request]));
+    }
+
+    public function testProcessMapsPreviousDataWithoutOverwritingRequestAttribute(): void
+    {
+        $dto = new \stdClass();
+        $previousResource = new \stdClass();
+        $entity = new ObjectMapperInputDummy();
+        $previousEntity = new ObjectMapperInputDummy();
+        $operation = new Put(class: ObjectMapperInputDummy::class, input: ['class' => \stdClass::class], map: true);
+
+        $request = new Request();
+        $request->attributes->set('previous_data', $previousResource);
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->exactly(2))
+            ->method('map')
+            ->willReturnMap([
+                [$dto, ObjectMapperInputDummy::class, $entity],
+                [$previousResource, ObjectMapperInputDummy::class, $previousEntity],
+            ]);
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($entity, $operation, [], $this->callback(static fn (array $context): bool => $previousEntity === $context['previous_data']))
+            ->willReturn($entity);
+
+        $processor = new ObjectMapperInputProcessor($objectMapper, $decorated);
+        $processor->process($dto, $operation, [], ['request' => $request]);
+
+        $this->assertSame($previousResource, $request->attributes->get('previous_data'));
     }
 }
 
