@@ -355,6 +355,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             && !($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && $config['doctrine_mongodb_odm']['discriminator_map'])
         ) {
             $container->removeDefinition('api_platform.serializer.subtype_resolver');
+            $container->removeDefinition('api_platform.cache_warmer.subtype');
         }
 
         $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix']] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);
