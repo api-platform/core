@@ -287,10 +287,21 @@ class ContextBuilderTest extends TestCase
         $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
     }
 
+    public function testSiblingSubtypesWithDifferentTermDefinitionsThrow(): void
+    {
+        $contextBuilder = $this->createSubtypeContextBuilder(seatsJsonldContext: [ContextDiscriminatedBus::class => ['@type' => 'xsd:integer']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The subtypes "%s" and "%s" of the resource "%s" define the "seats" property differently in JSON-LD', ContextDiscriminatedCar::class, ContextDiscriminatedBus::class, ContextDiscriminatedVehicle::class));
+
+        $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
+    }
+
     /**
-     * @param array<class-string, list<string>> $seatsIris
+     * @param array<class-string, list<string>>          $seatsIris
+     * @param array<class-string, array<string, string>> $seatsJsonldContext
      */
-    private function createSubtypeContextBuilder(array $seatsIris = []): ContextBuilder
+    private function createSubtypeContextBuilder(array $seatsIris = [], array $seatsJsonldContext = []): ContextBuilder
     {
         $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([ContextDiscriminatedVehicle::class]));
@@ -305,7 +316,7 @@ class ContextBuilderTest extends TestCase
         $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
 
         $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => new ApiProperty(readable: true, nativeType: Type::string(), iris: 'seats' === $property ? $seatsIris[$class] ?? null : null));
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => new ApiProperty(readable: true, nativeType: Type::string(), iris: 'seats' === $property ? $seatsIris[$class] ?? null : null, jsonldContext: 'seats' === $property ? $seatsJsonldContext[$class] ?? null : null));
 
         $mapping = new ClassDiscriminatorMapping('kind', ['car' => ContextDiscriminatedCar::class, 'bus' => ContextDiscriminatedBus::class]);
         $classDiscriminatorResolver = $this->createStub(ClassDiscriminatorResolverInterface::class);

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -249,13 +250,24 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
         $this->addTypePropertyContext($context, $resourceClass, $resourceClass, $shortName);
 
         [$scopes, $iris, $typeProperties] = $this->getSubtypePropertyScopes($this->subtypeResolver, $this->propertyMetadataFactory, $resourceClass, array_keys($propertyNames), fn (string $class): array => iterator_to_array($this->propertyNameCollectionFactory->create($class, $propertyNameCollectionContext), false));
+        $termOwners = [];
         foreach ($scopes as $subtype => $properties) {
             foreach ($properties as $propertyName => $scope) {
                 $scopeName = $this->subtypeResolver->getTypeName($scope);
+                $subtypeContext = [];
                 if (isset($typeProperties[$subtype][$propertyName])) {
-                    $this->addTypePropertyContext($context, $subtype, $scope, $scopeName);
+                    $this->addTypePropertyContext($subtypeContext, $subtype, $scope, $scopeName);
                 } else {
-                    $this->addPropertyContext($context, $subtype, $propertyName, $scopeName, $propertyContext, $iris[$propertyName] ?? null);
+                    $this->addPropertyContext($subtypeContext, $subtype, $propertyName, $scopeName, $propertyContext, $iris[$propertyName] ?? null);
+                }
+
+                foreach ($subtypeContext as $term => $definition) {
+                    if (isset($termOwners[$term]) && $context[$term] !== $definition) {
+                        throw new RuntimeException(\sprintf('The subtypes "%s" and "%s" of the resource "%s" define the "%s" property differently in JSON-LD: declare the same "iris" and "jsonldContext" or rename one of the properties.', $termOwners[$term], $subtype, $resourceClass, $term));
+                    }
+
+                    $termOwners[$term] ??= $subtype;
+                    $context[$term] = $definition;
                 }
             }
         }
