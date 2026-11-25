@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -241,20 +242,69 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
             $this->addPropertyContext($context, $resourceClass, $propertyName, $shortName, $propertyContext);
         }
 
-        foreach ($this->subtypeResolver?->getSubtypes($resourceClass) ?? [] as $subtype) {
-            if (null === $subtypeName = $this->subtypeResolver->getTypeName($subtype)) {
-                continue;
+        if (null === $this->subtypeResolver) {
+            return $context;
+        }
+
+        $this->addTypePropertyContext($context, $propertyNames, $resourceClass, $shortName);
+
+        // Properties declared by a subtype, and not inherited from a mapped parent, are defined by the subtype
+        $declaredProperties = [];
+        $termOwners = [];
+        foreach ($this->subtypeResolver->getSubtypes($resourceClass) as $subtype) {
+            $subtypeName = $this->subtypeResolver->getTypeName($subtype);
+            $declaredProperties[$subtype] = [];
+            $subtypeContext = [];
+            foreach ($this->propertyNameCollectionFactory->create($subtype, $propertyNameCollectionContext) as $propertyName) {
+                $declaredProperties[$subtype][$propertyName] = true;
+                if (!isset($propertyNames[$propertyName]) && !$this->isInheritedProperty($declaredProperties, $subtype, $propertyName)) {
+                    $this->addPropertyContext($subtypeContext, $subtype, $propertyName, $subtypeName, $propertyContext);
+                }
             }
 
-            foreach ($this->propertyNameCollectionFactory->create($subtype, $propertyNameCollectionContext) as $propertyName) {
-                if (!isset($propertyNames[$propertyName])) {
-                    $propertyNames[$propertyName] = true;
-                    $this->addPropertyContext($context, $subtype, $propertyName, $subtypeName, $propertyContext);
+            $this->addTypePropertyContext($subtypeContext, $declaredProperties[$subtype], $subtype, $subtypeName);
+            foreach ($subtypeContext as $term => $definition) {
+                if (isset($termOwners[$term]) && $context[$term] !== $definition) {
+                    throw new RuntimeException(\sprintf('The subtypes "%s" and "%s" of the resource "%s" both expose a "%s" property with a different JSON-LD definition. Give both properties the same "iris" or rename one of them.', $termOwners[$term], $subtype, $resourceClass, $term));
                 }
+
+                $termOwners[$term] ??= $subtype;
+                $context[$term] = $definition;
             }
         }
 
         return $context;
+    }
+
+    /**
+     * @param array<string, array<string, true>> $declaredProperties
+     */
+    private function isInheritedProperty(array $declaredProperties, string $subtype, string $propertyName): bool
+    {
+        foreach ($declaredProperties as $class => $properties) {
+            if ($class !== $subtype && isset($properties[$propertyName]) && is_a($subtype, $class, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The type property of a discriminator map is not a property of the class, it is defined as one.
+     *
+     * @param array<string, true> $propertyNames
+     */
+    private function addTypePropertyContext(array &$context, array &$propertyNames, string $class, string $shortName): void
+    {
+        $typeProperty = $this->subtypeResolver?->getMapping($class)?->getTypeProperty();
+        if (null === $typeProperty || isset($propertyNames[$typeProperty])) {
+            return;
+        }
+
+        $propertyNames[$typeProperty] = true;
+        $convertedName = $this->nameConverter ? $this->nameConverter->normalize($typeProperty, $class, self::FORMAT) : $typeProperty;
+        $context[$convertedName] ??= \sprintf('%s/%s', $shortName, $convertedName);
     }
 
     private function addPropertyContext(array &$context, string $resourceClass, string $propertyName, string $shortName, array $propertyContext): void

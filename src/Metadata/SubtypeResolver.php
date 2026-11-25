@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -24,8 +25,9 @@ final class SubtypeResolver implements SubtypeResolverInterface
     private array $subtypesCache = [];
     /** @var array<class-string, true>|null */
     private ?array $resourceClasses = null;
-    /** @var array<string, true>|null */
-    private ?array $ambiguousNames = null;
+    /** @var array<class-string, string> */
+    private array $subtypeNames = [];
+    private bool $typeNamesValidated = false;
 
     public function __construct(
         private readonly ClassDiscriminatorResolverInterface $classDiscriminatorResolver,
@@ -68,7 +70,7 @@ final class SubtypeResolver implements SubtypeResolverInterface
         return $this->subtypesCache[$class] = array_values($subtypes);
     }
 
-    public function getTypeName(string $class): ?string
+    public function getTypeName(string $class): string
     {
         if (isset($this->getResourceClasses()[$class])) {
             foreach ($this->resourceMetadataCollectionFactory->create($class) as $resource) {
@@ -76,9 +78,9 @@ final class SubtypeResolver implements SubtypeResolverInterface
             }
         }
 
-        $name = self::getShortClassName($class);
+        $this->validateTypeNames();
 
-        return isset($this->getAmbiguousNames()[$name]) ? null : $name;
+        return $this->getSubtypeName($class);
     }
 
     /**
@@ -96,16 +98,24 @@ final class SubtypeResolver implements SubtypeResolverInterface
         return $this->resourceClasses;
     }
 
-    /**
-     * A non-resource subtype is named after its class short name: it is ambiguous when a resource
-     * or another subtype uses the same name.
-     *
-     * @return array<string, true>
-     */
-    private function getAmbiguousNames(): array
+    private function getSubtypeName(string $class): string
     {
-        if (null !== $this->ambiguousNames) {
-            return $this->ambiguousNames;
+        if (isset($this->subtypeNames[$class])) {
+            return $this->subtypeNames[$class];
+        }
+
+        $attribute = (new \ReflectionClass($class))->getAttributes(ApiSubtype::class)[0] ?? null;
+
+        return $this->subtypeNames[$class] = $attribute?->newInstance()->shortName ?? (false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1));
+    }
+
+    /**
+     * @throws RuntimeException when a subtype is named like a resource or like another subtype
+     */
+    private function validateTypeNames(): void
+    {
+        if ($this->typeNamesValidated) {
+            return;
         }
 
         $owners = [];
@@ -115,25 +125,19 @@ final class SubtypeResolver implements SubtypeResolverInterface
             }
         }
 
-        $ambiguousNames = [];
         foreach ($this->getResourceClasses() as $resourceClass => $_) {
             foreach ($this->getSubtypes($resourceClass) as $subtype) {
                 if (isset($this->resourceClasses[$subtype])) {
                     continue;
                 }
 
-                $name = self::getShortClassName($subtype);
+                $name = $this->getSubtypeName($subtype);
                 if (($owners[$name] ??= $subtype) !== $subtype) {
-                    $ambiguousNames[$name] = true;
+                    throw new RuntimeException(\sprintf('The subtype "%s" and "%s" are both named "%s" in JSON-LD and Hydra. Give the subtype another name with #[%s(shortName: \'...\')].', $subtype, $owners[$name], $name, ApiSubtype::class));
                 }
             }
         }
 
-        return $this->ambiguousNames = $ambiguousNames;
-    }
-
-    private static function getShortClassName(string $class): string
-    {
-        return false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1);
+        $this->typeNamesValidated = true;
     }
 }

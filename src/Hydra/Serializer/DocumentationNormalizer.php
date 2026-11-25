@@ -98,6 +98,9 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 [$propertyNameContext, $propertyContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
                 $propertyNames = array_fill_keys(iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $propertyNameContext), false), true);
+                if (null !== $typeProperty = $this->getTypeProperty($resourceClass, $propertyNames, $prefixedShortName, $shortName, $context, $hydraPrefix)) {
+                    $classes[array_key_last($classes)][$hydraPrefix.'supportedProperty'][] = $typeProperty;
+                }
                 $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $resourceClass, $prefixedShortName, $propertyNames, $propertyNameContext, $propertyContext, $context, $hydraPrefix);
             }
         }
@@ -129,13 +132,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 continue;
             }
 
-            // A subtype without a name of its own is not documented, its subtypes extend its parent
-            if (null === $subtypeShortName = $this->subtypeResolver->getTypeName($subtype)) {
-                $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $subtype, $prefixedShortName, $propertyNames, $propertyNameContext, $propertyContext, $context, $hydraPrefix);
-
-                continue;
-            }
-
+            $subtypeShortName = $this->subtypeResolver->getTypeName($subtype);
             $subtypePrefixedShortName = "#$subtypeShortName";
             if (isset($subtypeClasses[$subtypePrefixedShortName])) {
                 continue;
@@ -158,6 +155,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $properties[] = $this->getProperty($propertyMetadata, $normalizedPropertyName, $subtypePrefixedShortName, $subtypeShortName, $hydraPrefix);
             }
 
+            if (null !== $typeProperty = $this->getTypeProperty($subtype, $subtypePropertyNames, $subtypePrefixedShortName, $subtypeShortName, $context, $hydraPrefix)) {
+                $properties[] = $typeProperty;
+            }
+
             $subtypeClasses[$subtypePrefixedShortName] = [
                 '@id' => $subtypePrefixedShortName,
                 '@type' => $hydraPrefix.'Class',
@@ -169,6 +170,24 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $subtype, $subtypePrefixedShortName, $subtypePropertyNames, $propertyNameContext, $propertyContext, $context, $hydraPrefix);
         }
+    }
+
+    /**
+     * The type property of a discriminator map is not a property of the class, it is documented as one.
+     *
+     * @param array<string, true> $propertyNames the properties already supported, the type property is added to them
+     */
+    private function getTypeProperty(string $class, array &$propertyNames, string $prefixedShortName, string $shortName, array $context, string $hydraPrefix): ?array
+    {
+        $mapping = $this->subtypeResolver?->getMapping($class);
+        if (null === $mapping || isset($propertyNames[$typeProperty = $mapping->getTypeProperty()])) {
+            return null;
+        }
+
+        $propertyNames[$typeProperty] = true;
+        $propertyMetadata = (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true)->withRequired(null === $mapping->getDefaultType());
+
+        return $this->getProperty($propertyMetadata, $this->nameConverter?->normalize($typeProperty, $class, self::FORMAT, $context) ?? $typeProperty, $prefixedShortName, $shortName, $hydraPrefix);
     }
 
     /**

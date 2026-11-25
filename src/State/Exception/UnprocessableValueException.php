@@ -20,4 +20,15 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 final class UnprocessableValueException extends NotNormalizableValueException
 {
+    public const TYPE_MISMATCH_ERROR = '13ff6cd3-d9ac-451a-af4a-846e8e36056f';
+
+    public function __construct(string $message, mixed $value, string $path, private readonly string $violationCode)
+    {
+        parent::__construct($message, 0, null, get_debug_type($value), null, $path, true);
+    }
+
+    public function getViolationCode(): string
+    {
+        return $this->violationCode;
+    }
 }

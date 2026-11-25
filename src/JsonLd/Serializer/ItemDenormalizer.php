@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
+use ApiPlatform\State\Exception\UnprocessableValueException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -34,7 +35,9 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ItemDenormalizer extends AbstractItemNormalizer
 {
-    use ItemNormalizerTrait;
+    use ItemNormalizerTrait {
+        denormalize as private denormalizeItem;
+    }
 
     public const FORMAT = 'jsonld';
 
@@ -51,6 +54,52 @@ final class ItemDenormalizer extends AbstractItemNormalizer
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
+    }
+
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
+        $object = $this->denormalizeItem($data, $type, $format, $context);
+
+        if (null !== $this->subtypeResolver && \is_array($data) && isset($data['@type']) && $this->resourceClassResolver->isResourceClass($type)) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass(null, $type);
+            if ($object instanceof $resourceClass) {
+                $this->validateType((array) $data['@type'], $object, $resourceClass, $context);
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * A "@type" naming a class of the discriminator maps the object is not an instance of contradicts its type property.
+     *
+     * @param array<mixed> $types
+     */
+    private function validateType(array $types, object $object, string $resourceClass, array $context): void
+    {
+        $classes = [$resourceClass, ...$this->subtypeResolver->getSubtypes($resourceClass)];
+        $classesByName = [];
+        foreach ($classes as $class) {
+            $classesByName[$this->subtypeResolver->getTypeName($class)] = $class;
+        }
+
+        foreach ($types as $typeName) {
+            if (!\is_string($typeName) || !isset($classesByName[$typeName]) || $object instanceof $classesByName[$typeName]) {
+                continue;
+            }
+
+            // The map deciding between both classes is the one of their most specific common mapped parent
+            $decidingClass = $resourceClass;
+            foreach ($classes as $class) {
+                if ($object instanceof $class && is_a($classesByName[$typeName], $class, true) && is_a($class, $decidingClass, true) && null !== $this->subtypeResolver->getMapping($class)) {
+                    $decidingClass = $class;
+                }
+            }
+
+            $typeProperty = $this->subtypeResolver->getMapping($decidingClass)?->getTypeProperty() ?? '@type';
+
+            throw new UnprocessableValueException(\sprintf('The type "%s" does not match the "%s" property.', $typeName, $typeProperty), $typeName, isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$typeProperty : $typeProperty, UnprocessableValueException::TYPE_MISMATCH_ERROR);
+        }
     }
 
     public function getSupportedTypes(?string $format): array

@@ -98,7 +98,7 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
     private function buildViolation(NotNormalizableValueException $exception, Operation $operation): ?array
     {
         if ($exception instanceof UnprocessableValueException) {
-            return $this->buildGenericViolation($exception);
+            return $this->violation((string) $exception->getPath(), $exception->getMessage(), $exception->getViolationCode());
         }
 
         $rules = $operation->getRules();

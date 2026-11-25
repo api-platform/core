@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
+use ApiPlatform\State\Exception\UnprocessableValueException;
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedBike;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedCar;
@@ -244,7 +245,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
     }
 
     /**
-     * @return iterable<string, array{string, string, array<string, mixed>, string}>
+     * @return iterable<string, array{string, string, array<string, mixed>, string, 4?: string}>
      */
     public static function constraintViolationProvider(): iterable
     {
@@ -252,17 +253,19 @@ final class DiscriminatedResourceTest extends ApiTestCase
         yield 'subtype constraint on PATCH' => ['PATCH', '/discriminated_vehicles/2', ['name' => 'MAN'], 'name'];
         // A setter parameter cannot be narrowed (contravariance): the covariant getter is enforced by validation
         yield 'covariant getter' => ['POST', '/discriminated_vehicles', ['kind' => 'truck', 'name' => 'Volvo FH', 'trailer' => '/discriminated_vehicles/1'], 'trailer'];
-        yield 'type change on PATCH' => ['PATCH', '/discriminated_vehicles/1', ['kind' => 'truck', 'payload' => 1], 'kind'];
-        yield 'nested type change on PATCH' => ['PATCH', '/discriminated_vehicles/4', ['frame' => 'bike'], 'frame'];
-        yield 'type change on PUT' => ['PUT', '/discriminated_vehicles/1', ['kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000], 'kind'];
-        yield 'nested type change on PUT' => ['PUT', '/discriminated_vehicles/4', ['kind' => 'bike', 'frame' => 'bike', 'name' => 'Rocky'], 'frame'];
+        yield 'type change on PATCH' => ['PATCH', '/discriminated_vehicles/1', ['kind' => 'truck', 'payload' => 1], 'kind', UnprocessableValueException::TYPE_MISMATCH_ERROR];
+        yield 'nested type change on PATCH' => ['PATCH', '/discriminated_vehicles/4', ['frame' => 'bike'], 'frame', UnprocessableValueException::TYPE_MISMATCH_ERROR];
+        yield 'type change on PUT' => ['PUT', '/discriminated_vehicles/1', ['kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000], 'kind', UnprocessableValueException::TYPE_MISMATCH_ERROR];
+        yield 'nested type change on PUT' => ['PUT', '/discriminated_vehicles/4', ['kind' => 'bike', 'frame' => 'bike', 'name' => 'Rocky'], 'frame', UnprocessableValueException::TYPE_MISMATCH_ERROR];
+        yield '@type contradicting the type' => ['POST', '/discriminated_vehicles', ['@type' => 'DiscriminatedCar', 'kind' => 'truck', 'name' => 'Scania'], 'kind', UnprocessableValueException::TYPE_MISMATCH_ERROR];
+        yield '@type contradicting the nested type' => ['POST', '/discriminated_vehicles', ['@type' => 'DiscriminatedMountainBike', 'kind' => 'bike', 'frame' => 'bike', 'name' => 'Brompton'], 'frame', UnprocessableValueException::TYPE_MISMATCH_ERROR];
     }
 
     /**
      * @param array<string, mixed> $payload
      */
     #[DataProvider('constraintViolationProvider')]
-    public function testSubtypeConstraintsAreValidated(string $method, string $uri, array $payload, string $propertyPath): void
+    public function testSubtypeConstraintsAreValidated(string $method, string $uri, array $payload, string $propertyPath, ?string $code = null): void
     {
         $classes = array_map(static fn (DiscriminatedVehicle $vehicle): string => $vehicle::class, DiscriminatedVehicleStore::$vehicles);
 
@@ -272,7 +275,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertJsonContains(['violations' => [['propertyPath' => $propertyPath]]]);
+        $this->assertJsonContains(['violations' => [['propertyPath' => $propertyPath] + (null === $code ? [] : ['code' => $code])]]);
         $this->assertSame($classes, array_map(static fn (DiscriminatedVehicle $vehicle): string => $vehicle::class, DiscriminatedVehicleStore::$vehicles));
     }
 
@@ -344,11 +347,15 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertSame('#DiscriminatedVehicle', $truck['subClassOf']);
         $this->assertSame(['#DiscriminatedTruck/payload'], array_column(array_column($truck['hydra:supportedProperty'], 'hydra:property'), '@id'));
         $this->assertSame('#DiscriminatedBike', $classes['#DiscriminatedMountainBike']['subClassOf']);
+        $this->assertContains('#DiscriminatedVehicle/kind', array_column(array_column($classes['#DiscriminatedVehicle']['hydra:supportedProperty'], 'hydra:property'), '@id'));
+        $this->assertContains('#DiscriminatedBike/frame', array_column(array_column($classes['#DiscriminatedBike']['hydra:supportedProperty'], 'hydra:property'), '@id'));
         $this->assertArrayNotHasKey('#DiscriminatedSportsCar', $classes);
 
         $context = $client->request('GET', '/contexts/DiscriminatedVehicle')->toArray()['@context'];
         $this->assertSame('DiscriminatedVehicle/name', $context['name']);
         $this->assertSame('DiscriminatedTruck/payload', $context['payload']);
         $this->assertSame('DiscriminatedMountainBike/suspension', $context['suspension']);
+        $this->assertSame('DiscriminatedVehicle/kind', $context['kind']);
+        $this->assertSame('DiscriminatedBike/frame', $context['frame']);
     }
 }

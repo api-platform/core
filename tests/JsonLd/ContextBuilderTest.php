@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\JsonLd;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
@@ -26,6 +27,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\SubtypeResolver;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -33,6 +35,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -264,4 +268,46 @@ class ContextBuilderTest extends TestCase
 
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
+
+    public function testSubtypesDefiningTheSamePropertyDifferentlyThrow(): void
+    {
+        $resourceNames = new ResourceNameCollection([ContextDiscriminatedVehicle::class]);
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->method('create')->willReturn($resourceNames);
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(ContextDiscriminatedVehicle::class, [
+            (new ApiResource())->withShortName('Vehicle')->withOperations(new Operations(['get' => (new Get())->withShortName('Vehicle')])),
+        ]));
+
+        $propertyNames = [ContextDiscriminatedVehicle::class => ['name'], ContextDiscriminatedCar::class => ['name', 'seats'], ContextDiscriminatedBus::class => ['name', 'seats']];
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true));
+
+        $mapping = new ClassDiscriminatorMapping('kind', ['car' => ContextDiscriminatedCar::class, 'bus' => ContextDiscriminatedBus::class]);
+        $classDiscriminatorResolver = $this->createStub(ClassDiscriminatorResolverInterface::class);
+        $classDiscriminatorResolver->method('getMappingForClass')->willReturnCallback(static fn (string $class): ?ClassDiscriminatorMapping => ContextDiscriminatedVehicle::class === $class ? $mapping : null);
+
+        $contextBuilder = new ContextBuilder($resourceNameCollectionFactory, $resourceMetadataCollectionFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(UrlGeneratorInterface::class), subtypeResolver: new SubtypeResolver($classDiscriminatorResolver, $resourceNameCollectionFactory, $resourceMetadataCollectionFactory));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The subtypes "%s" and "%s" of the resource "%s" both expose a "seats" property', ContextDiscriminatedCar::class, ContextDiscriminatedBus::class, ContextDiscriminatedVehicle::class));
+
+        $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
+    }
+}
+
+class ContextDiscriminatedVehicle
+{
+}
+
+class ContextDiscriminatedCar extends ContextDiscriminatedVehicle
+{
+}
+
+class ContextDiscriminatedBus extends ContextDiscriminatedVehicle
+{
 }

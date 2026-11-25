@@ -634,7 +634,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
 
     private function createTypeChangeException(mixed $value, string $typeProperty, array $context): UnprocessableValueException
     {
-        return new UnprocessableValueException(\sprintf('The type "%s" does not match the type of the resource being updated.', \is_scalar($value) ? $value : get_debug_type($value)), 0, null, get_debug_type($value), null, isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$typeProperty : $typeProperty, true);
+        return new UnprocessableValueException(\sprintf('The type "%s" does not match the type of the resource being updated.', \is_scalar($value) ? $value : get_debug_type($value)), $value, isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$typeProperty : $typeProperty, UnprocessableValueException::TYPE_MISMATCH_ERROR);
     }
 
     /**
