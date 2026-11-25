@@ -634,9 +634,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         return $data;
     }
 
-    /**
-     * A leaf resource declares no map: the maps of its parents still fix its type.
-     */
     private function validateTypeAgainstParentMappings(array $data, string $existingClass, array $context): void
     {
         if (null === $this->subtypeResolver) {
