@@ -28,35 +28,11 @@ use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Decorates a filter to apply it to a property that only exists on a subtype of the queried entity
- * (Doctrine single table or class table inheritance).
+ * Decorates a filter to apply it to rows of a subtype (entity, mapped superclass or interface) of the queried
+ * entity, whose properties DQL cannot reference from the parent class.
  *
- * DQL cannot reference a subclass property from its parent class, so the decorated filter is applied
- * to a subquery selecting from the subclass, and the root query keeps the rows whose identifier is
- * returned by that subquery:
- *
- *     #[GetCollection(parameters: [
- *         'seats' => new QueryParameter(
- *             filter: new SubtypeFilter(Car::class, new ExactFilter()),
- *             property: 'seats',
- *         ),
- *     ])]
- *     class Vehicle {}
- *
- * The subtype may be a mapped entity, a mapped superclass or an interface: it is expanded to the
- * topmost mapped entities of the queried hierarchy that are of that type, each one getting its own
- * subquery. New subclasses of a mapped superclass or implementations of an interface are therefore
- * picked up automatically.
- *
- * - With `strict: true` (default), only rows of the subtype matching the decorated filter are returned.
- * - With `strict: false`, rows of any other type are returned as well, as the filter does not apply to them.
- *
- * When wrapped in an {@see OrFilter}, the filter always behaves as strict: a non-strict condition would
- * match every row of another type and make the whole disjunction match everything.
- *
- * The decorated filter receives the subclass as `$resourceClass`. Nested properties (e.g. `owner.name`)
- * are resolved by API Platform from the queried resource metadata, so only properties declared directly
- * on the subtype are supported by the built-in filters.
+ * With `strict: true` (default) only rows of the subtype matching the decorated filter are returned; with
+ * `strict: false` rows of other types are returned as well. Inside an {@see OrFilter} it is always strict.
  */
 final class SubtypeFilter implements FilterInterface, OpenApiParameterFilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
 {
@@ -65,7 +41,7 @@ final class SubtypeFilter implements FilterInterface, OpenApiParameterFilterInte
     use ManagerRegistryAwareTrait;
 
     /**
-     * @param class-string $subtype an entity, mapped superclass or interface of the queried hierarchy
+     * @param class-string $subtype
      */
     public function __construct(
         private readonly string $subtype,
@@ -109,7 +85,6 @@ final class SubtypeFilter implements FilterInterface, OpenApiParameterFilterInte
 
             $this->filter->apply($subQueryBuilder, $queryNameGenerator, $entity, $operation, $context);
 
-            // the decorated filter ignored the value (e.g. unsupported shape), there is nothing to apply
             if (null === $subQueryBuilder->getDQLPart('where')) {
                 continue;
             }
@@ -153,9 +128,6 @@ final class SubtypeFilter implements FilterInterface, OpenApiParameterFilterInte
     }
 
     /**
-     * Returns the topmost mapped entities of the hierarchy that are of the configured subtype:
-     * querying an entity already includes its own subclasses.
-     *
      * @param list<class-string> $subClasses
      *
      * @return list<class-string>

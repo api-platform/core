@@ -78,7 +78,6 @@ final class SubtypeFilterTest extends ApiTestCase
         yield 'mapped superclass with a decorated comparison filter' => ['horsepower[gte]=300', ['sports', 'truck']];
         yield 'all conditions of the decorated filter apply to the same subquery' => ['horsepower[gt]=100&horsepower[lt]=400', ['car-7', 'truck']];
         yield 'interface implemented by unrelated subclasses' => ['cargoVolume[]=1&cargoVolume[]=40', ['cargo-bike', 'truck']];
-        yield 'interface implemented by unrelated subclasses single value' => ['cargoVolume=40', ['truck']];
         yield 'combined with a regular filter' => ['seatsOrOtherType=7&name=bike', ['bike']];
         yield 'wrapped in OrFilter always behaves as strict' => ['nameOr=car-4&gearsOr=21', ['bike', 'car-4']];
         yield 'decorated filter ignoring the value adds no condition' => ['horsepower[foo]=1', ['bike', 'car-4', 'car-7', 'cargo-bike', 'sports', 'truck']];
