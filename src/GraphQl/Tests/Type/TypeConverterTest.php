@@ -97,12 +97,6 @@ class TypeConverterTest extends TestCase
         $operation = (new Query())->withName('test');
         $graphqlType = $this->typeConverter->convertPhpType($type, false, $operation, 'resourceClass', 'rootClass', null, 0);
 
-        if (\is_string($expectedGraphqlType)) {
-            $this->assertSame($expectedGraphqlType, $graphqlType);
-
-            return;
-        }
-
         $this->assertEquals($expectedGraphqlType, $graphqlType);
     }
 
