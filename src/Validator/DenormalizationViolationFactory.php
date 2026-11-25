@@ -15,10 +15,12 @@ namespace ApiPlatform\Validator;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\DenormalizationViolationFactoryInterface;
+use ApiPlatform\State\Exception\UnprocessableValueException;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -108,6 +110,10 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
      */
     private function buildViolation(NotNormalizableValueException $exception, Operation $operation, bool $generic = false): ?ConstraintViolationInterface
     {
+        if ($exception instanceof UnprocessableValueException) {
+            return $this->emitViolation($exception, null, (string) Choice::NO_SUCH_CHOICE_ERROR);
+        }
+
         $path = $exception->getPath();
         if (null === $path || '' === $path) {
             return $generic ? $this->emitViolation($exception, null, (string) Type::INVALID_TYPE_ERROR) : null;

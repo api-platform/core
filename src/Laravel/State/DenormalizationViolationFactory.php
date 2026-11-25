@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\State;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\DenormalizationViolationFactoryInterface;
+use ApiPlatform\State\Exception\UnprocessableValueException;
 use Illuminate\Contracts\Validation\Rule as LaravelRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -96,6 +97,10 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
      */
     private function buildViolation(NotNormalizableValueException $exception, Operation $operation): ?array
     {
+        if ($exception instanceof UnprocessableValueException) {
+            return $this->buildGenericViolation($exception);
+        }
+
         $rules = $operation->getRules();
         if (\is_callable($rules)) {
             $rules = $rules();

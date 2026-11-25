@@ -224,8 +224,6 @@ final class DiscriminatedResourceTest extends ApiTestCase
         yield 'unknown type' => ['POST', '/discriminated_vehicles', ['kind' => 'plane', 'name' => 'Unknown']];
         yield 'no nested type' => ['POST', '/discriminated_vehicles', ['kind' => 'bike', 'name' => 'Untyped bike']];
         yield 'relation narrowed by the subtype' => ['POST', '/discriminated_vehicles', ['kind' => 'car', 'name' => 'Polo', 'tows' => '/discriminated_vehicles/2']];
-        yield 'type change' => ['PATCH', '/discriminated_vehicles/1', ['kind' => 'truck', 'payload' => 1]];
-        yield 'nested type change' => ['PATCH', '/discriminated_vehicles/4', ['frame' => 'bike']];
     }
 
     /**
@@ -254,6 +252,10 @@ final class DiscriminatedResourceTest extends ApiTestCase
         yield 'subtype constraint on PATCH' => ['PATCH', '/discriminated_vehicles/2', ['name' => 'MAN'], 'name'];
         // A setter parameter cannot be narrowed (contravariance): the covariant getter is enforced by validation
         yield 'covariant getter' => ['POST', '/discriminated_vehicles', ['kind' => 'truck', 'name' => 'Volvo FH', 'trailer' => '/discriminated_vehicles/1'], 'trailer'];
+        yield 'type change on PATCH' => ['PATCH', '/discriminated_vehicles/1', ['kind' => 'truck', 'payload' => 1], 'kind'];
+        yield 'nested type change on PATCH' => ['PATCH', '/discriminated_vehicles/4', ['frame' => 'bike'], 'frame'];
+        yield 'type change on PUT' => ['PUT', '/discriminated_vehicles/1', ['kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000], 'kind'];
+        yield 'nested type change on PUT' => ['PUT', '/discriminated_vehicles/4', ['kind' => 'bike', 'frame' => 'bike', 'name' => 'Rocky'], 'frame'];
     }
 
     /**
@@ -262,6 +264,8 @@ final class DiscriminatedResourceTest extends ApiTestCase
     #[DataProvider('constraintViolationProvider')]
     public function testSubtypeConstraintsAreValidated(string $method, string $uri, array $payload, string $propertyPath): void
     {
+        $classes = array_map(static fn (DiscriminatedVehicle $vehicle): string => $vehicle::class, DiscriminatedVehicleStore::$vehicles);
+
         self::createClient()->request($method, $uri, [
             'headers' => ['Content-Type' => 'PATCH' === $method ? 'application/merge-patch+json' : 'application/ld+json'],
             'json' => $payload,
@@ -269,6 +273,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertJsonContains(['violations' => [['propertyPath' => $propertyPath]]]);
+        $this->assertSame($classes, array_map(static fn (DiscriminatedVehicle $vehicle): string => $vehicle::class, DiscriminatedVehicleStore::$vehicles));
     }
 
     public function testPatchUpdatesSubtypeProperties(): void
@@ -283,16 +288,16 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[2]);
     }
 
-    public function testPutReplacesTheResourceWithTheGivenSubtype(): void
+    public function testPutKeepingTheSubtypeReplacesTheResource(): void
     {
-        self::createClient()->request('PUT', '/discriminated_vehicles/1', [
+        self::createClient()->request('PUT', '/discriminated_vehicles/2', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => ['kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000],
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertJsonContains(['@id' => '/discriminated_vehicles/1', '@type' => 'DiscriminatedTruck', 'kind' => 'truck', 'payload' => 5000]);
-        $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[1]);
+        $this->assertJsonContains(['@id' => '/discriminated_vehicles/2', 'kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000]);
+        $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[2]);
     }
 
     public function testOpenApiDocumentsSubtypes(): void

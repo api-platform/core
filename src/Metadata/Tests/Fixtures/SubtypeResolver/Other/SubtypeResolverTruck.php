@@ -11,8 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Tests\Fixtures\Discriminator;
+namespace ApiPlatform\Metadata\Tests\Fixtures\SubtypeResolver\Other;
 
-final class Truck extends Vehicle
+use ApiPlatform\Metadata\Tests\Fixtures\SubtypeResolver\SubtypeResolverGarage;
+
+class SubtypeResolverTruck extends SubtypeResolverGarage
 {
 }

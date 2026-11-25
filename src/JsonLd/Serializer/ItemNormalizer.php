@@ -23,8 +23,8 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\ContextTrait;
@@ -51,9 +51,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null, ?SubtypeResolverInterface $subtypeResolver = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver, $subtypeResolver);
     }
 
     /**
@@ -157,12 +157,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return null;
         }
 
-        $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
-        // A subtype declared in the discriminator map of the resource is typed by its own class, documented as a subclass of the resource
-        if (null === $types && $isResourceClass && null !== $discriminatedClass = $this->getDiscriminatedClass($data, $resourceClass)) {
-            return ClassDiscriminatorHelper::getShortName($discriminatedClass);
+        // A subtype is typed by its most specific class, documented as a subclass of the resource (and of its types)
+        if ($isResourceClass && null !== ($discriminatedClass = $this->getDiscriminatedClass($data, $resourceClass)) && null !== ($subtypeName = $this->subtypeResolver?->getTypeName($discriminatedClass))) {
+            return $subtypeName;
         }
 
+        $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
         if (null === $types) {
             $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
             if (isset($context['item_uri_template']) || $operation->getClass() === $typeClass) {

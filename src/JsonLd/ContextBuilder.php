@@ -22,10 +22,9 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -42,7 +41,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
     public const HYDRA_PREFIX = 'hydra:';
     public const HYDRA_CONTEXT_HAS_PREFIX = 'hydra_prefix';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null, private array $defaultContext = [], private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null, private array $defaultContext = [], private readonly ?SubtypeResolverInterface $subtypeResolver = null)
     {
     }
 
@@ -242,12 +241,15 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
             $this->addPropertyContext($context, $resourceClass, $propertyName, $shortName, $propertyContext);
         }
 
-        // The properties of the subtypes declared in the discriminator map of the resource are defined by their own class
-        foreach (null === $this->classDiscriminatorResolver ? [] : ClassDiscriminatorHelper::getSubtypes($this->classDiscriminatorResolver, $resourceClass) as $subtype) {
+        foreach ($this->subtypeResolver?->getSubtypes($resourceClass) ?? [] as $subtype) {
+            if (null === $subtypeName = $this->subtypeResolver->getTypeName($subtype)) {
+                continue;
+            }
+
             foreach ($this->propertyNameCollectionFactory->create($subtype, $propertyNameCollectionContext) as $propertyName) {
                 if (!isset($propertyNames[$propertyName])) {
                     $propertyNames[$propertyName] = true;
-                    $this->addPropertyContext($context, $subtype, $propertyName, ClassDiscriminatorHelper::getShortName($subtype), $propertyContext);
+                    $this->addPropertyContext($context, $subtype, $propertyName, $subtypeName, $propertyContext);
                 }
             }
         }

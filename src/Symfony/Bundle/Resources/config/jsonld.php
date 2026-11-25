@@ -34,7 +34,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.symfony.iri_converter.skolem'),
             service('api_platform.name_converter'),
             '%api_platform.serializer.default_context%',
-            service('api_platform.serializer.class_discriminator_resolver')->ignoreOnInvalid(),
+            service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.jsonld.normalizer.item', ItemNormalizer::class)
@@ -54,6 +54,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.operation.metadata_factory')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
+        ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -890])
         ->tag('kernel.reset', ['method' => '?reset']);
 
@@ -72,6 +73,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
+        ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -889])
         ->tag('kernel.reset', ['method' => '?reset']);
 

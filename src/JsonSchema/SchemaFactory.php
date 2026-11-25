@@ -22,9 +22,8 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
@@ -53,7 +52,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
     public const PARTIAL_UPDATE = 'partial_update';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?SubtypeResolverInterface $subtypeResolver = null)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -161,7 +160,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups);
         $this->buildDefinitionProperties($schema, $definition, $definitionName, $inputOrOutputClass, $options, $serializerContext, $format, $type, $isPartialUpdate);
 
-        // Subtypes explicitly declared in a serializer discriminator map are documented using "oneOf" (and a "discriminator" in OpenAPI)
         $this->buildDiscriminatedDefinitions($schema, $definition, $className, $inputOrOutputClass, $definitionFormat, $operation, $options, $serializerContext, $serializerContext + [
             'schema_type' => $type,
             self::PARTIAL_UPDATE => $isPartialUpdate && !$isJsonMergePatch,
@@ -197,7 +195,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     private function buildDiscriminatedDefinitions(Schema $schema, \ArrayObject $definition, string $className, string $class, string $definitionFormat, ?Operation $operation, array $options, array $serializerContext, array $definitionNameContext, string $format, string $type, bool $isPartialUpdate, array $parentTypeProperties = []): void
     {
-        if (null === $this->classDiscriminatorResolver || null === $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
+        if (null === $this->subtypeResolver || null === $mapping = $this->subtypeResolver->getMapping($class)) {
             return;
         }
 
@@ -207,7 +205,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $discriminatorMapping = [];
         $oneOf = [];
 
-        foreach (ClassDiscriminatorHelper::getDirectSubtypes($mapping, $class) as $typeValue => $subClass) {
+        foreach ($this->subtypeResolver->getDirectSubtypes($class) as $typeValue => $subClass) {
             $subDefinitionName = $this->definitionNameFactory->create($className, $definitionFormat, $subClass, $operation, $definitionNameContext);
             $discriminatorMapping[$typeValue] = $oneOf[]['$ref'] = $prefix.$subDefinitionName;
 
@@ -231,7 +229,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $this->buildDiscriminatedDefinitions($schema, $subDefinition, $className, $subClass, $definitionFormat, $operation, $options, $serializerContext, $definitionNameContext, $format, $type, $isPartialUpdate, $typeProperties);
         }
 
-        $ownTypeValues = ClassDiscriminatorHelper::getOwnTypes($mapping, $class);
+        $ownTypeValues = array_map(strval(...), array_keys($mapping->getTypesMapping(), $class, true));
         foreach ($ownTypeValues as $typeValue) {
             $discriminatorMapping[$typeValue] = $prefix.$this->definitionNameFactory->create($className, $definitionFormat, $class, $operation, $definitionNameContext);
         }
@@ -241,7 +239,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if ($oneOf) {
-            // An instance of the class itself is described by its own branch: it carries its own type and none of the subtype properties
+            // An instance of the class itself is described by its own branch, without the subtype properties
             if ($ownTypeValues) {
                 $ownBranch = new \ArrayObject(['type' => 'object']);
                 foreach (['properties', 'required', 'additionalProperties'] as $keyword) {
@@ -261,7 +259,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             unset($definition['properties'], $definition['required'], $definition['additionalProperties']);
         }
 
-        // An instance of the class itself carries its own type
         if ($ownTypeValues && !$oneOf && !isset($definition['properties'][$typeProperty])) {
             $this->addTypeProperties($definition, [$typeProperty => ['type' => 'string', 'enum' => $ownTypeValues]], $isPartialUpdate || \in_array($mapping->getDefaultType(), $ownTypeValues, true));
         }

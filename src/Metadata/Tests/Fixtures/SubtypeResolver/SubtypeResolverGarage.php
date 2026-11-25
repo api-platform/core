@@ -11,11 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Tests\Fixtures\Discriminator;
+namespace ApiPlatform\Metadata\Tests\Fixtures\SubtypeResolver;
 
-use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
-
-#[DiscriminatorMap(typeProperty: 'kind', mapping: ['car' => Car::class, 'truck' => Truck::class])]
-abstract class Vehicle
+class SubtypeResolverGarage
 {
 }

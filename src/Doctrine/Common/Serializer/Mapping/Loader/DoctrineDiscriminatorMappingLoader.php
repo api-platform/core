@@ -22,15 +22,10 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
 /**
- * Exposes the Doctrine inheritance discriminator map (ORM and MongoDB ODM) of an API resource as a serializer
- * discriminator map, so the subtypes of a Doctrine hierarchy are read, written and documented as such.
+ * Exposes the Doctrine discriminator map (ORM, MongoDB ODM) of a resource hierarchy as a serializer discriminator map.
  *
- * A serializer discriminator map declared in the hierarchy always takes precedence. It is detected using the
- * explicit serializer loaders (attributes, XML, YAML) when they are given, attributes only otherwise.
- *
- * The serializer does not inherit discriminator maps: every class having subclasses in the Doctrine map gets
- * its own map, restricted to itself and its subclasses, so a resource declared in the middle of a hierarchy
- * resolves its own subtypes too.
+ * The serializer does not inherit maps: every class with subclasses gets its own map, so a resource declared in the
+ * middle of a hierarchy resolves its subtypes too. A serializer map declared in the hierarchy takes precedence.
  *
  * @internal
  */
@@ -104,7 +99,6 @@ final class DoctrineDiscriminatorMappingLoader implements LoaderInterface
             return \is_string($name) && '' !== $name ? $name : null;
         }
 
-        // MongoDB ODM
         if (property_exists($doctrineMetadata, 'discriminatorField') && \is_string($doctrineMetadata->discriminatorField) && '' !== $doctrineMetadata->discriminatorField) {
             return $doctrineMetadata->discriminatorField;
         }

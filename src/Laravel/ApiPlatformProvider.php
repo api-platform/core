@@ -151,6 +151,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolver;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\OpenApi\Command\OpenApiCommand;
@@ -218,7 +220,6 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -314,8 +315,12 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ClassDiscriminatorResolverInterface::class, static function (Application $app) {
-            return new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class));
+        $this->app->singleton(SubtypeResolverInterface::class, static function (Application $app) {
+            return new SubtypeResolver(
+                new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+            );
         });
 
         $this->app->singleton(SerializerClassMetadataFactory::class, static function (Application $app) {
@@ -720,7 +725,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(IriConverterInterface::class),
                 $app->make(NameConverterInterface::class),
                 $defaultContext,
-                self::getResourceClassDiscriminatorResolver($app),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -752,6 +757,7 @@ class ApiPlatformProvider extends ServiceProvider
                 // $app->make(TagCollectorInterface::class)
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -774,6 +780,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -822,6 +829,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
                 // $app->make(TagCollectorInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -977,7 +985,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
-                self::getResourceClassDiscriminatorResolver($app),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {
@@ -988,7 +996,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
                 strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
-                classDiscriminatorResolver: self::getResourceClassDiscriminatorResolver($app),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
@@ -1023,7 +1031,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $defaultContext,
                 $entrypointEnabled,
-                self::getResourceClassDiscriminatorResolver($app),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1118,6 +1126,7 @@ class ApiPlatformProvider extends ServiceProvider
                 operationResourceResolver: $app->make(OperationResourceClassResolverInterface::class),
                 identifiersExtractor: $app->make(IdentifiersExtractorInterface::class),
                 useIriAsId: $useIriAsId,
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1137,6 +1146,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1240,6 +1250,7 @@ class ApiPlatformProvider extends ServiceProvider
                 null,
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1260,6 +1271,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceAccessCheckerInterface::class),
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1701,11 +1713,8 @@ class ApiPlatformProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
     }
 
-    /**
-     * Resource polymorphism through serializer discriminator maps is opt-in (api-platform.serializer.discriminator_map).
-     */
-    private static function getResourceClassDiscriminatorResolver(Application $app): ?ClassDiscriminatorResolverInterface
+    private static function getSubtypeResolver(Application $app): ?SubtypeResolverInterface
     {
-        return $app['config']->get('api-platform.serializer.discriminator_map', false) ? $app->make(ClassDiscriminatorResolverInterface::class) : null;
+        return $app['config']->get('api-platform.serializer.discriminator_map', false) ? $app->make(SubtypeResolverInterface::class) : null;
     }
 }

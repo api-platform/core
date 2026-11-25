@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolver;
 use ApiPlatform\Metadata\UriVariablesConverter;
 use ApiPlatform\Metadata\UriVariableTransformer\ApiResourceUriVariableTransformer;
 use ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer;
@@ -160,6 +161,13 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.serializer.operation_resource_resolver', OperationResourceClassResolver::class);
     $services->alias(OperationResourceClassResolverInterface::class, 'api_platform.serializer.operation_resource_resolver');
 
+    $services->set('api_platform.serializer.subtype_resolver', SubtypeResolver::class)
+        ->args([
+            service('serializer.mapping.class_discriminator_resolver'),
+            service('api_platform.metadata.resource.name_collection_factory'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+        ]);
+
     $services->set('api_platform.serializer.normalizer.item', ItemNormalizer::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
@@ -172,10 +180,11 @@ return function (ContainerConfigurator $container) {
             null,
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
-            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
+            [],
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
+        ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -895])
         ->tag('kernel.reset', ['method' => '?reset']);
 
@@ -191,10 +200,11 @@ return function (ContainerConfigurator $container) {
             null,
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
-            ['discriminator_map' => '%api_platform.serializer.discriminator_map%'],
+            [],
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
+        ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -894])
         ->tag('kernel.reset', ['method' => '?reset']);
 

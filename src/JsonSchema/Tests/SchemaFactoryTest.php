@@ -42,8 +42,10 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolver;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -562,7 +564,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertFalse($phone['additionalProperties']);
     }
 
-    public function testBuildSchemaWithoutClassDiscriminatorResolverIgnoresDiscriminatorMap(): void
+    public function testBuildSchemaWithoutSubtypeResolverIgnoresDiscriminatorMap(): void
     {
         $schemaFactory = $this->createDiscriminatorSchemaFactory(false);
         $definitions = $schemaFactory->buildSchema(DiscriminatedAnimal::class)->getDefinitions();
@@ -572,7 +574,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayNotHasKey('discriminator', $definitions['DiscriminatedAnimal']);
     }
 
-    private function createDiscriminatorSchemaFactory(bool $withClassDiscriminatorResolver = true): SchemaFactory
+    private function createDiscriminatorSchemaFactory(bool $withSubtypeResolver = true): SchemaFactory
     {
         $propertyNames = [
             DiscriminatedAnimal::class => ['name'],
@@ -597,7 +599,7 @@ class SchemaFactoryTest extends TestCase
             propertyMetadataFactory: $propertyMetadataFactory,
             resourceClassResolver: $resourceClassResolver,
             definitionNameFactory: new DefinitionNameFactory(),
-            classDiscriminatorResolver: $withClassDiscriminatorResolver ? new ClassDiscriminatorFromClassMetadata(new ClassMetadataFactory(new AttributeLoader())) : null,
+            subtypeResolver: $withSubtypeResolver ? new SubtypeResolver(new ClassDiscriminatorFromClassMetadata(new ClassMetadataFactory(new AttributeLoader())), $this->createStub(ResourceNameCollectionFactoryInterface::class), $this->createStub(ResourceMetadataCollectionFactoryInterface::class)) : null,
         );
     }
 

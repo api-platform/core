@@ -38,6 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(),
         new Delete(),
     ],
+    types: ['https://schema.org/Vehicle'],
     provider: [self::class, 'provide'],
     processor: [self::class, 'process'],
 )]

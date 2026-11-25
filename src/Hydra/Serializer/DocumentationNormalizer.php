@@ -28,10 +28,9 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\ClassDiscriminatorHelper;
 use ApiPlatform\Metadata\Util\TypeHelper;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -61,7 +60,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?array $defaultContext = [],
         private readonly ?bool $entrypointEnabled = true,
-        private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        private readonly ?SubtypeResolverInterface $subtypeResolver = null,
     ) {
     }
 
@@ -71,11 +70,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $classes = [];
+        $classIndexes = [];
         $subtypeClasses = [];
+        $resourceParents = [];
         $entrypointProperties = [];
         $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
-        $resourceClasses = iterator_to_array($data->getResourceNameCollection(), false);
-        $resourceShortNames = null === $this->classDiscriminatorResolver ? [] : $this->getResourceShortNames($resourceClasses);
+        $resourceClasses = array_fill_keys(iterator_to_array($data->getResourceNameCollection(), false), true);
 
         foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
@@ -90,12 +90,22 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix);
                 $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix);
+                $classIndexes[$resourceClass][] = array_key_last($classes);
 
-                if (null !== $this->classDiscriminatorResolver) {
-                    [$propertyNameContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
-                    $propertyNames = array_fill_keys(iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $propertyNameContext), false), true);
-                    $this->addSubtypeClasses($subtypeClasses, $resourceClasses, $resourceShortNames, $resourceClass, $prefixedShortName, $propertyNames, $resourceMetadata, $context, $hydraPrefix);
+                if (!$this->subtypeResolver?->getDirectSubtypes($resourceClass)) {
+                    continue;
                 }
+
+                [$propertyNameContext, $propertyContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
+                $propertyNames = array_fill_keys(iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $propertyNameContext), false), true);
+                $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $resourceClass, $prefixedShortName, $propertyNames, $propertyNameContext, $propertyContext, $context, $hydraPrefix);
+            }
+        }
+
+        foreach ($resourceParents as $resourceClass => $parents) {
+            foreach ($classIndexes[$resourceClass] ?? [] as $index) {
+                $subClassOf = array_values(array_unique([...(array) ($classes[$index]['subClassOf'] ?? []), ...$parents]));
+                $classes[$index]['subClassOf'] = 1 === \count($subClassOf) ? $subClassOf[0] : $subClassOf;
             }
         }
 
@@ -103,36 +113,34 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * Documents the subtypes declared in the discriminator map of a resource as subclasses of their parent,
-     * supporting the properties their parent does not expose.
+     * Documents the subtypes of a discriminator map as subclasses of their parent, supporting the properties their parent does not expose.
      *
      * @param array<string, array<string, mixed>> $subtypeClasses
-     * @param list<string>                        $resourceClasses
-     * @param array<string, true>                 $resourceShortNames
-     * @param array<string, true>                 $propertyNames      the properties exposed by the parent class
+     * @param array<string, list<string>>         $resourceParents
+     * @param array<string, true>                 $resourceClasses
+     * @param array<string, true>                 $propertyNames   the properties exposed by the parent class
      */
-    private function addSubtypeClasses(array &$subtypeClasses, array $resourceClasses, array $resourceShortNames, string $class, string $prefixedShortName, array $propertyNames, ApiResource $resourceMetadata, array $context, string $hydraPrefix): void
+    private function addSubtypeClasses(array &$subtypeClasses, array &$resourceParents, array $resourceClasses, string $class, string $prefixedShortName, array $propertyNames, array $propertyNameContext, array $propertyContext, array $context, string $hydraPrefix): void
     {
-        if (null === $mapping = $this->classDiscriminatorResolver?->getMappingForClass($class)) {
-            return;
-        }
+        foreach ($this->subtypeResolver?->getDirectSubtypes($class) ?? [] as $subtype) {
+            if (isset($resourceClasses[$subtype])) {
+                $resourceParents[$subtype][] = $prefixedShortName;
 
-        [$propertyNameContext, $propertyContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
-        foreach (ClassDiscriminatorHelper::getDirectSubtypes($mapping, $class) as $subtype) {
-            // A subtype being a resource is documented by its own class
-            if (\in_array($subtype, $resourceClasses, true)) {
                 continue;
             }
 
-            $subtypeShortName = ClassDiscriminatorHelper::getShortName($subtype);
-            // The short name already identifies a resource: its class must not be redefined, the subtypes of the subtype extend the parent
-            if (isset($resourceShortNames[$subtypeShortName])) {
-                $this->addSubtypeClasses($subtypeClasses, $resourceClasses, $resourceShortNames, $subtype, $prefixedShortName, $propertyNames, $resourceMetadata, $context, $hydraPrefix);
+            // A subtype without a name of its own is not documented, its subtypes extend its parent
+            if (null === $subtypeShortName = $this->subtypeResolver->getTypeName($subtype)) {
+                $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $subtype, $prefixedShortName, $propertyNames, $propertyNameContext, $propertyContext, $context, $hydraPrefix);
 
                 continue;
             }
 
             $subtypePrefixedShortName = "#$subtypeShortName";
+            if (isset($subtypeClasses[$subtypePrefixedShortName])) {
+                continue;
+            }
+
             $subtypePropertyNames = $propertyNames;
             $properties = [];
             foreach ($this->propertyNameCollectionFactory->create($subtype, $propertyNameContext) as $propertyName) {
@@ -150,7 +158,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $properties[] = $this->getProperty($propertyMetadata, $normalizedPropertyName, $subtypePrefixedShortName, $subtypeShortName, $hydraPrefix);
             }
 
-            $subtypeClasses[$subtypePrefixedShortName] ??= [
+            $subtypeClasses[$subtypePrefixedShortName] = [
                 '@id' => $subtypePrefixedShortName,
                 '@type' => $hydraPrefix.'Class',
                 $hydraPrefix.'title' => $subtypeShortName,
@@ -159,27 +167,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $hydraPrefix.'supportedOperation' => [],
             ];
 
-            $this->addSubtypeClasses($subtypeClasses, $resourceClasses, $resourceShortNames, $subtype, $subtypePrefixedShortName, $subtypePropertyNames, $resourceMetadata, $context, $hydraPrefix);
+            $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $subtype, $subtypePrefixedShortName, $subtypePropertyNames, $propertyNameContext, $propertyContext, $context, $hydraPrefix);
         }
-    }
-
-    /**
-     * @param list<string> $resourceClasses
-     *
-     * @return array<string, true>
-     */
-    private function getResourceShortNames(array $resourceClasses): array
-    {
-        $shortNames = [];
-        foreach ($resourceClasses as $resourceClass) {
-            foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
-                if (true !== $resourceMetadata->getHideHydraOperation()) {
-                    $shortNames[$resourceMetadata->getShortName()] = true;
-                }
-            }
-        }
-
-        return $shortNames;
     }
 
     /**
