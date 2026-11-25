@@ -297,6 +297,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             if (\is_array($data) && null !== $discriminatorMapping = $this->getDiscriminatorMapping($resourceClass, null !== $objectToPopulate ? $this->getObjectClass($objectToPopulate) : $type)) {
                 $data = $this->prepareDiscriminatedData($data, $discriminatorMapping, null !== $objectToPopulate ? $this->getObjectClass($objectToPopulate) : null, \is_string($replacedClass) ? $this->getRealClassName($replacedClass) : null, $type, $resourceClass, $context);
                 $resourceClass = $context['resource_class'] = $discriminatorMapping['class'];
+            } elseif (\is_array($data) && null !== ($existingClass = null !== $objectToPopulate ? $this->getObjectClass($objectToPopulate) : (\is_string($replacedClass) ? $this->getRealClassName($replacedClass) : null))) {
+                $this->validateTypeAgainstParentMappings($data, $existingClass, $context);
             }
         } elseif (($context['api_platform_input'] ?? false) && isset($context['resource_class'])) {
             // A discriminated input DTO base (not itself a resource) resolves to a concrete
@@ -630,6 +632,26 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         }
 
         return $data;
+    }
+
+    /**
+     * A leaf resource declares no map: the maps of its parents still fix its type.
+     */
+    private function validateTypeAgainstParentMappings(array $data, string $existingClass, array $context): void
+    {
+        if (null === $this->subtypeResolver) {
+            return;
+        }
+
+        for ($class = $existingClass; false !== $class; $class = get_parent_class($class)) {
+            if (null === ($mapping = $this->subtypeResolver->getMapping($class)) || !\array_key_exists($typeProperty = $mapping->getTypeProperty(), $data)) {
+                continue;
+            }
+
+            if (!\is_string($data[$typeProperty]) || $mapping->getClassForType($data[$typeProperty]) !== $this->getMostSpecificMappedClass($mapping, $existingClass)) {
+                throw $this->createTypeChangeException($data[$typeProperty], $typeProperty, $context);
+            }
+        }
     }
 
     private function createTypeChangeException(mixed $value, string $typeProperty, array $context): UnprocessableValueException

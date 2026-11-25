@@ -46,6 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     'car' => DiscriminatedCar::class,
     'truck' => DiscriminatedTruck::class,
     'bike' => DiscriminatedBike::class,
+    'bus' => DiscriminatedBus::class,
 ])]
 abstract class DiscriminatedVehicle
 {

@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\State\Exception\UnprocessableValueException;
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedBike;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedBus;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedMountainBike;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource\DiscriminatedSportsCar;
@@ -45,7 +46,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [DiscriminatedVehicle::class];
+        return [DiscriminatedVehicle::class, DiscriminatedBus::class];
     }
 
     protected function setUp(): void
@@ -296,6 +297,38 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[2]);
     }
 
+    /**
+     * @return iterable<string, array{string, string, array<string, mixed>}>
+     */
+    public static function leafResourceTypeChangeProvider(): iterable
+    {
+        yield 'PATCH on the endpoint of the leaf resource' => ['PATCH', '/discriminated_buses/6', ['kind' => 'car']];
+        yield 'PATCH of a leaf resource on the root endpoint' => ['PATCH', '/discriminated_vehicles/6', ['kind' => 'car']];
+        yield 'PUT to a leaf resource on the root endpoint' => ['PUT', '/discriminated_vehicles/1', ['kind' => 'bus', 'name' => 'Citaro']];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('leafResourceTypeChangeProvider')]
+    public function testLeafResourceTypeCannotChange(string $method, string $uri, array $payload): void
+    {
+        $bus = new DiscriminatedBus();
+        $bus->id = 6;
+        $bus->name = 'Citaro';
+        DiscriminatedVehicleStore::$vehicles[6] = $bus;
+
+        self::createClient()->request($method, $uri, [
+            'headers' => ['Content-Type' => 'PATCH' === $method ? 'application/merge-patch+json' : 'application/ld+json'],
+            'json' => $payload,
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonContains(['violations' => [['propertyPath' => 'kind', 'code' => UnprocessableValueException::TYPE_MISMATCH_ERROR]]]);
+        $this->assertInstanceOf(DiscriminatedCar::class, DiscriminatedVehicleStore::$vehicles[1]);
+        $this->assertInstanceOf(DiscriminatedBus::class, DiscriminatedVehicleStore::$vehicles[6]);
+    }
+
     public function testPutKeepingTheSubtypeReplacesTheResource(): void
     {
         self::createClient()->request('PUT', '/discriminated_vehicles/2', [
@@ -322,9 +355,10 @@ final class DiscriminatedResourceTest extends ApiTestCase
                 'car' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedCar.jsonld',
                 'truck' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedTruck.jsonld',
                 'bike' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedBike.jsonld',
+                'bus' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedBus.jsonld',
             ],
         ], $output['discriminator']);
-        $this->assertCount(3, $output['oneOf']);
+        $this->assertCount(4, $output['oneOf']);
         $this->assertArrayNotHasKey('properties', $output);
 
         $truck = $schemas['DiscriminatedVehicle.DiscriminatedTruck.jsonld'];
