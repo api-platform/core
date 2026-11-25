@@ -46,8 +46,6 @@ api_platform:
         Made with love
     enable_swagger: true
     enable_swagger_ui: true
-    serializer:
-        discriminator_map:             true
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']

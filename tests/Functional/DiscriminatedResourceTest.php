@@ -35,6 +35,11 @@ final class DiscriminatedResourceTest extends ApiTestCase
 
     protected static ?bool $alwaysBootKernel = false;
 
+    protected static function getKernelClass(): string
+    {
+        return DiscriminatorMapAppKernel::class;
+    }
+
     /**
      * @return class-string[]
      */
