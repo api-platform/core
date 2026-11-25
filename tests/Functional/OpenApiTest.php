@@ -138,6 +138,46 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayNotHasKey('ref', $responses['401']);
     }
 
+    public function testNonJsonLdRequestBodiesKeepTheirFormatDefinition(): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+
+        $content = $json['paths']['/dummies']['post']['requestBody']['content'];
+
+        $this->assertSame('#/components/schemas/Dummy', $content['application/xml']['schema']['$ref']);
+        $this->assertSame('#/components/schemas/Dummy', $content['application/ld+json']['schema']['$ref']);
+    }
+
+    public function testJsonApiRequestBodyUsesItsOwnInputDefinition(): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+        $schemas = $json['components']['schemas'];
+
+        $inputName = $this->definitionName($json['paths']['/dummies']['post']['requestBody']['content']['application/vnd.api+json']['schema']['$ref']);
+        $outputName = $this->definitionName($json['paths']['/dummies/{id}']['get']['responses']['200']['content']['application/vnd.api+json']['schema']['$ref']);
+
+        $this->assertSame('Dummy.jsonapi', $outputName);
+        $this->assertNotSame($outputName, $inputName);
+
+        $input = $schemas[$inputName];
+        $this->assertSame(['$ref' => '#/components/schemas/'.$inputName.'.resource'], $input['properties']['data']);
+        $this->assertSame(['type'], $schemas[$inputName.'.resource']['required']);
+        $this->assertArrayHasKey('attributes', $schemas[$inputName.'.resource']['properties']);
+        $this->assertArrayNotHasKey('included', $input['properties']);
+
+        $this->assertSame(['$ref' => '#/components/schemas/'.$outputName.'.resource'], $schemas[$outputName]['properties']['data']);
+        $this->assertSame(['type', 'id'], $schemas[$outputName.'.resource']['required']);
+    }
+
+    private function definitionName(string $ref): string
+    {
+        return substr($ref, \strlen('#/components/schemas/'));
+    }
+
     public function testDeprecatedPutDoesNotLeakIntoNestedResourceSchema(): void
     {
         $response = self::createClient()->request('GET', '/docs', [

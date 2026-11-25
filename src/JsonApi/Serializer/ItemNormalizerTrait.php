@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\BadRequestException;
+use ApiPlatform\Metadata\Exception\ConflictException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -53,7 +53,14 @@ trait ItemNormalizerTrait
         }
 
         $operation = $context['operation'] ?? null;
+        $this->assertValidRequestDocument($data, $operation, $type, $context);
+
         $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
+        if (!$isPostOperation && $operation instanceof HttpOperation && \is_object($context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? null)) {
+            if (isset($data['data']['id'])) {
+                $this->assertIdMatchesEndpoint((string) $data['data']['id'], $context[AbstractItemNormalizer::OBJECT_TO_POPULATE], $operation, $type);
+            }
+        }
         $allowClientGeneratedId = true === ($context[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? $this->defaultContext[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? false);
 
         // Avoid issues with proxies if we populated the object
@@ -66,6 +73,7 @@ trait ItemNormalizerTrait
             } elseif (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             } else {
+                $this->assertValidId($data['data']['id'], 'The type of the "data.id" attribute', 'data.id');
                 $context += ['fetch_data' => false];
                 if ($this->useIriAsId) {
                     $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['data']['id'], $context);
@@ -76,17 +84,87 @@ trait ItemNormalizerTrait
             }
         }
 
-        $dataToDenormalize = array_merge(
-            $data['data']['attributes'] ?? [],
-            $data['data']['relationships'] ?? []
-        );
+        $dataToDenormalize = $data['data']['attributes'] ?? [];
+        foreach ($data['data']['relationships'] ?? [] as $name => $relationship) {
+            $dataToDenormalize[$name] = \is_array($relationship) && \array_key_exists('data', $relationship) ? $relationship['data'] : $relationship;
+        }
 
         // Surface the client-generated id so the entity setter receives it.
         if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
-            $dataToDenormalize[ReservedAttributeNameConverter::JSON_API_RESERVED_ATTRIBUTES['id']] = $data['data']['id'];
+            $dataToDenormalize[$this->nameConverter?->normalize('id', $type, self::FORMAT) ?? 'id'] = $data['data']['id'];
         }
 
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
+    }
+
+    private function assertValidRequestDocument(mixed $data, mixed $operation, string $resourceClass, array $context): void
+    {
+        if (!\is_array($data) || !isset($data['data']) || !$this->isJsonObject($data['data'])) {
+            throw new BadRequestException('The request document must be an object with a "data" member holding a resource object.');
+        }
+
+        foreach (['attributes', 'relationships'] as $member) {
+            if (\array_key_exists($member, $data['data']) && !$this->isJsonObject($data['data'][$member])) {
+                throw new BadRequestException(\sprintf('The "%s" member of the resource object must be an object.', $member));
+            }
+        }
+
+        if (true !== ($context[ItemNormalizer::STRICT_RESOURCE_TYPE] ?? $this->defaultContext[ItemNormalizer::STRICT_RESOURCE_TYPE] ?? false)) {
+            return;
+        }
+
+        if (!isset($data['data']['type']) || !\is_string($data['data']['type'])) {
+            throw new BadRequestException('The resource object must have a "type" member.');
+        }
+
+        if (!$operation instanceof HttpOperation) {
+            return;
+        }
+
+        $acceptedTypes = array_filter([$operation->getShortName(), $this->getResourceShortName($resourceClass)]);
+        if (!\in_array($data['data']['type'], $acceptedTypes, true)) {
+            throw new ConflictException(\sprintf('The resource object type "%s" does not match the type of this endpoint, expected one of "%s".', $data['data']['type'], implode('", "', array_unique($acceptedTypes))));
+        }
+    }
+
+    private function assertIdMatchesEndpoint(string $id, object $object, HttpOperation $operation, string $resourceClass): void
+    {
+        if ($this->useIriAsId) {
+            $requested = $id;
+            $actual = $this->iriConverter->getIriFromResource($object);
+        } elseif (\count($operation->getUriVariables() ?? []) > 1) {
+            return;
+        } else {
+            $requested = $this->reconstructIri($resourceClass, $id, $operation);
+            $actual = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation);
+        }
+
+        if (parse_url($requested, \PHP_URL_PATH) !== parse_url($actual, \PHP_URL_PATH)) {
+            throw new ConflictException(\sprintf('The resource object id "%s" does not match the id of this endpoint.', $id));
+        }
+    }
+
+    private function getResourceShortName(string $resourceClass): string
+    {
+        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+
+            return $resourceMetadata->getOperation()->getShortName();
+        }
+
+        return (new \ReflectionClass($resourceClass))->getShortName();
+    }
+
+    private function assertValidId(mixed $id, string $subject, ?string $path): void
+    {
+        if (!\is_string($id) && ($this->useIriAsId || !\is_int($id))) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('%s must be "string", "%s" given.', $subject, \gettype($id)), $id, ['string'], $path, true);
+        }
+    }
+
+    private function isJsonObject(mixed $value): bool
+    {
+        return \is_array($value) && ([] === $value || !array_is_list($value));
     }
 
     protected function isAllowedAttribute(object|string $classOrObject, string $attribute, ?string $format = null, array $context = []): bool
@@ -102,7 +180,6 @@ trait ItemNormalizerTrait
     /**
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
@@ -111,33 +188,18 @@ trait ItemNormalizerTrait
             throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
-        try {
-            $context += ['fetch_data' => true];
-            if ($this->useIriAsId) {
-                return $this->iriConverter->getResourceFromIri($value['id'], $context);
-            }
+        $this->assertValidId($value['id'], \sprintf('The type of the "id" attribute of the "%s" relationship', $attributeName), $context['deserialization_path'] ?? null);
 
-            /** @var HttpOperation $getOperation */
-            $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
-            $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
-
-            return $this->iriConverter->getResourceFromIri($iri, $context);
-        } catch (ItemNotFoundException $e) {
-            if (!isset($context['not_normalizable_value_exceptions'])) {
-                throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-            }
-            $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
-                $e->getMessage(),
-                $value,
-                [$className],
-                $context['deserialization_path'] ?? null,
-                true,
-                $e->getCode(),
-                $e
-            );
-
-            return null;
+        $context += ['fetch_data' => true];
+        if ($this->useIriAsId) {
+            return $this->getResourceFromIri((string) $value['id'], $context, $className);
         }
+
+        /** @var HttpOperation $getOperation */
+        $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
+        $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
+
+        return $this->getResourceFromIri($iri, $context, $className);
     }
 
     /**

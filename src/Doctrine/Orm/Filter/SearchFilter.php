@@ -374,10 +374,11 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return 'array';
         }
 
+        // Use literal UTC type names for compatibility with Doctrine DBAL versions before 4.5.
         return match ($doctrineType) {
             Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
             Types::BOOLEAN => 'bool',
-            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE => \DateTimeInterface::class,
+            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE, 'datetime_utc', 'datetime_utc_immutable' => \DateTimeInterface::class,
             Types::FLOAT => 'float',
             default => 'string',
         };

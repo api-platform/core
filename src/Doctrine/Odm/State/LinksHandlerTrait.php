@@ -91,6 +91,8 @@ trait LinksHandlerTrait
             }
         }
 
+        $identifiers = $this->resolveLinkIdentifiers($identifiers, $link, $fromClass ?? $aggregationClass);
+
         $classMetadata = $manager->getClassMetadata($aggregationClass);
 
         $aggregation = $previousAggregationBuilder;

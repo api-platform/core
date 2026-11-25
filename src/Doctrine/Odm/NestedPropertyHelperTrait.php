@@ -87,4 +87,9 @@ trait NestedPropertyHelperTrait
 
         return "$alias$leafProperty";
     }
+
+    private function preserveNullsFor(array $context): bool
+    {
+        return 'addOr' === ($context['operator'] ?? null);
+    }
 }

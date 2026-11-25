@@ -168,7 +168,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 // Embedded/related resource: the operation belongs to another class, so fall back to its
                 // resource-level shortName instead of an operation-specific override.
                 try {
-                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                    $resourceCollection = $this->resourceMetadataCollectionFactory->create($typeClass);
+                    $typeResource = $resourceCollection[0];
+                    if (null !== $operation->getName()) {
+                        foreach ($resourceCollection as $candidate) {
+                            if ($candidate->getOperations()?->has($operation->getName())) {
+                                $typeResource = $candidate;
+                                break;
+                            }
+                        }
+                    }
+                    $types = [$typeResource->getShortName()];
                 } catch (\Exception) {
                     $types = [$operation->getShortName()];
                 }

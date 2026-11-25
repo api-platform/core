@@ -16,8 +16,8 @@ namespace ApiPlatform\Hal\Serializer;
 use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -42,27 +42,51 @@ final class EntrypointNormalizer implements NormalizerInterface
     {
         $entrypoint = ['_links' => ['self' => ['href' => $this->urlGenerator->generate('api_entrypoint')]]];
 
+        $bases = [];
+
         foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
+            $itemOperation = null;
+
             foreach ($resourceMetadata as $resource) {
                 foreach ($resource->getOperations() as $operation) {
-                    /** @var Operation $operation */
+                    if ($operation instanceof Get && [] !== ($uriVariables = $operation->getUriVariables() ?? []) && (null === $itemOperation || \count($uriVariables) < \count($itemOperation->getUriVariables() ?? []))) {
+                        $itemOperation = $operation;
+                    }
+
                     if (!$operation instanceof CollectionOperationInterface) {
                         continue;
                     }
 
                     try {
-                        $href = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
+                        $href = $this->iriConverter->getIriFromResource($operation->getClass(), $operation->getUrlGenerationStrategy() ?? UrlGeneratorInterface::ABS_PATH, $operation);
                         $entrypoint['_links'][lcfirst($operation->getShortName())]['href'] = $href;
                     } catch (InvalidArgumentException) {
                         // Ignore resources without GET operations
                     }
                 }
             }
+
+            if (null !== $itemOperation) {
+                $this->addItemLink($entrypoint, $itemOperation, $bases);
+            }
         }
 
         return $entrypoint;
+    }
+
+    private function addItemLink(array &$entrypoint, Get $operation, array &$bases): void
+    {
+        $uriTemplate = $operation->getUriTemplate();
+        if (null === $uriTemplate) {
+            return;
+        }
+
+        $strategy = $operation->getUrlGenerationStrategy() ?? UrlGeneratorInterface::ABS_PATH;
+        $bases[$strategy] ??= rtrim($this->urlGenerator->generate('api_entrypoint', [], $strategy), '/');
+
+        $entrypoint['_links'][lcfirst($operation->getShortName()).'Item'] = ['href' => $bases[$strategy].($operation->getRoutePrefix() ?? '').$uriTemplate, 'templated' => true];
     }
 
     /**

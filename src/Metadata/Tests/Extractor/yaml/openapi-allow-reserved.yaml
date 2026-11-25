@@ -1,0 +1,14 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program:
+        -   operations:
+                ApiPlatform\Metadata\GetCollection:
+                    openapi:
+                        parameters:
+                            -   name: path
+                                in: query
+                                allowReserved: true
+                    parameters:
+                        q:
+                            openapi:
+                                name: q
+                                allowReserved: true

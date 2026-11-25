@@ -42,6 +42,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
             service('api_platform.jsonapi.resource_linkage_resolver'),
+            false,
         ]);
 
     $services->set('api_platform.jsonapi.encoder', JsonEncoder::class)
@@ -49,7 +50,7 @@ return static function (ContainerConfigurator $container) {
         ->tag('serializer.encoder');
 
     $services->set('api_platform.jsonapi.name_converter.reserved_attribute_name', ReservedAttributeNameConverter::class)
-        ->args([service('api_platform.name_converter')->ignoreOnInvalid()]);
+        ->args([service('api_platform.name_converter')->ignoreOnInvalid(), false]);
 
     $services->set('api_platform.jsonapi.normalizer.entrypoint', EntrypointNormalizer::class)
         ->args([
@@ -83,7 +84,8 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.serializer.operation_resource_resolver'),
             service('api_platform.api.identifiers_extractor'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -890]);
+        ->tag('serializer.normalizer', ['priority' => -890])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.jsonapi.denormalizer.item', ItemDenormalizer::class)
         ->args([
@@ -100,7 +102,8 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -889]);
+        ->tag('serializer.normalizer', ['priority' => -889])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
         ->args([
@@ -119,6 +122,6 @@ return static function (ContainerConfigurator $container) {
         ->tag('serializer.normalizer', ['priority' => -780]);
 
     $services->set('api_platform.jsonapi.normalizer.error', ErrorNormalizer::class)
-        ->args([service('api_platform.jsonapi.normalizer.item')])
+        ->args([service('api_platform.jsonapi.normalizer.item'), service('serializer.normalizer.problem')->nullOnInvalid()])
         ->tag('serializer.normalizer', ['priority' => -790]);
 };

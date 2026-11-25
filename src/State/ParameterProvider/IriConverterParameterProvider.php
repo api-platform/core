@@ -36,53 +36,36 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
     public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
     {
         $operation = $context['operation'] ?? null;
-        if (!($value = $parameter->getValue()) || $value instanceof ParameterNotFound) {
+        $value = $parameter->getValue();
+        if (null === $value || $value instanceof ParameterNotFound) {
             return $operation;
         }
 
         $extraProperties = $parameter->getExtraProperties();
-        $iriConverterContext = ['fetch_data' => $extraProperties['fetch_data'] ?? false];
+        $iriConverterContext = [
+            'fetch_data' => $extraProperties['fetch_data'] ?? false,
+            'map_resource' => $extraProperties['map_resource'] ?? (null === $parameter->getFilter()),
+        ];
 
-        if (\is_array($value)) {
-            $entities = [];
-            foreach ($value as $v) {
-                try {
-                    $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
-                } catch (InvalidArgumentException|ItemNotFoundException $exception) {
-                    if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
-                        throw $exception;
-                    }
-
-                    $this->logger->error(
-                        message: 'Operation failed due to an invalid argument or a missing item',
-                        context: [
-                            'exception' => $exception->getMessage(),
-                        ]
-                    );
-
-                    break;
+        $resources = [];
+        foreach (\is_array($value) ? $value : [$value] as $iri) {
+            try {
+                $resources[] = $this->iriConverter->getResourceFromIri((string) $iri, $iriConverterContext);
+            } catch (InvalidArgumentException $exception) {
+                if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
+                    throw $exception;
                 }
+
+                $this->logger->notice(
+                    message: 'Unable to resolve an IRI parameter value',
+                    context: [
+                        'exception' => $exception->getMessage(),
+                    ]
+                );
             }
-
-            $parameter->setValue($entities);
-
-            return $operation;
         }
 
-        try {
-            $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
-        } catch (InvalidArgumentException|ItemNotFoundException $exception) {
-            if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
-                throw $exception;
-            }
-
-            $this->logger->error(
-                message: 'Operation failed due to an invalid argument or a missing item',
-                context: [
-                    'exception' => $exception->getMessage(),
-                ]
-            );
-        }
+        $parameter->setValue(\is_array($value) || [] === $resources ? $resources : $resources[0]);
 
         return $operation;
     }

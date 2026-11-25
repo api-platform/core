@@ -129,4 +129,16 @@ class SchemaFactoryTest extends TestCase
         $forceCollectionSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, null, null, null, true);
         $this->assertEquals($forceCollectionSchema, $resultSchema);
     }
+
+    public function testCollectionSchemaMatchesTheNormalizer(): void
+    {
+        $definitions = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, new GetCollection())['definitions'];
+
+        $this->assertSame(['_links'], $definitions['HalCollectionBaseSchemaNoPagination']['required']);
+        $this->assertArrayHasKey('item', $definitions['HalCollectionBaseSchemaNoPagination']['properties']['_links']['properties']);
+
+        $paginationLinks = $definitions['HalCollectionBaseSchema']['allOf'][1]['properties']['_links']['properties'];
+        $this->assertArrayHasKey('prev', $paginationLinks);
+        $this->assertArrayNotHasKey('previous', $paginationLinks);
+    }
 }

@@ -45,11 +45,7 @@ final class CacheTagsTest extends ApiTestCase
 
     protected function setUp(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped('HTTP Cache tags only enabled on SQLite test suite');
-        }
-
-        $this->recreateSchema($this->getResources());
+        $this->recreateSchema($this->isMongoDB() ? [RelationEmbedder::class, RelatedDummy::class, ThirdLevel::class] : $this->getResources());
         $this->purger()->clear();
     }
 
@@ -113,6 +109,10 @@ final class CacheTagsTest extends ApiTestCase
 
     public function testManyToManyCacheTags(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('No ODM Document fixtures for Relation1, Relation2 and Relation3');
+        }
+
         $client = self::createClient();
 
         // Two Relation2 instances.

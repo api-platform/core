@@ -20,6 +20,7 @@ use GraphQL\Language\AST\FloatValueNode;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
@@ -42,15 +43,27 @@ class IterableTypeTest extends TestCase
     {
         $iterableType = new IterableType();
 
+        $this->assertEquals(['foo'], $iterableType->serialize(['foo']));
+    }
+
+    public function testSerializeNonIterable(): void
+    {
+        $iterableType = new IterableType();
+
         $this->expectException(Error::class);
         $this->expectExceptionMessageMatches('/`Iterable` cannot represent non iterable value: .+/');
 
         $iterableType->serialize('foo');
-
-        $this->assertEquals(['foo'], $iterableType->serialize(['foo']));
     }
 
     public function testParseValue(): void
+    {
+        $iterableType = new IterableType();
+
+        $this->assertEquals(['foo'], $iterableType->parseValue(['foo']));
+    }
+
+    public function testParseValueNonIterable(): void
     {
         $iterableType = new IterableType();
 
@@ -58,42 +71,46 @@ class IterableTypeTest extends TestCase
         $this->expectExceptionMessageMatches('/`Iterable` cannot represent non iterable value: .+/');
 
         $iterableType->parseValue('foo');
-
-        $this->assertEquals(['foo'], $iterableType->parseValue(['foo']));
     }
 
     public function testParseLiteral(): void
     {
         $iterableType = new IterableType();
 
-        $this->expectException(\Exception::class);
-        $iterableType->parseLiteral(new IntValueNode(['value' => '1']));
-
-        $listValueNode = new ListValueNode(['values' => []]);
+        $listValueNode = new ListValueNode(['values' => new NodeList([])]);
         $this->assertEquals([], $iterableType->parseLiteral($listValueNode));
 
-        $objectValueNode = new ObjectValueNode(['fields' => []]);
+        $objectValueNode = new ObjectValueNode(['fields' => new NodeList([])]);
         $this->assertEquals([], $iterableType->parseLiteral($objectValueNode));
 
         $listValueNode = new ListValueNode([
-            'values' => [
+            'values' => new NodeList([
                 new StringValueNode(['value' => 'foo']),
                 new BooleanValueNode(['value' => false]),
                 new IntValueNode(['value' => '123']),
                 new FloatValueNode(['value' => '9.4']),
                 new NullValueNode([]),
                 new ObjectValueNode([
-                    'fields' => [
+                    'fields' => new NodeList([
                         new ObjectFieldNode(['value' => new StringValueNode(['value' => 'baz']), 'name' => new NameNode(['value' => 'bar'])]),
-                    ],
+                    ]),
                 ]),
                 new ListValueNode([
-                    'values' => [
+                    'values' => new NodeList([
                         new BooleanValueNode(['value' => true]),
-                    ],
+                    ]),
                 ]),
-            ],
+            ]),
         ]);
         $this->assertEquals(['foo', false, 123, 9.4, null, ['bar' => 'baz'], [true]], $iterableType->parseLiteral($listValueNode));
+    }
+
+    public function testParseLiteralWithNonIterableNode(): void
+    {
+        $iterableType = new IterableType();
+
+        $this->expectException(\Exception::class);
+
+        $iterableType->parseLiteral(new IntValueNode(['value' => '1']));
     }
 }

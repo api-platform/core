@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+/**
+ * Checks if the current user can access a resource, with a security expression.
+ */
 interface ResourceAccessCheckerInterface
 {
     /**

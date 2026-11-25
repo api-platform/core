@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ValidateOnce;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Decorator\DenormalizingJsonLdItemNormalizerDecorator;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -76,5 +76,19 @@ final class DecoratedItemNormalizerDenormalizationTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(201);
         $this->assertSame('decorated', $response->toArray()['name']);
+    }
+
+    #[IgnoreDeprecations]
+    public function testDecoratorOfTheItemNormalizerDoesNotBreakKernelReset(): void
+    {
+        $client = self::createClient();
+        $client->request('POST', '/validate_once', [
+            'headers' => ['Content-Type' => 'application/ld+json', 'Accept' => 'application/ld+json'],
+            'json' => ['name' => 'original'],
+        ]);
+
+        $client->getContainer()->get('services_resetter')->reset();
+
+        $this->addToAssertionCount(1);
     }
 }

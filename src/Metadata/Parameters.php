@@ -52,6 +52,13 @@ final class Parameters implements \IteratorAggregate, \Countable
         $this->sort();
     }
 
+    public function __clone()
+    {
+        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
+            $this->parameters[$i] = [$parameterName, clone $parameter];
+        }
+    }
+
     /**
      * @return \ArrayIterator<string, Parameter>
      */
@@ -105,15 +112,13 @@ final class Parameters implements \IteratorAggregate, \Countable
      */
     public function remove(string $key, string $parameterClass = QueryParameter::class): self
     {
-        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key && $parameterClass === $parameter::class) {
-                unset($this->parameters[$i]);
-
-                return $this;
-            }
+        if (null === $i = $this->indexOf($key, $parameterClass)) {
+            throw new RuntimeException(\sprintf('Could not remove parameter "%s".', $key));
         }
 
-        throw new RuntimeException(\sprintf('Could not remove parameter "%s".', $key));
+        unset($this->parameters[$i]);
+
+        return $this;
     }
 
     /**
@@ -125,13 +130,11 @@ final class Parameters implements \IteratorAggregate, \Countable
      */
     public function get(string $key, string $parameterClass = QueryParameter::class): ?Parameter
     {
-        foreach ($this->parameters as [$parameterName, $parameter]) {
-            if ($parameterName === $key && $parameterClass === $parameter::class) {
-                return $parameter;
-            }
+        if (null === $i = $this->indexOf($key, $parameterClass)) {
+            return null;
         }
 
-        return null;
+        return $this->parameters[$i][1];
     }
 
     /**
@@ -141,13 +144,27 @@ final class Parameters implements \IteratorAggregate, \Countable
      */
     public function has(string $key, string $parameterClass = QueryParameter::class): bool
     {
-        foreach ($this->parameters as [$parameterName, $parameter]) {
-            if ($parameterName === $key && $parameterClass === $parameter::class) {
-                return true;
+        return null !== $this->indexOf($key, $parameterClass);
+    }
+
+    private function indexOf(string $key, string $parameterClass): ?int
+    {
+        $subclassMatch = null;
+        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
+            if ($parameterName !== $key) {
+                continue;
+            }
+
+            if ($parameterClass === $parameter::class) {
+                return $i;
+            }
+
+            if (null === $subclassMatch && $parameter instanceof $parameterClass) {
+                $subclassMatch = $i;
             }
         }
 
-        return false;
+        return $subclassMatch;
     }
 
     public function count(): int

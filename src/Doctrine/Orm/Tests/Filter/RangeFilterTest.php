@@ -406,6 +406,12 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'lte + gte' => [
                     \sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
                 ],
+                'gt (array value)' => [
+                    \sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'gt (array value) + lte' => [
+                    \sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
+                ],
             ]
         );
     }

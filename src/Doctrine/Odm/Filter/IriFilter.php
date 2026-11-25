@@ -61,7 +61,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         }
 
         $property = $parameter->getProperty();
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, $this->preserveNullsFor($context), $context);
 
         $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
         $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
@@ -92,27 +92,21 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $method = $classMetadata->isSingleValuedAssociation($leafProperty) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
+            $value = \is_array($value) ? $value : iterator_to_array($value);
+
+            if ([] === $value) {
+                $match->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->in([]));
+
+                return;
+            }
+
             $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
-                if (!\is_object($v)) {
-                    continue;
-                }
-
                 $or->addOr($aggregationBuilder->matchExpr()->field($matchField)->{$method}($v));
             }
 
             $match->{$operator}($or);
-
-            return;
-        }
-
-        // The IRI did not resolve to a resource: emit an always-false clause so the query
-        // returns no result rather than attempting to match against a raw IRI string.
-        if (!\is_object($value)) {
-            $match->{$operator}(
-                $aggregationBuilder->matchExpr()->field($matchField)->in([])
-            );
 
             return;
         }

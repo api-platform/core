@@ -82,4 +82,16 @@ final class AbsoluteUrlTest extends ApiTestCase
         $this->assertSame('http://example.com/hal_absolute_url_parents/1/children', $body['_links']['self']['href']);
         $this->assertSame('http://example.com/hal_absolute_url_children/1', $body['_links']['item'][0]['href']);
     }
+
+    public function testEntrypointLinksUseAbsoluteUrls(): void
+    {
+        $client = self::createClient();
+        $response = $client->request('GET', '/', [
+            'headers' => ['Accept' => 'application/hal+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('http://localhost/hal_absolute_url_children', $body['_links']['halAbsoluteUrlChild']['href'] ?? null);
+        $this->assertSame(['href' => 'http://localhost/hal_absolute_url_children/{id}', 'templated' => true], $body['_links']['halAbsoluteUrlChildItem'] ?? null);
+    }
 }

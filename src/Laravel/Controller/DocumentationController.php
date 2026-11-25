@@ -65,6 +65,7 @@ final class DocumentationController
             'api_gateway' => $request->query->getBoolean(ApiGatewayNormalizer::API_GATEWAY),
             'base_url' => $request->getBaseUrl(),
             'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
+            'filter_tags' => $request->query->all('filter_tags'),
         ];
         $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
         // We want to find the format early on, this code is also executed later on by the ContentNegotiationProvider.

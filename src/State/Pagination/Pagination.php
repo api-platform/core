@@ -77,11 +77,11 @@ final class Pagination
         $limit = $this->getLimit($operation, $context);
 
         if ($graphql && null !== ($after = $this->getParameterFromContext($context, 'after'))) {
-            return false === ($after = base64_decode($after, true)) ? 0 : (int) $after + 1;
+            return null === ($after = $this->decodeCursor($after)) ? 0 : $after + 1;
         }
 
         if ($graphql && null !== ($before = $this->getParameterFromContext($context, 'before'))) {
-            return ($offset = (false === ($before = base64_decode($before, true)) ? 0 : (int) $before - $limit)) < 0 ? 0 : $offset;
+            return ($offset = ($this->decodeCursor($before) ?? 0) - $limit) < 0 ? 0 : $offset;
         }
 
         if ($graphql && null !== ($last = $this->getParameterFromContext($context, 'last'))) {
@@ -123,8 +123,8 @@ final class Pagination
         }
 
         if ($graphql && null !== ($before = $this->getParameterFromContext($context, 'before'))
-            && (false === ($before = base64_decode($before, true)) ? 0 : (int) $before - $limit) < 0) {
-            $limit = (int) $before;
+            && null !== ($before = $this->decodeCursor($before)) && $before - $limit < 0) {
+            $limit = $before;
         }
 
         if ($clientLimit) {
@@ -222,6 +222,20 @@ final class Pagination
         $enabled = $this->graphQlOptions['enabled'];
 
         return $operation?->getPaginationEnabled() ?? $enabled;
+    }
+
+    private function decodeCursor(string $cursor): ?int
+    {
+        if (false === ($decoded = base64_decode($cursor, true))) {
+            return null;
+        }
+
+        // the cursor is incremented by one for "after", keep the result within the int range
+        if (false === filter_var($decoded, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => \PHP_INT_MAX - 1]])) {
+            throw new \UnexpectedValueException('' === $cursor ? 'Empty cursor is invalid' : \sprintf('Cursor %s is invalid', $cursor));
+        }
+
+        return (int) $decoded;
     }
 
     /**

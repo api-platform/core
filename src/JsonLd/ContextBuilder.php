@@ -126,24 +126,23 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
 
         $shortName = $operation->getShortName();
 
-        $jsonLdContext = [
-            '@context' => $this->getResourceContextWithShortname(
+        $jsonLdContext = [];
+
+        if (!($context['has_context'] ?? false)) {
+            $jsonLdContext['@context'] = $this->getResourceContextWithShortname(
                 $outputClass,
                 $referenceType,
                 $shortName,
                 $operation
-            ),
-            '@type' => $types ?? $shortName,
-        ];
+            );
+        }
+
+        $jsonLdContext['@type'] = $types ?? $shortName;
 
         if (isset($context['iri'])) {
             $jsonLdContext['@id'] = $context['iri'];
         } elseif (true === ($context['gen_id'] ?? true) && $this->iriConverter && !isset($context['item_uri_template'])) {
             $jsonLdContext['@id'] = $this->iriConverter->getIriFromResource($object);
-        }
-
-        if ($context['has_context'] ?? false) {
-            unset($jsonLdContext['@context']);
         }
 
         return $jsonLdContext;

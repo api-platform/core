@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\Tests;
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
@@ -109,6 +110,19 @@ class EloquentTest extends TestCase
 
         $response = $this->get('/api/books?name='.$name, ['Accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['member'][0], $book);
+    }
+
+    public function testPartialSearchFilterWithArrayValue(): void
+    {
+        foreach (['Alpha', 'Bravo', 'Charlie'] as $name) {
+            BookFactory::new()->has(AuthorFactory::new())->create(['name' => $name]);
+        }
+
+        $response = $this->get('/api/books?name[]=lph&name[]=rav', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertEqualsCanonicalizing(['Alpha', 'Bravo'], array_column($response->json()['member'], 'name'));
+
+        $response = $this->get('/api/books?name[x]=lph', ['Accept' => ['application/ld+json']])->assertOk();
+        $this->assertCount(3, $response->json()['member']);
     }
 
     public function testDateFilterEqual(): void
@@ -425,6 +439,21 @@ class EloquentTest extends TestCase
         $this->assertSame($json['member'][0]['@id'], $bookBefore['@id']);
         $this->assertSame($json['member'][1]['@id'], $bookAfter['@id']);
         $this->assertSame($json['totalItems'], 2);
+    }
+
+    public function testRangeFilterWithInvalidValue(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $log = Log::spy();
+
+        $res = $this->get('/api/books?isbn_range=5', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(10, $res->json()['totalItems']);
+
+        $res = $this->get('/api/books?isbn_range[unknown]=5', ['Accept' => ['application/ld+json']]);
+        $res->assertOk();
+        $this->assertSame(10, $res->json()['totalItems']);
+        $log->shouldHaveReceived('notice')->twice();
     }
 
     public function testWrongOrderFilter(): void

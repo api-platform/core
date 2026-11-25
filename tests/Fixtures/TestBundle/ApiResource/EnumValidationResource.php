@@ -30,6 +30,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: self::class.'::process',
             collectDenormalizationErrors: true,
         ),
+        new Post(
+            uriTemplate: '/enum_validation_resources_without_constraint',
+            processor: self::class.'::process',
+        ),
     ],
 )]
 class EnumValidationResource
@@ -38,6 +42,10 @@ class EnumValidationResource
 
     #[Assert\NotNull]
     public ?GenderTypeEnum $gender = null;
+
+    // No validation constraint: the backed enum type is the only thing restricting the value,
+    // so a denormalization error must still surface as a 422 and not a 400 (see #8641).
+    public ?GenderTypeEnum $genderWithoutConstraint = null;
 
     public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {

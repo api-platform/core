@@ -131,6 +131,17 @@ class RespondProcessorTest extends TestCase
         $this->assertSame('bar', $response->headers->get('foo'));
     }
 
+    public function testSunsetHeaderIsAnHttpDate(): void
+    {
+        $operation = new Get(sunset: '2050-07-01T10:00:00+02:00');
+
+        $response = (new RespondProcessor())->process('content', $operation, context: [
+            'request' => new Request(),
+        ]);
+
+        $this->assertSame('Fri, 01 Jul 2050 08:00:00 GMT', $response->headers->get('Sunset'));
+    }
+
     public function testAddsLinkedDataPlatformHeaders(): void
     {
         $getOperation = new Get(uriTemplate: '/employees/{id}', class: Employee::class);

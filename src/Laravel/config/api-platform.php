@@ -11,10 +11,12 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 
 return [
@@ -93,6 +95,16 @@ return [
         // https://jsonapi.org/format/#crud-creating-client-ids. Off by default
         // to avoid id spoofing on public endpoints.
         'allow_client_generated_id' => false,
+
+        // Require the "type" member of JSON:API request resource objects (400
+        // when missing) and reject a "type" that does not match the endpoint
+        // resource on POST, PUT and PATCH (409 Conflict). Off by default.
+        'strict_resource_type' => false,
+
+        // Expose the "id" and "type" properties as "resourceId" and "resourceType"
+        // attributes instead of "_id" and "_type", which are not valid JSON:API
+        // member names. Off by default.
+        'strict_member_names' => false,
     ],
 
     'graphql' => [
@@ -116,6 +128,8 @@ return [
     'exception_to_status' => [
         AuthenticationException::class => 401,
         AuthorizationException::class => 403,
+        SerializerExceptionInterface::class => 400,
+        InvalidArgumentException::class => 400,
     ],
 
     'redoc' => [
@@ -195,6 +209,7 @@ return [
     // MCP (Model Context Protocol) configuration
     'mcp' => [
         'enabled' => true,
+        'middleware' => [],
     ],
 
     // install `api-platform/http-cache`

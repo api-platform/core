@@ -60,17 +60,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach ($propertyMetadata as $key => $value) {
             if ('nativeType' === $key && null !== $value) {
-                if (class_exists(PhpDocParser::class)) {
-                    $apiProperty = $apiProperty->withNativeType((new StringTypeResolver())->resolve($value));
-
-                    continue;
-                }
-
-                try {
-                    $apiProperty = $apiProperty->withNativeType(Type::builtin($value));
-                } catch (\ValueError) {
-                    throw new RuntimeException(\sprintf('Cannot create a type from "%s". Try running "composer require phpstan/phpdoc-parser" to support all types.', $value));
-                }
+                $apiProperty = $apiProperty->withNativeType($this->createNativeType($value));
 
                 continue;
             }
@@ -106,11 +96,28 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         foreach (get_class_methods(ApiProperty::class) as $method) {
             if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== ($val = $metadata[lcfirst($matches[1])] ?? null) && method_exists($propertyMetadata, "with{$matches[1]}")) {
+                if ('NativeType' === $matches[1]) {
+                    $val = $this->createNativeType($val);
+                }
+
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }
 
         return $propertyMetadata;
+    }
+
+    private function createNativeType(string $type): Type
+    {
+        if (class_exists(PhpDocParser::class)) {
+            return (new StringTypeResolver())->resolve($type);
+        }
+
+        try {
+            return Type::builtin($type);
+        } catch (\ValueError) {
+            throw new RuntimeException(\sprintf('Cannot create a type from "%s". Try running "composer require phpstan/phpdoc-parser" to support all types.', $type));
+        }
     }
 
     private function handleUserDefinedSchema(ApiProperty $propertyMetadata): ApiProperty

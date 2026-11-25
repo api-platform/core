@@ -17,7 +17,9 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Mcp\Capability\Registry\Loader;
 use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\Security\ElementAccessCheckerInterface;
+use ApiPlatform\Mcp\Tests\Fixtures\ListChangePublishingRegistryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
@@ -34,6 +36,19 @@ use PHPUnit\Framework\TestCase;
 
 class SecureRegistryTest extends TestCase
 {
+    public function testListChangePublishingCapabilityIsForwarded(): void
+    {
+        $inner = $this->createMock(ListChangePublishingRegistryInterface::class);
+        $inner->expects($this->exactly(2))->method('publishesListChanges')->willReturn(true, false);
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->never())->method('load');
+
+        $registry = new SecureRegistry($inner, $loader);
+
+        $this->assertTrue($registry->publishesListChanges());
+        $this->assertFalse($registry->publishesListChanges());
+    }
+
     public function testToolsAreLoadedIntoTheRegistryOnFirstRead(): void
     {
         $inputSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
@@ -219,7 +234,7 @@ class SecureRegistryTest extends TestCase
         $metadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $metadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class, [$resource]));
 
-        return new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+        return new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory, new ToolInputSchemaFactory($schemaFactory));
     }
 
     /**

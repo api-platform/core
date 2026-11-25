@@ -47,6 +47,16 @@ final class CollectionTest extends ApiTestCase
         $this->assertSame([1, 2, 3], array_column($body['_embedded']['item'], 'id'));
     }
 
+    public function testEmptyCollectionMatchesTheSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/hal_collection_paged?name=nope', [
+            'headers' => ['Accept' => 'application/hal+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertArrayNotHasKey('_embedded', $response->toArray());
+        $this->assertMatchesResourceCollectionJsonSchema(CollectionPagedResource::class, null, 'jsonhal');
+    }
+
     public function testMiddlePageHasPrevAndNext(): void
     {
         $response = self::createClient()->request('GET', '/hal_collection_paged?page=3', [

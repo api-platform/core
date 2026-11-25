@@ -126,11 +126,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $schemas = new \ArrayObject();
         $webhooks = new \ArrayObject();
         $tags = [];
+        $declaredTags = [];
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks, $tags, $context);
+                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks, $tags, $declaredTags, $context);
             }
         }
 
@@ -141,7 +142,17 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $securityRequirements[] = [$key => []];
         }
 
-        $globalTags = $this->openApiOptions->getTags() ?: array_values($tags) ?: [];
+        $configuredTags = $this->openApiOptions->getTags();
+        $globalTags = [];
+        foreach ($configuredTags ?: $tags as $tag) {
+            $globalTags[$tag->getName()] = $tag;
+        }
+
+        foreach ($declaredTags as $name => $tag) {
+            if (!$configuredTags || !isset($globalTags[$name])) {
+                $globalTags[$name] = $tag;
+            }
+        }
 
         return new OpenApi(
             $info,
@@ -157,14 +168,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 new \ArrayObject($securitySchemes)
             ),
             $securityRequirements,
-            $globalTags,
+            array_values($globalTags),
             null,
             null,
             $webhooks
         );
     }
 
-    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks, array &$tags, array $context = []): void
+    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks, array &$tags, array &$declaredTags, array $context = []): void
     {
         if (0 === $resource->getOperations()->count()) {
             return;
@@ -240,10 +251,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $summary = null !== $openapiOperation->getSummary() ? $openapiOperation->getSummary() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface);
 
+            $operationTags = null;
+            if (null !== $openapiOperation->getTags()) {
+                $operationTags = [];
+                foreach ($openapiOperation->getTags() as $tag) {
+                    if ($tag instanceof Tag) {
+                        $declaredTags[$tag->getName()] ??= $tag;
+                        $operationTags[] = $tag->getName();
+                    } else {
+                        $operationTags[] = $tag;
+                    }
+                }
+            }
+
             // Complete with defaults
             $openapiOperation = new Operation(
                 operationId: null !== $openapiOperation->getOperationId() ? $openapiOperation->getOperationId() : $this->normalizeOperationName($operationName),
-                tags: null !== $openapiOperation->getTags() ? $openapiOperation->getTags() : [$operation->getShortName() ?: $resourceShortName],
+                tags: $operationTags ?? [$operation->getShortName() ?: $resourceShortName],
                 responses: null !== $openapiOperation->getResponses() ? $openapiOperation->getResponses() : [],
                 summary: $summary,
                 description: null !== $openapiOperation->getDescription() ? $openapiOperation->getDescription() : $summary,
@@ -362,57 +386,49 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
-                $defaultSchema = ['type' => 'string'];
-                if (null !== $p->getDefault()) {
-                    $defaultSchema['default'] = $p->getDefault();
+                $parameterSchema = $p->getSchema() ?? ['type' => 'string'];
+                if (null !== $p->getDefault() && !isset($parameterSchema['default'])) {
+                    $parameterSchema['default'] = $p->getDefault();
                 }
-
-                $parameterSchema = $p->getSchema() ?? $defaultSchema;
                 $castToArray = $p->getCastToArray();
                 $parameterDescription = $p->getDescription() ?? "$resourceShortName $key";
                 $parameterRequired = $p->getRequired() ?? false;
                 $linkParameter = $p->getOpenApi();
-                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null);
+                $canSplitToArray = null === $linkParameter && 'query' === $in && 'array' === ($parameterSchema['type'] ?? null) && !str_ends_with($key, '[]');
 
-                $defaultParameters = [];
-                if (!$canSplitToArray || true !== $castToArray) {
-                    $defaultParameters[] = new Parameter($key, $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema);
-                }
-                if ($canSplitToArray && false !== $castToArray) {
-                    $defaultParameters[] = new Parameter($key.'[]', $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema, 'deepObject', true);
+                $defaultParameter = $canSplitToArray && false !== $castToArray
+                    ? new Parameter($key.'[]', $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema, 'form', true)
+                    : new Parameter($key, $in, $parameterDescription, $parameterRequired, false, null, $parameterSchema);
+
+                if (null === $linkParameter) {
+                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
+                        $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
+                    } else {
+                        $openapiParameters[] = $defaultParameter;
+                    }
+
+                    continue;
                 }
 
-                foreach ($defaultParameters as $defaultParameter) {
-                    if (null === $linkParameter) {
-                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
-                            $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
-                        } else {
-                            $openapiParameters[] = $defaultParameter;
+                if (\is_array($linkParameter)) {
+                    foreach ($linkParameter as $lp) {
+                        $parameter = $this->mergeParameter($defaultParameter, $lp);
+                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                            $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                            continue;
                         }
 
-                        continue;
+                        $openapiParameters[] = $parameter;
                     }
-
-                    if (\is_array($linkParameter)) {
-                        foreach ($linkParameter as $lp) {
-                            $parameter = $this->mergeParameter($defaultParameter, $lp);
-                            if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
-                                $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
-                                continue;
-                            }
-
-                            $openapiParameters[] = $parameter;
-                        }
-                        continue;
-                    }
-
-                    $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
-                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
-                        $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
-                        continue;
-                    }
-                    $openapiParameters[] = $parameter;
+                    continue;
                 }
+
+                $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
+                if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                    $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                    continue;
+                }
+                $openapiParameters[] = $parameter;
             }
 
             $openapiOperation = $openapiOperation->withParameters($openapiParameters);
@@ -473,7 +489,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            if ($overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
+            if ($overrideResponses && !isset($existingResponses[403]) && $this->canDenyAccess($operation)) {
                 $openapiOperation = $this->addOperationErrors($openapiOperation, [
                     $defaultError->withStatus(403)->withDescription('Forbidden'),
                 ], $resourceMetadataCollection, $schema, $schemas, $operation, $schemaSerializerContext);
@@ -574,6 +590,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
         }
+    }
+
+    private function canDenyAccess(HttpOperation $operation): bool
+    {
+        if ($operation->getSecurity() || $operation->getSecurityPostDenormalize() || $operation->getSecurityPostValidation() || $operation->getPolicy()) {
+            return true;
+        }
+
+        foreach ([$operation->getUriVariables() ?? [], $operation->getParameters() ?? []] as $parameters) {
+            foreach ($parameters as $parameter) {
+                if ($parameter instanceof MetadataParameter && null !== $parameter->getSecurity()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -983,7 +1016,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 false,
                 false,
                 null,
-                ['type' => 'integer', 'default' => 1],
+                ['type' => 'integer', 'default' => 1, 'minimum' => 1],
             );
 
             if ($operation->getPaginationClientItemsPerPage() ?? $this->paginationOptions->getClientItemsPerPage()) {

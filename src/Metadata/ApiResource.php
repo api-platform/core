@@ -1024,6 +1024,7 @@ class ApiResource extends Metadata
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
@@ -1038,6 +1039,10 @@ class ApiResource extends Metadata
         $this->processor = $processor;
         if (\is_string($types)) {
             $this->types = (array) $types;
+        }
+
+        if (null !== $compositeIdentifier) {
+            trigger_deprecation('api-platform/core', '5.1', 'The "compositeIdentifier" argument of "%s" has no effect, it is deprecated and will be removed in 6.0. Set "compositeIdentifier" on a "%s" instead.', static::class, Link::class);
         }
     }
 

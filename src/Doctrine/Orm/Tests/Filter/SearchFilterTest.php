@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Tests\DoctrineOrmFilterTestCase;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\CustomConverter;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\DummyUtcDate;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\RelatedDummy;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -37,6 +38,25 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
     protected const ALIAS = 'oo';
     protected string $filterClass = SearchFilter::class;
+
+    public function testGetDescriptionUtcDate(): void
+    {
+        foreach (['date', 'immutableDate'] as $property) {
+            $filter = self::buildSearchFilter($this, $this->managerRegistry, [$property => 'exact']);
+            $description = $filter->getDescription(DummyUtcDate::class);
+
+            $this->assertCount(2, $description);
+            foreach ([$property => false, $property.'[]' => true] as $key => $isCollection) {
+                $this->assertSame([
+                    'property' => $property,
+                    'type' => \DateTimeInterface::class,
+                    'required' => false,
+                    'strategy' => 'exact',
+                    'is_collection' => $isCollection,
+                ], $description[$key]);
+            }
+        }
+    }
 
     public function testGetDescriptionDefaultFields(): void
     {

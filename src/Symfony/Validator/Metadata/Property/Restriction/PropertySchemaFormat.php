@@ -58,8 +58,11 @@ class PropertySchemaFormat implements PropertySchemaRestrictionMetadataInterface
             if ($constraint->version === $constraint::V4) {
                 return ['format' => 'ipv4'];
             }
+            if ($constraint->version === $constraint::V6) {
+                return ['format' => 'ipv6'];
+            }
 
-            return ['format' => 'ipv6'];
+            return ['oneOf' => [['format' => 'ipv4'], ['format' => 'ipv6']]];
         }
 
         return [];

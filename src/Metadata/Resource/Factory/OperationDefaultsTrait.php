@@ -61,6 +61,11 @@ trait OperationDefaultsTrait
 
             $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
+            $can = 'can'.$upperKey;
+
+            if (!method_exists($operation, $getter) && method_exists($operation, $can)) {
+                $getter = $can;
+            }
 
             if (!method_exists($operation, $getter)) {
                 if (!isset($extraProperties[$key])) {
@@ -75,6 +80,12 @@ trait OperationDefaultsTrait
             if (\is_array($currentValue) && $currentValue) {
                 if (\is_string($value)) {
                     $value = [$value];
+                }
+
+                foreach ($value as $index => $item) {
+                    if (\is_int($index) && \in_array($item, $currentValue, true)) {
+                        unset($value[$index]);
+                    }
                 }
 
                 $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
@@ -219,6 +230,17 @@ trait OperationDefaultsTrait
         }
 
         $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, $resource->getClass());
+
+        $status = $operation->getStatus();
+        if (null !== $status && ($status < 100 || $status >= 600)) {
+            throw new RuntimeException(\sprintf('The HTTP status code "%s" of operation "%s" of resource "%s" is not valid.', $status, $operationName, $resource->getClass()));
+        }
+
+        foreach ($operation->getExceptionToStatus() ?? [] as $exceptionStatus) {
+            if (!\is_int($exceptionStatus) || $exceptionStatus < 100 || $exceptionStatus >= 600) {
+                throw new RuntimeException(\sprintf('The HTTP status code "%s" of operation "%s" of resource "%s" is not valid.', $exceptionStatus, $operationName, $resource->getClass()));
+            }
+        }
 
         return [
             $operationName,

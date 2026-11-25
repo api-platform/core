@@ -146,6 +146,36 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame(['foo' => ['type' => 'string']], $arr['properties']);
     }
 
+    public function testEmptySchemasStayEmptyObjects(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['WithMixed'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'anything' => new \ArrayObject(),
+                'described' => new \ArrayObject(['description' => 'x']),
+                'values' => new \ArrayObject([
+                    'type' => 'array',
+                    'items' => new \ArrayObject(),
+                ]),
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/WithMixed';
+
+        $inner = $this->createStub(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'json');
+
+        $properties = $result->getArrayCopy()['properties'];
+        $this->assertSame('{}', json_encode($properties['anything']));
+        $this->assertSame('{}', json_encode($properties['values']['items']));
+        $this->assertArrayNotHasKey('type', $properties['described']);
+    }
+
     public function testNestedRefInsideAllOf(): void
     {
         $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);

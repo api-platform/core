@@ -140,6 +140,39 @@ class JsonSchemaTest extends ApiTestCase
         $this->assertArrayHasKey('Related.jsonld-location.read_collection', $schema['definitions']);
     }
 
+    public function testJsonApiIncludedReferencesNotExposedResource(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonapi', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products/{code}_get'));
+
+        $included = $schema['definitions'][$schema->getRootDefinitionKey()]['properties']['included'];
+
+        $this->assertSame([['$ref' => '#/definitions/AggregateRating.jsonapi.resource']], $included['items']['anyOf']);
+        $this->assertArrayHasKey('AggregateRating.jsonapi', $schema['definitions']);
+    }
+
+    public function testJsonApiIncludedItemsAreResourceObjects(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonapi', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products/{code}_get'));
+        $definitions = $schema->getDefinitions();
+
+        $anyOf = $definitions[$schema->getRootDefinitionKey()]['properties']['included']['items']['anyOf'];
+        $this->assertNotEmpty($anyOf);
+
+        foreach ($anyOf as $entry) {
+            $resolved = $schema->getArrayCopy();
+            foreach (explode('/', substr($entry['$ref'], 2)) as $segment) {
+                $resolved = $resolved[$segment];
+            }
+
+            $this->assertArrayHasKey('id', $resolved['properties'], $entry['$ref']);
+            $this->assertArrayHasKey('type', $resolved['properties'], $entry['$ref']);
+            $this->assertArrayNotHasKey('data', $resolved['properties'], $entry['$ref']);
+
+            $documentName = substr($entry['$ref'], \strlen('#/definitions/'), -\strlen('.resource'));
+            $this->assertSame($entry['$ref'], $definitions[$documentName]['properties']['data']['$ref']);
+        }
+    }
+
     public function testArraySchemaWithReference(): void
     {
         if ('mongodb' === self::getContainer()->getParameter('kernel.environment')) {
@@ -214,8 +247,8 @@ class JsonSchemaTest extends ApiTestCase
     public function testSchemaWithUnknownType(): void
     {
         $schema = $this->schemaFactory->buildSchema(Book::class, 'json', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/issue-5452/books{._format}_get_collection'));
-        $this->assertContains(['$ref' => '#/definitions/ActivableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
-        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/ActivableInterface'], $schema['definitions']['Book']['properties']['library']['allOf']);
+        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface'], $schema['definitions']['Book']['properties']['library']['allOf']);
     }
 
     public function testReadOnlySchema(): void

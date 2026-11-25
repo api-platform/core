@@ -121,7 +121,7 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
 });
 
 // MCP endpoint (outside the API prefix)
-if (class_exists(McpController::class)) {
+if (class_exists(McpController::class) && config()->get('api-platform.mcp.enabled', true)) {
     Route::match(['GET', 'POST', 'DELETE', 'OPTIONS'], '/mcp', static function (Request $request) {
         $requestStack = app(RequestStack::class);
         $mcpController = app(McpController::class);
@@ -134,5 +134,5 @@ if (class_exists(McpController::class)) {
         } finally {
             $requestStack->pop();
         }
-    })->name('api_mcp');
+    })->name('api_mcp')->middleware(config()->get('api-platform.mcp.middleware', []));
 }

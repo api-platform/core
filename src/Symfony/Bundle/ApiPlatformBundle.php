@@ -23,6 +23,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ItemNormalizerDecorationBcPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\JsonStreamerTransformerPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\McpAppsExtensionPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\McpRegistryPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
@@ -63,6 +64,7 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new ErrorResourceAttributeLoaderPass());
         $container->addCompilerPass(new MutatorPass());
         $container->addCompilerPass(new McpRegistryPass());
+        $container->addCompilerPass(new McpAppsExtensionPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new PropertyInfoTagPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         // Runs after AutowireAsDecoratorPass (100) and before FrameworkBundle's SerializerPass (0), which reads the serializer.normalizer tag.
         $container->addCompilerPass(new ItemNormalizerDecorationBcPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);

@@ -56,7 +56,7 @@ class CollectionObjectNormalizerTest extends TestCase
         $contextBuilder->expects($this->once())->method('getResourceContextUri')->with(Foo::class)->willReturn('/contexts/Foo');
 
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolver->method('getResourceClass')->with(null, Foo::class)->willReturn(Foo::class);
+        $resourceClassResolver->expects($this->once())->method('getResourceClass')->with(null, Foo::class)->willReturn(Foo::class);
 
         $iriConverter = $this->createMock(IriConverterInterface::class);
         $iriConverter->expects($this->once())->method('getIriFromResource')->with(Foo::class, UrlGeneratorInterface::ABS_PATH, null, $this->anything())->willReturn('/foos');

@@ -66,7 +66,8 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -890]);
+        ->tag('serializer.normalizer', ['priority' => -890])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.hal.normalizer.object', ObjectNormalizer::class)
         ->args([

@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Parameter;
 
-use ApiPlatform\Metadata\Exception\BadRequestException;
-
 /**
  * Caster returns the value unchanged when it can not be casted, so constraint validation can
- * reject it. An empty string is the exception: it can not represent a scalar native type, so we
- * throw a Bad Request (400) rather than letting it reach the filter as a raw, untyped value.
+ * reject it. Therefore we do not need to throw exceptions, validation will just fail.
  *
  * @internal
  */
@@ -33,7 +30,6 @@ final class ValueCaster
         return match (strtolower($v)) {
             '1', 'true' => true,
             '0', 'false' => false,
-            '' => throw new BadRequestException('An empty value cannot be cast to a boolean.'),
             default => $v,
         };
     }
@@ -42,10 +38,6 @@ final class ValueCaster
     {
         if (\is_int($v)) {
             return $v;
-        }
-
-        if ('' === $v) {
-            throw new BadRequestException('An empty value cannot be cast to an integer.');
         }
 
         $value = filter_var($v, \FILTER_VALIDATE_INT);
@@ -57,10 +49,6 @@ final class ValueCaster
     {
         if (\is_float($v)) {
             return $v;
-        }
-
-        if ('' === $v) {
-            throw new BadRequestException('An empty value cannot be cast to a float.');
         }
 
         $value = filter_var($v, \FILTER_VALIDATE_FLOAT);

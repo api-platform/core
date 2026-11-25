@@ -24,22 +24,22 @@ abstract class Operation extends Metadata
     use WithResourceTrait;
 
     /**
-     * @param bool|null                           $paginationEnabled              {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource}
-     * @param string|null                         $paginationType                 {@see https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination}
-     * @param int|null                            $paginationItemsPerPage         {@see https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page}
-     * @param int|null                            $paginationMaximumItemsPerPage  {@see https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page}
-     * @param bool|null                           $paginationPartial              {@see https://api-platform.com/docs/core/performance/#partial-pagination}
-     * @param bool|null                           $paginationClientEnabled        {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1}
-     * @param bool|null                           $paginationClientItemsPerPage   {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3}
-     * @param bool|null                           $paginationClientPartial        {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6}
-     * @param bool|null                           $paginationFetchJoinCollection  {@see https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator}
-     * @param array<string, string>|string[]|null $order                          {@see https://api-platform.com/docs/core/default-order/#overriding-default-order}
-     * @param string|null                         $security                       {@see https://api-platform.com/docs/core/security}
-     * @param string|null                         $securityMessage                {@see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message}
-     * @param string|null                         $securityPostDenormalize        {@see https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization}
-     * @param string|null                         $securityPostDenormalizeMessage {@see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message}
-     * @param string|null                         $deprecationReason              {@see https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties}
-     * @param string[]|null                       $filters                        {@see https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters}
+     * @param bool|null                         $paginationEnabled              {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource}
+     * @param string|null                       $paginationType                 {@see https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination}
+     * @param int|null                          $paginationItemsPerPage         {@see https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page}
+     * @param int|null                          $paginationMaximumItemsPerPage  {@see https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page}
+     * @param bool|null                         $paginationPartial              {@see https://api-platform.com/docs/core/performance/#partial-pagination}
+     * @param bool|null                         $paginationClientEnabled        {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1}
+     * @param bool|null                         $paginationClientItemsPerPage   {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3}
+     * @param bool|null                         $paginationClientPartial        {@see https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6}
+     * @param bool|null                         $paginationFetchJoinCollection  {@see https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator}
+     * @param array<string|\SortDirection>|null $order                          {@see https://api-platform.com/docs/core/default-order/#overriding-default-order}
+     * @param string|null                       $security                       {@see https://api-platform.com/docs/core/security}
+     * @param string|null                       $securityMessage                {@see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message}
+     * @param string|null                       $securityPostDenormalize        {@see https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization}
+     * @param string|null                       $securityPostDenormalizeMessage {@see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message}
+     * @param string|null                       $deprecationReason              {@see https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties}
+     * @param string[]|null                     $filters                        {@see https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters}
      * @param array{
      *     class?: string|null,
      *     name?: string,

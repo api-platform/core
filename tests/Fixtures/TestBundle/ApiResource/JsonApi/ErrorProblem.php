@@ -29,6 +29,11 @@ use Symfony\Component\Validator\ConstraintViolationList;
             processor: [self::class, 'processValidation'],
         ),
         new Post(
+            uriTemplate: '/jsonapi_validation_problem_bad_request',
+            processor: [self::class, 'processValidation'],
+            exceptionToStatus: [ValidationException::class => 400],
+        ),
+        new Post(
             uriTemplate: '/jsonapi_exception_problem',
             processor: [self::class, 'processBadRequest'],
         ),

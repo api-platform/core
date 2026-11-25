@@ -87,7 +87,7 @@ class ReservedAttributeNameSchemaFactoryTest extends TestCase
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class);
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
-        $attributes = $resultSchema['definitions'][$rootDefinitionKey]['properties']['data']['properties']['attributes']['properties'];
+        $attributes = $resultSchema['definitions'][$rootDefinitionKey.'.resource']['properties']['attributes']['properties'];
 
         // Every reserved name must be documented under the prefixed key the ReservedAttributeNameConverter emits.
         $this->assertArrayHasKey('_id', $attributes);

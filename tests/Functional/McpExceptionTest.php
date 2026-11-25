@@ -62,6 +62,17 @@ final class McpExceptionTest extends ApiTestCase
         self::assertSame($expectedMessage, $result['error']['message'] ?? null);
     }
 
+    public function testExceptionMappedByExceptionToStatusReachesTheCaller(): void
+    {
+        $this->skipUnlessMcpIsAvailable();
+
+        $client = self::createClient();
+        $result = $this->callTool($client, $this->initializeMcpSession($client), 'mapped_domain_exception_tool', ['text' => 'hello'])->toArray(false);
+
+        self::assertArrayNotHasKey('result', $result);
+        self::assertSame('Contact 42 not found.', $result['error']['message'] ?? null);
+    }
+
     private function skipUnlessMcpIsAvailable(): void
     {
         if (!class_exists(McpBundle::class)) {

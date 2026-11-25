@@ -220,7 +220,11 @@ class PersistProcessorTest extends TestCase
         $deviceManagerProphecy->flush()->shouldBeCalled();
         $deviceManagerProphecy->refresh($device)->shouldBeCalled();
 
+        $userClassMetadata = new ORMClassMetadata(PersistProcessorTestUserStub::class);
+        $userClassMetadata->identifier = ['id'];
+
         $userManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $userManagerProphecy->getClassMetadata(PersistProcessorTestUserStub::class)->willReturn($userClassMetadata);
         $userManagerProphecy->getReference(PersistProcessorTestUserStub::class, 'user-uuid')
             ->willReturn($userReference)
             ->shouldBeCalledTimes(1);

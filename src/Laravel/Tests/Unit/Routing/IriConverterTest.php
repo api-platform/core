@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Tests\Unit\Routing;
 
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -28,6 +29,8 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Workbench\App\Models\Book;
 use Workbench\App\Models\BookVariant;
@@ -219,5 +222,45 @@ class IriConverterTest extends TestCase
             $resourceClassResolver,
             $resourceMetadataFactory,
         );
+    }
+
+    public function testGetResourceFromIriWithoutRoute(): void
+    {
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('match')->willThrowException(new ResourceNotFoundException());
+
+        $iriConverter = new IriConverter(
+            $this->createStub(ProviderInterface::class),
+            $this->createStub(OperationMetadataFactoryInterface::class),
+            $router,
+            $this->createStub(IdentifiersExtractorInterface::class),
+            $this->createStub(ResourceClassResolverInterface::class),
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No route matches "/api/nope/1".');
+
+        $iriConverter->getResourceFromIri('/api/nope/1');
+    }
+
+    public function testGetResourceFromIriWithoutGetRoute(): void
+    {
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('match')->willThrowException(new MethodNotAllowedException(['POST']));
+
+        $iriConverter = new IriConverter(
+            $this->createStub(ProviderInterface::class),
+            $this->createStub(OperationMetadataFactoryInterface::class),
+            $router,
+            $this->createStub(IdentifiersExtractorInterface::class),
+            $this->createStub(ResourceClassResolverInterface::class),
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No route matches "/api/only_posts".');
+
+        $iriConverter->getResourceFromIri('/api/only_posts');
     }
 }

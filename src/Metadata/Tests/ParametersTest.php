@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Tests;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Metadata\ScalarHeaderParameter;
 use PHPUnit\Framework\TestCase;
 
 class ParametersTest extends TestCase
@@ -76,5 +77,32 @@ class ParametersTest extends TestCase
         $parameters->add(':property', new QueryParameter(key: ':property', properties: ['field3', 'field4']));
 
         $this->assertCount(2, $parameters);
+    }
+
+    public function testLookupMatchesSubclass(): void
+    {
+        $scalar = new ScalarHeaderParameter(key: 'Foo');
+        $parameters = new Parameters([$scalar]);
+
+        $this->assertSame($scalar, $parameters->get('Foo', HeaderParameter::class));
+        $this->assertTrue($parameters->has('Foo', HeaderParameter::class));
+        $this->assertFalse($parameters->has('Foo'));
+
+        $parameters->remove('Foo', HeaderParameter::class);
+        $this->assertCount(0, $parameters);
+    }
+
+    public function testLookupPrefersExactClassOverSubclass(): void
+    {
+        $scalar = new ScalarHeaderParameter(key: 'Foo');
+        $header = new HeaderParameter(key: 'Foo');
+        $parameters = new Parameters([$scalar, $header]);
+
+        $this->assertSame($header, $parameters->get('Foo', HeaderParameter::class));
+        $this->assertSame($scalar, $parameters->get('Foo', ScalarHeaderParameter::class));
+
+        $parameters->remove('Foo', HeaderParameter::class);
+        $this->assertCount(1, $parameters);
+        $this->assertSame($scalar, $parameters->get('Foo', HeaderParameter::class));
     }
 }

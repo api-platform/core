@@ -19,9 +19,11 @@ use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\DummyPropertyWithDefaultValue
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\RuntimeReflectionService;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -106,6 +108,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $classMetadata->getFieldNames()->shouldBeCalled()->willReturn(['dummyDefaultOption']);
         if (class_exists(FieldMapping::class)) {
             $fieldMapping = new FieldMapping('string', 'dummyDefaultOption', 'dummyDefaultOption');
+            // TODO: FieldMapping::$default is removed in doctrine/orm 4.0, use $fieldMapping->options = ['default' => 'default value'] instead
             $fieldMapping->default = 'default value';
             $classMetadata->fieldMappings = [$fieldMapping];
             $classMetadata->getFieldMapping('dummyDefaultOption')->willReturn($fieldMapping);
@@ -124,6 +127,26 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption');
 
         $this->assertSame($doctrinePropertyMetadata->getDefault(), 'default value');
+    }
+
+    public function testCreateWithDefaultOptionFromColumnAttribute(): void
+    {
+        $classMetadata = new ORMClassMetadata(DummyPropertyWithDefaultValue::class);
+        $classMetadata->initializeReflection(new RuntimeReflectionService());
+        (new AttributeDriver([]))->loadMetadataForClass(DummyPropertyWithDefaultValue::class, $classMetadata);
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(new ApiProperty());
+
+        $objectManager = $this->createStub(ObjectManager::class);
+        $objectManager->method('getClassMetadata')->willReturn($classMetadata);
+
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($objectManager);
+
+        $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry, $propertyMetadataFactory);
+
+        $this->assertSame('default value', $doctrineOrmPropertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption')->getDefault());
     }
 
     public function testCreateClassMetadataInfo(): void

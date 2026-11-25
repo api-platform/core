@@ -58,7 +58,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "5.0.x-dev"
+            "dev-main": "5.1.x-dev"
         },
         "thanks": {
             "name": "api-platform/api-platform",

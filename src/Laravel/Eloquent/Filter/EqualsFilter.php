@@ -28,6 +28,30 @@ final class EqualsFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
+        if (\is_array($values)) {
+            if (!array_is_list($values)) {
+                return $builder;
+            }
+
+            $in = [];
+            foreach ($values as $value) {
+                if (!\is_array($value)) {
+                    $in[] = $value;
+                }
+            }
+
+            if (!$in) {
+                return $builder;
+            }
+
+            return $this->addNestedParameterJoins(
+                $builder,
+                $parameter,
+                static fn (Builder $query, string $property, string $whereClause) => $query->{$whereClause.'In'}($property, $in),
+                $context['whereClause'] ?? 'where'
+            );
+        }
+
         return $this->addNestedParameterJoins(
             $builder,
             $parameter,

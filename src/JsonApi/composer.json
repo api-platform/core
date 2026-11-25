@@ -25,7 +25,7 @@
         "api-platform/documentation": "^5.0",
         "api-platform/json-schema": "^5.0",
         "api-platform/metadata": "^5.0",
-        "api-platform/serializer": "^5.0",
+        "api-platform/serializer": "^5.0.6",
         "api-platform/state": "^5.0",
         "symfony/error-handler": "^7.4 || ^8.0",
         "symfony/http-foundation": "^7.4 || ^8.0",
@@ -57,7 +57,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "5.0.x-dev",
+            "dev-5.0": "5.0.x-dev",
+            "dev-main": "5.1.x-dev",
             "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"

@@ -15,6 +15,9 @@ namespace ApiPlatform\OpenApi\Factory;
 
 use ApiPlatform\OpenApi\OpenApi;
 
+/**
+ * Creates the OpenAPI document of the API.
+ */
 interface OpenApiFactoryInterface
 {
     /**

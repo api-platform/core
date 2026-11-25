@@ -384,10 +384,10 @@ XML_WRAP
     private function buildPaginationViaCursor(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('paginationViaCursor');
-        foreach ($values as $key => $value) {
+        foreach ($values as $value) {
             $child = $node->addChild('paginationField');
-            $child->addAttribute('field', $key);
-            $child->addAttribute('direction', $value);
+            $child->addAttribute('field', $value['field']);
+            $child->addAttribute('direction', $value['direction']);
         }
     }
 

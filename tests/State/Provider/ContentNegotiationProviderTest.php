@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\ProviderInterface;
 use Negotiation\Negotiator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -119,5 +120,63 @@ class ContentNegotiationProviderTest extends TestCase
         $context = ['request' => $request];
 
         $provider->provide($operation, [], $context);
+    }
+
+    public function testContentTypeIsCaseInsensitive(): void
+    {
+        $decorated = $this->prophesize(ProviderInterface::class);
+        $decorated->provide(Argument::cetera())->willReturn(new \stdClass());
+
+        $provider = new ContentNegotiationProvider($decorated->reveal(), new Negotiator(), ['jsonld' => ['application/ld+json']], ['jsonld' => ['application/ld+json']]);
+
+        $request = new Request(
+            server: [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/',
+                'CONTENT_TYPE' => 'Application/LD+JSON; charset=utf-8',
+            ],
+            content: '{}'
+        );
+
+        $operation = (new Post(inputFormats: ['jsonld' => ['application/ld+json']]))->withDeserialize();
+        $provider->provide($operation, [], ['request' => $request]);
+
+        $this->assertSame('jsonld', $request->attributes->get('input_format'));
+    }
+
+    /**
+     * @param list<string> $declaredMimeTypes
+     */
+    #[DataProvider('provideCaseInsensitiveContentTypes')]
+    public function testContentTypeMatchesTheDeclaredMimeTypesCaseInsensitively(string $contentType, array $declaredMimeTypes): void
+    {
+        $decorated = $this->prophesize(ProviderInterface::class);
+        $decorated->provide(Argument::cetera())->willReturn(new \stdClass());
+
+        $provider = new ContentNegotiationProvider($decorated->reveal(), new Negotiator(), ['jsonld' => $declaredMimeTypes], ['jsonld' => $declaredMimeTypes]);
+
+        $request = new Request(
+            server: [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/',
+                'CONTENT_TYPE' => $contentType,
+            ],
+            content: '{}'
+        );
+
+        $operation = (new Post(inputFormats: ['jsonld' => $declaredMimeTypes]))->withDeserialize();
+        $provider->provide($operation, [], ['request' => $request]);
+
+        $this->assertSame('jsonld', $request->attributes->get('input_format'));
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function provideCaseInsensitiveContentTypes(): iterable
+    {
+        yield 'declared in upper case' => ['application/ld+json', ['Application/LD+JSON']];
+        yield 'both in different cases' => ['APPLICATION/ld+json', ['application/LD+JSON']];
+        yield 'surrounding spaces' => [' application/ld+json ', ['application/ld+json']];
     }
 }

@@ -769,6 +769,38 @@ final class MutationTest extends ApiTestCase
         $this->assertSame('Relation-2', $rel['relatedToDummyFriend']['edges'][1]['node']['name']);
     }
 
+    public function testModifyItemWithNestedInputIdUpdatesExistingObject(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('ThirdLevel @!mongodb.');
+        }
+
+        $this->recreateSchema([Dummy::class, RelatedDummy::class, ThirdLevel::class, FourthLevel::class]);
+        $this->seedDummyWithRelatedDummyAndThirdLevel();
+        $manager = $this->getManager();
+        $manager->persist(new FourthLevel());
+        $manager->flush();
+
+        $response = $this->executeGraphQl(<<<'QUERY'
+            mutation {
+              updateRelatedDummy(input: {
+                id: "/related_dummies/1",
+                thirdLevel: { id: "/third_levels/1", fourthLevel: "/fourth_levels/1" }
+              }) {
+                relatedDummy {
+                  thirdLevel { id fourthLevel { id } }
+                }
+              }
+            }
+            QUERY);
+
+        $this->assertResponseIsSuccessful();
+        $thirdLevel = $response->toArray()['data']['updateRelatedDummy']['relatedDummy']['thirdLevel'];
+        $this->assertSame('/third_levels/1', $thirdLevel['id']);
+        $this->assertSame('/fourth_levels/1', $thirdLevel['fourthLevel']['id']);
+        $this->assertCount(1, $this->getManager()->getRepository(ThirdLevel::class)->findAll());
+    }
+
     public function testMutationRunsBeforeValidation(): void
     {
         if ($this->isMongoDB()) {

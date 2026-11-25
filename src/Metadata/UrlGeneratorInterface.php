@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
- * UrlGeneratorInterface is the interface that all URL generator classes must implement.
+ * Generates URLs and paths from route names and parameters.
  *
  * This interface has been imported and adapted from the Symfony project.
  *

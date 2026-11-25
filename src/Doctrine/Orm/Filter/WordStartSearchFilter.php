@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ScalarValuesTrait;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
@@ -29,8 +30,10 @@ use Doctrine\ORM\QueryBuilder;
 final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LikeEscapeTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
+    use ScalarValuesTrait;
 
     public function __construct(private readonly bool $caseSensitive = false)
     {
@@ -45,10 +48,16 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
         }
 
         $property = $parameter->getProperty();
-        $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
-        $field = $alias.'.'.$property;
         $values = $parameter->getValue();
+
+        $values = $this->scalarValuesOnly($values);
+        if ([] === $values) {
+            return;
+        }
+
+        $alias = $queryBuilder->getRootAliases()[0];
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, $this->joinTypeFor($context));
+        $field = $alias.'.'.$property;
 
         if (!is_iterable($values)) {
             $values = [$values];
@@ -60,8 +69,8 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
             $wordName = $queryNameGenerator->generateParameterName($property);
 
             $expressions[] = $queryBuilder->expr()->orX(
-                $this->createLikeExpression($field, $startName),
-                $this->createLikeExpression($field, $wordName),
+                $this->createLikeExpression($field, $startName, $this->caseSensitive),
+                $this->createLikeExpression($field, $wordName, $this->caseSensitive),
             );
 
             $queryBuilder->setParameter($startName, $this->formatStartValue($val));
@@ -73,20 +82,13 @@ final class WordStartSearchFilter implements FilterInterface, OpenApiParameterFi
         );
     }
 
-    private function createLikeExpression(string $field, string $parameterName): string
-    {
-        return $this->caseSensitive
-            ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
-            : 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
-    }
-
     private function formatStartValue(string $value): string
     {
-        return addcslashes($value, '\\%_').'%';
+        return $this->escapeLikeValue($value).'%';
     }
 
     private function formatWordValue(string $value): string
     {
-        return '% '.addcslashes($value, '\\%_').'%';
+        return '% '.$this->escapeLikeValue($value).'%';
     }
 }

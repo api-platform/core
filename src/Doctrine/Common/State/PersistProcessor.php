@@ -102,7 +102,15 @@ final class PersistProcessor implements ProcessorInterface
                             $referenceIdentifier = $this->getIdentifierValue($identifiers);
                         }
 
-                        $reflectionProperties[$toProperty]->setValue($newData, $parentManager->getReference($fromClass, $referenceIdentifier));
+                        $doctrineIdentifiers = $parentManager->getClassMetadata($fromClass)->getIdentifierFieldNames();
+                        if (!array_diff($identifierProperties, $doctrineIdentifiers) && !array_diff($doctrineIdentifiers, $identifierProperties)) {
+                            $parent = $parentManager->getReference($fromClass, $referenceIdentifier);
+                        } else {
+                            $criteria = $hasCompositeIdentifiers ? $referenceIdentifier : [$identifierProperties[0] => $referenceIdentifier];
+                            $parent = $parentManager->getRepository($fromClass)->findOneBy($criteria);
+                        }
+
+                        $reflectionProperties[$toProperty]->setValue($newData, $parent);
 
                         continue;
                     }

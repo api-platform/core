@@ -109,7 +109,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  *
- * @deprecated since API Platform 4.4: use {@see ComparisonFilter} instead, which now covers the full range syntax (`[gt]`/`[gte]`/`[lt]`/`[lte]` and `[between]=X..Y`). This filter is removed in 6.0; the upgrade codemod rewrites it to a QueryParameter declared with `ComparisonFilter`.
+ * @deprecated since API Platform 4.4: use {@see ComparisonFilter} instead, which now covers the full range syntax (`[gt]`/`[gte]`/`[lt]`/`[lte]` and `[between]=X..Y`). This filter is removed in 6.0; the upgrade codemod only moves its declaration to a QueryParameter, switching to `ComparisonFilter` is manual.
  */
 final class RangeFilter extends AbstractFilter implements RangeFilterInterface, OpenApiParameterFilterInterface
 {
@@ -239,6 +239,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface, 
             new OpenApiParameter(name: $key.'[lt]', in: $in),
             new OpenApiParameter(name: $key.'[gte]', in: $in),
             new OpenApiParameter(name: $key.'[lte]', in: $in),
+            new OpenApiParameter(name: $key.'[between]', in: $in),
         ];
     }
 }

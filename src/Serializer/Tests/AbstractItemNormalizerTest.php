@@ -37,8 +37,10 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritance;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceChild;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceRelated;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithArgAndVariadicConstructorArg;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithMultipleRequiredConstructorArgs;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithNullableConstructorArg;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithVariadicConstructorArg;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\NonCloneableDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\NotificationType;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnly;
@@ -46,6 +48,7 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnlyR
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -54,9 +57,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\TypeInfo\Type;
 
@@ -91,6 +98,40 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
         $this->assertFalse($normalizer->supportsNormalization([]));
         $this->assertSame(['object' => false], $normalizer->getSupportedTypes('any'));
+    }
+
+    public function testResetClearsAttributesCache(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->expects($this->exactly(4))->method('create')->with(Dummy::class, $this->isArray())->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/dummies/1');
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturn('foo');
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $serializer = $this->createStub(Serializer::class);
+        $serializer->method('normalize')->willReturnArgument(0);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $context = ['resources' => [], 'resource_class' => Dummy::class, 'cache_key' => 'explicit'];
+
+        $this->assertSame(['name' => 'foo'], $normalizer->normalize($dummy, null, $context));
+        $normalizer->reset();
+        $this->assertSame(['name' => 'foo'], $normalizer->normalize($dummy, null, $context));
     }
 
     public function testNormalize(): void
@@ -331,6 +372,82 @@ class AbstractItemNormalizerTest extends TestCase
 
         $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => SecuredDummy::class]));
         $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => SecuredDummy::class]));
+    }
+
+    public function testNormalizeDoesNotCacheAttributesGuardedByPolicy(): void
+    {
+        $dummy = new SecuredDummy();
+        $dummy->setTitle('myPublicTitle');
+        $dummy->setAdminOnlyProperty('secret');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => 'adminOnlyProperty' === $property
+            ? (new ApiProperty())->withReadable(true)->withPolicy('adminOnly')
+            : (new ApiProperty())->withReadable(true));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/secured_dummies/1');
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturnCallback(static fn (object $object, string $property): string => 'title' === $property ? 'myPublicTitle' : 'secret');
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(SecuredDummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturnOnConsecutiveCalls(true, false);
+
+        $serializer = $this->createStub(Serializer::class);
+        $serializer->method('normalize')->willReturnArgument(0);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, $resourceAccessChecker) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $context = ['resources' => []];
+        $this->assertArrayHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, $context));
+        $this->assertArrayNotHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, $context));
+    }
+
+    public function testNormalizeSafeCacheKeyDependsOnSerializerGroups(): void
+    {
+        $dummy = new SecuredDummy();
+        $dummy->setTitle('myPublicTitle');
+        $dummy->setAdminOnlyProperty('secret');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class, array $options): PropertyNameCollection => new PropertyNameCollection(['admin'] === ($options['serializer_groups'] ?? null) ? ['title', 'adminOnlyProperty'] : ['title']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => 'adminOnlyProperty' === $property
+            ? (new ApiProperty())->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')')
+            : (new ApiProperty())->withReadable(true));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/secured_dummies/1');
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturnCallback(static fn (object $object, string $property): string => 'title' === $property ? 'myPublicTitle' : 'secret');
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(SecuredDummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturnOnConsecutiveCalls(true, false);
+
+        $serializer = $this->createStub(Serializer::class);
+        $serializer->method('normalize')->willReturnArgument(0);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, $resourceAccessChecker) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->normalize($dummy, null, ['resources' => [], 'groups' => ['public']]);
+        $this->assertArrayHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, ['resources' => [], 'groups' => ['admin']]));
+        $this->assertArrayNotHasKey('adminOnlyProperty', $normalizer->normalize($dummy, null, ['resources' => [], 'groups' => ['admin']]));
     }
 
     private function createCacheKeySafeProbe(
@@ -1106,6 +1223,55 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'relatedDummiesWithUnionTypes', [0 => $relatedDummy3, 1 => $relatedDummy4])->shouldHaveBeenCalled();
     }
 
+    public static function provideDeepObjectToPopulateCases(): iterable
+    {
+        $current = new RelatedDummy();
+        $type = Type::object(RelatedDummy::class);
+
+        yield 'deep' => [['deep_object_to_populate' => true], [], $type, $current, [$current]];
+        yield 'untyped attribute' => [['deep_object_to_populate' => true], [], null, new \LogicException('The value must not be read.'), []];
+    }
+
+    #[DataProvider('provideDeepObjectToPopulateCases')]
+    public function testDeepObjectToPopulate(array $context, array $defaultContext, ?Type $type, object $currentValue, array $expectedObjectsToPopulate): void
+    {
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType($type)->withWritable(true)->withWritableLink(true));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+        $resourceClassResolver->method('getResourceClass')->willReturn(RelatedDummy::class);
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        if ($currentValue instanceof \Throwable) {
+            $propertyAccessor->method('getValue')->willThrowException($currentValue);
+        } else {
+            $propertyAccessor->method('getValue')->willReturn($currentValue);
+        }
+
+        $objectsToPopulate = [];
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, DenormalizerInterface::class]);
+        $serializer->method('denormalize')->willReturnCallback(static function (mixed $data, string $type, ?string $format = null, array $context = []) use (&$objectsToPopulate): RelatedDummy {
+            if (isset($context['object_to_populate'])) {
+                $objectsToPopulate[] = $context['object_to_populate'];
+            }
+
+            return new RelatedDummy();
+        });
+
+        $normalizer = new class($this->createStub(PropertyNameCollectionFactoryInterface::class), $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $propertyAccessor, null, null, $defaultContext) extends AbstractItemNormalizer {
+            public function setAttribute(object $object, string $attribute, mixed $value, array $context): void
+            {
+                $this->setAttributeValue($object, $attribute, $value, null, $context);
+            }
+        };
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->setAttribute(new Dummy(), 'relatedDummy', ['name' => 'foo'], $context + ['resource_class' => Dummy::class]);
+
+        $this->assertSame($expectedObjectsToPopulate, $objectsToPopulate);
+    }
+
     public function testUnionTypeDenormalizationFallsThroughAfterTypeConfusionGuardMismatch(): void
     {
         $data = ['relatedDummyUnion' => '/related_dummies/1'];
@@ -1780,6 +1946,30 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class);
     }
 
+    public function testDenormalizeBadWrappedKeyType(): void
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the key "a" must be');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummies']));
+
+        $type = Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::nullable(Type::int()));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType($type)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturnArgument(1);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $serializer = self::createStubForIntersectionOfInterfaces([SerializerInterface::class, DenormalizerInterface::class]);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $this->createStub(PropertyAccessorInterface::class), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->denormalize(['relatedDummies' => ['a' => ['bar' => 'baz']]], Dummy::class);
+    }
+
     public function testNullable(): void
     {
         $data = [
@@ -1972,6 +2162,36 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(NonCloneableDummy::class, $actual);
         $this->assertSame($dummy, $actual);
         $propertyAccessorProphecy->setValue($actual, 'name', 'bar')->shouldHaveBeenCalled();
+    }
+
+    public function testDenormalizeUpdateNonCloneableWithDeniedPostDenormalizeSecuredPropertyThrows(): void
+    {
+        $dummy = new NonCloneableDummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withWritable(true)->withSecurityPostDenormalize('false')
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(NonCloneableDummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $serializer = $this->createStub(Serializer::class);
+
+        $resourceAccessChecker = $this->createStub(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->method('isGranted')->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(IriConverterInterface::class), $resourceClassResolver, $this->createStub(PropertyAccessorInterface::class), null, null, [], null, $resourceAccessChecker) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $this->expectException(AccessDeniedException::class);
+
+        $normalizer->denormalize(['name' => 'bar'], NonCloneableDummy::class, null, [AbstractItemNormalizer::OBJECT_TO_POPULATE => $dummy]);
     }
 
     public function testDenormalizeObjectWithNullDisabledTypeEnforcement(): void
@@ -2180,6 +2400,61 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(DummyWithNullableConstructorArg::class, $result);
         $this->assertSame('Hello', $result->title);
         $this->assertNull($result->description);
+    }
+
+    public function testDenormalizeVariadicConstructorArg(): void
+    {
+        $this->assertSame(['a', 'b'], $this->denormalizeVariadicConstructorArg(['tagNames' => ['a', 'b']])->tagNames);
+    }
+
+    public function testDenormalizeVariadicConstructorArgWithNameConverter(): void
+    {
+        $this->assertSame(['a', 'b'], $this->denormalizeVariadicConstructorArg(['tag_names' => ['a', 'b']], new CamelCaseToSnakeCaseNameConverter())->tagNames);
+    }
+
+    public function testDenormalizeVariadicConstructorArgAfterAnotherArg(): void
+    {
+        $dummy = $this->denormalizeVariadicConstructorArg(['name' => 'tags', 'tagNames' => ['a', 'b']], null, DummyWithArgAndVariadicConstructorArg::class);
+
+        $this->assertInstanceOf(DummyWithArgAndVariadicConstructorArg::class, $dummy);
+        $this->assertSame('tags', $dummy->name);
+        $this->assertSame(['a', 'b'], $dummy->tagNames);
+    }
+
+    public function testDenormalizeVariadicConstructorArgThatIsNotAnArray(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('the variadic parameter tagNames can only accept an array');
+
+        $this->denormalizeVariadicConstructorArg(['tag_names' => 'a'], new CamelCaseToSnakeCaseNameConverter());
+    }
+
+    /**
+     * @param class-string<DummyWithVariadicConstructorArg|DummyWithArgAndVariadicConstructorArg> $class
+     */
+    private function denormalizeVariadicConstructorArg(array $data, ?NameConverterInterface $nameConverter = null, string $class = DummyWithVariadicConstructorArg::class): DummyWithVariadicConstructorArg|DummyWithArgAndVariadicConstructorArg
+    {
+        $properties = DummyWithArgAndVariadicConstructorArg::class === $class ? ['name', 'tagNames'] : ['tagNames'];
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create($class, Argument::type('array'))->willReturn(new PropertyNameCollection($properties));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create($class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+        $propertyMetadataFactoryProphecy->create($class, 'tagNames', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::list(Type::string()))->withReadable(true)->withWritable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, $class)->willReturn($class);
+        $resourceClassResolverProphecy->isResourceClass($class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), $nameConverter, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        return $normalizer->denormalize($data, $class);
     }
 }
 

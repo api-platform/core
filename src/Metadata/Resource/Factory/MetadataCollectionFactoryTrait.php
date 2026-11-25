@@ -113,10 +113,11 @@ trait MetadataCollectionFactoryTrait
 
             if ($metadata instanceof GraphQlOperation) {
                 if (-1 === $index) {
-                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
                 }
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
                 $graphQlOperations = $resources[$index]->getGraphQlOperations();
+                $this->assertGraphQlOperationNameIsUnique($graphQlOperations ?? [], $key, $resourceClass);
                 $graphQlOperations[$key] = $operation;
                 $resources[$index] = $resources[$index]->withGraphQlOperations($graphQlOperations);
                 continue;
@@ -124,7 +125,7 @@ trait MetadataCollectionFactoryTrait
 
             if ($metadata instanceof McpTool || $metadata instanceof McpResource) {
                 if (-1 === $index) {
-                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
                 }
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
                 $mcp = $resources[$index]->getMcp() ?? [];
@@ -137,8 +138,12 @@ trait MetadataCollectionFactoryTrait
                 continue;
             }
 
-            if (-1 === $index || $this->hasSameOperation($resources[$index], $metadata::class, $metadata)) {
-                $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+            if (
+                -1 === $index
+                || $this->hasSameOperation($resources[$index], $metadata::class, $metadata)
+                || (!$hasApiResource && null !== $metadata->getShortName() && $metadata->getShortName() !== $resources[$index]->getShortName())
+            ) {
+                $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $metadata->getShortName() ?? $shortName, new ApiResource());
             }
 
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
@@ -201,6 +206,7 @@ trait MetadataCollectionFactoryTrait
                     $operation = $this->mergeOperationParameters($operation, $parameters);
                 }
 
+                $this->assertGraphQlOperationNameIsUnique($graphQlOperationsWithDefaults, $key, $resourceClass);
                 $graphQlOperationsWithDefaults[$key] = $operation;
             }
 
@@ -264,6 +270,18 @@ trait MetadataCollectionFactoryTrait
         }
 
         return $resources;
+    }
+
+    /**
+     * @param array<string, mixed> $operations
+     */
+    private function assertGraphQlOperationNameIsUnique(array $operations, string $key, string $resourceClass): void
+    {
+        if (!\array_key_exists($key, $operations)) {
+            return;
+        }
+
+        throw new RuntimeException(\sprintf('GraphQL operation name "%s" is declared twice on resource "%s". GraphQL operation names must be unique, set distinct names.', $key, $resourceClass));
     }
 
     /**

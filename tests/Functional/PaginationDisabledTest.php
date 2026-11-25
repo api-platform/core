@@ -237,6 +237,18 @@ final class PaginationDisabledTest extends ApiTestCase
                             ],
                         ],
                     ],
+                    'item' => [
+                        'type' => 'array',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'href' => [
+                                    'type' => 'string',
+                                    'format' => 'iri-reference',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ],
             $schema['definitions']['HalCollectionBaseSchemaNoPagination']['properties']['_links']

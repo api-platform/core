@@ -129,7 +129,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             return self::resolveDeep($node, $definitions, $resolving);
         }
 
-        if (!isset($node['type'])) {
+        if (!isset($node['type']) && (isset($node['properties']) || isset($node['additionalProperties']) || isset($node['patternProperties']) || isset($node['required']))) {
             $node['type'] = 'object';
         }
 
@@ -142,36 +142,41 @@ final class SchemaFactory implements SchemaFactoryInterface
     private static function resolveDeep(array $node, array $definitions, array &$resolving): array
     {
         if (isset($node['items'])) {
-            $node['items'] = self::resolveNode(
+            $node['items'] = self::emptyAsObject(self::resolveNode(
                 $node['items'] instanceof \ArrayObject ? $node['items']->getArrayCopy() : $node['items'],
                 $definitions,
                 $resolving,
-            );
+            ));
         }
 
         if (isset($node['properties']) && \is_array($node['properties'])) {
             foreach ($node['properties'] as $propName => $propSchema) {
-                $node['properties'][$propName] = self::resolveNode(
+                $node['properties'][$propName] = self::emptyAsObject(self::resolveNode(
                     $propSchema instanceof \ArrayObject ? $propSchema->getArrayCopy() : $propSchema,
                     $definitions,
                     $resolving,
-                );
+                ));
             }
         }
 
         foreach (['oneOf', 'anyOf'] as $combinator) {
             if (isset($node[$combinator]) && \is_array($node[$combinator])) {
                 foreach ($node[$combinator] as $i => $member) {
-                    $node[$combinator][$i] = self::resolveNode(
+                    $node[$combinator][$i] = self::emptyAsObject(self::resolveNode(
                         $member instanceof \ArrayObject ? $member->getArrayCopy() : $member,
                         $definitions,
                         $resolving,
-                    );
+                    ));
                 }
             }
         }
 
         return self::splitArrayType($node);
+    }
+
+    private static function emptyAsObject(array $node): array|\ArrayObject
+    {
+        return [] === $node ? new \ArrayObject() : $node;
     }
 
     /**

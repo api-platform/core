@@ -157,7 +157,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'filters' => ['comment.custom_filter'],
             'order' => ['foo', 'bar'],
             'paginationViaCursor' => [
-                'id' => 'DESC',
+                ['field' => 'id', 'direction' => 'DESC'],
             ],
             'exceptionToStatus' => [
                 'Symfony\Component\Serializer\Exception\ExceptionInterface' => 400,
@@ -386,7 +386,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'paginationClientItemsPerPage' => false,
                     'paginationClientPartial' => false,
                     'paginationViaCursor' => [
-                        'userId' => 'DESC',
+                        ['field' => 'userId', 'direction' => 'DESC'],
                     ],
                     'paginationEnabled' => false,
                     'paginationFetchJoinCollection' => false,

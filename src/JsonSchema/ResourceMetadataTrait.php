@@ -51,10 +51,14 @@ trait ResourceMetadataTrait
             }
             $forceSubschema = $serializerContext[SchemaFactory::FORCE_SUBSCHEMA] ?? false;
             if ($operation->getShortName() === $this->getShortClassName($className) && $forceSubschema) {
-                $operation = new HttpOperation();
+                $operation = (new HttpOperation())
+                    ->withDescription($operation->getDescription())
+                    ->withTypes($operation instanceof HttpOperation ? $operation->getTypes() : null);
             }
 
-            return $this->findOperationForType($resourceMetadataCollection, $type, $operation, $forceSubschema ? null : $format);
+            $operation = $this->findOperationForType($resourceMetadataCollection, $type, $operation, $forceSubschema ? null : $format);
+
+            return $forceSubschema ? $operation->withInput(null)->withOutput(null) : $operation;
         }
 
         // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise

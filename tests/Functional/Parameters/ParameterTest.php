@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TranslateValidationError;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithDisabledParameterValidationOnResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,7 +32,7 @@ final class ParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, TranslateValidationError::class];
+        return [WithParameter::class, TranslateValidationError::class, WithDisabledParameterValidationOnResource::class];
     }
 
     public function testWithGroupFilter(): void
@@ -79,6 +80,12 @@ final class ParameterTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
     }
 
+    public function testDisabledOnResource(): void
+    {
+        self::createClient()->request('GET', 'with_disabled_parameter_validation_on_resource');
+        $this->assertResponseStatusCodeSame(200);
+    }
+
     /**
      * Because of the openapiContext deprecation.
      * TODO: only select a few classes to generate the docs for a faster test.
@@ -120,6 +127,16 @@ final class ParameterTest extends ApiTestCase
 
         self::createClient()->request('GET', 'header_required', ['headers' => []]);
         $this->assertResponseStatusCodeSame(422);
+    }
+
+    public function testScalarHeaderParameterNotBlank(): void
+    {
+        self::createClient()->request('GET', 'header_scalar_not_blank', ['headers' => ['Foo' => '']]);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertJsonContains(['detail' => 'Foo: This value should not be blank.']);
+
+        self::createClient()->request('GET', 'header_scalar_not_blank', ['headers' => ['Foo' => 'bar']]);
+        $this->assertResponseStatusCodeSame(200);
     }
 
     #[DataProvider('provideHeaderValues')]

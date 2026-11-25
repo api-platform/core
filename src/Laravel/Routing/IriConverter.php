@@ -68,7 +68,12 @@ class IriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
-        $parameters = $this->router->match($iri);
+        try {
+            $parameters = $this->router->match($iri);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(\sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
+        }
+
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'], $parameters['uri_variables'])) {
             throw new InvalidArgumentException(\sprintf('No resource associated to "%s".', $iri));
         }

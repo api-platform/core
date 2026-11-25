@@ -34,6 +34,7 @@ trait ContentNegotiationTrait
      */
     private function getMimeTypeFormat(string $mimeType, array $formats): ?string
     {
+        $mimeType = strtolower(trim($mimeType));
         $canonicalMimeType = null;
         $pos = strpos($mimeType, ';');
         if (false !== $pos) {
@@ -41,6 +42,7 @@ trait ContentNegotiationTrait
         }
 
         foreach ($formats as $format => $mimeTypes) {
+            $mimeTypes = array_map(strtolower(...), (array) $mimeTypes);
             if (\in_array($mimeType, $mimeTypes, true)) {
                 return $format;
             }

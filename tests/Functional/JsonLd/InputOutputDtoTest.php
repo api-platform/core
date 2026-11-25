@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyIdCollectionDt
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InputOutputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\NoInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\PostNoOutputResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\RequiredConstructorInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UserResource;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -41,6 +42,7 @@ final class InputOutputDtoTest extends ApiTestCase
             InputOutputResource::class,
             NoInputResource::class,
             PostNoOutputResource::class,
+            RequiredConstructorInputResource::class,
             DummyCollectionDto::class,
             DummyFooCollectionDto::class,
             DummyIdCollectionDto::class,
@@ -78,6 +80,21 @@ final class InputOutputDtoTest extends ApiTestCase
             ],
             'json' => ['foo' => 'test', 'bar' => 'not-an-int'],
         ]);
+        $this->assertResponseStatusCodeSame(400);
+        $body = $response->toArray(false);
+        $this->assertSame('The input data is misformatted.', $body['detail']);
+    }
+
+    public function testCustomInputRejectsBadTypeMissingConstructorParam(): void
+    {
+        $response = self::createClient()->request('POST', '/jsonld_required_constructor_inputs', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'json' => ['title' => 'Hello'],
+        ]);
+
         $this->assertResponseStatusCodeSame(400);
         $body = $response->toArray(false);
         $this->assertSame('The input data is misformatted.', $body['detail']);

@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Mcp\Tests\Server;
 
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\Server\Handler;
 use ApiPlatform\Mcp\State\ToolProvider;
 use ApiPlatform\Metadata\Exception\BadRequestException;
@@ -24,6 +27,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use Mcp\Capability\Discovery\SchemaValidator;
 use Mcp\Schema\Content\TextContent;
 use Mcp\Schema\JsonRpc\Error;
 use Mcp\Schema\JsonRpc\Response;
@@ -373,6 +377,28 @@ class HandlerTest extends TestCase
         $handler->handle((new CallToolRequest('createDummy', []))->withId('req-1'), $this->createStub(SessionInterface::class));
     }
 
+    public function testHandleHidesInternalSchemaValidationFailures(): void
+    {
+        $operation = new McpTool(name: 'createDummy', class: \stdClass::class);
+
+        $schemaValidator = $this->createStub(SchemaValidator::class);
+        $schemaValidator->method('validateAgainstJsonSchema')->willReturn([
+            ['pointer' => '', 'keyword' => 'internal', 'message' => 'Schema validation process failed: secret'],
+        ]);
+
+        $processor = $this->createMock(ProcessorInterface::class);
+        $processor->expects($this->never())->method('process');
+
+        $handler = $this->createHandler($this->createOperationMetadataFactory($operation), processor: $processor, schemaValidator: $schemaValidator);
+
+        $error = $handler->handle((new CallToolRequest('createDummy', []))->withId('req-1'), $this->createStub(SessionInterface::class));
+
+        $this->assertInstanceOf(Error::class, $error);
+        $this->assertSame(Error::INTERNAL_ERROR, $error->code);
+        $this->assertStringNotContainsString('secret', $error->message);
+        $this->assertSame('req-1', $error->id);
+    }
+
     private function createOperationMetadataFactory(?HttpOperation $operation): OperationMetadataFactoryInterface
     {
         $operationMetadataFactory = $this->createStub(OperationMetadataFactoryInterface::class);
@@ -386,12 +412,20 @@ class HandlerTest extends TestCase
         ?ProviderInterface $provider = null,
         ?ProcessorInterface $processor = null,
         ?RequestStack $requestStack = null,
+        ?SchemaValidator $schemaValidator = null,
     ): Handler {
+        $schemaFactory = $this->createStub(SchemaFactoryInterface::class);
+        $schema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        $schema['type'] = 'object';
+        $schemaFactory->method('buildSchema')->willReturn($schema);
+
         return new Handler(
             $operationMetadataFactory,
             $provider ?? $this->createStub(ProviderInterface::class),
             $processor ?? $this->createStub(ProcessorInterface::class),
             $requestStack ?? new RequestStack(),
+            new ToolInputSchemaFactory($schemaFactory),
+            schemaValidator: $schemaValidator,
         );
     }
 }

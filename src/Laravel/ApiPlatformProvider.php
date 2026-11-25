@@ -118,10 +118,12 @@ use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Mcp\Capability\Registry\Loader as McpLoader;
 use ApiPlatform\Mcp\Capability\Registry\SecureRegistry;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory as McpSchemaFactory;
+use ApiPlatform\Mcp\JsonSchema\ToolInputSchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
 use ApiPlatform\Mcp\Security\PolicyAccessChecker;
 use ApiPlatform\Mcp\Server\Handler;
+use ApiPlatform\Mcp\Server\McpAppsConfigurator;
 use ApiPlatform\Mcp\State\StructuredContentProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -232,6 +234,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Contracts\Service\ResetInterface;
 
 class ApiPlatformProvider extends ServiceProvider
 {
@@ -476,7 +479,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(DeserializeProvider::class, static function (Application $app) {
             return new DeserializeProvider(
-                $app->make(SwaggerUiProvider::class),
+                $app->make(AccessCheckerProvider::class),
                 $app->make(SerializerInterface::class),
                 $app->make(SerializerContextBuilderInterface::class),
                 $app->make(DenormalizationViolationFactoryInterface::class),
@@ -504,7 +507,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(AccessCheckerProvider::class, static function (Application $app) {
-            return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
+            return new AccessCheckerProvider($app->make(SwaggerUiProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
         $this->app->singleton(Negotiator::class, static function (Application $app) {
@@ -514,7 +517,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), $app->make(Negotiator::class), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
+            return new ContentNegotiationProvider($app->make(ParameterProvider::class), $app->make(Negotiator::class), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
@@ -831,11 +834,11 @@ class ApiPlatformProvider extends ServiceProvider
                 oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl', null),
                 oAuthScopes: $config->get('api-platform.swagger_ui.oauth.scopes', []),
                 apiKeys: $config->get('api-platform.swagger_ui.apiKeys', []),
-                contactName: $config->get('api-platform.swagger_ui.contact.name', ''),
-                contactUrl: $config->get('api-platform.swagger_ui.contact.url', ''),
-                contactEmail: $config->get('api-platform.swagger_ui.contact.email', ''),
-                licenseName: $config->get('api-platform.swagger_ui.license.name', ''),
-                licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
+                contactName: $config->get('api-platform.swagger_ui.contact.name'),
+                contactUrl: $config->get('api-platform.swagger_ui.contact.url'),
+                contactEmail: $config->get('api-platform.swagger_ui.contact.email'),
+                licenseName: $config->get('api-platform.swagger_ui.license.name'),
+                licenseUrl: $config->get('api-platform.swagger_ui.license.url'),
                 persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
                 tags: $config->get('api-platform.openapi.tags', []),
@@ -976,6 +979,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
@@ -1052,14 +1056,14 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app) {
-            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
+            return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class), (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false));
         });
 
         if (interface_exists(FieldsBuilderEnumInterface::class)) {
             $this->registerGraphQl();
         }
 
-        if (class_exists(McpController::class)) {
+        if (class_exists(McpController::class) && $this->app['config']->get('api-platform.mcp.enabled', true)) {
             $this->registerMcp();
         }
 
@@ -1086,6 +1090,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
             $defaultContext[JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID] = (bool) $config->get('api-platform.jsonapi.allow_client_generated_id', false);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
             $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', false);
 
             return new JsonApiItemNormalizer(
@@ -1109,6 +1114,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(JsonApiItemDenormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $defaultContext[JsonApiItemNormalizer::STRICT_RESOURCE_TYPE] = (bool) $config->get('api-platform.jsonapi.strict_resource_type', false);
 
             return new JsonApiItemDenormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -1278,14 +1284,28 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ToolInputSchemaFactory::class, static function (Application $app) {
+            return new ToolInputSchemaFactory(
+                $app->make(McpSchemaFactory::class)
+            );
+        });
+
         $this->app->singleton(McpLoader::class, static function (Application $app) {
             return new McpLoader(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(McpSchemaFactory::class)
+                $app->make(McpSchemaFactory::class),
+                $app->make(ToolInputSchemaFactory::class)
             );
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
+
+        $this->app->singleton(McpAppsConfigurator::class, static function (Application $app) {
+            return new McpAppsConfigurator(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+        });
 
         $this->app->singleton(PolicyAccessChecker::class, static function (Application $app) {
             return new PolicyAccessChecker(
@@ -1328,6 +1348,8 @@ class ApiPlatformProvider extends ServiceProvider
 
             $builder->addRequestHandler($app->make(Handler::class));
 
+            $app->make(McpAppsConfigurator::class)($builder);
+
             return $builder;
         });
 
@@ -1367,7 +1389,9 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ProviderInterface::class),
                 $app->make(StructuredContentProcessor::class),
                 $app->make(RequestStack::class),
-                $app->make(LoggerInterface::class)
+                $app->make(ToolInputSchemaFactory::class),
+                $app->make(LoggerInterface::class),
+                $app['config']->get('api-platform.exception_to_status', [])
             );
         });
 
@@ -1537,7 +1561,7 @@ class ApiPlatformProvider extends ServiceProvider
             $taggedCollectionResolvers = iterator_to_array($app->tagged(QueryCollectionResolverInterface::class));
 
             return new ResolverProvider(
-                $app->make(GraphQlReadProvider::class),
+                $app->make('api_platform.graphql.state_provider.access_checker'),
                 new ServiceLocator([...$resolvers, ...$taggedItemResolvers, ...$taggedCollectionResolvers]),
             );
         });
@@ -1555,7 +1579,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
 
         $this->app->singleton('api_platform.graphql.state_provider.access_checker', static function (Application $app) {
-            return new AccessCheckerProvider($app->make('api_platform.graphql.state_provider.parameter'), $app->make(ResourceAccessCheckerInterface::class));
+            return new AccessCheckerProvider($app->make(GraphQlReadProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
         $this->app->singleton(NormalizeProcessor::class, static function (Application $app) {
@@ -1576,7 +1600,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(ResolverFactoryInterface::class, static function (Application $app) {
             return new ResolverFactory(
-                $app->make('api_platform.graphql.state_provider.access_checker'),
+                $app->make('api_platform.graphql.state_provider.parameter'),
                 $app->make('api_platform.graphql.state_processor'),
                 $app->make('api_platform.graphql.runtime_operation_metadata_factory'),
             );
@@ -1656,6 +1680,12 @@ class ApiPlatformProvider extends ServiceProvider
 
         Event::listen(RequestHandled::class, function (): void {
             $this->app->make(SkolemIriConverter::class)->reset();
+
+            foreach ([ItemNormalizer::class, ItemDenormalizer::class, JsonLdItemNormalizer::class, JsonLdItemDenormalizer::class, JsonApiItemNormalizer::class, JsonApiItemDenormalizer::class, HalItemNormalizer::class, GraphQlItemNormalizer::class, GraphQlItemDenormalizer::class] as $normalizer) {
+                if ($this->app->resolved($normalizer) && ($instance = $this->app->make($normalizer)) instanceof ResetInterface) {
+                    $instance->reset();
+                }
+            }
         });
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');

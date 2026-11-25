@@ -17,6 +17,10 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Http\Request as LaravelRequest;
 use Illuminate\Routing\Router as BaseRouter;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -86,7 +90,14 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     public function match(string $pathInfo): array
     {
         $request = LaravelRequest::create($pathInfo, Request::METHOD_GET);
-        $route = $this->router->getRoutes()->match($request);
+
+        try {
+            $route = $this->router->getRoutes()->match($request);
+        } catch (NotFoundHttpException $e) {
+            throw new ResourceNotFoundException(\sprintf('No routes found for "%s".', $pathInfo), 0, $e);
+        } catch (MethodNotAllowedHttpException $e) {
+            throw new MethodNotAllowedException(explode(', ', $e->getHeaders()['Allow'] ?? ''), $e->getMessage(), 0, $e);
+        }
 
         return $route->defaults + ['uri_variables' => array_diff_key($route->parameters, $route->defaults)];
     }

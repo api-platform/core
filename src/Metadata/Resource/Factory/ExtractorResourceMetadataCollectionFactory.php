@@ -55,12 +55,6 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         foreach ($this->buildResources($resources, $resourceClass) as $resource) {
-            foreach ($this->defaults['attributes'] ?? [] as $key => $value) {
-                if (method_exists($resource, 'get'.ucfirst($key)) && !$resource->{'get'.ucfirst($key)}()) {
-                    $resource = $resource->{'with'.ucfirst($key)}($value);
-                }
-            }
-
             $resourceMetadataCollection[] = $resource;
         }
 
@@ -177,6 +171,9 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
             }
 
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+            if (\array_key_exists($key, $operations)) {
+                throw new RuntimeException(\sprintf('GraphQL operation name "%s" is declared twice on resource "%s". GraphQL operation names must be unique, set distinct names.', $key, $resource->getClass() ?? ''));
+            }
             $operations[$key] = $operation;
         }
 

@@ -15,6 +15,9 @@ namespace ApiPlatform\OpenApi;
 
 use ApiPlatform\OpenApi\Model\Tag;
 
+/**
+ * Holds the options of the OpenAPI document, such as its title, version and authentication schemes.
+ */
 final readonly class Options
 {
     /**

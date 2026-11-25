@@ -83,10 +83,10 @@ class JsonApiTest extends TestCase
         $response->assertHeader('content-type', 'application/vnd.api+json');
         $response->assertJsonFragment([
             'links' => [
-                'self' => '/api/books?page=1',
-                'first' => '/api/books?page=1',
-                'last' => '/api/books?page=2',
-                'next' => '/api/books?page=2',
+                'self' => '/api/books?page%5Bpage%5D=1',
+                'first' => '/api/books?page%5Bpage%5D=1',
+                'last' => '/api/books?page%5Bpage%5D=2',
+                'next' => '/api/books?page%5Bpage%5D=2',
             ],
             'meta' => ['totalItems' => 10, 'itemsPerPage' => 5, 'currentPage' => 1],
         ]);
@@ -266,6 +266,7 @@ class JsonApiTest extends TestCase
 
         $this->assertArrayHasKey('id', $json['errors'][0]);
         $this->assertArrayHasKey('links', $json['errors'][0]);
+        $this->assertArrayNotHasKey('type', $json['errors'][0]);
         $this->assertArrayHasKey('type', $json['errors'][0]['links']);
 
         $response = $this->postJson(

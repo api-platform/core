@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Exception\ContactNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[ApiResource(
@@ -27,6 +28,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
         ),
         'symfony_not_found_processor_tool' => new McpTool(
             processor: [self::class, 'processNotFound'],
+        ),
+        'mapped_domain_exception_tool' => new McpTool(
+            provider: [self::class, 'provideMappedDomainException'],
+            exceptionToStatus: [ContactNotFoundException::class => 404],
         ),
     ]
 )]
@@ -62,5 +67,14 @@ class McpExceptionTools
     public static function processNotFound(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): never
     {
         throw new NotFoundHttpException('Processor says this resource does not exist.');
+    }
+
+    /**
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
+     */
+    public static function provideMappedDomainException(Operation $operation, array $uriVariables = [], array $context = []): never
+    {
+        throw new ContactNotFoundException('Contact 42 not found.');
     }
 }

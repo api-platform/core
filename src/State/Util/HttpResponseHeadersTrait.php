@@ -88,7 +88,7 @@ trait HttpResponseHeadersTrait
         }
 
         if ($sunset = $operation->getSunset()) {
-            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTimeInterface::RFC1123);
+            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->setTimezone(new \DateTimeZone('UTC'))->format('D, d M Y H:i:s').' GMT';
         }
 
         if ($acceptPatch = $operation->getAcceptPatch()) {

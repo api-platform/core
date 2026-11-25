@@ -120,7 +120,7 @@ class Link extends Parameter
 
     public function withFromProperty(string $fromProperty): self
     {
-        $self = $this;
+        $self = clone $this;
         $self->fromProperty = $fromProperty;
 
         return $self;

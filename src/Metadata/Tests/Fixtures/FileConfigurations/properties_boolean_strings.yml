@@ -1,0 +1,5 @@
+properties:
+    'ApiPlatform\Metadata\Tests\Fixtures\ApiResource\FileConfigDummy':
+        'foo':
+            readable: 'false'
+            writable: 'yes'

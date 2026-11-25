@@ -115,6 +115,51 @@ class PurgeHttpCacheListenerTest extends TestCase
         $iriConverterProphecy->getIriFromResource(Argument::type(DummyNoGetOperation::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->shouldHaveBeenCalled();
     }
 
+    public function testResetDropsTheTagsCollectedByAFailedFlush(): void
+    {
+        $failed = new Dummy();
+        $failed->setId(1);
+        $purged = new Dummy();
+        $purged->setId(2);
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/dummies', '/dummies/2'])->shouldBeCalledOnce();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $this->createIriConverter(), $this->createResourceClassResolver(), $this->createStub(PropertyAccessorInterface::class));
+
+        // the commit of the first flush fails: Doctrine dispatches onFlush, but never postFlush
+        $listener->onFlush($this->createOnFlushEventArgs([$failed]));
+        // between two requests (or two messages), the services resetter resets the listener
+        $listener->reset();
+
+        $listener->onFlush($this->createOnFlushEventArgs([$purged]));
+        $listener->postFlush();
+    }
+
+    public function testTagsAreClearedWhenThePurgeFails(): void
+    {
+        $first = new Dummy();
+        $first->setId(1);
+        $second = new Dummy();
+        $second->setId(2);
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/dummies', '/dummies/1'])->willThrow(new \RuntimeException('The cache server is down.'))->shouldBeCalledOnce();
+        $purgerProphecy->purge(['/dummies', '/dummies/2'])->shouldBeCalledOnce();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $this->createIriConverter(), $this->createResourceClassResolver(), $this->createStub(PropertyAccessorInterface::class));
+
+        $listener->onFlush($this->createOnFlushEventArgs([$first]));
+        try {
+            $listener->postFlush();
+            $this->fail('The purge failure must be thrown.');
+        } catch (\RuntimeException) {
+        }
+
+        $listener->onFlush($this->createOnFlushEventArgs([$second]));
+        $listener->postFlush();
+    }
+
     public function testPreUpdate(): void
     {
         $oldRelatedDummy = new RelatedDummy();
@@ -366,10 +411,10 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
         $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
+        $resourceMetadataCollectionFactory->expects($this->atLeastOnce())->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+        $em->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
 
         $changeSet = [];
         $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
@@ -416,10 +461,10 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
         $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
+        $resourceMetadataCollectionFactory->expects($this->atLeastOnce())->method('create')->with(Dummy::class)->willReturn($resourceMetadataCollection);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+        $em->expects($this->atLeastOnce())->method('getClassMetadata')->with(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
 
         $changeSet = [];
         $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
@@ -427,5 +472,83 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, null, null, null, $resourceMetadataCollectionFactory);
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
+    }
+
+    public function testSkippedRelationDoesNotStopGatheringOtherRelations(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(1);
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setId(2);
+
+        $purger = $this->createMock(PurgerInterface::class);
+        $purger->expects($this->once())->method('purge')->with($this->callback(static function (array $tags): bool {
+            return \in_array('/related_dummies/2', $tags, true);
+        }));
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturnCallback(
+            static fn (object $resource): string => $resource instanceof RelatedDummy ? '/related_dummies/2' : '/dummies/1'
+        );
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn (string $class): bool => NotAResource::class !== $class);
+
+        $classMetadata = new ClassMetadata(Dummy::class);
+        // @phpstan-ignore-next-line
+        $classMetadata->associationMappings = [
+            'notAResource' => ['targetEntity' => NotAResource::class],
+            'relatedDummy' => ['targetEntity' => RelatedDummy::class],
+        ];
+
+        $unitOfWork = $this->createStub(UnitOfWork::class);
+        $unitOfWork->method('getScheduledEntityInsertions')->willReturn([]);
+        $unitOfWork->method('getScheduledEntityUpdates')->willReturn([$dummy]);
+        $unitOfWork->method('getScheduledEntityDeletions')->willReturn([]);
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getUnitOfWork')->willReturn($unitOfWork);
+        $em->method('getClassMetadata')->willReturn($classMetadata);
+
+        $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
+        $propertyAccessor->method('isReadable')->willReturn(true);
+        $propertyAccessor->method('getValue')->willReturnCallback(
+            static fn (object $object, string $property): object => 'relatedDummy' === $property ? $relatedDummy : new NotAResource('foo', 'bar')
+        );
+
+        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, $propertyAccessor);
+        $listener->onFlush(new OnFlushEventArgs($em));
+        $listener->postFlush();
+    }
+
+    private function createIriConverter(): IriConverterInterface
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies');
+        $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class))->will(static fn (array $args): string => '/dummies/'.$args[0]->getId());
+
+        return $iriConverterProphecy->reveal();
+    }
+
+    private function createResourceClassResolver(): ResourceClassResolverInterface
+    {
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        return $resourceClassResolverProphecy->reveal();
+    }
+
+    private function createOnFlushEventArgs(array $updates): OnFlushEventArgs
+    {
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([]);
+        $uowProphecy->getScheduledEntityUpdates()->willReturn($updates);
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([]);
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal());
+        $emProphecy->getClassMetadata(Dummy::class)->willReturn(new ClassMetadata(Dummy::class));
+
+        return new OnFlushEventArgs($emProphecy->reveal());
     }
 }

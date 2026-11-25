@@ -71,6 +71,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'extraProperties' => $this->buildExtraProperties($property, 'extraProperties'),
                 'iris' => $this->buildArrayValue($property, 'iri'),
                 'genId' => $this->phpize($property, 'genId', 'bool'),
+                'hydra' => $this->phpize($property, 'hydra', 'bool'),
                 'uriTemplate' => $this->phpize($property, 'uriTemplate', 'string'),
                 'property' => $this->phpize($property, 'property', 'string'),
                 'nativeType' => $this->phpize($property, 'nativeType', 'string'),

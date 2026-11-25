@@ -16,13 +16,16 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\Util\BCHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\SortFilterInterface;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -40,7 +43,9 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
-    use OpenApiFilterTrait;
+    use OpenApiFilterTrait {
+        getOpenApiParameters as private getOpenApiFilterParameters;
+    }
 
     public function __construct(
         private readonly ?string $nullsComparison = null,
@@ -64,6 +69,10 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
             return;
         }
 
+        if (null === $parameter->getProperty()) {
+            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
+        }
+
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
 
@@ -74,11 +83,11 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
             if (null !== $nullsDirection) {
                 $nullRankHiddenField = \sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
                 $queryBuilder->addSelect(\sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
-                $queryBuilder->addOrderBy($nullRankHiddenField, $nullsDirection);
+                $queryBuilder->addOrderBy($nullRankHiddenField, BCHelper::sortDirection($nullsDirection));
             }
         }
 
-        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), $direction);
+        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), BCHelper::sortDirection($direction));
     }
 
     /**
@@ -87,5 +96,13 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
     public function getSchema(Parameter $parameter): array
     {
         return ['type' => 'string', 'enum' => ['asc', 'desc', 'ASC', 'DESC']];
+    }
+
+    /**
+     * A sort direction is a single value, so the array form is only documented when castToArray is enabled explicitly.
+     */
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return $this->getOpenApiFilterParameters($parameter->withCastToArray($parameter->getCastToArray() ?? false));
     }
 }

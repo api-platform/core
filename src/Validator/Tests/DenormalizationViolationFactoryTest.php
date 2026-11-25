@@ -120,6 +120,41 @@ final class DenormalizationViolationFactoryTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
+    public function testBackedEnumWithoutConstraintThrowsValidationException(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType(
+            'The data must be one of the following values: "a", "b".',
+            'invalid',
+            [DenormBackedEnumFixture::class, 'null'],
+            'enum',
+            true,
+        );
+
+        try {
+            $this->factory->handle($exception, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violation = $e->getConstraintViolationList()[0];
+            $this->assertSame('enum', $violation->getPropertyPath());
+            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violation->getCode());
+            // The enum's backing scalar is reported, never the internal FQCN.
+            $this->assertSame('This value should be of type string|null.', (string) $violation->getMessage());
+        }
+    }
+
+    public function testBackedEnumWrappedInPreviousExceptionThrowsValidationException(): void
+    {
+        $previous = NotNormalizableValueException::createForUnexpectedDataType('msg', 'invalid', [DenormBackedEnumFixture::class], 'enum', true);
+        $exception = new NotNormalizableValueException('The data must be one of the following values: "a", "b".', 0, $previous, 'string', null, 'enum', true);
+
+        try {
+            $this->factory->handle($exception, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $e->getConstraintViolationList()[0]->getCode());
+        }
+    }
+
     public function testUnknownClassReturnsVoid(): void
     {
         $exception = NotNormalizableValueException::createForUnexpectedDataType('Type error.', null, ['string'], 'name');
@@ -160,6 +195,36 @@ final class DenormalizationViolationFactoryTest extends TestCase
         }
     }
 
+    public function testGroupSequenceValidationGroupsAreFlattened(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType('Type error.', null, ['string'], 'adminOnly');
+
+        $operation = (new Post(class: DenormHandlerFixture::class))
+            ->withValidationContext(['groups' => new Assert\GroupSequence(['Default', ['admin']])]);
+
+        try {
+            $this->factory->handle($exception, $operation);
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertSame((string) NotBlank::IS_BLANK_ERROR, $e->getConstraintViolationList()[0]->getCode());
+        }
+    }
+
+    public function testStringValidationGroupIsASingleGroup(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType('Type error.', null, ['string'], 'adminOnly');
+
+        $operation = (new Post(class: DenormHandlerFixture::class))
+            ->withValidationContext(['groups' => 'admin']);
+
+        try {
+            $this->factory->handle($exception, $operation);
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertSame((string) NotBlank::IS_BLANK_ERROR, $e->getConstraintViolationList()[0]->getCode());
+        }
+    }
+
     public function testHandlePartialAggregatesAllErrors(): void
     {
         $errors = [
@@ -181,6 +246,32 @@ final class DenormalizationViolationFactoryTest extends TestCase
             // Unconstrained → generic Type fallback @ INVALID_TYPE_ERROR
             $this->assertSame((string) Type::INVALID_TYPE_ERROR, $codes['rawFloat']);
         }
+    }
+
+    public function testHandlePartialDenormalizationExceptionWithoutDeprecation(): void
+    {
+        $exception = NotNormalizableValueException::createForUnexpectedDataType('Internal error detail', 42, ['string'], 'name', false);
+        $partial = new PartialDenormalizationException(null, [$exception]);
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            $this->factory->handle($partial, $this->operation());
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violations = $e->getConstraintViolationList();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+        $this->assertCount(1, $violations);
+        $this->assertSame('name', $violations[0]->getPropertyPath());
     }
 
     /**
@@ -215,4 +306,12 @@ class DenormHandlerFixture
 
     #[NotBlank(groups: ['admin'])]
     public string $adminOnly = '';
+
+    public ?DenormBackedEnumFixture $enum = null;
+}
+
+enum DenormBackedEnumFixture: string
+{
+    case A = 'a';
+    case B = 'b';
 }

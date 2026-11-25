@@ -227,7 +227,7 @@
                     @if ($swaggerUiEnabled && $ui !== 'swagger')<a href="{{ route($originalRoute, $originalRouteParams) }}">Swagger UI</a>@endif
                     @if ($redocEnabled && $ui !== 'redoc')<a href="{{ route($originalRoute, array_merge($originalRouteParams, ['ui' => 'redoc'])) }}">ReDoc</a>@endif
                     @if ($scalarEnabled && $ui !== 'scalar')<a href="{{ route($originalRoute, array_merge($originalRouteParams, ['ui' => 'scalar'])) }}">Scalar</a>@endif
-                    @if (!$graphQlEnabled || $graphiQlEnabled)<a @if ($graphiQlEnabled)href="{{ route('api_graphiql') }}"@endif class="graphiql-link">GraphiQL</a>@endif
+                    @if ($graphiQlEnabled)<a href="{{ route('api_graphiql') }}" class="graphiql-link">GraphiQL</a>@endif
                 </div>
             </div>
         </div>
