@@ -19,7 +19,9 @@ use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
+use ApiPlatform\State\Parameter\ValueCaster;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
 
 /**
  * Turns the legacy filters declared on a resource into the canonical {@see UpgradeApiFilterParameter}
@@ -90,7 +92,8 @@ final class UpgradeApiFilterResolver
                 $seenKeys[$key] = true;
 
                 $isRelation = null !== $info['property'] && $this->isRelation($resourceClass, $info['property']);
-                $mapping = $this->mapper->map($filterClass, $info['strategy'], $info['type'], $isRelation);
+                $enumClass = null !== $info['property'] && str_ends_with($filterClass, 'BackedEnumFilter') ? $this->resolveEnumClass($resourceClass, $info['property']) : null;
+                $mapping = $this->mapper->map($filterClass, $info['strategy'], $info['type'], $isRelation, $enumClass);
                 // The new filter system infers the property from a plain key, but cannot for a nested
                 // (dotted) key, so it must be stated explicitly even when it equals the key.
                 $property = $this->explicitProperty($info['property'], $key);
@@ -111,6 +114,7 @@ final class UpgradeApiFilterResolver
                     filterContext: $filterContext,
                     caseSensitive: $mapping->caseSensitive,
                     arguments: $filterArguments,
+                    enumClass: $mapping->enumClass,
                 );
             }
         }
@@ -214,5 +218,21 @@ final class UpgradeApiFilterResolver
         $className = TypeHelper::getClassName(TypeHelper::getCollectionValueType($type) ?? $type);
 
         return null !== $className && $this->resourceClassResolver->isResourceClass($className);
+    }
+
+    /**
+     * @return class-string|null
+     */
+    private function resolveEnumClass(string $resourceClass, string $property): ?string
+    {
+        try {
+            $type = $this->propertyMetadataFactory->create($resourceClass, $property)->getNativeType();
+        } catch (PropertyNotFoundException) {
+            return null;
+        }
+
+        $enumType = null !== $type ? ValueCaster::resolveEnumType($type) : null;
+
+        return $enumType instanceof BackedEnumType ? $enumType->getClassName() : null;
     }
 }

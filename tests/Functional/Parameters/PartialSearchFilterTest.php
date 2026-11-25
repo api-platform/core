@@ -143,6 +143,25 @@ final class PartialSearchFilterTest extends ApiTestCase
         ];
     }
 
+    public function testPartialSearchFilterAcceptsNonContiguousNumericKeys(): void
+    {
+        $manager = $this->getManager();
+        $chickenClass = $this->isMongoDB() ? DocumentChicken::class : Chicken::class;
+        $owner = $manager->getRepository($this->isMongoDB() ? DocumentOwner::class : Owner::class)->findOneBy(['name' => 'Alice']);
+        $coop = $manager->getRepository($this->isMongoDB() ? DocumentChickenCoop::class : ChickenCoop::class)->findOneBy([]);
+
+        foreach (['alpha', 'beta', 'gamma'] as $name) {
+            $chicken = new $chickenClass();
+            $chicken->setName($name);
+            $chicken->setOwner($owner);
+            $chicken->setChickenCoop($coop);
+            $manager->persist($chicken);
+        }
+        $manager->flush();
+
+        $this->testPartialSearchFilter('/chickens?namePartial%5B25%5D=alpha&namePartial%5B28%5D=beta', 2, ['alpha', 'beta']);
+    }
+
     public function testPartialSearchFilterMatchesEscapeCharLiterally(): void
     {
         if ($this->isMongoDB()) {

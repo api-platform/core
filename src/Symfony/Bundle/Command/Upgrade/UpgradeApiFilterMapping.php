@@ -25,6 +25,7 @@ final readonly class UpgradeApiFilterMapping
         public bool $castToNativeType = false,
         public ?string $nativeType = null,
         public bool $caseSensitive = false,
+        public ?string $enumClass = null,
     ) {
     }
 }

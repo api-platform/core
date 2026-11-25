@@ -48,8 +48,13 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $value = $parameter->getValue();
 
         if (\is_array($value) && !array_is_list($value)) {
-            // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
-            return;
+            foreach ($value as $key => $item) {
+                if (!\is_int($key)) {
+                    return;
+                }
+            }
+
+            $value = array_values($value);
         }
 
         if ($this->ignoreEmptyValue($parameter, $value)) {

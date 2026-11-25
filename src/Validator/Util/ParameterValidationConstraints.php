@@ -15,6 +15,8 @@ namespace ApiPlatform\Validator\Util;
 
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use ApiPlatform\State\Parameter\ValueCaster;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\Validator\Constraint;
@@ -98,7 +100,13 @@ trait ParameterValidationConstraints
             $assertions[] = new DivisibleBy(value: $schema['multipleOf']);
         }
 
-        if (isset($schema['enum'])) {
+        $nativeType = $parameter->getNativeType();
+        $enumType = $nativeType && $parameter->getCastToNativeType() ? ValueCaster::resolveEnumType($nativeType) : null;
+        $castsToEnum = $enumType instanceof BackedEnumType;
+
+        if ($castsToEnum) {
+            $assertions[] = new Choice(choices: $enumType->getClassName()::cases());
+        } elseif (isset($schema['enum'])) {
             $assertions[] = new Choice(choices: $schema['enum']);
         }
 
@@ -138,7 +146,7 @@ trait ParameterValidationConstraints
             $assertions[] = new Type(type: 'array');
         }
 
-        if (isset($schema['type']) && $parameter->getCastToNativeType()) {
+        if (isset($schema['type']) && $parameter->getCastToNativeType() && !$castsToEnum) {
             $assertion = match ($schema['type']) {
                 'boolean', 'integer' => new Type(type: $schema['type']),
                 'number' => new Type(type: 'float'),

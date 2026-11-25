@@ -17,12 +17,25 @@ use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[GetCollection(
     uriTemplate: 'backed_enum_filter{._format}',
     parameters: [
         'stringBackedEnum' => new QueryParameter(filter: new ExactFilter()),
         'integerBackedEnum' => new QueryParameter(filter: new ExactFilter()),
+    ],
+)]
+#[GetCollection(
+    uriTemplate: 'backed_enum_native_type{._format}',
+    parameters: [
+        'status' => new QueryParameter(
+            filter: new ExactFilter(),
+            property: 'stringBackedEnum',
+            nativeType: new BackedEnumType(StringBackedEnum::class, new BuiltinType(TypeIdentifier::STRING)),
+        ),
     ],
 )]
 #[ORM\Entity]
