@@ -18,8 +18,6 @@ use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Resolves the stage flags left unset on an operation to their request-dependent defaults.
- *
  * @internal
  */
 final class OperationStageDefaults

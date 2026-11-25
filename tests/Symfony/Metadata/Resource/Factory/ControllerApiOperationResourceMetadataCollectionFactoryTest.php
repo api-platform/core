@@ -79,6 +79,7 @@ final class ControllerApiOperationResourceMetadataCollectionFactoryTest extends 
     {
         $operation = $this->createFactory('withExplicitRouteName')->create(CheckoutOutput::class)->getOperation('explicit_route_name');
 
+        $this->assertInstanceOf(HttpOperation::class, $operation);
         $this->assertSame('explicit_route_name', $operation->getRouteName());
     }
 
