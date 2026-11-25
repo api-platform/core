@@ -27,7 +27,11 @@ interface SerializerContextBuilderInterface
     // @see ApiPlatform\Symfony\Controller\MainController and ApiPlatform\State\Provider\DeserializerProvider
     public const ASSIGN_OBJECT_TO_POPULATE = 'api_assign_object_to_populate';
 
-    // The class of the resource a PUT replaces, see ApiPlatform\State\Provider\DeserializeProvider
+    /**
+     * The class of the resource a PUT replaces, set by ApiPlatform\State\Provider\DeserializeProvider.
+     *
+     * @internal
+     */
     public const REPLACED_CLASS = 'api_replaced_class';
 
     /**
