@@ -411,7 +411,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $oneOf[] = $data;
             }
 
-            $subDocumentDefinitionName = $documentDefinitionName.'.'.$this->getShortClassName($subClass);
+            $subDocumentDefinitionName = $documentDefinitionName.'.'.$this->subtypeResolver->getTypeName($subClass);
             $subSchema = $this->buildDefinitionPropertiesSchema($subKey, $subDocumentDefinitionName, $subClass, $format, $type, $resourceOperation, $schema, $serializerContext);
             if (\in_array($typeProperty, $definitions[$subKey]['required'] ?? [], true)) {
                 $definitions[$subDocumentDefinitionName.'.resource']['properties']['attributes']['required'] = [$attributeName];

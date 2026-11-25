@@ -269,11 +269,31 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testSubtypesDefiningTheSamePropertyDifferentlyThrow(): void
+    public function testSiblingSubtypesShareTheTermOfAProperty(): void
     {
-        $resourceNames = new ResourceNameCollection([ContextDiscriminatedVehicle::class]);
+        $context = $this->createSubtypeContextBuilder()->getResourceContext(ContextDiscriminatedVehicle::class);
+
+        $this->assertSame('Vehicle/seats', $context['seats']);
+        $this->assertSame('Vehicle/kind', $context['kind']);
+    }
+
+    public function testSiblingSubtypesWithContradictoryIrisThrow(): void
+    {
+        $contextBuilder = $this->createSubtypeContextBuilder([ContextDiscriminatedCar::class => ['https://schema.org/seatingCapacity'], ContextDiscriminatedBus::class => ['https://schema.org/numberOfSeats']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The subtypes "%s" and "%s" of the resource "%s" give the "seats" property different "iris"', ContextDiscriminatedCar::class, ContextDiscriminatedBus::class, ContextDiscriminatedVehicle::class));
+
+        $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
+    }
+
+    /**
+     * @param array<class-string, list<string>> $seatsIris
+     */
+    private function createSubtypeContextBuilder(array $seatsIris = []): ContextBuilder
+    {
         $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactory->method('create')->willReturn($resourceNames);
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([ContextDiscriminatedVehicle::class]));
 
         $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(ContextDiscriminatedVehicle::class, [
@@ -285,18 +305,13 @@ class ContextBuilderTest extends TestCase
         $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
 
         $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true));
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => new ApiProperty(readable: true, nativeType: Type::string(), iris: 'seats' === $property ? $seatsIris[$class] ?? null : null));
 
         $mapping = new ClassDiscriminatorMapping('kind', ['car' => ContextDiscriminatedCar::class, 'bus' => ContextDiscriminatedBus::class]);
         $classDiscriminatorResolver = $this->createStub(ClassDiscriminatorResolverInterface::class);
         $classDiscriminatorResolver->method('getMappingForClass')->willReturnCallback(static fn (string $class): ?ClassDiscriminatorMapping => ContextDiscriminatedVehicle::class === $class ? $mapping : null);
 
-        $contextBuilder = new ContextBuilder($resourceNameCollectionFactory, $resourceMetadataCollectionFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(UrlGeneratorInterface::class), subtypeResolver: new SubtypeResolver($classDiscriminatorResolver, $resourceNameCollectionFactory, $resourceMetadataCollectionFactory));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf('The subtypes "%s" and "%s" of the resource "%s" both expose a "seats" property', ContextDiscriminatedCar::class, ContextDiscriminatedBus::class, ContextDiscriminatedVehicle::class));
-
-        $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
+        return new ContextBuilder($resourceNameCollectionFactory, $resourceMetadataCollectionFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(UrlGeneratorInterface::class), subtypeResolver: new SubtypeResolver($classDiscriminatorResolver, $resourceNameCollectionFactory, $resourceMetadataCollectionFactory));
     }
 }
 

@@ -162,20 +162,20 @@ final class DiscriminatedResourceTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSame(['car', 'truck', 'car', 'bike', 'bike'], array_column($members, 'kind'));
-        $this->assertSame(['DiscriminatedCar', 'DiscriminatedTruck', 'DiscriminatedCar', 'DiscriminatedMountainBike', 'DiscriminatedBike'], array_column($members, '@type'));
+        $this->assertSame(['DiscriminatedCar', 'https://schema.org/Truck', 'DiscriminatedCar', 'DiscriminatedMountainBike', 'DiscriminatedBike'], array_column($members, '@type'));
         $this->assertSame(18000, $members[1]['payload']);
         $this->assertArrayNotHasKey('payload', $members[0]);
         $this->assertMatchesResourceCollectionJsonSchema(DiscriminatedVehicle::class);
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, class-string}>
+     * @return iterable<string, array{array<string, mixed>, class-string, string}>
      */
     public static function postProvider(): iterable
     {
-        yield 'subtype' => [['kind' => 'truck', 'name' => 'Scania', 'payload' => 12000], DiscriminatedTruck::class];
-        yield 'nested subtype' => [['kind' => 'bike', 'frame' => 'mountain', 'name' => 'Trek', 'suspension' => 'hardtail'], DiscriminatedMountainBike::class];
-        yield 'class declared in its own nested map' => [['kind' => 'bike', 'frame' => 'bike', 'name' => 'Brompton', 'gears' => 3], DiscriminatedBike::class];
+        yield 'subtype' => [['kind' => 'truck', 'name' => 'Scania', 'payload' => 12000], DiscriminatedTruck::class, 'https://schema.org/Truck'];
+        yield 'nested subtype' => [['kind' => 'bike', 'frame' => 'mountain', 'name' => 'Trek', 'suspension' => 'hardtail'], DiscriminatedMountainBike::class, 'DiscriminatedMountainBike'];
+        yield 'class declared in its own nested map' => [['kind' => 'bike', 'frame' => 'bike', 'name' => 'Brompton', 'gears' => 3], DiscriminatedBike::class, 'DiscriminatedBike'];
     }
 
     /**
@@ -183,7 +183,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
      * @param class-string         $class
      */
     #[DataProvider('postProvider')]
-    public function testPostCreatesTheMostSpecificSubtype(array $payload, string $class): void
+    public function testPostCreatesTheMostSpecificSubtype(array $payload, string $class, string $type): void
     {
         self::createClient()->request('POST', '/discriminated_vehicles', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -191,7 +191,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertJsonContains(['@id' => '/discriminated_vehicles/6', '@type' => substr($class, strrpos($class, '\\') + 1)] + $payload);
+        $this->assertJsonContains(['@id' => '/discriminated_vehicles/6', '@type' => $type] + $payload);
         $this->assertSame($class, DiscriminatedVehicleStore::$vehicles[6]::class);
     }
 
@@ -343,7 +343,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $client = self::createClient();
 
         $classes = array_column($client->request('GET', '/docs.jsonld')->toArray()['hydra:supportedClass'], null, '@id');
-        $truck = $classes['#DiscriminatedTruck'];
+        $truck = $classes['https://schema.org/Truck'];
         $this->assertSame('#DiscriminatedVehicle', $truck['subClassOf']);
         $this->assertSame(['#DiscriminatedTruck/payload'], array_column(array_column($truck['hydra:supportedProperty'], 'hydra:property'), '@id'));
         $this->assertSame('#DiscriminatedBike', $classes['#DiscriminatedMountainBike']['subClassOf']);

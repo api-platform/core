@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
+use ApiPlatform\Metadata\ApiSubtype;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -25,6 +26,8 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private const JSON_MERGE_PATCH_SCHEMA_POSTFIX = 'jsonMergePatch';
 
     private array $prefixCache = [];
+    /** @var array<string, string|null> */
+    private array $subtypeShortNames = [];
 
     public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
     {
@@ -40,7 +43,7 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             // Use createPrefixFromClass so DTOs with identical short names but different
             // FQCNs (e.g. App\...\Input\ThingCreate and App\...\Output\ThingCreate) get
             // disambiguated suffixes instead of overwriting each other in the schema map.
-            $prefix .= self::GLUE.$this->createPrefixFromClass($inputOrOutputClass);
+            $prefix .= self::GLUE.($this->getSubtypeShortName($inputOrOutputClass) ?? $this->createPrefixFromClass($inputOrOutputClass));
         }
 
         if (!\in_array($format, ['json', 'merge-patch+json'], true)) {
@@ -156,6 +159,15 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
 
         // This will fallback to using `createPrefixFromClass`
         return null;
+    }
+
+    private function getSubtypeShortName(string $class): ?string
+    {
+        if (!\array_key_exists($class, $this->subtypeShortNames)) {
+            $this->subtypeShortNames[$class] = class_exists($class) ? ((new \ReflectionClass($class))->getAttributes(ApiSubtype::class)[0] ?? null)?->newInstance()->shortName : null;
+        }
+
+        return $this->subtypeShortNames[$class];
     }
 
     private function createPrefixFromClass(string $fullyQualifiedClassName, int $namespaceParts = 1): string

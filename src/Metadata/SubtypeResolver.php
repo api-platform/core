@@ -25,8 +25,8 @@ final class SubtypeResolver implements SubtypeResolverInterface
     private array $subtypesCache = [];
     /** @var array<class-string, true>|null */
     private ?array $resourceClasses = null;
-    /** @var array<class-string, string> */
-    private array $subtypeNames = [];
+    /** @var array<class-string, ApiSubtype> */
+    private array $subtypes = [];
     private bool $typeNamesValidated = false;
 
     public function __construct(
@@ -72,15 +72,37 @@ final class SubtypeResolver implements SubtypeResolverInterface
 
     public function getTypeName(string $class): string
     {
-        if (isset($this->getResourceClasses()[$class])) {
-            foreach ($this->resourceMetadataCollectionFactory->create($class) as $resource) {
-                return $resource->getShortName();
-            }
+        if (null !== $resourceShortName = $this->getResourceShortName($class)) {
+            return $resourceShortName;
         }
 
         $this->validateTypeNames();
 
-        return $this->getSubtypeName($class);
+        return $this->getSubtype($class)->shortName ?? '';
+    }
+
+    public function getTypes(string $class): array
+    {
+        if (null !== $resourceShortName = $this->getResourceShortName($class)) {
+            return [$resourceShortName];
+        }
+
+        $this->validateTypeNames();
+
+        return $this->getSubtype($class)->types ?? [];
+    }
+
+    private function getResourceShortName(string $class): ?string
+    {
+        if (!isset($this->getResourceClasses()[$class])) {
+            return null;
+        }
+
+        foreach ($this->resourceMetadataCollectionFactory->create($class) as $resource) {
+            return $resource->getShortName();
+        }
+
+        return null;
     }
 
     /**
@@ -98,19 +120,20 @@ final class SubtypeResolver implements SubtypeResolverInterface
         return $this->resourceClasses;
     }
 
-    private function getSubtypeName(string $class): string
+    private function getSubtype(string $class): ApiSubtype
     {
-        if (isset($this->subtypeNames[$class])) {
-            return $this->subtypeNames[$class];
+        if (isset($this->subtypes[$class])) {
+            return $this->subtypes[$class];
         }
 
-        $attribute = (new \ReflectionClass($class))->getAttributes(ApiSubtype::class)[0] ?? null;
+        $subtype = ((new \ReflectionClass($class))->getAttributes(ApiSubtype::class)[0] ?? null)?->newInstance() ?? new ApiSubtype();
+        $shortName = $subtype->shortName ?? (false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1));
 
-        return $this->subtypeNames[$class] = $attribute?->newInstance()->shortName ?? (false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1));
+        return $this->subtypes[$class] = new ApiSubtype($shortName, $subtype->types ?? [$shortName]);
     }
 
     /**
-     * @throws RuntimeException when a subtype is named like a resource or like another subtype
+     * @throws RuntimeException when a subtype name or type is also the one of a resource or of another subtype
      */
     private function validateTypeNames(): void
     {
@@ -131,9 +154,11 @@ final class SubtypeResolver implements SubtypeResolverInterface
                     continue;
                 }
 
-                $name = $this->getSubtypeName($subtype);
-                if (($owners[$name] ??= $subtype) !== $subtype) {
-                    throw new RuntimeException(\sprintf('The subtype "%s" and "%s" are both named "%s" in JSON-LD and Hydra. Give the subtype another name with #[%s(shortName: \'...\')].', $subtype, $owners[$name], $name, ApiSubtype::class));
+                $apiSubtype = $this->getSubtype($subtype);
+                foreach (array_unique([$apiSubtype->shortName, ...$apiSubtype->types]) as $name) {
+                    if (($owners[$name] ??= $subtype) !== $subtype) {
+                        throw new RuntimeException(\sprintf('The subtype "%s" and "%s" are both named "%s" in JSON-LD and Hydra. Give the subtype another name with #[%s(shortName: \'...\')].', $subtype, $owners[$name], $name, ApiSubtype::class));
+                    }
                 }
             }
         }

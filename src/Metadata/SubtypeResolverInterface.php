@@ -41,4 +41,13 @@ interface SubtypeResolverInterface
      * @throws RuntimeException when a subtype name is also the name of a resource or of another subtype
      */
     public function getTypeName(string $class): string;
+
+    /**
+     * Returns the JSON-LD types of a subtype, its name unless declared with ApiSubtype.
+     *
+     * @throws RuntimeException when a subtype name is also the name of a resource or of another subtype
+     *
+     * @return list<string>
+     */
+    public function getTypes(string $class): array;
 }

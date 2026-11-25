@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiSubtype;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiSubtype(types: ['https://schema.org/Truck'])]
 final class DiscriminatedTruck extends DiscriminatedVehicle
 {
     #[Assert\Length(min: 5)]

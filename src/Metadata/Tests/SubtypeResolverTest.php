@@ -50,6 +50,8 @@ class SubtypeResolverTest extends TestCase
         $this->assertSame('SubtypeResolverHeavyTruck', $resolver->getTypeName(SubtypeResolverHeavyTruck::class));
         // Named explicitly, its class short name is also the one of SubtypeResolverCar
         $this->assertSame('GarageCar', $resolver->getTypeName(OtherCar::class));
+        $this->assertSame(['GarageCar'], $resolver->getTypes(OtherCar::class));
+        $this->assertSame(['Coach'], $resolver->getTypes(SubtypeResolverBus::class));
     }
 
     /**

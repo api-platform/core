@@ -159,7 +159,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         // A subtype is typed by its most specific class, documented as a subclass of the resource (and of its types)
         if ($isResourceClass && null !== $this->subtypeResolver && null !== $discriminatedClass = $this->getDiscriminatedClass($data, $resourceClass)) {
-            return $this->subtypeResolver->getTypeName($discriminatedClass);
+            $subtypeTypes = $this->subtypeResolver->getTypes($discriminatedClass);
+
+            return 1 === \count($subtypeTypes) ? $subtypeTypes[0] : $subtypeTypes;
         }
 
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;

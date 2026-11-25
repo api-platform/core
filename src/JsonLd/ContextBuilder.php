@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -37,6 +36,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
 {
     use ClassInfoTrait;
     use HydraPrefixTrait;
+    use SubtypePropertyScopeTrait;
 
     public const FORMAT = 'jsonld';
     public const HYDRA_PREFIX = 'hydra:';
@@ -246,68 +246,37 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
             return $context;
         }
 
-        $this->addTypePropertyContext($context, $propertyNames, $resourceClass, $shortName);
+        $this->addTypePropertyContext($context, $resourceClass, $resourceClass, $shortName);
 
-        // Properties declared by a subtype, and not inherited from a mapped parent, are defined by the subtype
-        $declaredProperties = [];
-        $termOwners = [];
-        foreach ($this->subtypeResolver->getSubtypes($resourceClass) as $subtype) {
-            $subtypeName = $this->subtypeResolver->getTypeName($subtype);
-            $declaredProperties[$subtype] = [];
-            $subtypeContext = [];
-            foreach ($this->propertyNameCollectionFactory->create($subtype, $propertyNameCollectionContext) as $propertyName) {
-                $declaredProperties[$subtype][$propertyName] = true;
-                if (!isset($propertyNames[$propertyName]) && !$this->isInheritedProperty($declaredProperties, $subtype, $propertyName)) {
-                    $this->addPropertyContext($subtypeContext, $subtype, $propertyName, $subtypeName, $propertyContext);
+        [$scopes, $iris, $typeProperties] = $this->getSubtypePropertyScopes($this->subtypeResolver, $this->propertyMetadataFactory, $resourceClass, array_keys($propertyNames), fn (string $class): array => iterator_to_array($this->propertyNameCollectionFactory->create($class, $propertyNameCollectionContext), false));
+        foreach ($scopes as $subtype => $properties) {
+            foreach ($properties as $propertyName => $scope) {
+                $scopeName = $this->subtypeResolver->getTypeName($scope);
+                if (isset($typeProperties[$subtype][$propertyName])) {
+                    $this->addTypePropertyContext($context, $subtype, $scope, $scopeName);
+                } else {
+                    $this->addPropertyContext($context, $subtype, $propertyName, $scopeName, $propertyContext, $iris[$propertyName] ?? null);
                 }
-            }
-
-            $this->addTypePropertyContext($subtypeContext, $declaredProperties[$subtype], $subtype, $subtypeName);
-            foreach ($subtypeContext as $term => $definition) {
-                if (isset($termOwners[$term]) && $context[$term] !== $definition) {
-                    throw new RuntimeException(\sprintf('The subtypes "%s" and "%s" of the resource "%s" both expose a "%s" property with a different JSON-LD definition. Give both properties the same "iris" or rename one of them.', $termOwners[$term], $subtype, $resourceClass, $term));
-                }
-
-                $termOwners[$term] ??= $subtype;
-                $context[$term] = $definition;
             }
         }
 
         return $context;
     }
 
-    /**
-     * @param array<string, array<string, true>> $declaredProperties
-     */
-    private function isInheritedProperty(array $declaredProperties, string $subtype, string $propertyName): bool
+    private function addTypePropertyContext(array &$context, string $class, string $scope, string $scopeName): void
     {
-        foreach ($declaredProperties as $class => $properties) {
-            if ($class !== $subtype && isset($properties[$propertyName]) && is_a($subtype, $class, true)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * The type property of a discriminator map is not a property of the class, it is defined as one.
-     *
-     * @param array<string, true> $propertyNames
-     */
-    private function addTypePropertyContext(array &$context, array &$propertyNames, string $class, string $shortName): void
-    {
-        $typeProperty = $this->subtypeResolver?->getMapping($class)?->getTypeProperty();
-        if (null === $typeProperty || isset($propertyNames[$typeProperty])) {
+        if (null === $typeProperty = $this->subtypeResolver?->getMapping($class)?->getTypeProperty()) {
             return;
         }
 
-        $propertyNames[$typeProperty] = true;
-        $convertedName = $this->nameConverter ? $this->nameConverter->normalize($typeProperty, $class, self::FORMAT) : $typeProperty;
-        $context[$convertedName] ??= \sprintf('%s/%s', $shortName, $convertedName);
+        $convertedName = $this->nameConverter ? $this->nameConverter->normalize($typeProperty, $scope, self::FORMAT) : $typeProperty;
+        $context[$convertedName] ??= \sprintf('%s/%s', $scopeName, $convertedName);
     }
 
-    private function addPropertyContext(array &$context, string $resourceClass, string $propertyName, string $shortName, array $propertyContext): void
+    /**
+     * @param string|list<string>|null $iris
+     */
+    private function addPropertyContext(array &$context, string $resourceClass, string $propertyName, string $shortName, array $propertyContext, string|array|null $iris = null): void
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
 
@@ -318,8 +287,8 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
         $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT) : $propertyName;
         $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
 
-        if ($id = $propertyMetadata->getIris()) {
-            $id = 1 === (is_countable($id) ? \count($id) : 0) ? $id[0] : $id;
+        if ($id = $iris ?? $propertyMetadata->getIris()) {
+            $id = \is_array($id) && 1 === \count($id) ? $id[0] : $id;
         }
 
         if (!$id) {

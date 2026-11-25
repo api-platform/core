@@ -80,7 +80,9 @@ final class ItemDenormalizer extends AbstractItemNormalizer
         $classes = [$resourceClass, ...$this->subtypeResolver->getSubtypes($resourceClass)];
         $classesByName = [];
         foreach ($classes as $class) {
-            $classesByName[$this->subtypeResolver->getTypeName($class)] = $class;
+            foreach ($this->subtypeResolver->getTypes($class) as $typeName) {
+                $classesByName[$typeName] = $class;
+            }
         }
 
         foreach ($types as $typeName) {
