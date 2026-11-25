@@ -246,8 +246,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         // A list shape (array{int, string}) is serialized as a JSON array, so it is left to the CollectionType branch.
-        // symfony/type-info < 7.4.20 resolves its keyless items to a single '' key, which is left to that branch too.
-        if ($type instanceof ArrayShapeType && !array_is_list($shape = $type->getShape()) && !isset($shape[''])) {
+        if ($type instanceof ArrayShapeType && !array_is_list($type->getShape())) {
             return $this->applyNullability($this->getArrayShapeSchema($type, $readableLink), $isNullable);
         }
 
@@ -307,9 +306,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         return ['type' => Schema::UNKNOWN_TYPE];
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     private function getArrayShapeSchema(ArrayShapeType $type, ?bool $readableLink): array
     {
         $properties = [];

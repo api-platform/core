@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8766;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
 
 #[ApiResource(
     shortName: 'Issue8766Report',
@@ -24,7 +25,7 @@ final class Issue8766Report
 {
     public int $id = 1;
 
-    /** @var array{total: int, processed: int, failed?: int|null} */
+    /** @var array{total: int, processed: int, failed?: int|null, output: CustomOutputDto|null} */
     public array $totals;
 
     /** @var array{name: string, ...<string, int>} */
@@ -36,7 +37,7 @@ final class Issue8766Report
     public static function provide(): self
     {
         $report = new self();
-        $report->totals = ['total' => 0, 'processed' => 0];
+        $report->totals = ['total' => 0, 'processed' => 0, 'output' => null];
         $report->unsealed = ['name' => ''];
         $report->tuple = [0, ''];
 

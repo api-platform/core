@@ -17,10 +17,6 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8766\Issue8766Report;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\ArrayShapeType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
-use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 final class JsonSchemaArrayShapeTest extends ApiTestCase
 {
@@ -36,9 +32,6 @@ final class JsonSchemaArrayShapeTest extends ApiTestCase
         $this->schemaFactory = self::getContainer()->get('api_platform.json_schema.schema_factory');
     }
 
-    /**
-     * @return class-string[]
-     */
     public static function getResources(): array
     {
         return [Issue8766Report::class];
@@ -52,18 +45,16 @@ final class JsonSchemaArrayShapeTest extends ApiTestCase
                 'total' => ['type' => 'integer'],
                 'processed' => ['type' => 'integer'],
                 'failed' => ['type' => ['integer', 'null']],
+                'output' => ['anyOf' => [['$ref' => '#/definitions/CustomOutputDto'], ['type' => 'null']]],
             ],
-            'required' => ['processed', 'total'],
+            'required' => ['output', 'processed', 'total'],
             'additionalProperties' => false,
         ]), $this->properties()['totals']);
+        $this->assertStringNotContainsString('unknown_type', json_encode($this->schemaFactory->buildSchema(Issue8766Report::class, 'json')));
     }
 
     public function testUnsealedArrayShapeAllowsExtraKeys(): void
     {
-        if (!Type::arrayShape([], false, Type::string(), Type::int())->getExtraValueType()?->isIdentifiedBy(TypeIdentifier::INT)) {
-            $this->markTestSkipped('symfony/type-info < 7.4.6 returns the extra key type from ArrayShapeType::getExtraValueType().');
-        }
-
         $this->assertEquals(new \ArrayObject([
             'type' => 'object',
             'properties' => [
@@ -76,14 +67,6 @@ final class JsonSchemaArrayShapeTest extends ApiTestCase
 
     public function testListArrayShapeStaysAnArray(): void
     {
-        // symfony/type-info < 7.4.20 merges keyless items into one '' key, the tuple then falls back to a map
-        $tuple = (new StringTypeResolver())->resolve('array{int, string}');
-        if ($tuple instanceof ArrayShapeType && !array_is_list($tuple->getShape())) {
-            $this->assertArrayNotHasKey('properties', $this->properties()['tuple']);
-
-            return;
-        }
-
         $this->assertEquals(new \ArrayObject([
             'type' => 'array',
             'items' => [
