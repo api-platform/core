@@ -25,6 +25,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
@@ -198,6 +200,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $type = $propertyMetadata->getNativeType();
 
+        $shapeType = $this->getArrayShapeType($type);
+        if ($shapeType && \is_array($propertySchema['properties'] ?? null)) {
+            $propertySchema['properties'] = $this->completeArrayShapeProperties($propertySchema['properties'], $shapeType, $schema, $format, $parentType, $serializerContext);
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
+        }
+
         // Type is defined in an allOf, anyOf, or oneOf
         $propertySchemaType = $this->getSchemaValue($propertySchema, 'type');
         $currentRef = $this->getSchemaValue($propertySchema, '$ref');
@@ -291,6 +301,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                             $propertySchema['items'] = 1 === \count($unionRefs)
                                 ? $unionRefs[0]
                                 : ['anyOf' => $unionRefs];
+                            if ($isNullable) {
+                                $propertySchema['type'] = $this->withNullType($propertySchema['type']);
+                            }
                         } else {
                             $refs = 1 === \count($unionRefs)
                                 ? [$unionRefs[0]]
@@ -350,6 +363,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                         $propertySchema[$key] = [];
                     }
                     $propertySchema[$key] = ['$ref' => $subSchemaResult['$ref']];
+                    if ($isNullable) {
+                        $propertySchema['type'] = $this->withNullType($propertySchema['type']);
+                    }
                     $refs = [];
                     break;
                 }
@@ -377,11 +393,77 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
     }
 
+    private function getArrayShapeType(?Type $type): ?ArrayShapeType
+    {
+        if ($type instanceof ArrayShapeType) {
+            return array_is_list($type->getShape()) ? null : $type;
+        }
+
+        if (!$type instanceof UnionType) {
+            return null;
+        }
+
+        $members = array_filter($type->getTypes(), static fn (Type $t): bool => !$t instanceof BuiltinType || TypeIdentifier::NULL !== $t->getTypeIdentifier());
+
+        return 1 === \count($members) ? $this->getArrayShapeType(reset($members)) : null;
+    }
+
+    private function completeArrayShapeProperties(array $properties, ArrayShapeType $shapeType, Schema $schema, string $format, string $parentType, array $serializerContext): array
+    {
+        foreach ($shapeType->getShape() as $key => ['type' => $valueType]) {
+            $key = (string) $key;
+            if (!\is_array($properties[$key] ?? null)) {
+                continue;
+            }
+
+            if (Schema::UNKNOWN_TYPE !== ($properties[$key]['type'] ?? null)) {
+                if (($nestedShape = $this->getArrayShapeType($valueType)) && \is_array($properties[$key]['properties'] ?? null)) {
+                    $properties[$key]['properties'] = $this->completeArrayShapeProperties($properties[$key]['properties'], $nestedShape, $schema, $format, $parentType, $serializerContext);
+                }
+
+                continue;
+            }
+
+            $isNullable = $valueType->isNullable();
+            $objectType = $valueType instanceof UnionType
+                ? array_values(array_filter($valueType->getTypes(), static fn (Type $t): bool => $t instanceof ObjectType))[0] ?? null
+                : $valueType;
+            if (!$objectType instanceof ObjectType) {
+                continue;
+            }
+
+            $subSchema = new Schema($schema->getVersion());
+            $subSchema->setDefinitions($schema->getDefinitions());
+            unset($serializerContext[AbstractNormalizer::ATTRIBUTES]);
+            $result = ($this->schemaFactory ?: $this)->buildSchema(
+                $objectType->getClassName(),
+                $format,
+                $parentType,
+                null,
+                $subSchema,
+                [self::FORCE_SUBSCHEMA => true] + $serializerContext,
+                false,
+            );
+
+            if (!isset($result['$ref'])) {
+                continue;
+            }
+
+            $properties[$key] = $isNullable ? ['anyOf' => [['$ref' => $result['$ref']], ['type' => 'null']]] : ['$ref' => $result['$ref']];
+        }
+
+        return $properties;
+    }
+
     private function getValidationGroups(Operation $operation): array
     {
         $groups = $operation->getValidationContext()['groups'] ?? [];
 
-        return \is_array($groups) ? $groups : [$groups];
+        if (\is_object($groups) && property_exists($groups, 'groups') && \is_array($groups->groups)) {
+            return [$groups];
+        }
+
+        return \is_array($groups) && !\is_callable($groups) ? $groups : [];
     }
 
     /**
@@ -428,6 +510,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['type'], $schema['items'], $schema['allOf'], $schema['anyOf'], $schema['oneOf']);
 
         return $schema;
+    }
+
+    private function withNullType(array|string $type): array
+    {
+        $types = (array) $type;
+
+        return \in_array('null', $types, true) ? $types : [...$types, 'null'];
     }
 
     private function getSchemaValue(array $schema, string $key): array|string|null

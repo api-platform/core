@@ -107,9 +107,9 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             return '';
         }
 
-        $groups = \is_array($groups) ? $groups : [$groups];
-
-        if (\is_callable($groups)) {
+        if (\is_object($groups) && property_exists($groups, 'groups') && \is_array($groups->groups)) {
+            $groups = [$groups];
+        } elseif (!\is_array($groups) || \is_callable($groups)) {
             return '';
         }
 

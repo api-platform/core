@@ -21,10 +21,12 @@ use ApiPlatform\HttpCache\PurgerInterface;
 final class NullPurger implements PurgerInterface
 {
     private array $iris = [];
+    private int $purgeCount = 0;
 
     public function purge(array $iris): void
     {
         $this->iris = $iris;
+        ++$this->purgeCount;
     }
 
     public function getIris(): array
@@ -32,9 +34,15 @@ final class NullPurger implements PurgerInterface
         return $this->iris;
     }
 
+    public function getPurgeCount(): int
+    {
+        return $this->purgeCount;
+    }
+
     public function clear(): void
     {
         $this->iris = [];
+        $this->purgeCount = 0;
     }
 
     public function getResponseHeaders(array $iris): array

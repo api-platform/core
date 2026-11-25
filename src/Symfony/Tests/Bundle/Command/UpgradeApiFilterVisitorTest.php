@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Tests\Bundle\Command;
 
 use ApiPlatform\Symfony\Bundle\Command\Upgrade\UpgradeApiFilterParameter;
 use ApiPlatform\Symfony\Bundle\Command\Upgrade\UpgradeApiFilterVisitor;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7126\StringBackedEnum;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
@@ -88,6 +89,62 @@ PHP;
                 filterClass: 'ApiPlatform\Doctrine\Orm\Filter\ExactFilter',
                 nativeType: 'bool',
                 castToNativeType: true,
+            ),
+        ]);
+
+        $this->assertSame($after, $this->transform($before, $visitor));
+    }
+
+    public function testBackedEnumFilterBecomesExactFilterWithBackedEnumType(): void
+    {
+        $before = <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+
+use ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+
+#[ApiFilter(BackedEnumFilter::class)]
+#[ApiResource]
+class ConvertedEnum
+{
+    public $status;
+}
+PHP;
+
+        $after = <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7126\StringBackedEnum;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type\BackedEnumType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use ApiPlatform\Metadata\ApiResource;
+
+#[ApiResource(parameters: ['status' => new QueryParameter(filter: new ExactFilter(), nativeType: new BackedEnumType(StringBackedEnum::class, new BuiltinType(TypeIdentifier::STRING)), castToNativeType: true)])]
+class ConvertedEnum
+{
+    public $status;
+}
+PHP;
+
+        $visitor = new UpgradeApiFilterVisitor('ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConvertedEnum', [
+            new UpgradeApiFilterParameter(
+                key: 'status',
+                filterClass: 'ApiPlatform\Doctrine\Orm\Filter\ExactFilter',
+                nativeType: 'string',
+                castToNativeType: true,
+                enumClass: StringBackedEnum::class,
             ),
         ]);
 

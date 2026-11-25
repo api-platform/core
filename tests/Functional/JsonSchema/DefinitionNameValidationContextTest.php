@@ -60,6 +60,19 @@ final class DefinitionNameValidationContextTest extends ApiTestCase
         $this->assertContains('name', $groupsRequired, 'The POST with validationContext groups=["a"] must require "name", regardless of declaration order.');
     }
 
+    public function testValidationGroupsGeneratorServiceIdIsNotALiteralGroup(): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+
+        [$barePostName] = $this->postSchema($json, 'dummy_validation');
+        [$generatorPostName] = $this->postSchema($json, 'dummy_validation/validation_sequence');
+
+        $this->assertStringNotContainsString('group_generator', $generatorPostName);
+        $this->assertSame($barePostName, $generatorPostName);
+    }
+
     /**
      * @return array{0: string, 1: array}
      */

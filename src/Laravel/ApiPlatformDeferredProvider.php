@@ -20,6 +20,9 @@ use ApiPlatform\GraphQl\Type\FieldsBuilder;
 use ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\TypeConverterInterface;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\HttpCache\PurgeTagProviderInterface;
+use ApiPlatform\HttpCache\State\PurgeTagsProcessor;
 use ApiPlatform\JsonApi\Filter\SparseFieldset;
 use ApiPlatform\JsonApi\Filter\SparseFieldsetParameterProvider;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
@@ -83,6 +86,7 @@ use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
@@ -149,6 +153,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         $this->app->singleton(ParameterProvider::class, static function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
+            $tagged[ReadLinkParameterProvider::class] = new ReadLinkParameterProvider($app->make(CallableProvider::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
 
             return new ParameterProvider(
                 new ParameterValidatorProvider(
@@ -193,10 +198,23 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                 $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
             }
 
+            if (interface_exists(PurgerInterface::class) && $app->bound(PurgerInterface::class)) {
+                $purger = $app->make(PurgerInterface::class);
+                foreach ($tagged as $processor) {
+                    if ($processor instanceof PersistProcessor || $processor instanceof RemoveProcessor) {
+                        $tagged[$processor::class] = new PurgeTagsProcessor($processor, $purger, $app->tagged(PurgeTagProviderInterface::class));
+                    }
+                }
+            }
+
             return new CallableProcessor(new ServiceLocator($tagged));
         });
 
         $this->autoconfigure($classes, ProcessorInterface::class, [RemoveProcessor::class, PersistProcessor::class]);
+
+        if (interface_exists(PurgeTagProviderInterface::class)) {
+            $this->autoconfigure($classes, PurgeTagProviderInterface::class, []);
+        }
 
         $this->app->singleton(CallableProvider::class, static function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ProviderInterface::class));
@@ -326,6 +344,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         $this->app->singleton('api_platform.graphql.state_provider.parameter', static function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
+            $tagged[ReadLinkParameterProvider::class] = new ReadLinkParameterProvider($app->make(CallableProvider::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
 
             return new ParameterProvider(
                 new ParameterValidatorProvider(

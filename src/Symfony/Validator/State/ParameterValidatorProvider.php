@@ -57,11 +57,12 @@ final class ParameterValidatorProvider implements ProviderInterface
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
-                if ($uriVariable->getValue() instanceof ParameterNotFound) {
-                    $uriVariable->setValue($uriVariables[$key] ?? new ParameterNotFound());
+                $link = $uriVariable->withKey($key);
+                if ($link->getValue() instanceof ParameterNotFound) {
+                    $link = $link->withValue($uriVariables[$key] ?? new ParameterNotFound());
                 }
 
-                $parameters->add($key, $uriVariable->withKey($key));
+                $parameters->add($key, $link);
             }
         }
 

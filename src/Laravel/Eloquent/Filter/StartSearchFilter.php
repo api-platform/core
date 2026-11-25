@@ -27,8 +27,12 @@ final class StartSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        if (\is_array($values) && !array_is_list($values)) {
-            return $builder;
+        if (\is_array($values)) {
+            foreach ($values as $key => $value) {
+                if (!\is_int($key)) {
+                    return $builder;
+                }
+            }
         }
 
         $property = $this->getQueryProperty($parameter);

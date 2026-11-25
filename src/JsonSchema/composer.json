@@ -29,7 +29,7 @@
         "symfony/console": "^7.4 || ^8.0",
         "symfony/property-info": "^7.4 || ^8.0",
         "symfony/serializer": "^7.4 || ^8.0",
-        "symfony/type-info": "^7.4 || ^8.0",
+        "symfony/type-info": "^7.4.20 || ^8.1.8",
         "symfony/uid": "^7.4 || ^8.0"
     },
     "require-dev": {

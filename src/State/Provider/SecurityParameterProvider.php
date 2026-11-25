@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\ParameterParserTrait;
+use ApiPlatform\Symfony\Security\AccessDecisionAwareResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -55,11 +56,12 @@ final class SecurityParameterProvider implements ProviderInterface
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
-                if ($uriVariable->getValue() instanceof ParameterNotFound) {
-                    $uriVariable->setValue($uriVariables[$key] ?? new ParameterNotFound());
+                $link = $uriVariable->withKey($key);
+                if ($link->getValue() instanceof ParameterNotFound) {
+                    $link = $link->withValue($uriVariables[$key] ?? new ParameterNotFound());
                 }
 
-                $parameters->add($key, $uriVariable->withKey($key));
+                $parameters->add($key, $link);
             }
         }
 
@@ -103,7 +105,15 @@ final class SecurityParameterProvider implements ProviderInterface
                 $securityContext[$securityObjectName] = $request?->attributes->get($securityObjectName);
             }
 
-            if (!$this->resourceAccessChecker->isGranted($targetResource, $security, $securityContext)) {
+            $decision = null;
+            if ($this->resourceAccessChecker instanceof AccessDecisionAwareResourceAccessCheckerInterface) {
+                $decision = $this->resourceAccessChecker->decide($targetResource, $security, $securityContext);
+                $granted = $decision->isGranted;
+            } else {
+                $granted = $this->resourceAccessChecker->isGranted($targetResource, $security, $securityContext);
+            }
+
+            if (!$granted) {
                 $exception = match (true) {
                     class_exists(MetadataAccessDeniedException::class, true) => MetadataAccessDeniedException::class,
                     $operation instanceof GraphQlOperation => AccessDeniedHttpException::class,
@@ -113,7 +123,9 @@ final class SecurityParameterProvider implements ProviderInterface
 
                 $securityMessage = $parameter->getSecurityMessage();
                 if (MetadataAccessDeniedException::class === $exception) {
-                    throw new $exception($securityMessage ?? 'Access Denied.', detail: $securityMessage);
+                    $message = $securityMessage ?? ($operation instanceof GraphQlOperation ? null : $decision?->getMessage()) ?? 'Access Denied.';
+
+                    throw new $exception($message, detail: $securityMessage);
                 }
 
                 throw new $exception($securityMessage ?? 'Access Denied.');

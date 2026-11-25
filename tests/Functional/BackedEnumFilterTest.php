@@ -65,6 +65,31 @@ final class BackedEnumFilterTest extends ApiTestCase
         $this->assertEquals(IntegerBackedEnum::Two->value, $a['hydra:member'][0]['integerBackedEnum']);
     }
 
+    public function testExactFilterWithBackedEnumNativeType(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
+        $this->recreateSchema($this->getResources());
+        $this->loadFixtures();
+        $client = self::createClient();
+
+        $docs = $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']])->toArray();
+        $parameters = array_values(array_filter(
+            $docs['paths']['/backed_enum_native_type']['get']['parameters'],
+            static fn (array $parameter): bool => 'status' === $parameter['name'],
+        ));
+        $this->assertSame(array_column(StringBackedEnum::cases(), 'value'), $parameters[0]['schema']['enum']);
+
+        $members = $client->request('GET', 'backed_enum_native_type?status='.StringBackedEnum::One->value)->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertSame(StringBackedEnum::One->value, $members[0]['stringBackedEnum']);
+
+        $client->request('GET', 'backed_enum_native_type?status=nope');
+        $this->assertResponseStatusCodeSame(422);
+    }
+
     public function loadFixtures(): void
     {
         $container = static::$kernel->getContainer();

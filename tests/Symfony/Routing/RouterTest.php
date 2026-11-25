@@ -95,6 +95,22 @@ class RouterTest extends TestCase
         $this->assertEquals(['bar'], $router->match('/app_dev.php/foo'));
     }
 
+    public function testMatchKeepsContextParameters(): void
+    {
+        $context = new RequestContext('', 'GET', 'localhost', 'https');
+        $context->setParameter('_functions', 'functions');
+
+        $mockedRouter = $this->prophesize(RouterInterface::class);
+        $mockedRouter->getContext()->willReturn($context);
+        $mockedRouter->setContext(Argument::that(static fn (RequestContext $matchContext): bool => $matchContext !== $context && ['_functions' => 'functions'] === $matchContext->getParameters()))->shouldBeCalled();
+        $mockedRouter->setContext($context)->shouldBeCalled();
+        $mockedRouter->match('/foo')->willReturn(['bar']);
+
+        $router = new Router($mockedRouter->reveal());
+
+        $this->assertEquals(['bar'], $router->match('/foo'));
+    }
+
     public function testMatchDuplicatedBaseUrl(): void
     {
         $context = new RequestContext('/app', 'GET', 'localhost', 'https');

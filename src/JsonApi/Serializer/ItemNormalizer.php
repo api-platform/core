@@ -137,6 +137,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->isCacheKeySafe($context) ? $this->getCacheKey($format, $context) : false;
+        } elseif (false !== $context['cache_key'] && !$this->isCacheKeySafe($context)) {
+            $context['cache_key'] = false;
         }
 
         $normalizedData = parent::normalize($data, $format, $context);
@@ -191,6 +193,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return $document;
+    }
+
+    public function reset(): void
+    {
+        parent::reset();
+        $this->componentsCache = [];
     }
 
     protected function getAttributes(object $object, ?string $format = null, array $context = []): array
@@ -301,6 +309,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     );
 
                     $components['links'][$attribute] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
+                    $cacheKey = null;
                 }
 
                 $components['relationships'][] = $relation;
@@ -311,7 +320,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
         }
 
-        if (false !== $context['cache_key']) {
+        if ($cacheKey && false !== $context['cache_key']) {
             $this->componentsCache[$cacheKey] = $components;
         }
 

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Mcp\Tests\Fixtures;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
-use Mcp\Capability\RegistryInterface;
-
-interface ListChangePublishingRegistryInterface extends RegistryInterface
+final class MappedResourceLevelOutputDto
 {
-    public function publishesListChanges(): bool;
+    public ?int $id = null;
+
+    public string $name;
 }

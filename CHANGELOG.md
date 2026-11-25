@@ -8,6 +8,8 @@ API Platform 5.1 contains every change shipped in the v5.0.x releases, plus the 
 
 * JSON:API: a `PATCH` or `PUT` whose `data.id` does not match the endpoint now returns `409 Conflict`, as the specification requires; it used to be applied to the endpoint's resource ([#8752](https://github.com/api-platform/core/pull/8752)). With `jsonapi.strict_resource_type` enabled, a mismatched `data.type` also returns `409` on `PATCH` and `PUT`, not only on `POST`.
 * JSON:API: `jsonapi.strict_member_names` (off by default) exposes the `id` and `type` properties as `resourceId` and `resourceType` attributes instead of `_id` and `_type`, which are not valid member names, and stops renaming `links`, `relationships` and `included` ([#8752](https://github.com/api-platform/core/pull/8752)).
+* GraphQL: properties typed as a list of `bool`, `int`, `float` or `string` are now exposed as `[Boolean]`, `[Int]`, `[Float]` and `[String]` instead of the `Iterable` scalar; dictionaries and lists of other types still use `Iterable`, so schemas and clients using these fields must be updated ([#8619](https://github.com/api-platform/core/pull/8619)).
+* JSON Schema: properties typed with a PHPDoc `array{...}` shape are now documented as objects with `properties` and `required` instead of a generic object or array ([#8767](https://github.com/api-platform/core/pull/8767)).
 
 ### Breaking changes
 
@@ -31,6 +33,58 @@ API Platform 5.1 contains every change shipped in the v5.0.x releases, plus the 
 * [45dad9480](https://github.com/api-platform/core/commit/45dad94802963c8039a8a10e0b47d9ed0f82501a) fix(metadata): match parameter subclasses in Parameters lookups (#8710)
 * [2bba68f6c](https://github.com/api-platform/core/commit/2bba68f6c9dc83609759c48abdad9bc7c2880c4f) fix(openapi): document array query params once (#8638)
 * [e3fe5cd57](https://github.com/api-platform/core/commit/e3fe5cd5743ac56f3ba36daa3fc91afe2e24d734) fix(jsonld): filter @context by serializer groups (#8563)
+
+## v5.0.8
+
+### Security
+
+* [05be3e6e7](https://github.com/api-platform/core/commit/05be3e6e767888ba834de5741192bee4c5bb526f) fix(state): never write request values into cached metadata ([GHSA-xmq6-3c6q-fr8m](https://github.com/api-platform/core/security/advisories/GHSA-xmq6-3c6q-fr8m))
+* [f297e3344](https://github.com/api-platform/core/commit/f297e3344710bb6003323ecc8ffe89ded19b229f) fix(serializer): check cache key safety for embedded resources ([GHSA-w5jw-x8fm-533g](https://github.com/api-platform/core/security/advisories/GHSA-w5jw-x8fm-533g))
+
+### Bug fixes
+
+* [8d745fc81](https://github.com/api-platform/core/commit/8d745fc81ea7622c143c5826a0a8dcec6be56886) fix(serializer): reset normalizer caches between requests (#8852)
+* [f5690affd](https://github.com/api-platform/core/commit/f5690affd790439b205fc81667bea81a0e9b4cac) fix(state): map to the resource on mapped write operations (#8848)
+* [0ed92ea88](https://github.com/api-platform/core/commit/0ed92ea88a594d0da7987d3b6309158b88250ea0) fix(laravel): register ReadLinkParameterProvider (#8853)
+* [3f9a4b8e3](https://github.com/api-platform/core/commit/3f9a4b8e3fdbad940ca2cbaa7d069a4773154594) fix(jsonapi): skip cache for uriTemplate links (#8851)
+* [201b43a13](https://github.com/api-platform/core/commit/201b43a134af0d1868fa4e71002b4a5961f8ae82) fix(doctrine): avoid deprecated Type::hasType() (#8854)
+
+## v5.0.7
+
+### Notes
+
+* JSON Schema definition names no longer include a validation groups generator service id, or `none` for callable validation groups (#8843). This restores the names generated before 4.4.3/5.0.2.
+* A nullable collection of objects is now documented as `type: ["array", "null"]` (or `nullable: true` with OpenAPI 3.0) instead of `type: array` (#8845).
+* HTTP cache purgers now send every purge request and throw a single `ApiPlatform\HttpCache\Exception\PurgeFailedException` listing all failures, instead of stopping at the first one (#8592).
+
+### Security
+
+* [0dcb5ea52](https://github.com/api-platform/core/commit/0dcb5ea529aec775134524cb2a1efb48dfa8ef78) fix(mcp): support MCP SDK 0.9 on 4.4 (security advisory on 0.8) (#8837)
+
+### Features
+
+* [563cf7782](https://github.com/api-platform/core/commit/563cf778277f25c07efcfaa84a8b1c9decc132a4) feat(mcp): advertise MCP Apps extension for app resources (#8833)
+
+### Bug fixes
+
+* [bd9afeee4](https://github.com/api-platform/core/commit/bd9afeee4b11cdc40de10ceaee10c58cf9396102) fix(doctrine): document the between operator of RangeFilter in OpenAPI (#8824)
+* [8d28703f5](https://github.com/api-platform/core/commit/8d28703f5edf6d8f5ed5fe0e028dac4d492401ca) fix(doctrine): do not add an empty condition in FreeTextQueryFilter (#8817)
+* [5b9500108](https://github.com/api-platform/core/commit/5b9500108312e08b97639a3f0a75ae7479f51660) fix(doctrine): drop the unused doctrine/common requirement (#8838)
+* [12a911570](https://github.com/api-platform/core/commit/12a9115707f67a3fb1794d7a68d3d97318bad74d) fix(doctrine): support nested enum properties in IriFilter (#8821)
+* [729f17743](https://github.com/api-platform/core/commit/729f17743e599cfa768b244f2ed7090ee136c08e) fix(doctrine): throw when SortFilter has no property (#8820)
+* [66a799515](https://github.com/api-platform/core/commit/66a7995159345895c275ef3ce0dbe8ffedda9220) fix(httpcache): attempt every purge request and report all failures (#8592)
+* [0a5a8113e](https://github.com/api-platform/core/commit/0a5a8113e583cf6b3db720d77d1994e810b4184f) fix(jsonschema): ignore validation groups generator in definition name (#8843)
+* [18ae47675](https://github.com/api-platform/core/commit/18ae4767552e6b647111928b21473f56a04bac6a) fix(jsonschema): keep null on nullable collections (#8845)
+* [1d5aff07f](https://github.com/api-platform/core/commit/1d5aff07f83e996b395e0dfbb5c98a9b58cb061d) fix(laravel): do not output an empty contact and license in OpenAPI (#8828)
+* [b7a8b9c30](https://github.com/api-platform/core/commit/b7a8b9c302bb43c4b44b60a609b74be5f1eb738f) fix(laravel): filter the OpenAPI documentation with filter_tags (#8827)
+* [d4b060a16](https://github.com/api-platform/core/commit/d4b060a16c063e00d5264b351e75fc1559528822) fix(laravel): hide the GraphiQL link when GraphQL is disabled (#8830)
+* [91c650ffa](https://github.com/api-platform/core/commit/91c650ffa1dbd264c5e2d15a42375bbf3946791b) fix(laravel): pass persist_authorization to Swagger UI (#8829)
+* [54e67b643](https://github.com/api-platform/core/commit/54e67b6436afda7a2e08ed126838ccab3802d0b7) fix(metadata): incorrect property schema format for ip version=all (#8667)
+* [542776a27](https://github.com/api-platform/core/commit/542776a2737950a90d19440d8c5c2d0fed44d626) fix(mongodb): do not corrupt nested paths with a repeated association (#8822)
+* [ac5500ade](https://github.com/api-platform/core/commit/ac5500aded62f63738875464e87a8dbeb211edcb) fix(serializer): accept the IRI of an abstract discriminated resource (#8831)
+* [f40f12ff3](https://github.com/api-platform/core/commit/f40f12ff3c08a4657d42490f2f932df83822fa18) fix(serializer): read the current relation for deep_object_to_populate (#8825)
+* [d2f7a0f2e](https://github.com/api-platform/core/commit/d2f7a0f2e05206ea2bcc386351e9a83710b79d85) fix(state): ignore unresolvable IRIs in IriConverterParameterProvider (#8844)
+* [cf20162c6](https://github.com/api-platform/core/commit/cf20162c6bb0e63b6da2aaf96932ac874e00a3ff) fix(symfony): register docs and jsonld routes in api_platform_iris mode (#8745)
 
 ## v5.0.6
 
@@ -256,6 +310,16 @@ API Platform 5.0 contains every change shipped in [v4.4.0](#v440), plus the remo
 
 * `ApiPlatform\Symfony\Bundle\Test\ApiTestCase` and its helpers now live in the new `api-platform/test` package; the classes in the old namespace are deprecated and will be removed in 6.0 ([#7887](https://github.com/api-platform/core/pull/7887)).
 * Symfony `^7.4 || ^8.0`; support for `6.4` is dropped.
+
+## v4.4.8
+
+### Security
+
+* [0dcb5ea52](https://github.com/api-platform/core/commit/0dcb5ea529aec775134524cb2a1efb48dfa8ef78) fix(mcp): support MCP SDK 0.9 on 4.4 (security advisory on 0.8) (#8837)
+
+### Bug fixes
+
+* [cf20162c6](https://github.com/api-platform/core/commit/cf20162c6bb0e63b6da2aaf96932ac874e00a3ff) fix(symfony): register docs and jsonld routes in api_platform_iris mode (#8745)
 
 ## v4.4.7
 

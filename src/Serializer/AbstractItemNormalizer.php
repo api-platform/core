@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Util\CloneTrait;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -54,13 +55,14 @@ use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Base item normalizer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
+abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implements ResetInterface
 {
     use CacheKeyTrait;
     use ClassInfoTrait;
@@ -78,6 +80,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
     protected array $safeCacheKeysCache = [];
+    protected array $attributesCache = [];
     protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
 
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, protected ?OperationResourceClassResolverInterface $operationResourceResolver = null)
@@ -194,6 +197,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->isCacheKeySafe($context) ? $this->getCacheKey($format, $context) : false;
+        } elseif (false !== $context['cache_key'] && !$this->isCacheKeySafe($context)) {
+            $context['cache_key'] = false;
         }
 
         $context['object'] = $data;
@@ -261,7 +266,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if (null === $objectToPopulate = $this->extractObjectToPopulate($resourceClass, $context, static::OBJECT_TO_POPULATE)) {
+        // An IRI references an existing resource, its type is resolved when it is retrieved
+        if (null === ($objectToPopulate = $this->extractObjectToPopulate($resourceClass, $context, static::OBJECT_TO_POPULATE)) && !\is_string($data)) {
             $normalizedData = \is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
             $type = $this->getClassDiscriminatorResolvedClass($normalizedData, $type, $context);
         }
@@ -586,6 +592,33 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return true;
     }
 
+    public function reset(): void
+    {
+        $this->attributesCache = [];
+        $this->localCache = [];
+        $this->localFactoryOptionsCache = [];
+        $this->safeCacheKeysCache = [];
+    }
+
+    protected function getAttributes(object $object, ?string $format, array $context): array
+    {
+        $class = $this->getObjectClass($object);
+        $cacheKey = $context['cache_key'] ?? false;
+        $key = $class.'-'.$cacheKey;
+
+        if (isset($this->attributesCache[$key])) {
+            return $this->attributesCache[$key];
+        }
+
+        $attributes = parent::getAttributes($object, $format, ['cache_key' => false] + $context);
+
+        if ($cacheKey && \stdClass::class !== $class) {
+            $this->attributesCache[$key] = $attributes;
+        }
+
+        return $attributes;
+    }
+
     /**
      * Check if any property contains a security grant, which makes the cache key not safe,
      * as allowed_properties can differ for two instances of the same object.
@@ -641,6 +674,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
+        // symfony/serializer only reads the current value of typed attributes (https://github.com/symfony/symfony/pull/67883), and it can't type them here
+        if (!isset($context[static::OBJECT_TO_POPULATE])
+            && ($context[static::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[static::DEEP_OBJECT_TO_POPULATE] ?? false)
+            && null !== $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context))->getNativeType()
+        ) {
+            try {
+                $context[static::OBJECT_TO_POPULATE] = $this->propertyAccessor->getValue($object, $attribute);
+            } catch (NoSuchPropertyException|UninitializedPropertyException) {
+            }
+        }
+
         try {
             $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
         } catch (NotNormalizableValueException $exception) {

@@ -177,7 +177,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -895]);
+        ->tag('serializer.normalizer', ['priority' => -895])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.serializer.denormalizer.item', ItemDenormalizer::class)
         ->args([
@@ -195,7 +196,8 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
-        ->tag('serializer.normalizer', ['priority' => -894]);
+        ->tag('serializer.normalizer', ['priority' => -894])
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.normalizer.object', ObjectNormalizer::class)
         ->args([
@@ -254,7 +256,7 @@ return function (ContainerConfigurator $container) {
 
     $services->set('api_platform.symfony.iri_converter.skolem', SkolemIriConverter::class)
         ->args([service('api_platform.router')])
-        ->tag('kernel.reset', ['method' => 'reset']);
+        ->tag('kernel.reset', ['method' => '?reset']);
 
     $services->set('api_platform.api.identifiers_extractor', IdentifiersExtractor::class)
         ->args([

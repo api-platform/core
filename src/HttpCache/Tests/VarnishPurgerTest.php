@@ -13,11 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache\Tests;
 
+use ApiPlatform\HttpCache\Exception\PurgeFailedException;
 use ApiPlatform\HttpCache\VarnishPurger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -33,20 +37,20 @@ class VarnishPurgerTest extends TestCase
     public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo|/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo|/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy3 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $clientProphecy4 = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/bar)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
 
         $purger = new VarnishPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);
@@ -165,7 +169,7 @@ class VarnishPurgerTest extends TestCase
     public function testConstructor(): void
     {
         $clientProphecy = $this->prophesize(HttpClientInterface::class);
-        $clientProphecy->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
+        $clientProphecy->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)'], 'user_data' => ['ApiPlatform-Ban-Regex', '(/foo)($|\,)']])->willReturn(new MockResponse())->shouldBeCalled();
         $purger = new VarnishPurger(new RewindableGenerator(static function () use ($clientProphecy) {
             yield $clientProphecy->reveal();
         }, 1));
@@ -179,5 +183,106 @@ class VarnishPurgerTest extends TestCase
 
         $purger = new VarnishPurger([$clientProphecy->reveal()]);
         self::assertSame(['Cache-Tags' => '/foo'], $purger->getResponseHeaders(['/foo']));
+    }
+
+    /**
+     * @param array<string, list<string>> $sent
+     * @param array<string, MockResponse> $responsesByRegex
+     */
+    private function createRecordingClient(string $baseUri, array &$sent, array $responsesByRegex = []): MockHttpClient
+    {
+        return new MockHttpClient(static function (string $method, string $url, array $options) use ($baseUri, &$sent, $responsesByRegex): MockResponse {
+            $regex = substr($options['normalized_headers']['apiplatform-ban-regex'][0], \strlen('ApiPlatform-Ban-Regex: '));
+            $sent[$baseUri][] = $regex;
+
+            return $responsesByRegex[$regex] ?? new MockResponse();
+        }, $baseUri);
+    }
+
+    private function catchPurgeFailure(callable $purge): PurgeFailedException
+    {
+        try {
+            $purge();
+        } catch (PurgeFailedException $e) {
+            return $e;
+        }
+
+        $this->fail('Expected a PurgeFailedException to be thrown.');
+    }
+
+    public function testEveryClientIsBannedWhenAnEarlierClientFails(): void
+    {
+        $sent = [];
+        $clientA = $this->createRecordingClient('http://varnish-a', $sent, ['(/foo)($|\\,)' => new MockResponse('', ['http_code' => 500])]);
+        $clientB = $this->createRecordingClient('http://varnish-b', $sent);
+
+        $e = $this->catchPurgeFailure(static fn () => (new VarnishPurger([$clientA, $clientB]))->purge(['/foo']));
+
+        $this->assertSame(['(/foo)($|\\,)'], $sent['http://varnish-b']);
+        $this->assertCount(1, $e->getFailures());
+        $this->assertSame('http://varnish-a/', $e->getFailures()[0]->getUrl());
+        $this->assertSame('ApiPlatform-Ban-Regex', $e->getFailures()[0]->getHeaderName());
+        $this->assertSame('(/foo)($|\\,)', $e->getFailures()[0]->getHeaderValue());
+        $this->assertInstanceOf(ServerException::class, $e->getFailures()[0]->getException());
+    }
+
+    public function testEveryBanIsSentWhenAnEarlierBanFails(): void
+    {
+        $sent = [];
+        $failing = ['(/foo/3|/foo/4)($|\\,)' => new MockResponse('', ['http_code' => 503])];
+        $clientA = $this->createRecordingClient('http://varnish-a', $sent, $failing);
+        $clientB = $this->createRecordingClient('http://varnish-b', $sent, $failing);
+
+        $e = $this->catchPurgeFailure(static fn () => (new VarnishPurger([$clientA, $clientB], 25))->purge(['/foo/1', '/foo/2', '/foo/3', '/foo/4', '/foo/5', '/foo/6']));
+
+        $expected = ['(/foo/1|/foo/2)($|\\,)', '(/foo/3|/foo/4)($|\\,)', '(/foo/5|/foo/6)($|\\,)'];
+        $this->assertSame($expected, $sent['http://varnish-a']);
+        $this->assertSame($expected, $sent['http://varnish-b']);
+        $this->assertCount(2, $e->getFailures());
+    }
+
+    public function testATransportErrorIsABanFailure(): void
+    {
+        $sent = [];
+        $client = $this->createRecordingClient('http://varnish-a', $sent, ['(/foo)($|\\,)' => new MockResponse('', ['error' => 'Connection refused'])]);
+
+        $e = $this->catchPurgeFailure(static fn () => (new VarnishPurger([$client]))->purge(['/foo']));
+
+        $this->assertCount(1, $e->getFailures());
+        $this->assertInstanceOf(TransportException::class, $e->getFailures()[0]->getException());
+    }
+
+    public function testEveryBanFailureIsReportedWithTheFirstAsPrevious(): void
+    {
+        $sent = [];
+        $clientA = $this->createRecordingClient('http://varnish-a', $sent, ['(/foo/1|/foo/2)($|\\,)' => new MockResponse('', ['http_code' => 500])]);
+        $clientB = $this->createRecordingClient('http://varnish-b', $sent, [
+            '(/foo/1|/foo/2)($|\\,)' => new MockResponse('', ['error' => 'Connection refused']),
+            '(/foo/5|/foo/6)($|\\,)' => new MockResponse('', ['http_code' => 502]),
+        ]);
+
+        $e = $this->catchPurgeFailure(static fn () => (new VarnishPurger([$clientA, $clientB], 25))->purge(['/foo/1', '/foo/2', '/foo/3', '/foo/4', '/foo/5', '/foo/6']));
+
+        $failures = array_map(static fn ($failure): array => [$failure->getUrl(), $failure->getHeaderValue()], $e->getFailures());
+        $this->assertSame([
+            ['http://varnish-a/', '(/foo/1|/foo/2)($|\\,)'],
+            ['http://varnish-b/', '(/foo/1|/foo/2)($|\\,)'],
+            ['http://varnish-b/', '(/foo/5|/foo/6)($|\\,)'],
+        ], $failures);
+        $this->assertSame($e->getFailures()[0]->getException(), $e->getPrevious());
+        $this->assertSame('3 of 6 HTTP cache purge requests failed.', $e->getMessage());
+    }
+
+    public function testEveryBanReachesEveryClientWhenNothingFails(): void
+    {
+        $sent = [];
+        $clientA = $this->createRecordingClient('http://varnish-a', $sent);
+        $clientB = $this->createRecordingClient('http://varnish-b', $sent);
+
+        (new VarnishPurger([$clientA, $clientB], 25))->purge(['/foo/1', '/foo/2', '/foo/3', '/foo/4', '/foo/5', '/foo/6']);
+
+        $expected = ['(/foo/1|/foo/2)($|\\,)', '(/foo/3|/foo/4)($|\\,)', '(/foo/5|/foo/6)($|\\,)'];
+        $this->assertSame($expected, $sent['http://varnish-a']);
+        $this->assertSame($expected, $sent['http://varnish-b']);
     }
 }

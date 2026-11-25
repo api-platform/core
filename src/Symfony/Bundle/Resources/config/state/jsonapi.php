@@ -38,6 +38,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
             service('api_platform.jsonapi.resource_linkage_resolver'),
+            service('api_platform.name_converter')->ignoreOnInvalid(),
         ])
         ->tag('api_platform.parameter_provider', ['key' => SparseFieldsetParameterProvider::class]);
 
