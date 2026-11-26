@@ -81,19 +81,20 @@ final class ItemDenormalizer extends AbstractItemNormalizer
         $classesByName = [];
         foreach ($classes as $class) {
             foreach ($this->subtypeResolver->getTypes($class) as $typeName) {
-                $classesByName[$typeName] = $class;
+                $classesByName[$typeName][] = $class;
             }
         }
 
         foreach ($types as $typeName) {
-            if (!\is_string($typeName) || !isset($classesByName[$typeName]) || $object instanceof $classesByName[$typeName]) {
+            if (!\is_string($typeName) || !isset($classesByName[$typeName]) || array_filter($classesByName[$typeName], static fn (string $class): bool => $object instanceof $class)) {
                 continue;
             }
 
             // The map deciding between both classes is the one of their most specific common mapped parent
+            $namedClass = $classesByName[$typeName][0];
             $decidingClass = $resourceClass;
             foreach ($classes as $class) {
-                if ($object instanceof $class && is_a($classesByName[$typeName], $class, true) && is_a($class, $decidingClass, true) && null !== $this->subtypeResolver->getMapping($class)) {
+                if ($object instanceof $class && is_a($namedClass, $class, true) && is_a($class, $decidingClass, true) && null !== $this->subtypeResolver->getMapping($class)) {
                     $decidingClass = $class;
                 }
             }
