@@ -41,6 +41,10 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
             return $propertyMetadata;
         }
 
+        if (!class_exists($resourceClass) && !interface_exists($resourceClass)) {
+            return $propertyMetadata;
+        }
+
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager) {
             return $propertyMetadata;

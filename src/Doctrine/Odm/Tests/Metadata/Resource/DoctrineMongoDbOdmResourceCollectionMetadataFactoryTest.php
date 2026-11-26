@@ -71,6 +71,25 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $this->assertNull($resourceMetadataCollection->getOperation('graphql_get')->getProvider());
     }
 
+    public function testResourceNotBeingAClass(): void
+    {
+        if (!class_exists(DocumentManager::class)) {
+            $this->markTestSkipped('ODM not installed');
+        }
+
+        /** @var class-string $resourceClass resource identified by a name which is not a class */
+        $resourceClass = 'DynamicFaq'; // @phpstan-ignore varTag.nativeType
+        $operation = (new Get())->withClass($resourceClass)->withName('get');
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass($resourceClass)->shouldNotBeCalled();
+
+        $resourceMetadataCollectionFactory = new DoctrineMongoDbOdmResourceCollectionMetadataFactory($managerRegistry->reveal(), $this->getResourceMetadataCollectionFactory($operation));
+        $resourceMetadataCollection = $resourceMetadataCollectionFactory->create($resourceClass);
+
+        $this->assertNull($resourceMetadataCollection->getOperation('get')->getProvider());
+        $this->assertNull($resourceMetadataCollection->getOperation('graphql_get')->getProvider());
+    }
+
     #[DataProvider('operationProvider')]
     public function testWithProvider(HttpOperation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {

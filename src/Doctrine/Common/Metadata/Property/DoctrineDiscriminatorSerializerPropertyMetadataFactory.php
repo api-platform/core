@@ -107,6 +107,10 @@ final class DoctrineDiscriminatorSerializerPropertyMetadataFactory implements Pr
      */
     private function getDiscriminatorSubclasses(string $resourceClass): array
     {
+        if (!class_exists($resourceClass) && !interface_exists($resourceClass)) {
+            return [];
+        }
+
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $manager) {
             return [];

@@ -44,6 +44,11 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException) {
+            // Resource identified by a name rather than a class: there are no filter attributes to read
+            if (\count($resourceMetadataCollection) > 0) {
+                return $resourceMetadataCollection;
+            }
+
             throw new ResourceClassNotFoundException(\sprintf('Resource "%s" not found.', $resourceClass));
         }
 

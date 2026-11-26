@@ -41,6 +41,10 @@ final class DoctrineMongoDbOdmPropertyMetadataFactory implements PropertyMetadat
             return $propertyMetadata;
         }
 
+        if (!class_exists($resourceClass) && !interface_exists($resourceClass)) {
+            return $propertyMetadata;
+        }
+
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
             return $propertyMetadata;
