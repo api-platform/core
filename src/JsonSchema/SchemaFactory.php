@@ -22,8 +22,9 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
@@ -51,8 +52,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
     public const PARTIAL_UPDATE = 'partial_update';
+    private const DISCRIMINATOR_UPDATE = 'discriminator_update';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?SubtypeResolverInterface $subtypeResolver = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -83,6 +85,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
         }
 
+        $discriminatorUpdate = $serializerContext[self::DISCRIMINATOR_UPDATE] ?? null;
+        unset($serializerContext[self::DISCRIMINATOR_UPDATE]);
+
         if (null === $inputOrOutputClass) {
             // input or output disabled
             return $schema;
@@ -101,8 +106,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        $isJsonMergePatch = 'json' === $format && 'PATCH' === $method && Schema::TYPE_INPUT === $type;
-        $isNonStandardPut = Schema::TYPE_INPUT === $type && 'PUT' === $method && !($operation?->getExtraProperties()['standard_put'] ?? true);
+        $isJsonMergePatch = 'merge-patch' === $discriminatorUpdate || ('json' === $format && 'PATCH' === $method && Schema::TYPE_INPUT === $type);
+        $isNonStandardPut = 'partial' === $discriminatorUpdate || (Schema::TYPE_INPUT === $type && 'PUT' === $method && !($operation?->getExtraProperties()['standard_put'] ?? true));
         $isPartialUpdate = $isJsonMergePatch || $isNonStandardPut;
         $definitionFormat = match (true) {
             default => $format,
@@ -127,6 +132,21 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $definitions = $schema->getDefinitions();
         if (isset($definitions[$definitionName])) {
             // Already computed
+            return $schema;
+        }
+
+        $mapping = Schema::VERSION_SWAGGER !== $version ? $this->classDiscriminatorResolver?->getMappingForClass($inputOrOutputClass) : null;
+        $subtypes = $mapping ? $this->getDirectSubtypes($mapping, $inputOrOutputClass) : [];
+        $hasOwnBranch = $subtypes && [] !== array_keys($mapping->getTypesMapping(), $inputOrOutputClass, true);
+        $subtypeContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, self::DISCRIMINATOR_UPDATE => match (true) {
+            $isJsonMergePatch => 'merge-patch',
+            $isPartialUpdate => 'partial',
+            default => null,
+        }];
+
+        if ($subtypes && !$hasOwnBranch) {
+            $this->buildDiscriminatorDefinition($schema, $definitionName, $inputOrOutputClass, $mapping, $subtypes, false, $format, $type, $subtypeContext, $serializerContext);
+
             return $schema;
         }
 
@@ -158,136 +178,137 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups);
-        $this->buildDefinitionProperties($schema, $definition, $definitionName, $inputOrOutputClass, $options, $serializerContext, $format, $type, $isPartialUpdate);
-
-        $this->buildDiscriminatedDefinitions($schema, $definition, $className, $inputOrOutputClass, $definitionFormat, $operation, $options, $serializerContext, $serializerContext + [
-            'schema_type' => $type,
-            self::PARTIAL_UPDATE => $isPartialUpdate && !$isJsonMergePatch,
-        ], $format, $type, $isPartialUpdate);
-
-        return $schema;
-    }
-
-    /**
-     * @param \ArrayObject<string, mixed> $definition
-     */
-    private function buildDefinitionProperties(Schema $schema, \ArrayObject $definition, string $definitionName, string $class, array $options, array $serializerContext, string $format, string $type, bool $isPartialUpdate): void
-    {
-        foreach ($this->propertyNameCollectionFactory->create($class, $options) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($class, $propertyName, $options);
+        foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
 
             if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
                 continue;
             }
 
-            $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $class, $format, $serializerContext) : $propertyName;
+            $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
             if ($propertyMetadata->isRequired() && !$isPartialUpdate) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 
             $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
+
+        $this->addDiscriminatorProperties($definition, $inputOrOutputClass, $format, $serializerContext, $isPartialUpdate);
+
+        if ($hasOwnBranch) {
+            $this->buildDiscriminatorDefinition($schema, $definitionName, $inputOrOutputClass, $mapping, $subtypes, true, $format, $type, $subtypeContext, $serializerContext);
+        }
+
+        return $schema;
     }
 
     /**
-     * @param \ArrayObject<string, mixed>         $definition
-     * @param array<string, array<string, mixed>> $parentTypeProperties type properties of the outer discriminator maps the class belongs to
+     * @param array<string, class-string> $subtypes
      */
-    private function buildDiscriminatedDefinitions(Schema $schema, \ArrayObject $definition, string $className, string $class, string $definitionFormat, ?Operation $operation, array $options, array $serializerContext, array $definitionNameContext, string $format, string $type, bool $isPartialUpdate, array $parentTypeProperties = []): void
+    private function buildDiscriminatorDefinition(Schema $schema, string $definitionName, string $class, ClassDiscriminatorMapping $mapping, array $subtypes, bool $hasOwnBranch, string $format, string $type, array $subtypeContext, array $serializerContext): void
     {
-        if (null === $this->subtypeResolver || null === $mapping = $this->subtypeResolver->getMapping($class)) {
-            return;
-        }
-
-        $typeProperty = $mapping->getTypeProperty();
+        $version = $schema->getVersion();
+        $prefix = $this->getSchemaUriPrefix($version);
         $definitions = $schema->getDefinitions();
-        $prefix = $this->getSchemaUriPrefix($schema->getVersion());
-        $discriminatorMapping = [];
-        $oneOf = [];
+        /** @var \ArrayObject<string, mixed> $definition */
+        $definition = $definitions[$definitionName] ?? new \ArrayObject();
 
-        foreach ($this->subtypeResolver->getDirectSubtypes($class) as $typeValue => $subClass) {
-            $subDefinitionName = $this->definitionNameFactory->create($className, $definitionFormat, $subClass, $operation, $definitionNameContext);
-            $discriminatorMapping[$typeValue] = $oneOf[]['$ref'] = $prefix.$subDefinitionName;
-
-            if (isset($definitions[$subDefinitionName])) {
-                continue;
+        $oneOf = $refs = [];
+        if ($hasOwnBranch) {
+            $ownKeywords = array_flip(['type', 'properties', 'required', 'additionalProperties']);
+            $oneOf[] = array_intersect_key($definition->getArrayCopy(), $ownKeywords);
+            $definition->exchangeArray(array_diff_key($definition->getArrayCopy(), $ownKeywords));
+            foreach (array_keys($mapping->getTypesMapping(), $class, true) as $typeValue) {
+                $refs[(string) $typeValue] = $prefix.$definitionName;
             }
+        } else {
+            $definition->exchangeArray([]);
+        }
 
-            /** @var \ArrayObject<string, mixed> $subDefinition */
-            $subDefinition = new \ArrayObject(['type' => 'object']);
-            $definitions[$subDefinitionName] = $subDefinition;
-            if (isset($definition['additionalProperties'])) {
-                $subDefinition['additionalProperties'] = $definition['additionalProperties'];
+        // registered before recursing so that a subclass referencing its parent does not loop
+        $definitions[$definitionName] = $definition;
+
+        $branches = [];
+        foreach ($subtypes as $typeValue => $subtype) {
+            $subSchema = new Schema($version);
+            $subSchema->setDefinitions($definitions);
+            $result = ($this->schemaFactory ?: $this)->buildSchema($subtype, $format, $type, null, $subSchema, $subtypeContext);
+
+            if (isset($result['$ref'])) {
+                $branches[$result['$ref']] = ['$ref' => $result['$ref']];
+                $refs[$typeValue] = $result['$ref'];
             }
-
-            $this->buildDefinitionProperties($schema, $subDefinition, $subDefinitionName, $subClass, $options, $serializerContext, $format, $type, $isPartialUpdate);
-
-            // The type properties of the outer maps are part of the payload of a nested subtype too
-            $typeProperties = $parentTypeProperties + [$typeProperty => ['type' => 'string', 'enum' => [(string) $typeValue]]];
-            $this->addTypeProperties($subDefinition, $typeProperties, $isPartialUpdate);
-
-            $this->buildDiscriminatedDefinitions($schema, $subDefinition, $className, $subClass, $definitionFormat, $operation, $options, $serializerContext, $definitionNameContext, $format, $type, $isPartialUpdate, $typeProperties);
         }
 
-        $ownTypeValues = array_map(strval(...), array_keys($mapping->getTypesMapping(), $class, true));
-        foreach ($ownTypeValues as $typeValue) {
-            $discriminatorMapping[$typeValue] = $prefix.$this->definitionNameFactory->create($className, $definitionFormat, $class, $operation, $definitionNameContext);
-        }
-
-        if (!$discriminatorMapping) {
-            return;
-        }
-
-        if ($oneOf) {
-            // An instance of the class itself is described by its own branch, without the subtype properties
-            if ($ownTypeValues) {
-                $ownBranch = new \ArrayObject(['type' => 'object']);
-                foreach (['properties', 'required', 'additionalProperties'] as $keyword) {
-                    if (isset($definition[$keyword])) {
-                        $ownBranch[$keyword] = $definition[$keyword];
-                    }
-                }
-
-                $this->addTypeProperties($ownBranch, [$typeProperty => ['type' => 'string', 'enum' => $ownTypeValues]], $isPartialUpdate || \in_array($mapping->getDefaultType(), $ownTypeValues, true));
-                array_unshift($oneOf, $ownBranch->getArrayCopy());
-            }
-
-            $definition['oneOf'] = $oneOf;
-
-            // Every branch carries the common properties: they are not repeated next to "oneOf"
-            // "additionalProperties" ignores the properties declared in the "oneOf" branches, they are restricted by the branches instead
-            unset($definition['properties'], $definition['required'], $definition['additionalProperties']);
-        }
-
-        if ($ownTypeValues && !$oneOf && !isset($definition['properties'][$typeProperty])) {
-            $this->addTypeProperties($definition, [$typeProperty => ['type' => 'string', 'enum' => $ownTypeValues]], $isPartialUpdate || \in_array($mapping->getDefaultType(), $ownTypeValues, true));
-        }
-
-        // "discriminator" is an OpenAPI keyword, plain JSON Schema relies on the "enum" of the type property in every branch
-        if (Schema::VERSION_OPENAPI === $schema->getVersion()) {
-            $definition['discriminator'] = ['propertyName' => $typeProperty, 'mapping' => $discriminatorMapping];
+        $definition['oneOf'] = [...$oneOf, ...array_values($branches)];
+        if (Schema::VERSION_OPENAPI === $version) {
+            $definition['discriminator'] = ['propertyName' => $this->normalizeTypeProperty($mapping->getTypeProperty(), $class, $format, $serializerContext), 'mapping' => $refs];
         }
     }
 
     /**
-     * @param \ArrayObject<string, mixed>         $definition
-     * @param array<string, array<string, mixed>> $typeProperties
+     * @return array<string, class-string> the strict subclasses declared in the map, indexed by type value
      */
-    private function addTypeProperties(\ArrayObject $definition, array $typeProperties, bool $optional): void
+    private function getDirectSubtypes(ClassDiscriminatorMapping $mapping, string $class): array
     {
-        $properties = $definition['properties'] ?? [];
-        $required = $definition['required'] ?? [];
-        foreach ($typeProperties as $name => $typePropertySchema) {
-            $properties[$name] = $typePropertySchema;
-            if (!$optional && !\in_array($name, $required, true)) {
-                $required[] = $name;
+        $subtypes = [];
+        foreach ($mapping->getTypesMapping() as $typeValue => $typeClass) {
+            if ($typeClass !== $class && is_a($typeClass, $class, true)) {
+                $subtypes[(string) $typeValue] = $typeClass;
             }
         }
 
-        $definition['properties'] = $properties;
-        if ($required) {
-            $definition['required'] = $required;
+        return $subtypes;
+    }
+
+    /**
+     * @param \ArrayObject<string, mixed> $definition
+     */
+    private function addDiscriminatorProperties(\ArrayObject $definition, string $class, string $format, array $serializerContext, bool $isPartialUpdate): void
+    {
+        foreach ($this->getDiscriminatorTypes($class) as $typeProperty => ['values' => $values, 'required' => $required]) {
+            $name = $this->normalizeTypeProperty($typeProperty, $class, $format, $serializerContext);
+            $definition['properties'][$name] = ['type' => 'string', 'enum' => $values];
+            if ($required && !$isPartialUpdate && !\in_array($name, $definition['required'] ?? [], true)) {
+                $definition['required'][] = $name;
+            }
         }
+    }
+
+    /**
+     * The type properties of every discriminator map the class is declared in, from the nearest map to the outer ones.
+     *
+     * @return array<string, array{values: non-empty-list<string>, required: bool}>
+     */
+    private function getDiscriminatorTypes(string $class): array
+    {
+        $types = [];
+        $mapped = $from = $class;
+        while ($this->classDiscriminatorResolver && null !== $from && $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($from)) {
+            $declaring = $from;
+            while (false !== $declaring && $this->classDiscriminatorResolver->getMappingForClass($declaring) !== $mapping) {
+                $declaring = get_parent_class($declaring);
+            }
+
+            $values = array_map(strval(...), array_keys($mapping->getTypesMapping(), $mapped, true));
+            if (!$values && null !== $value = $mapping->getMappedObjectType($mapped)) {
+                $values = [$value];
+            }
+
+            if ($values) {
+                $types[$mapping->getTypeProperty()] ??= ['values' => $values, 'required' => null === $mapping->getDefaultType() || !array_intersect($values, [$mapping->getDefaultType()])];
+            }
+
+            $mapped = $declaring;
+            $from = false === $declaring ? null : (get_parent_class($declaring) ?: null);
+        }
+
+        return $types;
+    }
+
+    private function normalizeTypeProperty(string $typeProperty, string $class, string $format, array $serializerContext): string
+    {
+        return $this->nameConverter ? $this->nameConverter->normalize($typeProperty, $class, $format, $serializerContext) : $typeProperty;
     }
 
     private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void

@@ -352,29 +352,29 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertSame([
             'propertyName' => 'kind',
             'mapping' => [
-                'car' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedCar.jsonld',
-                'truck' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedTruck.jsonld',
-                'bike' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedBike.jsonld',
-                'bus' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedBus.jsonld',
+                'car' => '#/components/schemas/DiscriminatedCar.jsonld',
+                'truck' => '#/components/schemas/DiscriminatedTruck.jsonld',
+                'bike' => '#/components/schemas/DiscriminatedBike.jsonld',
+                'bus' => '#/components/schemas/DiscriminatedBus.jsonld',
             ],
         ], $output['discriminator']);
         $this->assertCount(4, $output['oneOf']);
         $this->assertArrayNotHasKey('properties', $output);
 
-        $truck = $schemas['DiscriminatedVehicle.DiscriminatedTruck.jsonld'];
+        $truck = $schemas['DiscriminatedTruck.jsonld'];
         $this->assertSame(['type' => 'string', 'enum' => ['truck']], $truck['properties']['kind']);
         $this->assertArrayHasKey('payload', $truck['properties']);
         $this->assertSame(5, $truck['properties']['name']['minLength']);
-        $this->assertArrayNotHasKey('minLength', $schemas['DiscriminatedVehicle.DiscriminatedCar.jsonld']['properties']['name']);
+        $this->assertArrayNotHasKey('minLength', $schemas['DiscriminatedCar.jsonld']['properties']['name']);
 
         // The nested map lists the bike itself: an instance of the bike is described by an inline branch
-        $bike = $schemas['DiscriminatedVehicle.DiscriminatedBike.jsonld'];
+        $bike = $schemas['DiscriminatedBike.jsonld'];
         $this->assertSame('frame', $bike['discriminator']['propertyName']);
         $this->assertSame(['type' => 'string', 'enum' => ['bike']], $bike['oneOf'][0]['properties']['frame']);
-        $this->assertSame(['$ref' => '#/components/schemas/DiscriminatedVehicle.DiscriminatedMountainBike.jsonld'], $bike['oneOf'][1]);
+        $this->assertSame(['$ref' => '#/components/schemas/DiscriminatedMountainBike.jsonld'], $bike['oneOf'][1]);
 
         // Unmapped subclasses are never documented
-        $this->assertArrayNotHasKey('DiscriminatedVehicle.DiscriminatedSportsCar.jsonld', $schemas);
+        $this->assertArrayNotHasKey('DiscriminatedSportsCar.jsonld', $schemas);
     }
 
     public function testHydraDocumentsSubtypesAsSubclasses(): void
