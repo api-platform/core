@@ -225,7 +225,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $this->routeCollection = $this->router->getRouteCollection();
             }
 
-            if ($this->routeCollection && $routeName && $route = $this->routeCollection->get($routeName)) {
+            $extraProperties = $operation->getExtraProperties();
+            if ($operation->getRouteName() && ($extraProperties['user_defined_uri_template'] ?? false) && true === ($extraProperties['openapi_use_uri_template'] ?? false)) {
+                $path = rtrim($operation->getRoutePrefix() ?? '', '/').'/'.ltrim($operation->getUriTemplate() ?? '', '/');
+            } elseif ($this->routeCollection && $routeName && $route = $this->routeCollection->get($routeName)) {
                 $path = $route->getPath();
             } else {
                 $path = rtrim($operation->getRoutePrefix() ?? '', '/').'/'.ltrim($operation->getUriTemplate() ?? '', '/');
@@ -309,6 +312,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $openapiParameters = $openapiOperation->getParameters();
             foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariable) {
                 if ($uriVariable->getExpandedValue() ?? false) {
+                    continue;
+                }
+
+                if (!str_contains($path, '{'.$parameterName.'}')) {
                     continue;
                 }
 

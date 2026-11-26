@@ -25,6 +25,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\State\ResourceObjectResolver;
+use ApiPlatform\State\ResourceObjectResolverInterface;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
@@ -50,6 +52,7 @@ final class PurgeHttpCacheListener implements ResetInterface
 {
     use ClassInfoTrait;
     private readonly PropertyAccessorInterface $propertyAccessor;
+    private readonly ResourceObjectResolverInterface $resourceObjectResolver;
     private array $tags = [];
 
     private array $scheduledInsertions = [];
@@ -60,9 +63,11 @@ final class PurgeHttpCacheListener implements ResetInterface
         ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ObjectMapperInterface $objectMapper = null,
         private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null,
-        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ResourceObjectResolverInterface $resourceObjectResolver = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
+        $this->resourceObjectResolver = $resourceObjectResolver ?? new ResourceObjectResolver($resourceClassResolver, $objectMapper, $objectMapperMetadata);
     }
 
     /**
@@ -155,16 +160,16 @@ final class PurgeHttpCacheListener implements ResetInterface
         $resources = $this->getResourcesForEntity($entity);
 
         foreach ($resources as $resource) {
-            try {
-                foreach ($this->getCollectionOperations($resource) as $operation) {
+            foreach ($this->getCollectionOperations($resource) as $operation) {
+                try {
                     $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, $operation);
                     $this->tags[$iri] = $iri;
+                } catch (OperationNotFoundException|InvalidArgumentException) {
                 }
+            }
 
-                if ($purgeItem) {
-                    $this->addTagForItem($entity);
-                }
-            } catch (OperationNotFoundException|InvalidArgumentException) {
+            if ($purgeItem) {
+                $this->addTagForItem($entity);
             }
         }
     }
@@ -183,10 +188,6 @@ final class PurgeHttpCacheListener implements ResetInterface
         foreach ($this->resourceMetadataCollectionFactory->create($this->getObjectClass($resource)) as $apiResource) {
             foreach ($apiResource->getOperations() ?? [] as $operation) {
                 if (!$operation instanceof CollectionOperationInterface || !$operation instanceof HttpOperation) {
-                    continue;
-                }
-
-                if (!empty($operation->getUriVariables())) {
                     continue;
                 }
 
@@ -366,44 +367,11 @@ final class PurgeHttpCacheListener implements ResetInterface
         }
     }
 
-    private function getResourcesForEntity(object $entity): array
+    /**
+     * @return iterable<object>
+     */
+    private function getResourcesForEntity(object $entity): iterable
     {
-        $resources = [];
-
-        if (!$this->resourceClassResolver->isResourceClass($class = $this->getObjectClass($entity))) {
-            // is the entity mapped to resource(s)?
-            if (!$this->objectMapper) {
-                return [];
-            }
-
-            if ($this->objectMapperMetadata) {
-                $mappings = $this->objectMapperMetadata->create($entity);
-
-                if (!$mappings) {
-                    return [];
-                }
-
-                $resources = array_map(
-                    fn ($mapping) => $this->objectMapper->map($entity, $mapping->target),
-                    $mappings
-                );
-            } else {
-                $mapAttributes = (new \ReflectionClass($class))->getAttributes(Map::class);
-
-                if (!$mapAttributes) {
-                    return [];
-                }
-
-                // loop over all mappings to fetch all resources mapped to this entity
-                $resources = array_map(
-                    fn ($mapAttribute) => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
-                    $mapAttributes
-                );
-            }
-        } else {
-            $resources[] = $entity;
-        }
-
-        return $resources;
+        return $this->resourceObjectResolver->resolve($entity);
     }
 }

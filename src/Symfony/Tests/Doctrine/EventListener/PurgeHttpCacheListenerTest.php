@@ -207,7 +207,7 @@ class PurgeHttpCacheListenerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Argument::type(DummyNoGetOperation::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willThrow(new InvalidArgumentException())->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($dummyNoGetOperation)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummyNoGetOperation)->willThrow(new InvalidArgumentException())->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(DummyNoGetOperation::class)->willReturn(true)->shouldBeCalled();
@@ -424,7 +424,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->postFlush();
     }
 
-    public function testPreUpdateSkipsCollectionOperationsWithUriVariables(): void
+    public function testPreUpdatePurgesCollectionOperationsWithUriVariables(): void
     {
         $dummy = new Dummy();
         $dummy->setId(1);
@@ -443,14 +443,18 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purger->expects($this->once())->method('purge')->with($this->callback(static function (array $tags): bool {
             sort($tags);
 
-            return ['/dummies', '/dummies/1'] === $tags;
+            return ['/dummies', '/dummies/1', '/related_dummies/1/dummies'] === $tags;
         }));
 
         $iriConverter = $this->createMock(IriConverterInterface::class);
-        $iriConverter->expects($this->exactly(2))->method('getIriFromResource')->willReturnCallback(
-            static function (object $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null) use ($getCollection): string {
+        $iriConverter->expects($this->exactly(3))->method('getIriFromResource')->willReturnCallback(
+            static function (object $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null) use ($getCollection, $getSubresourceCollection): string {
                 if ($operation === $getCollection) {
                     return '/dummies';
+                }
+
+                if ($operation === $getSubresourceCollection) {
+                    return '/related_dummies/1/dummies';
                 }
 
                 return '/dummies/1';

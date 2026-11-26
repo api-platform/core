@@ -231,4 +231,16 @@ final class DefinitionNameFactoryTest extends TestCase
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, shortName: 'DummyClass'))
         );
     }
+
+    public function testResetClearsShortNamePrefixCache(): void
+    {
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $this->assertSame('Thing', $definitionNameFactory->create(InputThingCreate::class, 'json', null, new Get(class: InputThingCreate::class, shortName: 'Thing')));
+        $this->assertNotSame('Thing', $definitionNameFactory->create(OutputThingCreate::class, 'json', null, new Get(class: OutputThingCreate::class, shortName: 'Thing')));
+
+        $definitionNameFactory->reset();
+
+        $this->assertSame('Thing', $definitionNameFactory->create(OutputThingCreate::class, 'json', null, new Get(class: OutputThingCreate::class, shortName: 'Thing')));
+    }
 }

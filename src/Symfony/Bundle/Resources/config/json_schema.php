@@ -53,5 +53,6 @@ return static function (ContainerConfigurator $container) {
         ->decorate('api_platform.json_schema.schema_factory', null, -2)
         ->args([service('api_platform.json_schema.backward_compatible_schema_factory.inner')]);
 
-    $services->set('api_platform.json_schema.definition_name_factory', DefinitionNameFactory::class);
+    $services->set('api_platform.json_schema.definition_name_factory', DefinitionNameFactory::class)
+        ->tag('kernel.reset', ['method' => 'reset']);
 };

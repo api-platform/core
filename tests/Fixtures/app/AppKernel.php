@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
+use ApiPlatform\Tests\Fixtures\TestBundle\RuntimeResource\RuntimeResourceBundle;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\Command\Proxy\ValidateSchemaCommand;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
@@ -56,6 +57,7 @@ class AppKernel extends Kernel
     use MicroKernelTrait;
 
     private $genIdDefault;
+    private bool $runtimeResources;
 
     public function __construct(string $environment, bool $debug, ?bool $genIdDefault = null)
     {
@@ -63,6 +65,7 @@ class AppKernel extends Kernel
 
         $this->environment = $_SERVER['APP_ENV'] ?? $environment;
         $this->genIdDefault = $genIdDefault ?? $_SERVER['GEN_ID_DEFAULT'] ?? null;
+        $this->runtimeResources = (bool) ($_SERVER['RUNTIME_RESOURCES'] ?? false);
     }
 
     public function registerBundles(): array
@@ -88,6 +91,10 @@ class AppKernel extends Kernel
 
         $bundles[] = new TestBundle();
 
+        if ($this->runtimeResources) {
+            $bundles[] = new RuntimeResourceBundle();
+        }
+
         return $bundles;
     }
 
@@ -98,18 +105,22 @@ class AppKernel extends Kernel
 
     public function getCacheDir(): string
     {
-        return parent::getCacheDir().(null !== $this->genIdDefault ? '_gen_id_'.$this->genIdDefault : '');
+        return parent::getCacheDir().(null !== $this->genIdDefault ? '_gen_id_'.$this->genIdDefault : '').($this->runtimeResources ? '_runtime_resources' : '');
     }
 
     protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
+        if ($this->runtimeResources) {
+            $routes->import(__DIR__.'/config/routing_runtime_resources.yml');
+        }
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->setParameter('kernel.project_dir', __DIR__);
         $c->setParameter('app.gen_id_default', $this->genIdDefault);
+        $c->setParameter('app.runtime_resources_controller', ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false) ? 'api_platform.action.placeholder' : 'api_platform.symfony.main_controller');
         $c->setParameter('app.security.admin_only', 'is_granted("ROLE_ADMIN")');
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
@@ -317,6 +328,11 @@ class AppKernel extends Kernel
         // We reduce the amount of resources to the strict minimum to speed up tests
         if (null !== ($_ENV['APP_PHPUNIT'] ?? null)) {
             $loader->load(__DIR__.'/config/phpunit.yml');
+        }
+
+        if ($this->runtimeResources) {
+            $loader->load(__DIR__.'/config/config_runtime_resources.yml');
+            $loader->load(__DIR__.'/config/config_runtime_resources_'.('mongodb' === $this->environment ? 'odm' : 'orm').'.yml');
         }
 
         if ('mongodb' === $this->environment) {

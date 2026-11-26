@@ -199,3 +199,25 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			path: tests/Symfony/Bundle/Command/DebugResourceCommandTest.php
 			reportUnmatched: false
+
+		# Runtime resource example services are registered only by the runtime_resources test kernel configs
+		-
+			message: '#Service "ApiPlatform\\Tests\\Fixtures\\TestBundle\\RuntimeResource\\DefinitionProvider" is not registered in the container\.#'
+			identifier: symfonyContainer.serviceNotFound
+			path: tests/Functional/RuntimeResourceEavTest.php
+			count: 4
+		-
+			message: '#Service "ApiPlatform\\Tests\\Fixtures\\TestBundle\\RuntimeResource\\RuntimeResources" is not registered in the container\.#'
+			identifier: symfonyContainer.serviceNotFound
+			path: tests/Functional/RuntimeResourceEavTest.php
+			count: 2
+		-
+			message: '#Service "ApiPlatform\\Tests\\Fixtures\\TestBundle\\RuntimeResource\\DefinitionProvider" is not registered in the container\.#'
+			identifier: symfonyContainer.serviceNotFound
+			path: tests/Functional/RuntimeResourceMongoDbTest.php
+			count: 4
+		-
+			message: '#Service "ApiPlatform\\Tests\\Fixtures\\TestBundle\\RuntimeResource\\RuntimeResources" is not registered in the container\.#'
+			identifier: symfonyContainer.serviceNotFound
+			path: tests/Functional/RuntimeResourceMongoDbTest.php
+			count: 2

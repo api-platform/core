@@ -20,6 +20,8 @@ use ApiPlatform\State\ObjectProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Provider\BackedEnumProvider;
+use ApiPlatform\State\ResourceObjectResolver;
+use ApiPlatform\State\ResourceObjectResolverInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -84,4 +86,13 @@ return static function (ContainerConfigurator $container) {
     $services->set('api_platform.state_provider.backed_enum', BackedEnumProvider::class)
         ->tag('api_platform.state_provider', ['key' => 'ApiPlatform\State\Provider\BackedEnumProvider'])
         ->tag('api_platform.state_provider', ['key' => 'api_platform.state_provider.backed_enum']);
+
+    $services->set('api_platform.state.resource_object_resolver', ResourceObjectResolver::class)
+        ->args([
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.object_mapper')->nullOnInvalid(),
+            service('api_platform.object_mapper.metadata_factory')->nullOnInvalid(),
+        ]);
+
+    $services->alias(ResourceObjectResolverInterface::class, 'api_platform.state.resource_object_resolver');
 };

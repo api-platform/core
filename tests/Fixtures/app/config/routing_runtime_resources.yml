@@ -1,0 +1,13 @@
+runtime_collection:
+    path: /runtime/{resource}
+    methods: [GET, HEAD, POST]
+    controller: '%app.runtime_resources_controller%'
+    defaults: { _format: null }
+    requirements: { resource: '[a-z][a-z0-9]{0,63}' }
+
+runtime_item:
+    path: /runtime/{resource}/{id}
+    methods: [GET, HEAD, PUT, PATCH, DELETE]
+    controller: '%app.runtime_resources_controller%'
+    defaults: { _format: null }
+    requirements: { resource: '[a-z][a-z0-9]{0,63}', id: '\d+' }

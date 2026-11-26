@@ -1021,9 +1021,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_mercure_publisher.php');
+            if ($config['mercure']['resolve_resource_objects']) {
+                $container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->setArgument('$resourceObjectResolver', new Reference('api_platform.state.resource_object_resolver'));
+            }
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             $loader->load('doctrine_odm_mercure_publisher.php');
+            if ($config['mercure']['resolve_resource_objects']) {
+                $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument('$resourceObjectResolver', new Reference('api_platform.state.resource_object_resolver'));
+            }
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {

@@ -18,6 +18,7 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCo
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -59,5 +60,8 @@ final class PropertySchemaCountRestrictionTest extends TestCase
         yield 'min items' => [new Count(min: 1), new ApiProperty(), ['minItems' => 1]];
         yield 'max items' => [new Count(max: 10), new ApiProperty(), ['maxItems' => 10]];
         yield 'min/max items' => [new Count(min: 1, max: 10), new ApiProperty(), ['minItems' => 1, 'maxItems' => 10]];
+        yield 'list items' => [new Count(min: 1, max: 10), (new ApiProperty())->withNativeType(Type::list(Type::string())), ['minItems' => 1, 'maxItems' => 10]];
+        yield 'string-keyed map properties' => [new Count(min: 1, max: 3), (new ApiProperty())->withNativeType(Type::array(Type::mixed(), Type::string())), ['minProperties' => 1, 'maxProperties' => 3]];
+        yield 'nullable string-keyed map properties' => [new Count(max: 3), (new ApiProperty())->withNativeType(Type::nullable(Type::array(Type::mixed(), Type::string()))), ['maxProperties' => 3]];
     }
 }

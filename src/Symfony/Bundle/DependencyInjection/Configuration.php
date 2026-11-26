@@ -453,6 +453,10 @@ final class Configuration implements ConfigurationInterface
                             ->defaultFalse()
                             ->info('Always include @type in updates (including delete ones).')
                         ->end()
+                        ->booleanNode('resolve_resource_objects')
+                            ->defaultFalse()
+                            ->info('Publish one update per resource exposing the persisted object (e.g. resources using stateOptions), resolved by api_platform.state.resource_object_resolver.')
+                        ->end()
                     ->end()
                 ->end()
             ->end();

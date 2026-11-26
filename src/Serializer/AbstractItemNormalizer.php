@@ -76,6 +76,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public const SKIP_NULL_TO_ONE_RELATIONS = 'skip_null_to_one_relations';
 
+    public const MERGE_PATCH_MAPS = 'api_merge_patch_maps';
+
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
@@ -674,6 +676,23 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
+        if (\is_array($value)
+            && ($context[self::MERGE_PATCH_MAPS] ?? $this->defaultContext[self::MERGE_PATCH_MAPS] ?? false)
+            && ($context['api_allow_update'] ?? false)
+            && ($context[static::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[static::DEEP_OBJECT_TO_POPULATE] ?? false)
+            && null !== $mapType = $this->getStringKeyedMapType($this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context))->getNativeType())
+        ) {
+            try {
+                $currentValue = $this->propertyAccessor->getValue($object, $attribute);
+            } catch (NoSuchPropertyException|UninitializedPropertyException) {
+                $currentValue = null;
+            }
+
+            if (\is_array($currentValue)) {
+                $value = $this->mergePatchMap($currentValue, $value, $mapType->getCollectionValueType());
+            }
+        }
+
         // symfony/serializer only reads the current value of typed attributes (https://github.com/symfony/symfony/pull/67883), and it can't type them here
         if (!isset($context[static::OBJECT_TO_POPULATE])
             && ($context[static::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[static::DEEP_OBJECT_TO_POPULATE] ?? false)
@@ -695,6 +714,49 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         } catch (PropertyAccessInvalidArgumentException $exception) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to denormalize attribute "%s" value for class "%s": %s', $attribute, $object::class, $exception->getMessage()), $value, $exception instanceof InvalidTypeException ? [$exception->expectedType] : ['unknown'], $context['deserialization_path'] ?? null, false, $exception->getCode(), $exception);
         }
+    }
+
+    private function getStringKeyedMapType(?Type $type): ?CollectionType
+    {
+        if ($type instanceof NullableType) {
+            $type = $type->getWrappedType();
+        }
+
+        if (!$type instanceof CollectionType || $type->isList()) {
+            return null;
+        }
+
+        $keyType = $type->getCollectionKeyType();
+
+        return $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier() ? $type : null;
+    }
+
+    private function mergePatchMap(array $target, array $patch, Type $valueType): array
+    {
+        $nestedMapType = $this->getStringKeyedMapType($valueType);
+        $isUntypedValue = $valueType instanceof BuiltinType && TypeIdentifier::MIXED === $valueType->getTypeIdentifier();
+
+        foreach ($patch as $key => $patchValue) {
+            if (null === $patchValue) {
+                unset($target[$key]);
+                continue;
+            }
+
+            if (\is_array($patchValue) && $nestedMapType) {
+                $target[$key] = $this->mergePatchMap(\is_array($target[$key] ?? null) ? $target[$key] : [], $patchValue, $nestedMapType->getCollectionValueType());
+                continue;
+            }
+
+            if (\is_array($patchValue) && $isUntypedValue && !array_is_list($patchValue)) {
+                $currentValue = $target[$key] ?? null;
+                $target[$key] = $this->mergePatchMap(\is_array($currentValue) && !array_is_list($currentValue) ? $currentValue : [], $patchValue, $valueType);
+                continue;
+            }
+
+            $target[$key] = $patchValue;
+        }
+
+        return $target;
     }
 
     /**

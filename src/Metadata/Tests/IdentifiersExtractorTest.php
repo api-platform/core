@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractor;
@@ -24,6 +25,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithEnumIdentifier;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelationMultiple;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -172,6 +174,46 @@ class IdentifiersExtractorTest extends TestCase
             ],
             $identifiersExtractor->getIdentifiersFromItem($item, $operation)
         );
+    }
+
+    public static function unreadableToPropertyProvider(): iterable
+    {
+        yield 'missing property' => ['missing'];
+        yield 'null relation' => ['first'];
+    }
+
+    #[DataProvider('unreadableToPropertyProvider')]
+    public function testGetIdentifiersFromItemWithUnreadableToPropertyThrowsRuntimeException(string $toProperty): void
+    {
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+        $resourceClassResolver->method('getResourceClass')->willReturn(RelationMultiple::class);
+
+        $identifiersExtractor = new IdentifiersExtractor(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $resourceClassResolver,
+            $this->createStub(PropertyNameCollectionFactoryInterface::class),
+            $this->createStub(PropertyMetadataFactoryInterface::class)
+        );
+
+        $operation = (new Get())
+            ->withUriTemplate('/resources/{firstId}')
+            ->withUriVariables([
+                'firstId' => (new Link())
+                    ->withFromClass(Dummy::class)
+                    ->withToProperty($toProperty)
+                    ->withIdentifiers(['id'])
+                    ->withParameterName('firstId'),
+            ])
+            ->withClass(RelationMultiple::class);
+
+        $item = new RelationMultiple();
+        $item->id = 1;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Not able to retrieve identifiers.');
+
+        $identifiersExtractor->getIdentifiersFromItem($item, $operation);
     }
 
     public function testGetIdentifierWithEnumValues(): void

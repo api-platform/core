@@ -16,8 +16,9 @@ namespace ApiPlatform\JsonSchema;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class DefinitionNameFactory implements DefinitionNameFactoryInterface
+final class DefinitionNameFactory implements DefinitionNameFactoryInterface, ResetInterface
 {
     use ResourceClassInfoTrait;
 
@@ -25,6 +26,11 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private const JSON_MERGE_PATCH_SCHEMA_POSTFIX = 'jsonMergePatch';
 
     private array $prefixCache = [];
+
+    public function reset(): void
+    {
+        $this->prefixCache = [];
+    }
 
     public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
     {
