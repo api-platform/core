@@ -501,6 +501,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/links.php');
         $loader->load('metadata/property.php');
         $loader->load('metadata/resource.php');
+        if (!$container->hasDefinition('api_platform.serializer.subtype_resolver')) {
+            $container->removeDefinition('api_platform.metadata.resource.metadata_collection_factory.polymorphic_graphql');
+        }
         $loader->load('metadata/operation.php');
         $loader->load('metadata/mutator.php');
 

@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCol
 use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\PolymorphicGraphQlResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
 use ApiPlatform\Symfony\Metadata\Resource\Factory\ContainerParameterResourceMetadataCollectionFactory;
@@ -161,6 +162,14 @@ return function (ContainerConfigurator $container) {
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('logger')->ignoreOnInvalid(),
             service('api_platform.resource_class_resolver')->ignoreOnInvalid(),
+        ]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.polymorphic_graphql', PolymorphicGraphQlResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 750)
+        ->args([
+            service('serializer.mapping.class_discriminator_resolver'),
+            service('api_platform.metadata.resource.metadata_collection_factory.polymorphic_graphql.inner'),
+            '%api_platform.defaults%',
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.cached', CachedResourceMetadataCollectionFactory::class)

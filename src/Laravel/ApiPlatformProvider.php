@@ -463,6 +463,14 @@ class ApiPlatformProvider extends ServiceProvider
             return new Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory($inner, $app->make(ModelMetadata::class), new \Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter());
         });
 
+        $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
+            if (!$app['config']->get('api-platform.serializer.discriminator_map', false)) {
+                return $inner;
+            }
+
+            return new Metadata\Resource\Factory\PolymorphicGraphQlResourceMetadataCollectionFactory(new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)), $inner, $app['config']->get('api-platform.defaults', []));
+        });
+
         $this->app->singleton(OperationMetadataFactory::class, static function (Application $app) {
             return new OperationMetadataFactory($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
         });

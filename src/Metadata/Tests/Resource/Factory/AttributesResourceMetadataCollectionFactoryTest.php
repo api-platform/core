@@ -62,11 +62,11 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     private function getDefaultGraphqlOperations(string $shortName, string $class, mixed $provider = null): array
     {
         return [
-            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
-            'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
-            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName.", provider: $provider),
-            'delete' => new DeleteMutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'delete', description: "Deletes a $shortName.", provider: $provider),
-            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName.", provider: $provider),
+            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider, extraProperties: ['graphql_default_operation' => true]),
+            'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider, extraProperties: ['graphql_default_operation' => true]),
+            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName.", provider: $provider, extraProperties: ['graphql_default_operation' => true]),
+            'delete' => new DeleteMutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'delete', description: "Deletes a $shortName.", provider: $provider, extraProperties: ['graphql_default_operation' => true]),
+            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName.", provider: $provider, extraProperties: ['graphql_default_operation' => true]),
         ];
     }
 

@@ -149,12 +149,12 @@ trait OperationDefaultsTrait
         $graphQlOperations = [];
         foreach ($operations as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
-            $graphQlOperations[$key] = $operation;
+            $graphQlOperations[$key] = $operation->withExtraProperties($operation->getExtraProperties() + ['graphql_default_operation' => true]);
         }
 
         if ($resource->getMercure()) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, (new Subscription())->withDescription("Subscribes to the update event of a {$operation->getShortName()}."));
-            $graphQlOperations[$key] = $operation;
+            $graphQlOperations[$key] = $operation->withExtraProperties($operation->getExtraProperties() + ['graphql_default_operation' => true]);
         }
 
         return $resource->withGraphQlOperations($graphQlOperations);
