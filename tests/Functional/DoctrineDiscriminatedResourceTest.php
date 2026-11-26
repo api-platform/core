@@ -148,6 +148,30 @@ final class DoctrineDiscriminatedResourceTest extends ApiTestCase
         ]);
     }
 
+    public function testPostToAConcreteSubtypeEndpointDoesNotRequireTheTypeProperty(): void
+    {
+        self::createClient()->request('POST', '/doctrine_discriminated_cars', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['name' => 'City car', 'seats' => 3],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains(['@id' => '/doctrine_discriminated_cars/4', '@type' => 'DoctrineDiscriminatedCar', 'kind' => 'car', 'seats' => 3]);
+        $this->assertSame(DoctrineDiscriminatedCar::class, $this->findVehicle(4)::class);
+    }
+
+    public function testPutWithoutTheTypePropertyKeepsTheSubtype(): void
+    {
+        self::createClient()->request('PUT', '/doctrine_discriminated_cars/3', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['name' => 'Renamed', 'seats' => 4],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains(['@id' => '/doctrine_discriminated_cars/3', '@type' => 'DoctrineDiscriminatedSportsCar', 'kind' => 'sportsCar', 'name' => 'Renamed']);
+        $this->assertSame(DoctrineDiscriminatedSportsCar::class, $this->findVehicle(3)::class);
+    }
+
     public function testJoinedInheritanceWithIntegerDiscriminatorValues(): void
     {
         $client = self::createClient();

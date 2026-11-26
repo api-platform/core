@@ -85,7 +85,12 @@ final class DoctrineDiscriminatorMappingLoader implements LoaderInterface
             return false;
         }
 
-        $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($typeProperty, $typesMapping));
+        $defaultType = null;
+        if (!(new \ReflectionClass($class))->isAbstract() && false !== $ownType = array_search($class, $typesMapping, true)) {
+            $defaultType = (string) $ownType;
+        }
+
+        $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($typeProperty, $typesMapping, $defaultType));
 
         return true;
     }

@@ -41,7 +41,7 @@ final class DoctrineDiscriminatorMappingLoaderTest extends TestCase
         $metadata = new ClassMetadata(LoaderVehicle::class);
 
         $this->assertTrue($this->createOrmLoader()->loadClassMetadata($metadata));
-        $this->assertEquals(new ClassDiscriminatorMapping('kind', self::ORM_MAP), $metadata->getClassDiscriminatorMapping());
+        $this->assertEquals(new ClassDiscriminatorMapping('kind', self::ORM_MAP, 'vehicle'), $metadata->getClassDiscriminatorMapping());
     }
 
     public function testIntermediateClassGetsItselfAndItsSubclasses(): void
@@ -50,7 +50,7 @@ final class DoctrineDiscriminatorMappingLoaderTest extends TestCase
 
         $this->assertTrue($this->createOrmLoader()->loadClassMetadata($metadata));
         $this->assertEquals(
-            new ClassDiscriminatorMapping('kind', ['car' => LoaderCar::class, 'sportsCar' => LoaderSportsCar::class]),
+            new ClassDiscriminatorMapping('kind', ['car' => LoaderCar::class, 'sportsCar' => LoaderSportsCar::class], 'car'),
             $metadata->getClassDiscriminatorMapping(),
         );
     }

@@ -282,8 +282,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         if (null === ($objectToPopulate = $this->extractObjectToPopulate($resourceClass, $context, static::OBJECT_TO_POPULATE)) && !\is_string($data)) {
             $normalizedData = \is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
             $resolvedTypes = [];
+            $replacedRealClass = \is_string($replacedClass) ? $this->getRealClassName($replacedClass) : null;
             do {
                 $resolvedTypes[$type] = true;
+                if (null !== $replacedRealClass && is_a($replacedRealClass, $type, true) && null !== ($typeMapping = $this->classDiscriminatorResolver?->getMappingForClass($type)) && !isset($normalizedData[$typeMapping->getTypeProperty()])) {
+                    $type = $replacedRealClass;
+                    break;
+                }
+
                 $type = $this->getClassDiscriminatorResolvedClass($normalizedData, $type, $context);
             } while (null !== $this->subtypeResolver && !isset($resolvedTypes[$type]));
         }

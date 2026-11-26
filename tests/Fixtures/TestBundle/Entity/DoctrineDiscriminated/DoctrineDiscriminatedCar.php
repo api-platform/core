@@ -17,13 +17,14 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * A resource in the middle of the hierarchy: it resolves its own subtypes from the Doctrine map.
  */
-#[ApiResource(operations: [new Get(), new Post()])]
+#[ApiResource(operations: [new Get(), new Post(), new Put()])]
 #[ORM\Entity]
 class DoctrineDiscriminatedCar extends DoctrineDiscriminatedVehicle
 {
