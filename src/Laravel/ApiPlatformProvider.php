@@ -985,6 +985,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
+                new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
+                null !== self::getSubtypeResolver($app),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {
@@ -995,6 +997,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
                 strictMemberNames: (bool) $app['config']->get('api-platform.jsonapi.strict_member_names', false),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
         $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {

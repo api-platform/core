@@ -60,6 +60,16 @@ final class DiscriminatedResourceWithoutPolymorphismTest extends ApiTestCase
         $this->assertSame('Actros', ConvertedTypeVehicleStore::$vehicles[1]->name);
     }
 
+    public function testOpenApiDoesNotDocumentTheSubtypesOfAResource(): void
+    {
+        $schemas = self::createClient()->request('GET', '/docs', ['headers' => ['Accept' => 'application/vnd.openapi+json']])->toArray()['components']['schemas'];
+
+        $schema = $schemas['ConvertedTypeVehicle'] ?? $schemas['ConvertedTypeVehicle.jsonld'] ?? [];
+        $this->assertNotSame([], $schema);
+        $this->assertArrayNotHasKey('oneOf', $schema);
+        $this->assertArrayNotHasKey('discriminator', $schema);
+    }
+
     public function testGetDoesNotEmitTheTypeProperty(): void
     {
         $truck = new ConvertedTypeTruck();
