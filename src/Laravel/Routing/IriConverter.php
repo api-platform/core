@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UriVariablesFromIriInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
@@ -38,7 +39,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class IriConverter implements IriConverterInterface
+class IriConverter implements IriConverterInterface, UriVariablesFromIriInterface
 {
     use ClassInfoTrait;
     use ResourceClassInfoTrait;
@@ -68,6 +69,37 @@ class IriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
+        [$routeOperation, $uriVariables] = $this->resolveIri($iri);
+
+        $dispatchOperation = ($operation instanceof GraphQlOperation && null !== $operation->getProvider())
+            ? $operation
+            : $routeOperation;
+
+        if ($item = $this->provider->provide($dispatchOperation, $uriVariables, $context)) {
+            return $item; // @phpstan-ignore-line
+        }
+
+        throw new ItemNotFoundException(\sprintf('Item not found for "%s".', $iri));
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    public function getUriVariablesFromIri(string $iri, array $context = [], ?Operation $operation = null): array
+    {
+        return $this->resolveIri($iri, $operation)[1];
+    }
+
+    /**
+     * Matches the IRI against the router and resolves the item operation and its URI variables,
+     * without calling the state provider. When $operation is given, the IRI must reference its resource class.
+     *
+     * @return array{0: HttpOperation, 1: array<string, mixed>}
+     */
+    private function resolveIri(string $iri, ?Operation $operation = null): array
+    {
         try {
             $parameters = $this->router->match($iri);
         } catch (RoutingExceptionInterface $e) {
@@ -76,6 +108,10 @@ class IriConverter implements IriConverterInterface
 
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'], $parameters['uri_variables'])) {
             throw new InvalidArgumentException(\sprintf('No resource associated to "%s".', $iri));
+        }
+
+        if ($operation && !is_a($parameters['_api_resource_class'], $operation->getClass(), true)) {
+            throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $iri));
         }
 
         $routeOperation = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
@@ -88,15 +124,7 @@ class IriConverter implements IriConverterInterface
             throw new RuntimeException(\sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
         }
 
-        $dispatchOperation = ($operation instanceof GraphQlOperation && null !== $operation->getProvider())
-            ? $operation
-            : $routeOperation;
-
-        if ($item = $this->provider->provide($dispatchOperation, $parameters['uri_variables'], $context)) {
-            return $item; // @phpstan-ignore-line
-        }
-
-        throw new ItemNotFoundException(\sprintf('Item not found for "%s".', $iri));
+        return [$routeOperation, $parameters['uri_variables']];
     }
 
     /**
