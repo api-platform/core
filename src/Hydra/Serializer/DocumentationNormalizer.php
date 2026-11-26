@@ -17,6 +17,7 @@ use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
+use ApiPlatform\JsonLd\SubtypePropertyScopeTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -28,6 +29,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -48,6 +50,7 @@ use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
 final class DocumentationNormalizer implements NormalizerInterface
 {
     use HydraPrefixTrait;
+    use SubtypePropertyScopeTrait;
     public const FORMAT = 'jsonld';
 
     public function __construct(
@@ -59,6 +62,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?array $defaultContext = [],
         private readonly ?bool $entrypointEnabled = true,
+        private readonly ?SubtypeResolverInterface $subtypeResolver = null,
     ) {
     }
 
@@ -68,8 +72,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $classes = [];
+        $classIndexes = [];
+        $subtypeClasses = [];
+        $resourceParents = [];
         $entrypointProperties = [];
         $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+        $resourceClasses = array_fill_keys(iterator_to_array($data->getResourceNameCollection(), false), true);
 
         foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
@@ -84,10 +92,111 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix);
                 $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix);
+                $classIndexes[$resourceClass][] = array_key_last($classes);
+
+                if (!$this->subtypeResolver?->getDirectSubtypes($resourceClass)) {
+                    continue;
+                }
+
+                [$propertyNameContext, $propertyContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
+                $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $propertyNameContext), false);
+                $mapping = $this->subtypeResolver->getMapping($resourceClass);
+                if (null !== $mapping && !\in_array($mapping->getTypeProperty(), $propertyNames, true)) {
+                    $classes[array_key_last($classes)][$hydraPrefix.'supportedProperty'][] = $this->getTypeProperty($resourceClass, $prefixedShortName, $shortName, $context, $hydraPrefix);
+                }
+
+                $scopes = $this->getSubtypePropertyScopes($this->subtypeResolver, $this->propertyMetadataFactory, $this->propertyNameCollectionFactory, $resourceClass, $propertyNames, $propertyNameContext, $propertyContext);
+                $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $resourceClass, $prefixedShortName, $scopes, $propertyContext, $context, $hydraPrefix);
             }
         }
 
-        return $this->computeDoc($data, $this->getClasses($entrypointProperties, $classes, $hydraPrefix), $hydraPrefix);
+        foreach ($resourceParents as $resourceClass => $parents) {
+            foreach ($classIndexes[$resourceClass] ?? [] as $index) {
+                $subClassOfKeys = [];
+                foreach ((array) ($classes[$index]['subClassOf'] ?? []) as $existing) {
+                    $subClassOfKeys[$existing] = true;
+                }
+                $subClassOf = array_keys($subClassOfKeys + $parents);
+                $classes[$index]['subClassOf'] = 1 === \count($subClassOf) ? $subClassOf[0] : $subClassOf;
+            }
+        }
+
+        return $this->computeDoc($data, $this->getClasses($entrypointProperties, [...$classes, ...array_values($subtypeClasses)], $hydraPrefix), $hydraPrefix);
+    }
+
+    /**
+     * Documents the subtypes of a discriminator map as subclasses of their parent, supporting the properties they declare.
+     *
+     * @param array<string, array<string, mixed>>                                                                                                                            $subtypeClasses
+     * @param array<string, array<string, true>>                                                                                                                             $resourceParents
+     * @param array<string, true>                                                                                                                                            $resourceClasses
+     * @param array{array<class-string, array<string, array{class-string, ApiProperty|null}>>, array<string, string|list<string>>, array<class-string, array<string, true>>} $scopes
+     */
+    private function addSubtypeClasses(array &$subtypeClasses, array &$resourceParents, array $resourceClasses, string $class, string $classId, array $scopes, array $propertyContext, array $context, string $hydraPrefix): void
+    {
+        [$propertyScopes, $iris, $typeProperties] = $scopes;
+        foreach ($this->subtypeResolver?->getDirectSubtypes($class) ?? [] as $subtype) {
+            if (isset($resourceClasses[$subtype])) {
+                $resourceParents[$subtype][$classId] = true;
+
+                continue;
+            }
+
+            $subtypeId = $this->getClassId($subtype);
+            if (isset($subtypeClasses[$subtypeId])) {
+                continue;
+            }
+
+            $properties = [];
+            foreach ($propertyScopes[$subtype] ?? [] as $propertyName => [$scope, $propertyMetadata]) {
+                $scopeId = $this->getClassId($scope);
+                $scopeName = $this->subtypeResolver->getTypeName($scope);
+                if (isset($typeProperties[$subtype][$propertyName])) {
+                    $properties[] = $this->getTypeProperty($subtype, $scopeId, $scopeName, $context, $hydraPrefix);
+
+                    continue;
+                }
+
+                if ((true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) || false === $propertyMetadata->getHydra()) {
+                    continue;
+                }
+
+                if (isset($iris[$propertyName])) {
+                    $propertyMetadata = $propertyMetadata->withIris($iris[$propertyName]);
+                }
+
+                $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $subtype, self::FORMAT, $context) : $propertyName;
+                $properties[] = $this->getProperty($propertyMetadata, $normalizedPropertyName, $scopeId, $scopeName, $hydraPrefix);
+            }
+
+            $subtypeClasses[$subtypeId] = [
+                '@id' => $subtypeId,
+                '@type' => $hydraPrefix.'Class',
+                $hydraPrefix.'title' => $this->subtypeResolver->getTypeName($subtype),
+                'subClassOf' => $classId,
+                $hydraPrefix.'supportedProperty' => $properties,
+                $hydraPrefix.'supportedOperation' => [],
+            ];
+
+            $this->addSubtypeClasses($subtypeClasses, $resourceParents, $resourceClasses, $subtype, $subtypeId, $scopes, $propertyContext, $context, $hydraPrefix);
+        }
+    }
+
+    private function getClassId(string $class): string
+    {
+        return '#'.$this->subtypeResolver?->getTypeName($class);
+    }
+
+    /**
+     * The type property of a discriminator map is not a property of the class, it is documented as one.
+     */
+    private function getTypeProperty(string $class, string $classId, string $shortName, array $context, string $hydraPrefix): array
+    {
+        $mapping = $this->subtypeResolver?->getMapping($class);
+        $typeProperty = $mapping?->getTypeProperty() ?? '';
+        $propertyMetadata = (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true)->withRequired(null === $mapping?->getDefaultType());
+
+        return $this->getProperty($propertyMetadata, $this->nameConverter?->normalize($typeProperty, $class, self::FORMAT, $context) ?? $typeProperty, $classId, $shortName, $hydraPrefix);
     }
 
     /**

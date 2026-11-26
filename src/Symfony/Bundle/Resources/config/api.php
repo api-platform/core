@@ -184,6 +184,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
+        ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -895])
         ->tag('kernel.reset', ['method' => '?reset']);
 
@@ -203,6 +204,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
             service('api_platform.serializer.operation_resource_resolver'),
         ])
+        ->arg('$subtypeResolver', service('api_platform.serializer.subtype_resolver')->ignoreOnInvalid())
         ->tag('serializer.normalizer', ['priority' => -894])
         ->tag('kernel.reset', ['method' => '?reset']);
 

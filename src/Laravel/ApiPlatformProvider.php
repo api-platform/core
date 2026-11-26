@@ -724,7 +724,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(UrlGeneratorInterface::class),
                 $app->make(IriConverterInterface::class),
                 $app->make(NameConverterInterface::class),
-                $defaultContext
+                $defaultContext,
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -756,6 +757,7 @@ class ApiPlatformProvider extends ServiceProvider
                 // $app->make(TagCollectorInterface::class)
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -778,6 +780,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -826,6 +829,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
                 // $app->make(TagCollectorInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1024,7 +1028,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(UrlGeneratorInterface::class),
                 $app->make(NameConverterInterface::class),
                 $defaultContext,
-                $entrypointEnabled
+                $entrypointEnabled,
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1119,6 +1124,7 @@ class ApiPlatformProvider extends ServiceProvider
                 operationResourceResolver: $app->make(OperationResourceClassResolverInterface::class),
                 identifiersExtractor: $app->make(IdentifiersExtractorInterface::class),
                 useIriAsId: $useIriAsId,
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1138,6 +1144,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1241,6 +1248,7 @@ class ApiPlatformProvider extends ServiceProvider
                 null,
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1261,6 +1269,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceAccessCheckerInterface::class),
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
+                subtypeResolver: self::getSubtypeResolver($app),
             );
         });
 
@@ -1700,5 +1709,10 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
+    }
+
+    private static function getSubtypeResolver(Application $app): ?SubtypeResolverInterface
+    {
+        return $app['config']->get('api-platform.serializer.discriminator_map', false) ? $app->make(SubtypeResolverInterface::class) : null;
     }
 }

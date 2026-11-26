@@ -28,6 +28,13 @@ interface SerializerContextBuilderInterface
     public const ASSIGN_OBJECT_TO_POPULATE = 'api_assign_object_to_populate';
 
     /**
+     * The class of the resource a PUT replaces, set by ApiPlatform\State\Provider\DeserializeProvider.
+     *
+     * @internal
+     */
+    public const REPLACED_CLASS = 'api_replaced_class';
+
+    /**
      * Creates a serialization context from a Request.
      *
      * @param array<string, mixed>|null $extractedAttributes
