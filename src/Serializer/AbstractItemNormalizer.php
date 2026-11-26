@@ -286,7 +286,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $replacedRealClass = \is_string($replacedClass) ? $this->getRealClassName($replacedClass) : null;
             do {
                 $resolvedTypes[$type] = true;
-                if (null !== $replacedRealClass && is_a($replacedRealClass, $type, true) && null !== ($typeMapping = $this->classDiscriminatorResolver?->getMappingForClass($type)) && !isset($normalizedData[$this->getTypePropertyKey($typeMapping->getTypeProperty(), $type, $format, $context)])) {
+                if (null !== $this->subtypeResolver && null !== $replacedRealClass && is_a($replacedRealClass, $type, true) && null !== ($typeMapping = $this->classDiscriminatorResolver?->getMappingForClass($type)) && !isset($normalizedData[$this->getTypePropertyKey($typeMapping->getTypeProperty(), $type, $format, $context)])) {
                     $type = $replacedRealClass;
                     break;
                 }

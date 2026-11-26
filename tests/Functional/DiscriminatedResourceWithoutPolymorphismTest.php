@@ -44,6 +44,22 @@ final class DiscriminatedResourceWithoutPolymorphismTest extends ApiTestCase
         parent::tearDown();
     }
 
+    public function testPutWithoutTheTypePropertyDoesNotKeepTheStoredClass(): void
+    {
+        $truck = new ConvertedTypeTruck();
+        $truck->id = 1;
+        $truck->name = 'Actros';
+        ConvertedTypeVehicleStore::$vehicles[1] = $truck;
+
+        self::createClient()->request('PUT', '/converted_type_vehicles/1', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['name' => 'Arocs'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertSame('Actros', ConvertedTypeVehicleStore::$vehicles[1]->name);
+    }
+
     public function testOpenApiDoesNotDocumentTheSubtypesOfAResource(): void
     {
         $schemas = self::createClient()->request('GET', '/docs', ['headers' => ['Accept' => 'application/vnd.openapi+json']])->toArray()['components']['schemas'];
