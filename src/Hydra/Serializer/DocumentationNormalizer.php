@@ -30,6 +30,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
+use ApiPlatform\Metadata\Util\UriTemplateHelper;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -71,19 +72,31 @@ final class DocumentationNormalizer implements NormalizerInterface
         $entrypointProperties = [];
         $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
 
+        $resourceMetadataCollections = [];
         foreach ($data->getResourceNameCollection() as $resourceClass) {
-            $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollections[$resourceClass] = $this->resourceMetadataFactory->create($resourceClass);
+        }
 
+        $attachedUriTemplates = [];
+        foreach ($resourceMetadataCollections as $resourceClass => $resourceMetadataCollection) {
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 if (true === $resourceMetadata->getHideHydraOperation()) {
                     continue;
                 }
 
                 $shortName = $resourceMetadata->getShortName();
-                $prefixedShortName = "#$shortName";
+                $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, "#$shortName", $context, $hydraPrefix, $attachedUriTemplates);
+            }
+        }
 
-                $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix);
-                $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix);
+        foreach ($resourceMetadataCollections as $resourceMetadataCollection) {
+            foreach ($resourceMetadataCollection as $resourceMetadata) {
+                if (true === $resourceMetadata->getHideHydraOperation()) {
+                    continue;
+                }
+
+                $shortName = $resourceMetadata->getShortName();
+                $this->populateEntrypointProperties($resourceMetadata, $shortName, "#$shortName", $entrypointProperties, $hydraPrefix, $attachedUriTemplates);
             }
         }
 
@@ -93,9 +106,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Populates entrypoint properties.
      */
-    private function populateEntrypointProperties(ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, string $hydraPrefix): void
+    private function populateEntrypointProperties(ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, string $hydraPrefix, array $attachedUriTemplates): void
     {
-        $hydraCollectionOperations = $this->getHydraOperations(true, $resourceMetadata, $hydraPrefix);
+        $hydraCollectionOperations = $this->getHydraOperations(true, $resourceMetadata, $hydraPrefix, $attachedUriTemplates);
         if (empty($hydraCollectionOperations)) {
             return;
         }
@@ -130,7 +143,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets a Hydra class.
      */
-    private function getClass(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, string $hydraPrefix): array
+    private function getClass(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, string $hydraPrefix, array &$attachedUriTemplates = []): array
     {
         $description = $resourceMetadata->getDescription();
         $isDeprecated = $resourceMetadata->getDeprecationReason();
@@ -139,7 +152,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             '@id' => $prefixedShortName,
             '@type' => $hydraPrefix.'Class',
             $hydraPrefix.'title' => $shortName,
-            $hydraPrefix.'supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix),
+            $hydraPrefix.'supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $attachedUriTemplates),
             $hydraPrefix.'supportedOperation' => $this->getHydraOperations(false, $resourceMetadata, $hydraPrefix),
         ];
 
@@ -208,7 +221,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets Hydra properties.
      */
-    private function getHydraProperties(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
+    private function getHydraProperties(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX, array &$attachedUriTemplates = []): array
     {
         $classes = [];
 
@@ -250,7 +263,12 @@ final class DocumentationNormalizer implements NormalizerInterface
                     continue;
                 }
 
-                $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName, $hydraPrefix);
+                $operations = $this->getUriTemplateOperations($propertyMetadata, $hydraPrefix);
+                if ($operations) {
+                    $attachedUriTemplates[UriTemplateHelper::withoutFormatSuffix($propertyMetadata->getUriTemplate())] = true;
+                }
+
+                $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName, $hydraPrefix, $operations);
             }
         }
 
@@ -260,11 +278,15 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets Hydra operations.
      */
-    private function getHydraOperations(bool $collection, ApiResource $resourceMetadata, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
+    private function getHydraOperations(bool $collection, ApiResource $resourceMetadata, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX, array $attachedUriTemplates = []): array
     {
         $hydraOperations = [];
         foreach ($resourceMetadata->getOperations() as $operation) {
             if (true === $operation->getHideHydraOperation() || $operation instanceof NotExposed) {
+                continue;
+            }
+
+            if (null !== $operation->getUriTemplate() && isset($attachedUriTemplates[UriTemplateHelper::withoutFormatSuffix($operation->getUriTemplate())])) {
                 continue;
             }
 
@@ -273,6 +295,52 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
+        }
+
+        return $hydraOperations;
+    }
+
+    /**
+     * Gets the collection operations a property exposes through its URI template, as AbstractItemNormalizer resolves them.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function getUriTemplateOperations(ApiProperty $propertyMetadata, string $hydraPrefix): array
+    {
+        if (null === $uriTemplate = $propertyMetadata->getUriTemplate()) {
+            return [];
+        }
+
+        $nativeType = $propertyMetadata->getNativeType();
+        if ($nativeType?->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
+            $nativeType = TypeHelper::getCollectionValueType($nativeType);
+        }
+
+        $className = null;
+        if (!$nativeType?->isSatisfiedBy(function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
+        }) || null === $className) {
+            return [];
+        }
+
+        $strippedUriTemplate = UriTemplateHelper::withoutFormatSuffix($uriTemplate);
+        $hydraOperations = [];
+        foreach ($this->resourceMetadataFactory->create($className) as $resourceMetadata) {
+            foreach ($resourceMetadata->getOperations() ?? [] as $operation) {
+                if (true === $operation->getHideHydraOperation() || $operation instanceof NotExposed) {
+                    continue;
+                }
+
+                if (null === $operation->getUriTemplate() || UriTemplateHelper::withoutFormatSuffix($operation->getUriTemplate()) !== $strippedUriTemplate) {
+                    continue;
+                }
+
+                if ('POST' !== $operation->getMethod() && !$operation instanceof CollectionOperationInterface) {
+                    continue;
+                }
+
+                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
+            }
         }
 
         return $hydraOperations;
@@ -511,7 +579,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets a property definition.
      */
-    private function getProperty(ApiProperty $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName, string $hydraPrefix): array
+    private function getProperty(ApiProperty $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName, string $hydraPrefix, array $operations = []): array
     {
         if ($iri = $propertyMetadata->getIris()) {
             $iri = 1 === (is_countable($iri) ? \count($iri) : 0) ? $iri[0] : $iri;
@@ -527,6 +595,11 @@ final class DocumentationNormalizer implements NormalizerInterface
             'domain' => $prefixedShortName,
             'label' => $propertyName,
         ];
+
+        if ($operations) {
+            $propertyData['@type'] = $hydraPrefix.'Link';
+            $propertyData[$hydraPrefix.'supportedOperation'] = $operations;
+        }
 
         if (!isset($propertyData['owl:deprecated']) && $propertyMetadata->getDeprecationReason()) {
             $propertyData['owl:deprecated'] = true;
