@@ -171,6 +171,7 @@ use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\ErrorProvider;
+use ApiPlatform\State\ObjectMapper\SubtypeObjectMapper;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -451,7 +452,8 @@ class ApiPlatformProvider extends ServiceProvider
             $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
                 return new ObjectMapperMetadataCollectionFactory(
                     $inner,
-                    $app->make(ObjectMapperMetadataFactoryInterface::class)
+                    $app->make(ObjectMapperMetadataFactoryInterface::class),
+                    static fn (): ?SubtypeResolverInterface => self::getSubtypeResolver($app)
                 );
             });
         }
@@ -538,9 +540,15 @@ class ApiPlatformProvider extends ServiceProvider
             $this->app->singleton(ObjectMapperMetadataFactoryInterface::class, ReflectionObjectMapperMetadataFactory::class);
 
             $this->app->singleton(ObjectMapper::class, static function (Application $app) {
-                return new ObjectMapper(
+                $objectMapper = new ObjectMapper(
                     $app->make(ObjectMapperMetadataFactoryInterface::class)
                 );
+
+                if (!$subtypeResolver = self::getSubtypeResolver($app)) {
+                    return $objectMapper;
+                }
+
+                return new SubtypeObjectMapper($objectMapper, $subtypeResolver, $app->make(ObjectMapperMetadataFactoryInterface::class));
             });
 
             $this->app->extend(ProviderInterface::class, static function (ProviderInterface $inner, Application $app) {
