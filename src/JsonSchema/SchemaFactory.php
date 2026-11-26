@@ -54,7 +54,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public const PARTIAL_UPDATE = 'partial_update';
     private const DISCRIMINATOR_UPDATE = 'discriminator_update';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, private readonly bool $resourcePolymorphism = false)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -135,7 +135,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        $mapping = Schema::VERSION_SWAGGER !== $version ? $this->classDiscriminatorResolver?->getMappingForClass($inputOrOutputClass) : null;
+        $mapping = Schema::VERSION_SWAGGER !== $version && ($this->resourcePolymorphism || !$this->resourceClassResolver?->isResourceClass($inputOrOutputClass)) ? $this->classDiscriminatorResolver?->getMappingForClass($inputOrOutputClass) : null;
         $subtypes = $mapping ? $this->getDirectSubtypes($mapping, $inputOrOutputClass) : [];
         $hasOwnBranch = $subtypes && [] !== array_keys($mapping->getTypesMapping(), $inputOrOutputClass, true);
         $subtypeContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, self::DISCRIMINATOR_UPDATE => match (true) {
@@ -193,7 +193,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
 
-        $this->addDiscriminatorProperties($definition, $inputOrOutputClass, $format, $serializerContext, $isPartialUpdate);
+        if ($this->resourcePolymorphism || !$this->resourceClassResolver?->isResourceClass($inputOrOutputClass)) {
+            $this->addDiscriminatorProperties($definition, $inputOrOutputClass, $format, $serializerContext, $isPartialUpdate);
+        }
 
         if ($hasOwnBranch) {
             $this->buildDiscriminatorDefinition($schema, $definitionName, $inputOrOutputClass, $mapping, $subtypes, true, $format, $type, $subtypeContext, $serializerContext);

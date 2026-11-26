@@ -1002,6 +1002,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(DefinitionNameFactoryInterface::class),
                 new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
+                null !== self::getSubtypeResolver($app),
             );
         });
         $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {
