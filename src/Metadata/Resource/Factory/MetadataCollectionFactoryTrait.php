@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * @internal
@@ -39,7 +40,7 @@ trait MetadataCollectionFactoryTrait
 {
     use OperationDefaultsTrait;
 
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, ?LoggerInterface $logger = null, array $defaults = [], private readonly bool $graphQlEnabled = false)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, ?LoggerInterface $logger = null, array $defaults = [], private readonly bool $graphQlEnabled = false, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
         $this->logger = $logger ?? new NullLogger();
         $this->defaults = $defaults;
@@ -189,11 +190,19 @@ trait MetadataCollectionFactoryTrait
                     continue;
                 }
 
-                // Add default GraphQL operations on the first resource
-                if (0 === $index) {
-                    $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
+                if (0 !== $index) {
+                    continue;
                 }
-                continue;
+
+                if (!$this->isPolymorphicResource($resourceClass, $this->classDiscriminatorResolver)) {
+                    // Add default GraphQL operations on the first resource
+                    $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
+                    continue;
+                }
+
+                $resources[$index] = $resources[$index]->withGraphQlOperations([]);
+            } elseif ($this->isPolymorphicResource($resourceClass, $this->classDiscriminatorResolver)) {
+                $this->assertPolymorphicGraphQlOperations($graphQlOperations, $resourceClass);
             }
 
             $resources[$index] = $this->completeGraphQlOperations($resources[$index]);

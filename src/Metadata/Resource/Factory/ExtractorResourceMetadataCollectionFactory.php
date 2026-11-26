@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * Creates a resource metadata from {@see Resource} extractors (XML, YAML).
@@ -33,7 +34,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 {
     use OperationDefaultsTrait;
 
-    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], ?LoggerInterface $logger = null, private readonly bool $graphQlEnabled = false)
+    public function __construct(private readonly ResourceExtractorInterface $extractor, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [], ?LoggerInterface $logger = null, private readonly bool $graphQlEnabled = false, private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
         $this->logger = $logger ?? new NullLogger();
         $this->defaults = $defaults;
@@ -142,8 +143,14 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
     {
         $operations = [];
 
+        $polymorphic = $this->isPolymorphicResource($resource->getClass() ?? '', $this->classDiscriminatorResolver);
+
         if (null === $data) {
-            return $this->addDefaultGraphQlOperations($resource);
+            if (!$polymorphic) {
+                return $this->addDefaultGraphQlOperations($resource);
+            }
+
+            $data = [];
         }
 
         foreach ($data as $attributes) {
@@ -175,6 +182,10 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 throw new RuntimeException(\sprintf('GraphQL operation name "%s" is declared twice on resource "%s". GraphQL operation names must be unique, set distinct names.', $key, $resource->getClass() ?? ''));
             }
             $operations[$key] = $operation;
+        }
+
+        if ($polymorphic) {
+            $this->assertPolymorphicGraphQlOperations($operations, $resource->getClass() ?? '');
         }
 
         $resource = $resource->withGraphQlOperations($operations);

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
@@ -27,6 +28,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -535,6 +538,22 @@ class XmlExtractorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', Comment::class));
 
         $factory->create(Comment::class);
+    }
+
+    public function testPolymorphicResourceWithoutGraphQlOperationsOnlyGetsNestedQueriesFromXml(): void
+    {
+        $resolver = $this->createStub(ClassDiscriminatorResolverInterface::class);
+        $resolver->method('getMappingForClass')->willReturnCallback(static fn (string $class): ?ClassDiscriminatorMapping => Comment::class === $class ? new ClassDiscriminatorMapping('kind', ['comment' => Comment::class]) : null);
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/pagination_via_cursor.xml']);
+        $factory = new ExtractorResourceMetadataCollectionFactory($extractor, graphQlEnabled: true, classDiscriminatorResolver: $resolver);
+
+        $operations = $factory->create(Comment::class)[0]->getGraphQlOperations();
+
+        $this->assertCount(2, $operations);
+        foreach ($operations as $operation) {
+            $this->assertInstanceOf(Query::class, $operation);
+            $this->assertTrue($operation->getNested());
+        }
     }
 
     public function testOpenApiParametersAreAList(): void
