@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -25,9 +24,6 @@ final class SubtypeResolver implements SubtypeResolverInterface
     private array $subtypesCache = [];
     /** @var array<class-string, true>|null */
     private ?array $resourceClasses = null;
-    /** @var array<class-string, ApiSubtype> */
-    private array $subtypes = [];
-    private bool $typeNamesValidated = false;
 
     public function __construct(
         private readonly ClassDiscriminatorResolverInterface $classDiscriminatorResolver,
@@ -72,43 +68,19 @@ final class SubtypeResolver implements SubtypeResolverInterface
 
     public function getTypeName(string $class): string
     {
-        if (null !== $resourceShortName = $this->getResourceShortName($class)) {
-            return $resourceShortName;
-        }
-
-        $this->validateTypeNames();
-
-        return $this->getSubtype($class)->shortName ?? '';
+        return $this->getResource($class)?->getShortName() ?? $this->getClassShortName($class);
     }
 
     public function getTypes(string $class): array
     {
-        if (null !== $resourceShortName = $this->getResourceShortName($class)) {
-            return [$resourceShortName];
+        if (null === $resource = $this->getResource($class)) {
+            return [$this->getClassShortName($class)];
         }
 
-        $this->validateTypeNames();
-
-        return $this->getSubtype($class)->types ?? [];
+        return $resource->getTypes() ?? [(string) $resource->getShortName()];
     }
 
-    private function getResourceShortName(string $class): ?string
-    {
-        if (!isset($this->getResourceClasses()[$class])) {
-            return null;
-        }
-
-        foreach ($this->resourceMetadataCollectionFactory->create($class) as $resource) {
-            return $resource->getShortName();
-        }
-
-        return null;
-    }
-
-    /**
-     * @return array<class-string, true>
-     */
-    private function getResourceClasses(): array
+    private function getResource(string $class): ?ApiResource
     {
         if (null === $this->resourceClasses) {
             $this->resourceClasses = [];
@@ -117,52 +89,19 @@ final class SubtypeResolver implements SubtypeResolverInterface
             }
         }
 
-        return $this->resourceClasses;
+        if (!isset($this->resourceClasses[$class])) {
+            return null;
+        }
+
+        foreach ($this->resourceMetadataCollectionFactory->create($class) as $resource) {
+            return $resource;
+        }
+
+        return null;
     }
 
-    private function getSubtype(string $class): ApiSubtype
+    private function getClassShortName(string $class): string
     {
-        if (isset($this->subtypes[$class])) {
-            return $this->subtypes[$class];
-        }
-
-        $subtype = ((new \ReflectionClass($class))->getAttributes(ApiSubtype::class)[0] ?? null)?->newInstance() ?? new ApiSubtype();
-        $shortName = $subtype->shortName ?? (false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1));
-
-        return $this->subtypes[$class] = new ApiSubtype($shortName, $subtype->types ?? [$shortName]);
-    }
-
-    /**
-     * @throws RuntimeException when a subtype name or type is also the one of a resource or of another subtype
-     */
-    private function validateTypeNames(): void
-    {
-        if ($this->typeNamesValidated) {
-            return;
-        }
-
-        $owners = [];
-        foreach ($this->getResourceClasses() as $resourceClass => $_) {
-            foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
-                $owners[$resource->getShortName()] ??= $resourceClass;
-            }
-        }
-
-        foreach ($this->getResourceClasses() as $resourceClass => $_) {
-            foreach ($this->getSubtypes($resourceClass) as $subtype) {
-                if (isset($this->resourceClasses[$subtype])) {
-                    continue;
-                }
-
-                $apiSubtype = $this->getSubtype($subtype);
-                foreach (array_unique([$apiSubtype->shortName, ...$apiSubtype->types]) as $name) {
-                    if (($owners[$name] ??= $subtype) !== $subtype) {
-                        throw new RuntimeException(\sprintf('The subtype "%s" and "%s" are both named "%s" in JSON-LD and Hydra. Give the subtype another name with #[%s(shortName: \'...\')].', $subtype, $owners[$name], $name, ApiSubtype::class));
-                    }
-                }
-            }
-        }
-
-        $this->typeNamesValidated = true;
+        return false === ($position = strrpos($class, '\\')) ? $class : substr($class, $position + 1);
     }
 }

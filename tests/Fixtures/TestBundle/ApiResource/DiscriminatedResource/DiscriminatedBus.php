@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Put;
 
 #[ApiResource(
     operations: [new Get(), new Put(), new Patch()],
+    types: ['https://schema.org/BusOrCoach'],
     provider: [DiscriminatedVehicle::class, 'provide'],
     processor: [DiscriminatedVehicle::class, 'process'],
 )]

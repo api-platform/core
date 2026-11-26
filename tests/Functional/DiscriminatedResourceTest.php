@@ -168,7 +168,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSame(['car', 'truck', 'car', 'bike', 'bike'], array_column($members, 'kind'));
-        $this->assertSame(['DiscriminatedCar', 'https://schema.org/Truck', 'DiscriminatedCar', 'DiscriminatedMountainBike', 'DiscriminatedBike'], array_column($members, '@type'));
+        $this->assertSame(['DiscriminatedCar', 'DiscriminatedTruck', 'DiscriminatedCar', 'DiscriminatedMountainBike', 'DiscriminatedBike'], array_column($members, '@type'));
         $this->assertSame(18000, $members[1]['payload']);
         $this->assertArrayNotHasKey('payload', $members[0]);
         $this->assertMatchesResourceCollectionJsonSchema(DiscriminatedVehicle::class);
@@ -179,7 +179,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
      */
     public static function postProvider(): iterable
     {
-        yield 'subtype' => [['kind' => 'truck', 'name' => 'Scania', 'payload' => 12000], DiscriminatedTruck::class, 'https://schema.org/Truck'];
+        yield 'subtype' => [['kind' => 'truck', 'name' => 'Scania', 'payload' => 12000], DiscriminatedTruck::class, 'DiscriminatedTruck'];
         yield 'nested subtype' => [['kind' => 'bike', 'frame' => 'mountain', 'name' => 'Trek', 'suspension' => 'hardtail'], DiscriminatedMountainBike::class, 'DiscriminatedMountainBike'];
         yield 'class declared in its own nested map' => [['kind' => 'bike', 'frame' => 'bike', 'name' => 'Brompton', 'gears' => 3], DiscriminatedBike::class, 'DiscriminatedBike'];
     }
@@ -264,6 +264,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         yield 'type change on PUT' => ['PUT', '/discriminated_vehicles/1', ['kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000], 'kind', UnprocessableValueException::TYPE_MISMATCH_ERROR];
         yield 'nested type change on PUT' => ['PUT', '/discriminated_vehicles/4', ['kind' => 'bike', 'frame' => 'bike', 'name' => 'Rocky'], 'frame', UnprocessableValueException::TYPE_MISMATCH_ERROR];
         yield '@type contradicting the type' => ['POST', '/discriminated_vehicles', ['@type' => 'DiscriminatedCar', 'kind' => 'truck', 'name' => 'Scania'], 'kind', UnprocessableValueException::TYPE_MISMATCH_ERROR];
+        yield '@type of a resource subtype contradicting the type' => ['POST', '/discriminated_vehicles', ['@type' => 'https://schema.org/BusOrCoach', 'kind' => 'truck', 'name' => 'Scania'], 'kind', UnprocessableValueException::TYPE_MISMATCH_ERROR];
         yield '@type contradicting the nested type' => ['POST', '/discriminated_vehicles', ['@type' => 'DiscriminatedMountainBike', 'kind' => 'bike', 'frame' => 'bike', 'name' => 'Brompton'], 'frame', UnprocessableValueException::TYPE_MISMATCH_ERROR];
     }
 
@@ -382,7 +383,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $client = self::createClient();
 
         $classes = array_column($client->request('GET', '/docs.jsonld')->toArray()['hydra:supportedClass'], null, '@id');
-        $truck = $classes['https://schema.org/Truck'];
+        $truck = $classes['#DiscriminatedTruck'];
         $this->assertSame('#DiscriminatedVehicle', $truck['subClassOf']);
         $this->assertSame(['#DiscriminatedTruck/payload'], array_column(array_column($truck['hydra:supportedProperty'], 'hydra:property'), '@id'));
         $this->assertSame('#DiscriminatedBike', $classes['#DiscriminatedMountainBike']['subClassOf']);

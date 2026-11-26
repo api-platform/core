@@ -43,7 +43,6 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Action\NotExposedAction;
 use ApiPlatform\Symfony\Action\NotFoundAction;
-use ApiPlatform\Symfony\Bundle\CacheWarmer\SubtypeCacheWarmer;
 use ApiPlatform\Symfony\Routing\ApiLoader;
 use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Symfony\Routing\Router;
@@ -168,13 +167,6 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ]);
-
-    $services->set('api_platform.cache_warmer.subtype', SubtypeCacheWarmer::class)
-        ->args([
-            service('api_platform.serializer.subtype_resolver'),
-            service('api_platform.metadata.resource.name_collection_factory'),
-        ])
-        ->tag('kernel.cache_warmer', ['priority' => -1024]);
 
     $services->set('api_platform.serializer.normalizer.item', ItemNormalizer::class)
         ->args([

@@ -181,10 +181,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     private function getClassId(string $class): string
     {
-        $name = $this->subtypeResolver?->getTypeName($class) ?? '';
-        $types = $this->subtypeResolver?->getTypes($class) ?? [];
-
-        return [$name] === $types ? "#$name" : $types[0];
+        return '#'.$this->subtypeResolver?->getTypeName($class);
     }
 
     /**

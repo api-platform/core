@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 
 /**
@@ -36,16 +35,12 @@ interface SubtypeResolverInterface
     public function getSubtypes(string $class): array;
 
     /**
-     * Returns the name of a class in JSON-LD and Hydra: the short name of its resource, or of the subtype.
-     *
-     * @throws RuntimeException when a subtype name is also the name of a resource or of another subtype
+     * Returns the name of a class in JSON-LD and Hydra: the short name of its resource, or of the class.
      */
     public function getTypeName(string $class): string;
 
     /**
-     * Returns the JSON-LD types of a subtype, its name unless declared with ApiSubtype.
-     *
-     * @throws RuntimeException when a subtype name is also the name of a resource or of another subtype
+     * Returns the JSON-LD types of a class: the types of its resource, or the short name of the class.
      *
      * @return list<string>
      */
