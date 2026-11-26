@@ -95,4 +95,33 @@ final class PropertyCollectionIriOnlyTest extends ApiTestCase
             'toOneRelation' => '/parent/1/property-uri-template/one-to-ones/1',
         ]);
     }
+
+    public function testDocumentationAttachesUriTemplateOperationsToLinks(): void
+    {
+        $classes = [];
+        foreach (self::createClient()->request('GET', '/docs.jsonld')->toArray()['hydra:supportedClass'] as $class) {
+            $classes[$class['@id']] = $class;
+        }
+
+        $entrypointProperties = [];
+        foreach ($classes['#Entrypoint']['hydra:supportedProperty'] as $supportedProperty) {
+            $entrypointProperties[$supportedProperty['hydra:property']['@id']] = $supportedProperty['hydra:property'];
+        }
+
+        $entrypointOperations = array_column($entrypointProperties['#Entrypoint/propertyCollectionIriOnlyRelation']['hydra:supportedOperation'], 'hydra:method');
+        sort($entrypointOperations);
+        $this->assertSame(['GET', 'POST'], $entrypointOperations);
+
+        $properties = [];
+        foreach ($classes['#PropertyCollectionIriOnly']['hydra:supportedProperty'] as $supportedProperty) {
+            $properties[$supportedProperty['hydra:property']['@id']] = $supportedProperty['hydra:property'];
+        }
+
+        foreach (['#PropertyCollectionIriOnly/propertyCollectionIriOnlyRelation', '#PropertyCollectionIriOnly/iterableIri'] as $link) {
+            $this->assertSame('hydra:Link', $properties[$link]['@type']);
+            $this->assertSame(['GET'], array_column($properties[$link]['hydra:supportedOperation'], 'hydra:method'));
+        }
+
+        $this->assertArrayNotHasKey('hydra:supportedOperation', $properties['#PropertyCollectionIriOnly/toOneRelation']);
+    }
 }

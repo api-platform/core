@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -1069,54 +1070,12 @@ class DocumentationNormalizerTest extends TestCase
 
     public function testNormalizeSubresourceCollectionIsLinkedFromParentPropertyUriTemplate(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection(['Book' => 'Book', 'Review' => 'Review']), 'Test Api', 'test', '0.0.0');
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Book')->willReturn(new ResourceMetadataCollection('Book', [
-            (new ApiResource())->withShortName('Book')->withOperations(new Operations([
-                'get_collection' => (new GetCollection())->withShortName('Book'),
-            ])),
-        ]));
-        $resourceMetadataFactoryProphecy->create('Review')->willReturn(new ResourceMetadataCollection('Review', [
-            (new ApiResource())->withShortName('Review')->withOperations(new Operations([
-                'get' => (new Get())->withShortName('Review'),
-                'get_collection' => (new GetCollection(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
-                'post' => (new Post(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
-            ])),
-        ]));
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create('Book', [])->willReturn(new PropertyNameCollection(['reviews']));
-        $propertyNameCollectionFactoryProphecy->create('Review', [])->willReturn(new PropertyNameCollection([]));
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create('Book', 'reviews', Argument::type('array'))->willReturn(
-            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withUriTemplate('/books/{bookId}/reviews{._format}')->withReadable(true)->withWritable(false)->withReadableLink(false) // @phpstan-ignore-line
+        $classes = $this->normalizeBookReviewsDocumentation(
+            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withUriTemplate('/books/{bookId}/reviews{._format}')->withReadable(true)->withWritable(false)->withReadableLink(false), // @phpstan-ignore-line
+            ['Review' => self::bookReviewsOperations()],
         );
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
-
-        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGenerator->generate('api_entrypoint')->willReturn('/');
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc');
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc');
-
-        $documentationNormalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $urlGenerator->reveal(),
-        );
-
-        $classes = [];
-        foreach ($documentationNormalizer->normalize($documentation)['hydra:supportedClass'] as $class) {
-            $classes[$class['@id']] = $class;
-        }
-
-        $entrypointProperties = array_map(static fn (array $property): string => $property['hydra:property']['@id'], $classes['#Entrypoint']['hydra:supportedProperty']);
-        $this->assertSame(['#Entrypoint/book'], $entrypointProperties);
+        $this->assertSame(['#Entrypoint/book'], $this->entrypointPropertyIds($classes));
 
         $reviews = $classes['#Book']['hydra:supportedProperty'][0]['hydra:property'];
         $this->assertSame('#Book/reviews', $reviews['@id']);
@@ -1142,7 +1101,93 @@ class DocumentationNormalizerTest extends TestCase
 
     public function testNormalizeSubresourceCollectionStaysInEntrypointWithoutPropertyUriTemplate(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection(['Book' => 'Book', 'Review' => 'Review']), 'Test Api', 'test', '0.0.0');
+        $classes = $this->normalizeBookReviewsDocumentation(
+            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withReadable(true)->withWritable(false)->withReadableLink(false), // @phpstan-ignore-line
+            ['Review' => self::bookReviewsOperations()],
+        );
+
+        $this->assertSame(['#Entrypoint/book', '#Entrypoint/review'], $this->entrypointPropertyIds($classes));
+        $this->assertArrayNotHasKey('hydra:supportedOperation', $classes['#Book']['hydra:supportedProperty'][0]['hydra:property']);
+    }
+
+    public function testNormalizeTopLevelCollectionLinkedFromPropertyStaysInEntrypoint(): void
+    {
+        $classes = $this->normalizeBookReviewsDocumentation(
+            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withUriTemplate('/reviews{._format}')->withReadable(true)->withWritable(false)->withReadableLink(false), // @phpstan-ignore-line
+            ['Review' => [
+                'get' => (new Get())->withShortName('Review'),
+                'get_collection' => (new GetCollection(uriTemplate: '/reviews{._format}'))->withShortName('Review'),
+            ]],
+        );
+
+        $this->assertSame(['#Entrypoint/book', '#Entrypoint/review'], $this->entrypointPropertyIds($classes));
+        $this->assertSame(['GET'], array_column($classes['#Entrypoint']['hydra:supportedProperty'][1]['hydra:property']['hydra:supportedOperation'], 'hydra:method'));
+        $this->assertSame(['GET'], array_column($classes['#Book']['hydra:supportedProperty'][0]['hydra:property']['hydra:supportedOperation'], 'hydra:method'));
+    }
+
+    public function testNormalizeSubresourceOperationOfAnotherResourceStaysInEntrypoint(): void
+    {
+        $classes = $this->normalizeBookReviewsDocumentation(
+            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withUriTemplate('/books/{bookId}/reviews{._format}')->withReadable(true)->withWritable(false)->withReadableLink(false), // @phpstan-ignore-line
+            [
+                'Review' => [
+                    'get' => (new Get())->withShortName('Review'),
+                    'get_collection' => (new GetCollection(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
+                ],
+                'ReviewInput' => [
+                    'post' => (new Post(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('ReviewInput'),
+                ],
+            ],
+        );
+
+        $this->assertSame(['#Entrypoint/book', '#Entrypoint/reviewInput'], $this->entrypointPropertyIds($classes));
+        $this->assertSame(['GET'], array_column($classes['#Book']['hydra:supportedProperty'][0]['hydra:property']['hydra:supportedOperation'], 'hydra:method'));
+    }
+
+    public function testNormalizeUnreadablePropertyUriTemplateIsNotLinked(): void
+    {
+        $classes = $this->normalizeBookReviewsDocumentation(
+            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withUriTemplate('/books/{bookId}/reviews{._format}')->withReadable(false)->withWritable(true)->withReadableLink(false), // @phpstan-ignore-line
+            ['Review' => self::bookReviewsOperations()],
+        );
+
+        $this->assertSame(['#Entrypoint/book', '#Entrypoint/review'], $this->entrypointPropertyIds($classes));
+        $this->assertArrayNotHasKey('hydra:supportedOperation', $classes['#Book']['hydra:supportedProperty'][0]['hydra:property']);
+    }
+
+    public function testNormalizePropertyUriTemplateKeepsJsonldContextType(): void
+    {
+        $classes = $this->normalizeBookReviewsDocumentation(
+            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withUriTemplate('/books/{bookId}/reviews{._format}')->withJsonldContext(['hydra:property' => ['@type' => 'rdf:Property']])->withReadable(true)->withWritable(false)->withReadableLink(false), // @phpstan-ignore-line
+            ['Review' => self::bookReviewsOperations()],
+        );
+
+        $reviews = $classes['#Book']['hydra:supportedProperty'][0]['hydra:property'];
+        $this->assertSame('rdf:Property', $reviews['@type']);
+        $this->assertSame(['GET', 'POST'], array_column($reviews['hydra:supportedOperation'], 'hydra:method'));
+    }
+
+    /**
+     * @return array<string, Operation>
+     */
+    private static function bookReviewsOperations(): array
+    {
+        return [
+            'get' => (new Get())->withShortName('Review'),
+            'get_collection' => (new GetCollection(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
+            'post' => (new Post(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
+        ];
+    }
+
+    /**
+     * @param array<string, array<string, Operation>> $resources
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function normalizeBookReviewsDocumentation(ApiProperty $reviews, array $resources): array
+    {
+        $resourceNames = ['Book' => 'Book'] + array_combine(array_keys($resources), array_keys($resources));
+        $documentation = new Documentation(new ResourceNameCollection($resourceNames), 'Test Api', 'test', '0.0.0');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Book')->willReturn(new ResourceMetadataCollection('Book', [
@@ -1150,22 +1195,19 @@ class DocumentationNormalizerTest extends TestCase
                 'get_collection' => (new GetCollection())->withShortName('Book'),
             ])),
         ]));
-        $resourceMetadataFactoryProphecy->create('Review')->willReturn(new ResourceMetadataCollection('Review', [
-            (new ApiResource())->withShortName('Review')->withOperations(new Operations([
-                'get' => (new Get())->withShortName('Review'),
-                'get_collection' => (new GetCollection(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
-                'post' => (new Post(uriTemplate: '/books/{bookId}/reviews{._format}', uriVariables: ['bookId' => new Link(fromClass: 'Book', toProperty: 'book')]))->withShortName('Review'),
-            ])),
-        ]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('Book', [])->willReturn(new PropertyNameCollection(['reviews']));
-        $propertyNameCollectionFactoryProphecy->create('Review', [])->willReturn(new PropertyNameCollection([]));
+
+        foreach ($resources as $shortName => $operations) {
+            $resourceMetadataFactoryProphecy->create($shortName)->willReturn(new ResourceMetadataCollection($shortName, [
+                (new ApiResource())->withShortName($shortName)->withOperations(new Operations($operations)),
+            ]));
+            $propertyNameCollectionFactoryProphecy->create($shortName, [])->willReturn(new PropertyNameCollection([]));
+        }
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create('Book', 'reviews', Argument::type('array'))->willReturn(
-            (new ApiProperty())->withNativeType(Type::collection(Type::object('Book'), Type::object('Review')))->withReadable(true)->withWritable(false)->withReadableLink(false) // @phpstan-ignore-line
-        );
+        $propertyMetadataFactoryProphecy->create('Book', 'reviews', Argument::type('array'))->willReturn($reviews);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
@@ -1188,9 +1230,17 @@ class DocumentationNormalizerTest extends TestCase
             $classes[$class['@id']] = $class;
         }
 
-        $entrypointProperties = array_map(static fn (array $property): string => $property['hydra:property']['@id'], $classes['#Entrypoint']['hydra:supportedProperty']);
-        $this->assertSame(['#Entrypoint/book', '#Entrypoint/review'], $entrypointProperties);
-        $this->assertArrayNotHasKey('hydra:supportedOperation', $classes['#Book']['hydra:supportedProperty'][0]['hydra:property']);
+        return $classes;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $classes
+     *
+     * @return list<string>
+     */
+    private function entrypointPropertyIds(array $classes): array
+    {
+        return array_map(static fn (array $property): string => $property['hydra:property']['@id'], $classes['#Entrypoint']['hydra:supportedProperty']);
     }
 
     public function testNormalizeNoEntrypointAndHideHydraOperation(): void
