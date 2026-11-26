@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\State\ApiResource\Error;
 
 /**
@@ -81,7 +82,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private readonly ResourceLinkageResolver $resourceLinkageResolver;
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, ?ResourceLinkageResolver $resourceLinkageResolver = null, private readonly bool $strictMemberNames = false)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null, ?ResourceLinkageResolver $resourceLinkageResolver = null, private readonly bool $strictMemberNames = false, private readonly ?SubtypeResolverInterface $subtypeResolver = null)
     {
         if (!$definitionNameFactory) {
             $this->definitionNameFactory = new DefinitionNameFactory();
@@ -291,7 +292,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Capture the resource's operation up front; the relationship loop below reassigns $operation.
         $resourceOperation = $operation;
         $definitions = $schema->getDefinitions();
-        $properties = $definitions[$key]['properties'] ?? [];
+        // A definition listing its subtypes in "oneOf" carries no properties: an instance of the class itself is described by its inline branch
+        $ownBranch = null;
+        foreach (null !== $this->subtypeResolver?->getMapping($propertyClass) ? $definitions[$key]['oneOf'] ?? [] : [] as $branch) {
+            if (!isset($branch['$ref'])) {
+                $ownBranch = $branch;
+                break;
+            }
+        }
+        $properties = $ownBranch['properties'] ?? $definitions[$key]['properties'] ?? [];
 
         $attributes = [];
         $relationships = [];
@@ -383,16 +392,111 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Only relax the requirement on the input schema; responses still always carry an `id`.
         $required = Schema::TYPE_INPUT === $type && $resourceOperation instanceof HttpOperation && 'POST' === $resourceOperation->getMethod() ? ['type'] : ['type', 'id'];
 
-        $resourceDefinitionName = $documentDefinitionName.'.resource';
-        $definitions[$resourceDefinitionName] = [
+        $data = [
             'type' => 'object',
             'properties' => $replacement,
             'required' => $required,
         ];
 
+        // Subtypes declared in a serializer discriminator map: the type property lives in "attributes" so an OpenAPI discriminator cannot be used
+        $oneOf = [];
+        $reservedAttributes = null;
+        foreach ($this->getDiscriminatedSubtypes($key, $propertyClass, $definitions, $schema->getVersion()) as [$subKey, $subClass, $typeProperty]) {
+            $reservedAttributes ??= ReservedAttributeNameConverter::getReservedAttributes($this->strictMemberNames);
+            $attributeName = $reservedAttributes[$typeProperty] ?? $typeProperty;
+
+            // The inline branch of a class declared in its own discriminator map describes the instances of the class itself
+            if (!$oneOf && null !== $ownBranch) {
+                if (\in_array($typeProperty, $ownBranch['required'] ?? [], true)) {
+                    $data['properties']['attributes']['required'] = [$attributeName];
+                }
+                $oneOf[] = $data;
+            }
+
+            $subDocumentDefinitionName = $documentDefinitionName.'.'.$this->subtypeResolver->getTypeName($subClass);
+            $subSchema = $this->buildDefinitionPropertiesSchema($subKey, $subDocumentDefinitionName, $subClass, $format, $type, $resourceOperation, $schema, $serializerContext);
+            if (\in_array($typeProperty, $definitions[$subKey]['required'] ?? [], true)) {
+                $definitions[$subDocumentDefinitionName.'.resource']['properties']['attributes']['required'] = [$attributeName];
+            }
+            $oneOf[] = $subSchema['data'];
+
+            foreach ($subSchema['included']['items']['anyOf'] ?? [] as $relatedDefinition) {
+                $relatedDefinitions[$relatedDefinition['$ref']] = $relatedDefinition;
+            }
+        }
+
+        // Every branch carries the common members: they are not repeated next to "oneOf"
+        if ($oneOf) {
+            $data = ['type' => 'object', 'oneOf' => $oneOf];
+        }
+
+        if ($relatedDefinitions && !$included) {
+            $included = [
+                'included' => [
+                    'description' => 'Related resources requested via the "include" query parameter.',
+                    'type' => 'array',
+                    'items' => [],
+                    'readOnly' => true,
+                    'externalDocs' => [
+                        'url' => 'https://jsonapi.org/format/#fetching-includes',
+                    ],
+                ],
+            ];
+        }
+
+        if ($included) {
+            $included['included']['items'] = ['anyOf' => array_values($relatedDefinitions)];
+        }
+
+        $resourceDefinitionName = $documentDefinitionName.'.resource';
+        $definitions[$resourceDefinitionName] = $data;
+
         return [
             'data' => ['$ref' => $this->getSchemaUriPrefix($schema->getVersion()).$resourceDefinitionName],
         ] + $included;
+    }
+
+    /**
+     * Matches the "$ref" branches of a "oneOf" to the subtypes through the type value their definition declares.
+     *
+     * @return iterable<array{string, class-string, string}>
+     */
+    private function getDiscriminatedSubtypes(string $key, string $className, \ArrayObject $definitions, string $version): iterable
+    {
+        if (!isset($definitions[$key]['oneOf']) || null === $mapping = $this->subtypeResolver?->getMapping($className)) {
+            return;
+        }
+
+        $typeProperty = $mapping->getTypeProperty();
+        $subtypes = $this->subtypeResolver->getDirectSubtypes($className);
+        $prefix = $this->getSchemaUriPrefix($version);
+        foreach ($definitions[$key]['oneOf'] as $branch) {
+            if (!isset($branch['$ref'])) {
+                continue;
+            }
+
+            $subKey = substr($branch['$ref'], \strlen($prefix));
+            $typeValue = $this->getTypeValue($definitions, $subKey, $typeProperty, $prefix);
+            if (null !== $typeValue && isset($subtypes[$typeValue])) {
+                yield [$subKey, $subtypes[$typeValue], $typeProperty];
+            }
+        }
+    }
+
+    private function getTypeValue(\ArrayObject $definitions, string $key, string $typeProperty, string $prefix): ?string
+    {
+        if (isset($definitions[$key]['properties'][$typeProperty]['enum'][0])) {
+            return (string) $definitions[$key]['properties'][$typeProperty]['enum'][0];
+        }
+
+        foreach ($definitions[$key]['oneOf'] ?? [] as $branch) {
+            $typeValue = isset($branch['$ref']) ? $this->getTypeValue($definitions, substr($branch['$ref'], \strlen($prefix)), $typeProperty, $prefix) : ($branch['properties'][$typeProperty]['enum'][0] ?? null);
+            if (null !== $typeValue) {
+                return (string) $typeValue;
+            }
+        }
+
+        return null;
     }
 
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
@@ -409,6 +513,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $relatedClasses = [];
         foreach ($relationships as [$className, $isCollection]) {
             $isOne = $isOne || !$isCollection;
+            // A relation narrowed to a subtype targets the resource itself
+            if (null !== $this->subtypeResolver) {
+                $className = $this->resourceClassResolver->getResourceClass(null, $className);
+            }
             $relatedClasses[$className] = $className;
         }
 

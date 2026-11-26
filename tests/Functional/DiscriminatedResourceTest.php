@@ -110,6 +110,9 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertSame(18000, $attributes['payload']);
         // Subtype property security
         $this->assertArrayNotHasKey('plate', $attributes);
+        if ('jsonhal' !== $format) {
+            $this->assertMatchesResourceItemJsonSchema(DiscriminatedVehicle::class, format: $format);
+        }
     }
 
     /**
@@ -136,6 +139,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         foreach ($absent as $property) {
             $this->assertArrayNotHasKey($property, $json);
         }
+        $this->assertMatchesResourceItemJsonSchema(DiscriminatedVehicle::class);
     }
 
     /**
@@ -167,6 +171,7 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertSame(['DiscriminatedCar', 'DiscriminatedTruck', 'DiscriminatedCar', 'DiscriminatedMountainBike', 'DiscriminatedBike'], array_column($members, '@type'));
         $this->assertSame(18000, $members[1]['payload']);
         $this->assertArrayNotHasKey('payload', $members[0]);
+        $this->assertMatchesResourceCollectionJsonSchema(DiscriminatedVehicle::class);
     }
 
     /**
@@ -335,6 +340,42 @@ final class DiscriminatedResourceTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['@id' => '/discriminated_vehicles/2', 'kind' => 'truck', 'name' => 'Unimog', 'payload' => 5000]);
         $this->assertInstanceOf(DiscriminatedTruck::class, DiscriminatedVehicleStore::$vehicles[2]);
+    }
+
+    public function testOpenApiDocumentsSubtypes(): void
+    {
+        $json = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ])->toArray();
+        $schemas = $json['components']['schemas'];
+
+        $output = $schemas['DiscriminatedVehicle.jsonld']['allOf'][1] ?? $schemas['DiscriminatedVehicle.jsonld'];
+        $this->assertSame([
+            'propertyName' => 'kind',
+            'mapping' => [
+                'car' => '#/components/schemas/DiscriminatedCar.jsonld',
+                'truck' => '#/components/schemas/DiscriminatedTruck.jsonld',
+                'bike' => '#/components/schemas/DiscriminatedBike.jsonld',
+                'bus' => '#/components/schemas/DiscriminatedBus.jsonld',
+            ],
+        ], $output['discriminator']);
+        $this->assertCount(4, $output['oneOf']);
+        $this->assertArrayNotHasKey('properties', $output);
+
+        $truck = $schemas['DiscriminatedTruck.jsonld'];
+        $this->assertSame(['type' => 'string', 'enum' => ['truck']], $truck['properties']['kind']);
+        $this->assertArrayHasKey('payload', $truck['properties']);
+        $this->assertSame(5, $truck['properties']['name']['minLength']);
+        $this->assertArrayNotHasKey('minLength', $schemas['DiscriminatedCar.jsonld']['properties']['name']);
+
+        // The nested map lists the bike itself: an instance of the bike is described by an inline branch
+        $bike = $schemas['DiscriminatedBike.jsonld'];
+        $this->assertSame('frame', $bike['discriminator']['propertyName']);
+        $this->assertSame(['type' => 'string', 'enum' => ['bike']], $bike['oneOf'][0]['properties']['frame']);
+        $this->assertSame(['$ref' => '#/components/schemas/DiscriminatedMountainBike.jsonld'], $bike['oneOf'][1]);
+
+        // Unmapped subclasses are never documented
+        $this->assertArrayNotHasKey('DiscriminatedSportsCar.jsonld', $schemas);
     }
 
     public function testHydraDocumentsSubtypesAsSubclasses(): void
