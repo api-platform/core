@@ -52,7 +52,7 @@ if (false === interface_exists(ObjectMapperAwareInterface::class)) {
                 throw new RuntimeException(\sprintf('Given object mapper "%s" does not implements %s.', get_debug_type($this->decorated), ObjectMapperAwareInterface::class));
             }
 
-            $s->decorated->withObjectMapper($objectMapper);
+            $s->decorated = $s->decorated->withObjectMapper($objectMapper);
 
             return $s;
         }
