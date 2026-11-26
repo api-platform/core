@@ -16,14 +16,19 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 
 class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    /**
+     * @param SubtypeResolverInterface|\Closure(): ?SubtypeResolverInterface|null $subtypeResolver
+     */
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $decorated,
         private readonly ObjectMapperMetadataFactoryInterface $objectMapperMetadata,
+        private SubtypeResolverInterface|\Closure|null $subtypeResolver = null,
     ) {
     }
 
@@ -93,7 +98,11 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
     {
         try {
             $r = new \ReflectionClass($class);
-            if (!$r->isInstantiable() || !($mapping = $this->objectMapperMetadata->create($r->newInstanceWithoutConstructor(), null, ['_api_check_can_be_mapped' => true]))) {
+            if (!$r->isInstantiable()) {
+                return $this->canSubtypesBeMapped($class);
+            }
+
+            if (!($mapping = $this->objectMapperMetadata->create($r->newInstanceWithoutConstructor(), null, ['_api_check_can_be_mapped' => true]))) {
                 return false;
             }
         } catch (\ReflectionException $e) {
@@ -101,5 +110,25 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
         }
 
         return $mapping;
+    }
+
+    /**
+     * @return bool|list<Mapping>
+     */
+    private function canSubtypesBeMapped(string $class): bool|array
+    {
+        if ($this->subtypeResolver instanceof \Closure) {
+            $this->subtypeResolver = ($this->subtypeResolver)();
+        }
+
+        $mappings = [];
+        foreach ($this->subtypeResolver?->getSubtypes($class) ?? [] as $subtype) {
+            $subtypeMapping = $this->canBeMapped($subtype);
+            if (\is_array($subtypeMapping)) {
+                array_push($mappings, ...$subtypeMapping);
+            }
+        }
+
+        return $mappings ?: false;
     }
 }

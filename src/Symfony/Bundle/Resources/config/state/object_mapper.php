@@ -15,6 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Metadata\Resource\Factory\ObjectMapperMetadataCollectionFactory;
 use ApiPlatform\State\ObjectMapper\ObjectMapper;
+use ApiPlatform\State\ObjectMapper\SubtypeObjectMapper;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 
@@ -24,6 +25,14 @@ return static function (ContainerConfigurator $container) {
     $services->set('api_platform.object_mapper.metadata_factory', ReflectionObjectMapperMetadataFactory::class);
 
     $services->alias('api_platform.object_mapper', 'object_mapper');
+
+    $services->set('api_platform.object_mapper.subtype', SubtypeObjectMapper::class)
+        ->decorate('api_platform.object_mapper', null, 0)
+        ->args([
+            service('api_platform.object_mapper.subtype.inner'),
+            service('api_platform.serializer.subtype_resolver'),
+            service('api_platform.object_mapper.metadata_factory'),
+        ]);
 
     $services->set('api_platform.object_mapper.relation', ObjectMapper::class)
         ->decorate('api_platform.object_mapper', null, -255)
@@ -42,5 +51,6 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory.object_mapper.inner'),
             service('api_platform.object_mapper.metadata_factory'),
+            service_closure('api_platform.serializer.subtype_resolver')->ignoreOnInvalid(),
         ]);
 };

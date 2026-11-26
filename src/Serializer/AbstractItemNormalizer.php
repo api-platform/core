@@ -716,7 +716,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
         // Only the subtypes declared in a discriminator map of the resource are exposed
-        $discriminatorMapping = $this->getDiscriminatorMapping($resourceClass, $context['resource_class']);
+        $discriminatorMapping = $this->getDiscriminatorMapping($resourceClass, \is_object($classOrObject) ? $this->getObjectClass($classOrObject) : $context['resource_class']);
         if (null !== $discriminatorMapping) {
             $resourceClass = $discriminatorMapping['class'];
         }

@@ -215,6 +215,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (class_exists(ObjectMapper::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('state/object_mapper.php');
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
+
+            if (!$container->hasDefinition('api_platform.serializer.subtype_resolver')) {
+                $container->removeDefinition('api_platform.object_mapper.subtype');
+            }
         }
 
         $container->setParameter('api_platform.mcp.format', $config['mcp']['format'] ?? null);
