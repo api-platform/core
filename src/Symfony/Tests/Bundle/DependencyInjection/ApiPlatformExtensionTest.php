@@ -682,9 +682,13 @@ class ApiPlatformExtensionTest extends TestCase
     public function testResourcePolymorphismIsDisabledByDefault(): void
     {
         $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        $config['api_platform']['doctrine_mongodb_odm']['enabled'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $this->assertNotContainerHasService('api_platform.serializer.subtype_resolver');
+        $this->assertNotContainerHasService('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
     }
 
     /**
@@ -693,6 +697,8 @@ class ApiPlatformExtensionTest extends TestCase
     public static function resourcePolymorphismConfigProvider(): iterable
     {
         yield 'serializer' => [['serializer' => ['discriminator_map' => true]], null];
+        yield 'doctrine' => [['doctrine' => ['enabled' => true, 'discriminator_map' => true]], 'api_platform.doctrine.orm.serializer.discriminator_mapping_loader'];
+        yield 'doctrine_mongodb_odm' => [['doctrine_mongodb_odm' => ['enabled' => true, 'discriminator_map' => true]], 'api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader'];
     }
 
     /**

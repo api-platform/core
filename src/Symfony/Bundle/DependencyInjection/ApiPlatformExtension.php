@@ -349,7 +349,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setDefinition('serializer.normalizer.number', $numberNormalizerDefinition);
         }
 
-        if (!$config['serializer']['discriminator_map']) {
+        // Doctrine discriminator maps are exposed as serializer discriminator maps: they need resource polymorphism
+        if (!$config['serializer']['discriminator_map']
+            && !($this->isConfigEnabled($container, $config['doctrine']) && $config['doctrine']['discriminator_map'])
+            && !($this->isConfigEnabled($container, $config['doctrine_mongodb_odm']) && $config['doctrine_mongodb_odm']['discriminator_map'])
+        ) {
             $container->removeDefinition('api_platform.serializer.subtype_resolver');
             $container->setParameter('api_platform.serializer.resource_polymorphism', false);
         } else {
@@ -874,6 +878,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('graphql/doctrine_orm.php');
         }
 
+        if (!$config['doctrine']['discriminator_map']) {
+            $container->removeDefinition('api_platform.doctrine.orm.serializer.discriminator_mapping_loader');
+        }
+
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
         }
@@ -907,6 +915,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql/doctrine_mongodb_odm.php');
+        }
+
+        if (!$config['doctrine_mongodb_odm']['discriminator_map']) {
+            $container->removeDefinition('api_platform.doctrine_mongodb.odm.serializer.discriminator_mapping_loader');
         }
     }
 

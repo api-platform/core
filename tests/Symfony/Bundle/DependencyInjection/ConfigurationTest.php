@@ -200,9 +200,11 @@ class ConfigurationTest extends TestCase
             ],
             'doctrine' => [
                 'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),
+                'discriminator_map' => false,
             ],
             'doctrine_mongodb_odm' => [
                 'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true),
+                'discriminator_map' => false,
             ],
             'messenger' => [
                 'enabled' => true,
