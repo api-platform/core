@@ -151,6 +151,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolver;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\OpenApi\Command\OpenApiCommand;
@@ -217,6 +219,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -309,6 +312,14 @@ class ApiPlatformProvider extends ServiceProvider
                     new EloquentAttributeLoader(new AttributeLoader()),
                     new RelationMetadataLoader($app->make(ModelMetadata::class)),
                 ])
+            );
+        });
+
+        $this->app->singleton(SubtypeResolverInterface::class, static function (Application $app) {
+            return new SubtypeResolver(
+                new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
 

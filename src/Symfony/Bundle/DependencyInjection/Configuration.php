@@ -173,6 +173,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hydra_prefix')->defaultFalse()->info('Use the "hydra:" prefix.')->end()
+                        ->booleanNode('discriminator_map')->defaultFalse()->info('Expose the subtypes declared in the serializer discriminator map of a resource (polymorphic resources): subtype properties are readable, writable and documented.')->end()
                     ->end()
                 ->end()
             ->end();
