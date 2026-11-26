@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
@@ -89,8 +90,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
         bool $useIriAsId = true,
         ?ResourceLinkageResolver $resourceLinkageResolver = null,
+        ?SubtypeResolverInterface $subtypeResolver = null,
     ) {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver, $subtypeResolver);
         $this->useIriAsId = $useIriAsId;
         $this->resourceLinkageResolver = $resourceLinkageResolver ?? new ResourceLinkageResolver($resourceClassResolver);
     }
