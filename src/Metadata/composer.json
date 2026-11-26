@@ -44,6 +44,7 @@
         "phpunit/phpunit": "^11.5 || ^12.2 || ^13.0",
         "symfony/config": "^7.4 || ^8.0",
         "symfony/routing": "^7.4 || ^8.0",
+        "symfony/serializer": "^7.4 || ^8.0",
         "symfony/var-dumper": "^7.4 || ^8.0",
         "symfony/web-link": "^7.4 || ^8.0",
         "symfony/yaml": "^7.4 || ^8.0"
@@ -51,7 +52,8 @@
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
         "symfony/yaml": "For YAML resource configuration.",
-        "symfony/config": "For XML resource configuration."
+        "symfony/config": "For XML resource configuration.",
+        "symfony/serializer": "For resource polymorphism through serializer discriminator maps."
     },
     "autoload": {
         "psr-4": {

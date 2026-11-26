@@ -29,6 +29,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -676,5 +677,37 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertSame('api_platform.doctrine_mongodb.odm.state.persist_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.persist_processor')->getDecoratedService()[0]);
         $this->assertSame('api_platform.doctrine_mongodb.odm.state.remove_processor', $this->container->getDefinition('api_platform.doctrine_mongodb.odm.http_cache.purge_tags.remove_processor')->getDecoratedService()[0]);
         $this->assertNotContainerHasService('api_platform.doctrine.orm.http_cache.purge_tags.persist_processor');
+    }
+
+    public function testResourcePolymorphismIsDisabledByDefault(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertNotContainerHasService('api_platform.serializer.subtype_resolver');
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, ?string}>
+     */
+    public static function resourcePolymorphismConfigProvider(): iterable
+    {
+        yield 'serializer' => [['serializer' => ['discriminator_map' => true]], null];
+    }
+
+    /**
+     * @param array<string, mixed> $polymorphismConfig
+     */
+    #[DataProvider('resourcePolymorphismConfigProvider')]
+    public function testResourcePolymorphismCanBeEnabled(array $polymorphismConfig, ?string $loader): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform'] = $polymorphismConfig + $config['api_platform'];
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.serializer.subtype_resolver');
+        if (null !== $loader) {
+            $this->assertContainerHasService($loader);
+        }
     }
 }
