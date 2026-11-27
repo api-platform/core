@@ -242,6 +242,7 @@
         @else
             <script src="/vendor/api-platform/swagger-ui/swagger-ui-bundle.js"></script>
             <script src="/vendor/api-platform/swagger-ui/swagger-ui-standalone-preset.js"></script>
+            <script src="/vendor/api-platform/swagger-ui-login-plugin.js"></script>
             <script src="/vendor/api-platform/init-swagger-ui.js"></script>
         @endif
     </body>
