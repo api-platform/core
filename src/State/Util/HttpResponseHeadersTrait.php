@@ -124,6 +124,8 @@ trait HttpResponseHeadersTrait
                 $iri = null;
                 if ($hasData) {
                     $iri = $this->iriConverter->getIriFromResource($originalData);
+                } elseif ($hasOutput && \is_object($mappedResource = $request->attributes->get('mapped_resource'))) {
+                    $iri = $this->iriConverter->getIriFromResource($mappedResource);
                 } elseif ($operation->getClass()) {
                     $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                 }
