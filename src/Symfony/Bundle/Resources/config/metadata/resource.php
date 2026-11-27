@@ -46,6 +46,7 @@ return function (ContainerConfigurator $container) {
             service('logger')->nullOnInvalid(),
             '%api_platform.defaults%',
             '%api_platform.graphql.enabled%',
+            service('serializer.mapping.class_discriminator_resolver'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.xml', ExtractorResourceMetadataCollectionFactory::class)
@@ -56,6 +57,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.defaults%',
             service('logger')->nullOnInvalid(),
             '%api_platform.graphql.enabled%',
+            service('serializer.mapping.class_discriminator_resolver'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.php_file', PhpFileResourceMetadataCollectionFactory::class)
@@ -74,6 +76,7 @@ return function (ContainerConfigurator $container) {
             service('logger')->nullOnInvalid(),
             '%api_platform.defaults%',
             '%api_platform.graphql.enabled%',
+            service('serializer.mapping.class_discriminator_resolver'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.container_parameter', ContainerParameterResourceMetadataCollectionFactory::class)

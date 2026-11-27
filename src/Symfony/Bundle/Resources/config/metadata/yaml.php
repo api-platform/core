@@ -50,6 +50,7 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.defaults%',
             service('logger')->nullOnInvalid(),
             '%api_platform.graphql.enabled%',
+            service('serializer.mapping.class_discriminator_resolver'),
         ]);
 
     $services->set('api_platform.metadata.property.metadata_factory.yaml', ExtractorPropertyMetadataFactory::class)

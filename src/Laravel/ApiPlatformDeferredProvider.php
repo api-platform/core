@@ -99,6 +99,8 @@ use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -244,6 +246,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                 $formats['html'] = ['text/html'];
             }
 
+            $classDiscriminatorResolver = $config->get('api-platform.serializer.discriminator_map', false) ? new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)) : null;
+
             return new CacheResourceCollectionMetadataFactory(
                 new EloquentResourceCollectionMetadataFactory(
                     new ParameterValidationResourceMetadataCollectionFactory(
@@ -269,10 +273,12 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                                                                         $app->make(LoggerInterface::class),
                                                                         $config->get('api-platform.defaults', []),
                                                                         $config->get('api-platform.graphql.enabled'),
+                                                                        $classDiscriminatorResolver,
                                                                     ),
                                                                     $app->make(LoggerInterface::class),
                                                                     $config->get('api-platform.defaults', []),
                                                                     $config->get('api-platform.graphql.enabled'),
+                                                                    $classDiscriminatorResolver,
                                                                 ),
                                                             )
                                                         ),

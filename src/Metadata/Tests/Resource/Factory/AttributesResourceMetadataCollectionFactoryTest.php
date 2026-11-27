@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AbstractTraitPropertyParent;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeConfigOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeDefaultOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyGraphQlOperationWithShortName;
@@ -37,6 +38,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationsWithD
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperationWithShortName;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ConcreteTraitPropertyChild;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\InvalidExceptionToStatusOperation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
@@ -51,6 +53,8 @@ use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -489,5 +493,62 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->expectExceptionMessage(\sprintf('GraphQL operation name "item_query" is declared twice on resource "%s".', SameNameGraphQlOperationAttributes::class));
 
         $factory->create(SameNameGraphQlOperationAttributes::class);
+    }
+
+    public function testPolymorphicResourceWithoutGraphQlOperationsOnlyGetsNestedQueries(): void
+    {
+        $resolver = $this->createDiscriminatorResolver(ConcreteTraitPropertyChild::class, ['child' => ConcreteTraitPropertyChild::class]);
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true, classDiscriminatorResolver: $resolver);
+
+        $operations = $factory->create(ConcreteTraitPropertyChild::class)[0]->getGraphQlOperations();
+
+        $this->assertCount(2, $operations);
+        foreach ($operations as $operation) {
+            $this->assertInstanceOf(Query::class, $operation);
+            $this->assertTrue($operation->getNested());
+        }
+    }
+
+    public function testSubtypeResourceIsDetectedThroughItsParentMapping(): void
+    {
+        $resolver = $this->createDiscriminatorResolver(AbstractTraitPropertyParent::class, ['child' => ConcreteTraitPropertyChild::class]);
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true, classDiscriminatorResolver: $resolver);
+
+        $operations = $factory->create(ConcreteTraitPropertyChild::class)[0]->getGraphQlOperations();
+
+        $this->assertCount(2, $operations);
+        foreach ($operations as $operation) {
+            $this->assertInstanceOf(Query::class, $operation);
+            $this->assertTrue($operation->getNested());
+        }
+    }
+
+    public function testPolymorphicResourceWithExplicitGraphQlOperationsThrows(): void
+    {
+        $resolver = $this->createDiscriminatorResolver(MutationDescription::class, ['mutation' => MutationDescription::class]);
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true, classDiscriminatorResolver: $resolver);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('GraphQL is not supported yet for "%s", a resource with a discriminator map', MutationDescription::class));
+
+        $factory->create(MutationDescription::class);
+    }
+
+    public function testResourceKeepsDefaultGraphQlOperationsWithoutDiscriminatorResolver(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->assertSame(
+            ['item_query', 'collection_query', 'update', 'delete', 'create'],
+            array_keys($factory->create(ConcreteTraitPropertyChild::class)[0]->getGraphQlOperations())
+        );
+    }
+
+    private function createDiscriminatorResolver(string $parentClass, array $typesMapping): ClassDiscriminatorResolverInterface
+    {
+        $resolver = $this->createStub(ClassDiscriminatorResolverInterface::class);
+        $resolver->method('getMappingForClass')->willReturnCallback(static fn (string $class): ?ClassDiscriminatorMapping => $parentClass === $class ? new ClassDiscriminatorMapping('kind', $typesMapping) : null);
+
+        return $resolver;
     }
 }

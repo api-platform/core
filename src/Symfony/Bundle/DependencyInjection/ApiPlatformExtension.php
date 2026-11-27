@@ -513,6 +513,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->getDefinition('api_platform.metadata.resource_extractor.php_file')->replaceArgument(0, $phpResources);
+
+        if (!$container->getParameter('api_platform.serializer.resource_polymorphism')) {
+            foreach (['attributes' => 4, 'concerns' => 4, 'xml' => 5, 'yaml' => 5] as $factory => $index) {
+                if ($container->hasDefinition($id = 'api_platform.metadata.resource.metadata_collection_factory.'.$factory)) {
+                    $container->getDefinition($id)->replaceArgument($index, null);
+                }
+            }
+        }
     }
 
     private function getClassNameResources(): array

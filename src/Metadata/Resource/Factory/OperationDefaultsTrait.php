@@ -35,6 +35,7 @@ use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\CreateProvider;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * @internal since api-platform 4.2
@@ -158,6 +159,45 @@ trait OperationDefaultsTrait
         }
 
         return $resource->withGraphQlOperations($graphQlOperations);
+    }
+
+    private function isPolymorphicResource(string $resourceClass, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver): bool
+    {
+        if (null === $classDiscriminatorResolver) {
+            return false;
+        }
+
+        if (null !== $classDiscriminatorResolver->getMappingForClass($resourceClass)) {
+            return true;
+        }
+
+        foreach (class_parents($resourceClass) ?: [] as $parent) {
+            if (null === $mapping = $classDiscriminatorResolver->getMappingForClass($parent)) {
+                continue;
+            }
+
+            foreach ($mapping->getTypesMapping() as $type) {
+                if ($type === $resourceClass) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param GraphQlOperation[] $graphQlOperations
+     */
+    private function assertPolymorphicGraphQlOperations(array $graphQlOperations, string $resourceClass): void
+    {
+        foreach ($graphQlOperations as $operation) {
+            if ($operation instanceof Query && $operation->getNested()) {
+                continue;
+            }
+
+            throw new RuntimeException(\sprintf('GraphQL is not supported yet for "%s", a resource with a discriminator map. Remove its "graphQlOperations" or set them to an empty array.', $resourceClass));
+        }
     }
 
     /**
