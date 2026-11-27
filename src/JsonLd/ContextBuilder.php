@@ -93,18 +93,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
         // Every operation resolves to this same /contexts/{shortName} URI, so union their groups.
         $sharedGroups = $this->getOperationsGroups($resourceMetadataCollection, $operation->getShortName());
 
-        $context = $this->buildOperationContext($operation, $resourceClass, $referenceType, $sharedGroups);
-        foreach ($resourceMetadataCollection as $resource) {
-            foreach ($resource->getOperations() ?? [] as $resourceOperation) {
-                if (true === ($resourceOperation->getExtraProperties()[PotentialActionNormalizer::EXTRA_PROPERTY] ?? false)) {
-                    $context['potentialAction'] = PotentialActionNormalizer::JSONLD_CONTEXT;
-
-                    return $context;
-                }
-            }
-        }
-
-        return $context;
+        return $this->addPotentialAction($this->buildOperationContext($operation, $resourceClass, $referenceType, $sharedGroups), $resourceMetadataCollection);
     }
 
     /**
@@ -177,7 +166,22 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
      */
     public function getResourceContextFromOperation(HttpOperation $operation, string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
-        return $this->buildOperationContext($operation, $resourceClass, $referenceType);
+        return $this->addPotentialAction($this->buildOperationContext($operation, $resourceClass, $referenceType), $this->resourceMetadataFactory->create($resourceClass));
+    }
+
+    private function addPotentialAction(array $context, ResourceMetadataCollection $resourceMetadataCollection): array
+    {
+        foreach ($resourceMetadataCollection as $resource) {
+            foreach ($resource->getOperations() ?? [] as $operation) {
+                if ($operation instanceof HttpOperation && $operation->getPotentialAction()) {
+                    $context['potentialAction'] = PotentialActionNormalizer::JSONLD_CONTEXT;
+
+                    return $context;
+                }
+            }
+        }
+
+        return $context;
     }
 
     private function buildOperationContext(HttpOperation $operation, string $resourceClass, int $referenceType, ?array $additionalGroups = []): array

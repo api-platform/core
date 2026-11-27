@@ -108,6 +108,7 @@ final class Patch extends HttpOperation
         array $extraProperties = [],
         ?bool $map = null,
         ?string $canonicalUriTemplate = null,
+        bool|string|array|null $potentialAction = null,
     ) {
         parent::__construct(
             method: 'PATCH',
@@ -196,7 +197,8 @@ final class Patch extends HttpOperation
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map,
-            canonicalUriTemplate: $canonicalUriTemplate
+            canonicalUriTemplate: $canonicalUriTemplate,
+            potentialAction: $potentialAction,
         );
     }
 }

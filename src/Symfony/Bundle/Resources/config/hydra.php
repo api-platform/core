@@ -117,6 +117,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.router'),
             service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
             service('api_platform.name_converter')->ignoreOnInvalid(),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.hydra.name_converter.hydra_prefix', HydraPrefixNameConverter::class)

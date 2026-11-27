@@ -112,6 +112,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         private ?string $itemUriTemplate = null,
         ?bool $map = null,
         ?string $canonicalUriTemplate = null,
+        bool|string|array|null $potentialAction = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -199,7 +200,8 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
             map: $map,
-            canonicalUriTemplate: $canonicalUriTemplate
+            canonicalUriTemplate: $canonicalUriTemplate,
+            potentialAction: $potentialAction,
         );
     }
 

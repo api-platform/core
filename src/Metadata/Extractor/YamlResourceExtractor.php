@@ -370,6 +370,10 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 throw new InvalidArgumentException(\sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $class));
             }
 
+            if (isset($operation['potentialAction'])) {
+                $datum['potentialAction'] = \is_array($operation['potentialAction']) ? $operation['potentialAction'] : $this->phpize($operation, 'potentialAction', 'bool|string');
+            }
+
             if (isset($operation['queryParameterValidate'])) {
                 trigger_deprecation('api-platform/core', '5.1', 'The "queryParameterValidate" option has no effect, it is deprecated and will be removed in 6.0. Use "queryParameterValidationEnabled" instead.');
             }

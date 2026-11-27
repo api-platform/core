@@ -418,6 +418,10 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 throw new InvalidArgumentException(\sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $operation['class']));
             }
 
+            if (isset($operation['potentialAction'])) {
+                $datum['potentialAction'] = $this->phpize($operation, 'potentialAction', 'bool|string');
+            }
+
             $data[] = array_merge($datum, [
                 'class' => (string) $operation['class'],
                 'method' => $this->phpize($operation, 'method', 'string'),
