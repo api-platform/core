@@ -15,10 +15,12 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PotentialAction;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -26,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(uriTemplate: '/actionable_books/{id}', provider: [self::class, 'provide']),
         new GetCollection(uriTemplate: '/actionable_books', provider: [self::class, 'provideCollection']),
-        new Post(uriTemplate: '/actionable_books', processor: [self::class, 'process'], extraProperties: ['potential_action' => true]),
+        new Post(uriTemplate: '/actionable_books', processor: [self::class, 'process'], potentialAction: true),
         new Post(
             uriTemplate: '/actionable_books/{id}/reviews',
             uriVariables: ['id' => new Link(fromClass: self::class)],
@@ -34,17 +36,28 @@ use Symfony\Component\Validator\Constraints as Assert;
             output: false,
             provider: [self::class, 'provide'],
             processor: [self::class, 'process'],
-            extraProperties: ['potential_action' => true],
+            potentialAction: true,
         ),
         new Post(
             uriTemplate: '/actionable_books/{id}/archive',
             uriVariables: ['id' => new Link(fromClass: self::class)],
             input: ArchiveBookInput::class,
             output: false,
-            hydraContext: ['@type' => ['hydra:Operation', 'schema:ArchiveAction']],
             provider: [self::class, 'provide'],
             processor: [self::class, 'process'],
-            extraProperties: ['potential_action' => true],
+            potentialAction: 'ArchiveAction',
+        ),
+        new Patch(uriTemplate: '/actionable_books/{id}', provider: [self::class, 'provide'], processor: [self::class, 'process'], potentialAction: true),
+        new Delete(uriTemplate: '/actionable_books/{id}', provider: [self::class, 'provide'], processor: [self::class, 'process'], potentialAction: true),
+        new Post(
+            uriTemplate: '/actionable_books/{id}/lock',
+            uriVariables: ['id' => new Link(fromClass: self::class)],
+            input: ArchiveBookInput::class,
+            output: false,
+            security: 'false',
+            provider: [self::class, 'provide'],
+            processor: [self::class, 'process'],
+            potentialAction: true,
         ),
         new Post(
             uriTemplate: '/actionable_books/{id}/restore',

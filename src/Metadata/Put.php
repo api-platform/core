@@ -109,6 +109,7 @@ final class Put extends HttpOperation
         private ?bool $allowCreate = null,
         ?bool $map = null,
         ?string $canonicalUriTemplate = null,
+        bool|string|array|null $potentialAction = null,
     ) {
         parent::__construct(
             method: 'PUT',
@@ -197,7 +198,8 @@ final class Put extends HttpOperation
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map,
-            canonicalUriTemplate: $canonicalUriTemplate
+            canonicalUriTemplate: $canonicalUriTemplate,
+            potentialAction: $potentialAction,
         );
     }
 

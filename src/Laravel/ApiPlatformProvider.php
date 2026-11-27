@@ -1177,6 +1177,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(UrlGeneratorInterface::class),
                 new ClassDiscriminatorFromClassMetadata($app->make(ClassMetadataFactoryInterface::class)),
                 $app->make(NameConverterInterface::class),
+                $app->make(ResourceAccessCheckerInterface::class),
             );
 
             $list = new \SplPriorityQueue();

@@ -77,9 +77,10 @@ class HttpOperation extends Operation
      *     field: string,
      *     direction: string,
      * }>|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
-     * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
-     * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
-     * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
+     * @param array|null             $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
+     * @param array|null             $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
+     * @param array|null             $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
+     * @param bool|string|array|null $potentialAction        advertise this operation as a schema.org potential action in JSON-LD: true uses the default type of the HTTP method, a string sets the action type, an array is merged into the action node
      * @param array{
      *     class?: string|null,
      *     name?: string,
@@ -230,6 +231,7 @@ class HttpOperation extends Operation
         array $extraProperties = [],
         ?bool $map = null,
         protected ?string $canonicalUriTemplate = null,
+        protected bool|string|array|null $potentialAction = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -670,6 +672,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
+
+        return $self;
+    }
+
+    public function getPotentialAction(): bool|string|array|null
+    {
+        return $this->potentialAction;
+    }
+
+    public function withPotentialAction(bool|string|array|null $potentialAction): static
+    {
+        $self = clone $this;
+        $self->potentialAction = $potentialAction;
 
         return $self;
     }

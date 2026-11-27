@@ -108,6 +108,7 @@ final class Get extends HttpOperation
         array $extraProperties = [],
         ?bool $map = null,
         ?string $canonicalUriTemplate = null,
+        bool|string|array|null $potentialAction = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -195,7 +196,8 @@ final class Get extends HttpOperation
             throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map,
-            canonicalUriTemplate: $canonicalUriTemplate
+            canonicalUriTemplate: $canonicalUriTemplate,
+            potentialAction: $potentialAction,
         );
     }
 }

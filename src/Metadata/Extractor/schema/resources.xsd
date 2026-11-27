@@ -51,6 +51,7 @@
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
         <xsd:attribute type="xsd:string" name="routeName"/>
+        <xsd:attribute type="xsd:string" name="potentialAction"/>
     </xsd:complexType>
 
     <xsd:complexType name="graphQlOperations">
