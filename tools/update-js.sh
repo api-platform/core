@@ -79,4 +79,4 @@ cp node_modules/redoc/bundles/redoc.standalone.js "$dest"
 
 done
 
-rm -Rf package.json node_modules/
+rm -Rf package.json package-lock.json node_modules/
