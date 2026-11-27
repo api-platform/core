@@ -176,6 +176,12 @@ return [
         // ],
         //
         // 'with_credentials' => true,
+        //
+        // Extra options merged into the Swagger UI configuration object, see https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
+        // 'extra_configuration' => [
+        //     'docExpansion' => 'list',
+        //     'filter' => true,
+        // ],
     ],
 
     // 'openapi' => [

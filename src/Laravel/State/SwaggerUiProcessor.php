@@ -35,6 +35,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
     /**
      * @param array<string, string[]> $formats
      * @param array<string, mixed>    $scalarExtraConfiguration
+     * @param array<string, mixed>    $swaggerUiExtraConfiguration
      */
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
@@ -50,6 +51,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
         private readonly bool $redocEnabled = false,
         private readonly bool $graphQlEnabled = false,
         private readonly bool $graphiQlEnabled = false,
+        private readonly array $swaggerUiExtraConfiguration = [],
     ) {
     }
 
@@ -85,6 +87,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
                 'pkce' => $this->oauthPkce,
             ],
             'withCredentials' => $this->openApiOptions->getWithCredentials(),
+            'extraConfiguration' => $this->swaggerUiExtraConfiguration,
         ];
 
         $status = 200;
