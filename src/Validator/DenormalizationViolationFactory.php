@@ -15,6 +15,7 @@ namespace ApiPlatform\Validator;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\DenormalizationViolationFactoryInterface;
+use ApiPlatform\State\Exception\UnprocessableValueException;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -108,6 +109,10 @@ final class DenormalizationViolationFactory implements DenormalizationViolationF
      */
     private function buildViolation(NotNormalizableValueException $exception, Operation $operation, bool $generic = false): ?ConstraintViolationInterface
     {
+        if ($exception instanceof UnprocessableValueException) {
+            return $this->emitViolation($exception, null, $exception->getViolationCode());
+        }
+
         $path = $exception->getPath();
         if (null === $path || '' === $path) {
             return $generic ? $this->emitViolation($exception, null, (string) Type::INVALID_TYPE_ERROR) : null;

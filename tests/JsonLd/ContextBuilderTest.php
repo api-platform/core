@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\JsonLd;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
@@ -26,6 +27,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\SubtypeResolver;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -33,6 +35,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -264,4 +268,72 @@ class ContextBuilderTest extends TestCase
 
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
+
+    public function testSiblingSubtypesShareTheTermOfAProperty(): void
+    {
+        $context = $this->createSubtypeContextBuilder()->getResourceContext(ContextDiscriminatedVehicle::class);
+
+        $this->assertSame('Vehicle/seats', $context['seats']);
+        $this->assertSame('Vehicle/kind', $context['kind']);
+    }
+
+    public function testSiblingSubtypesWithContradictoryIrisThrow(): void
+    {
+        $contextBuilder = $this->createSubtypeContextBuilder([ContextDiscriminatedCar::class => ['https://schema.org/seatingCapacity'], ContextDiscriminatedBus::class => ['https://schema.org/numberOfSeats']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The subtypes "%s" and "%s" of the resource "%s" give the "seats" property different "iris"', ContextDiscriminatedCar::class, ContextDiscriminatedBus::class, ContextDiscriminatedVehicle::class));
+
+        $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
+    }
+
+    public function testSiblingSubtypesWithDifferentTermDefinitionsThrow(): void
+    {
+        $contextBuilder = $this->createSubtypeContextBuilder(seatsJsonldContext: [ContextDiscriminatedBus::class => ['@type' => 'xsd:integer']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The subtypes "%s" and "%s" of the resource "%s" define the "seats" property differently in JSON-LD', ContextDiscriminatedCar::class, ContextDiscriminatedBus::class, ContextDiscriminatedVehicle::class));
+
+        $contextBuilder->getResourceContext(ContextDiscriminatedVehicle::class);
+    }
+
+    /**
+     * @param array<class-string, list<string>>          $seatsIris
+     * @param array<class-string, array<string, string>> $seatsJsonldContext
+     */
+    private function createSubtypeContextBuilder(array $seatsIris = [], array $seatsJsonldContext = []): ContextBuilder
+    {
+        $resourceNameCollectionFactory = $this->createStub(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([ContextDiscriminatedVehicle::class]));
+
+        $resourceMetadataCollectionFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(ContextDiscriminatedVehicle::class, [
+            (new ApiResource())->withShortName('Vehicle')->withOperations(new Operations(['get' => (new Get())->withShortName('Vehicle')])),
+        ]));
+
+        $propertyNames = [ContextDiscriminatedVehicle::class => ['name'], ContextDiscriminatedCar::class => ['name', 'seats'], ContextDiscriminatedBus::class => ['name', 'seats']];
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturnCallback(static fn (string $class): PropertyNameCollection => new PropertyNameCollection($propertyNames[$class]));
+
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(static fn (string $class, string $property): ApiProperty => new ApiProperty(readable: true, nativeType: Type::string(), iris: 'seats' === $property ? $seatsIris[$class] ?? null : null, jsonldContext: 'seats' === $property ? $seatsJsonldContext[$class] ?? null : null));
+
+        $mapping = new ClassDiscriminatorMapping('kind', ['car' => ContextDiscriminatedCar::class, 'bus' => ContextDiscriminatedBus::class]);
+        $classDiscriminatorResolver = $this->createStub(ClassDiscriminatorResolverInterface::class);
+        $classDiscriminatorResolver->method('getMappingForClass')->willReturnCallback(static fn (string $class): ?ClassDiscriminatorMapping => ContextDiscriminatedVehicle::class === $class ? $mapping : null);
+
+        return new ContextBuilder($resourceNameCollectionFactory, $resourceMetadataCollectionFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $this->createStub(UrlGeneratorInterface::class), subtypeResolver: new SubtypeResolver($classDiscriminatorResolver, $resourceNameCollectionFactory, $resourceMetadataCollectionFactory));
+    }
+}
+
+class ContextDiscriminatedVehicle
+{
+}
+
+class ContextDiscriminatedCar extends ContextDiscriminatedVehicle
+{
+}
+
+class ContextDiscriminatedBus extends ContextDiscriminatedVehicle
+{
 }

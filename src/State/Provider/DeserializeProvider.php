@@ -71,6 +71,8 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
 
         if (null !== $data && ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? false)) {
             $serializerContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
+        } elseif (\is_object($data) && 'PUT' === $operation->getMethod()) {
+            $serializerContext[SerializerContextBuilderInterface::REPLACED_CLASS] = $data::class;
         }
 
         unset($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE]);

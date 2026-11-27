@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SubtypeResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
@@ -50,9 +51,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null, ?SubtypeResolverInterface $subtypeResolver = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver, $subtypeResolver);
     }
 
     /**
@@ -130,7 +131,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $normalizedData;
         }
 
-        if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($resourceClass, $isResourceClass, $context))) {
+        if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($data, $resourceClass, $isResourceClass, $context))) {
             $metadata['@type'] = $type;
         }
 
@@ -140,7 +141,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * @return string|array<int, string>|null
      */
-    private function resolveType(string $resourceClass, bool $isResourceClass, array $context): string|array|null
+    private function resolveType(object $data, string $resourceClass, bool $isResourceClass, array $context): string|array|null
     {
         $operation = $context['operation'] ?? null;
 
@@ -154,6 +155,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (!$operation) {
             return null;
+        }
+
+        // A subtype is typed by its most specific class, documented as a subclass of the resource (and of its types)
+        if ($isResourceClass && null !== $this->subtypeResolver && null !== $discriminatedClass = $this->getDiscriminatedClass($data, $resourceClass)) {
+            $subtypeTypes = $this->subtypeResolver->getTypes($discriminatedClass);
+
+            return 1 === \count($subtypeTypes) ? $subtypeTypes[0] : $subtypeTypes;
         }
 
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
