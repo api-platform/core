@@ -54,6 +54,8 @@ window.onload = function() {
         ],
         plugins: [
             SwaggerUIBundle.plugins.DownloadUrl,
+            // Custom plugins: any script running before the "load" event can push them to window.apiPlatformSwaggerUiPlugins
+            ...(window.apiPlatformSwaggerUiPlugins || []),
         ],
         layout: 'StandaloneLayout',
     };
