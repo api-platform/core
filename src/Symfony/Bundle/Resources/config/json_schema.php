@@ -31,7 +31,9 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('api_platform.resource_class_resolver'),
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
-        ]);
+            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+        ])
+        ->arg('$resourcePolymorphism', '%api_platform.serializer.resource_polymorphism%');
 
     $services->alias(SchemaFactoryInterface::class, 'api_platform.json_schema.schema_factory');
 
