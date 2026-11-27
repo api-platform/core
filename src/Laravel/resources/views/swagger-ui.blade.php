@@ -7,6 +7,8 @@
         <link rel="stylesheet" href="/vendor/api-platform/fonts/open-sans/700.css">
         <link rel="stylesheet" href="/vendor/api-platform/swagger-ui/swagger-ui.css">
         <link rel="stylesheet" href="/vendor/api-platform/style.css">
+        {{-- Optional view of the application: resources/views/vendor/api-platform/swagger-ui-stylesheet.blade.php --}}
+        @includeIf('api-platform::swagger-ui-stylesheet')
         <style>body { margin: 0; }</style>
         <script id="swagger-data" type="application/json">{!! Illuminate\Support\Js::encode($swagger_data) !!}</script>
     </head>
@@ -244,5 +246,7 @@
             <script src="/vendor/api-platform/swagger-ui/swagger-ui-standalone-preset.js"></script>
             <script src="/vendor/api-platform/init-swagger-ui.js"></script>
         @endif
+        {{-- Optional view of the application: resources/views/vendor/api-platform/swagger-ui-javascript.blade.php --}}
+        @includeIf('api-platform::swagger-ui-javascript')
     </body>
 </html>
