@@ -44,9 +44,11 @@ final class MappedResourcePutTest extends ApiTestCase
         $client = self::createClient();
         $created = $client->request('POST', '/mapped_resources', ['json' => ['username' => 'so yuka']])->toArray();
 
-        $client->request('PUT', '/mapped_resources/'.$created['id'], ['json' => ['username' => 'ba zar']]);
+        $updated = $client->request('PUT', '/mapped_resources/'.$created['id'], ['json' => ['username' => 'ba zar']])->toArray();
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertJsonContains(['username' => 'ba zar']);
+        $this->assertSame('ba zar', $updated['username']);
+        $this->assertSame($created['id'], $updated['id']);
+        $this->assertSame(1, static::getContainer()->get('doctrine')->getRepository(MappedEntity::class)->count([]));
     }
 }
