@@ -349,6 +349,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setDefinition('serializer.normalizer.number', $numberNormalizerDefinition);
         }
 
+        if (!$config['serializer']['discriminator_map']) {
+            $container->removeDefinition('api_platform.serializer.subtype_resolver');
+            $container->setParameter('api_platform.serializer.resource_polymorphism', false);
+        } else {
+            $container->setParameter('api_platform.serializer.resource_polymorphism', true);
+        }
+
         $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix']] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);
 
         $container->setParameter('api_platform.serializer.default_context', $defaultContext);
