@@ -190,7 +190,7 @@
         "symfony/var-exporter": "^7.4 || ^8.0",
         "symfony/web-profiler-bundle": "^7.4 || ^8.0",
         "symfony/yaml": "^7.4 || ^8.0",
-        "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
+        "twig/twig": "^1.42.3 || ^2.12 || ^3.0 || ^4.0",
         "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
