@@ -17,4 +17,5 @@ composer.lock
 /tests/Metadata/Extractor/Adapter/*.yaml
 /vendor/
 /Dockerfile
-tests/Fixtures/app/config/reference.php
+/tests/Fixtures/app/config/reference.php
+/tests/Fixtures/app/config/schema.json
